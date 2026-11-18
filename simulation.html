@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Simulating reality | Universe Model</title>
-<meta name="description" content="The goal and design of the Universe Model simulation: physical reality with a perfect human tensegrity inside it, imperfections as points, lines and planes, and fascia-first protocols. In progress.">
-<meta property="og:title" content="Simulating reality | Universe Model"><meta property="og:description" content="The goal and design of the Universe Model simulation: physical reality with a perfect human tensegrity inside it, imperfections as points, lines and planes, and fascia-first protocols. In progress."><meta property="og:type" content="website">
+<meta name="description" content="An interactive 3D human tensegrity with fascial lines, the evidence that the body is a tensegrity, and how the Universe Model simulation is being built from measured data.">
+<meta property="og:title" content="Simulating reality | Universe Model"><meta property="og:description" content="An interactive 3D human tensegrity with fascial lines, the evidence that the body is a tensegrity, and how the Universe Model simulation is being built from measured data."><meta property="og:type" content="website">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 32 32' aria-hidden='true'><g fill='none' stroke-linecap='round'><path d='M6 9 L26 23 M26 9 L6 23 M16 4 L16 28' stroke='%230E3A75' stroke-width='2.6'/><path d='M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23' stroke='%235B9BE6' stroke-width='1.2' opacity='.9'/></g></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,17 +16,100 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="health.html">Health</a><a href="reality.html">Reality</a><a href="simulation.html" aria-current="page">Simulation</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="library.html">Library</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html" aria-current="page">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">Simulating reality</span>
   <h1>A working model of physical reality, with a perfect human inside it.</h1>
   <p class="lede">The goal is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that world and watch what follows, from health to disease and back again.</p>
-  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">In progress</span> <span class="muted small">The data for the model is being collected now. The interactive figures below are illustrations, not the model itself.</span></p>
+  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">Test phase</span> <span class="muted small">The data for the full model is being collected now. The interactive figures below are test models, not the finished simulation.</span></p>
 </div></div>
 
-<section>
+<section class="tint" id="model">
+  <div class="wrap">
+    <h2>Try it: a human tensegrity in 3D.</h2>
+    <p class="lede">Bones are the dark struts. Fascia is the web of cables, with the body's main fascial lines in color. Tap the body to create an imperfection: the fascia there is densified and stays that way, and the physics decides how the rest of the body answers.</p>
+    <div class="simgrid" style="margin-top:20px">
+      <div class="simstage">
+        <canvas id="body3d" role="img" aria-label="A rotating three-dimensional human figure built as a tensegrity: dark bone struts held by a web of fascia cables, with the main fascial lines in color. Tapping the figure densifies the fascia at that point."></canvas>
+        <div class="simview" role="group" aria-label="View">
+          <button type="button" class="chipbtn" data-view="front">Front</button><button type="button" class="chipbtn" data-view="side">Side</button><button type="button" class="chipbtn" data-view="back">Back</button>
+          <button type="button" class="chipbtn" id="sim-zoomin" aria-label="Zoom in">+</button><button type="button" class="chipbtn" id="sim-zoomout" aria-label="Zoom out">−</button>
+        </div>
+        <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
+      </div>
+      <div class="simpanel">
+        <div class="pgroup">
+          <h3>Body</h3>
+          <div class="btns" role="group" aria-label="Reference body"><button class="btn ghost on" data-sex="male" type="button">Male, 183 cm</button><button class="btn ghost" data-sex="female" type="button">Female, 170 cm</button></div>
+        </div>
+        <div class="pgroup">
+          <h3>Make an imperfection</h3>
+          <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button></div>
+          <label class="range">Strength <input type="range" id="sim-strength" min="1" max="6" value="3"></label>
+          <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (densification creeps along the lines)</label>
+        </div>
+        <div class="pgroup">
+          <h3>Try a scenario</h3>
+          <div class="btns"><button class="btn ghost" data-preset="desk" type="button">Desk posture</button><button class="btn ghost" data-preset="back" type="button">Tight lower back</button><button class="btn ghost" data-preset="hip" type="button">One-sided hip</button><button class="btn ghost" data-preset="foot" type="button">Tight foot</button></div>
+          <button class="btn primary" id="sim3d-reset" type="button" style="margin-top:10px">Reset to healthy</button>
+        </div>
+        <div class="pgroup">
+          <h3>Show</h3>
+          <label class="tog"><input type="checkbox" id="sim-skin" checked> Body outline</label>
+          <label class="tog"><input type="checkbox" id="sim-bones" checked> Bones</label>
+          <label class="tog"><input type="checkbox" id="sim-web" checked> Fascial web</label>
+          <label class="tog"><input type="checkbox" id="sim-heat"> Tension map (blue relaxed, red strained, dashed slack)</label>
+          <label class="tog"><input type="checkbox" id="sim-spin" checked> Turn slowly</label>
+          <div id="sim-lines" class="lines" aria-label="Fascial lines"></div>
+        </div>
+        <div class="pgroup">
+          <h3>What changed</h3>
+          <dl class="metrics">
+            <div><dt>Height</dt><dd id="m-height">0.0 cm</dd></div>
+            <div><dt>Head forward</dt><dd id="m-head">0.0 cm</dd></div>
+            <div><dt>Shoulders</dt><dd id="m-shoulders">level</dd></div>
+            <div><dt>Pelvis</dt><dd id="m-pelvis">level</dd></div>
+            <div><dt>Largest shift 40+ cm away</dt><dd id="m-far">—</dd></div>
+            <div><dt>Newly slack fascia</dt><dd id="m-slack">none</dd></div>
+            <div><dt>Time</dt><dd id="m-time">paused</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:18px">Drag to turn the body all the way around; pinch or scroll to zoom. This is a teaching model with about a hundred points. The real model is being built from measured anatomy and tissue mechanics, and will run in time. The colored lines follow the myofascial chains described in anatomy (superficial back and front lines, lateral, spiral and deep front lines, arm and functional lines).</p>
+  </div>
+</section>
+
+<section id="why-tensegrity">
+  <div class="wrap">
+    <span class="eyebrow">Why a tensegrity</span>
+    <h2>A mechanic needs the right wrench.</h2>
+    <div class="split" style="margin-top:8px">
+      <div>
+        <p class="lede" style="color:var(--ink)">Medicine has treated the body as a set of separate systems built like a building: bones as columns, stacked to carry a load from above, with muscles and organs attached. That is a compression structure, and it calls for one toolkit. A tensegrity calls for a completely different one.</p>
+        <p>In a tensegrity, the rigid parts do not rest on each other. They are held apart and in place by a continuous web of tension. Change the tension anywhere and the whole structure changes shape. Push on one part, and the load spreads through the web instead of down a column.</p>
+        <p>If the body works this way, then many of today's tools are the wrong wrench. Treating a sore knee as a knee, or a stiff neck as a neck, is like tightening one bolt on a suspension bridge without looking at the cables. The mistake is not care or effort; it is the model. <b>If the body is a tensegrity, the HMR is already a significant improvement on how we understand health</b>, before any of its larger claims are considered.</p>
+      </div>
+      <div class="compare" style="grid-template-columns:1fr">
+        <div class="now"><h3>A compression model</h3><ul><li>Bones stack; joints bear the load.</li><li>Problems are local: fix the part that hurts.</li><li>Each specialty treats its own system.</li><li>Soft tissue is packing around the frame.</li></ul></div>
+        <div class="new" style="border-left:0;border-top:1px solid var(--line)"><h3>A tensegrity model</h3><ul><li>Bones float in a continuous web of fascia.</li><li>Problems can be global: tension travels.</li><li>The body is studied as one connected structure.</li><li>Fascia shapes the whole body, and everything inside it.</li></ul></div>
+      </div>
+    </div>
+
+    <h3 style="margin:38px 0 14px;font-size:1.4rem">What the research says.</h3>
+    <div class="grid g2">
+      <div class="card"><p class="pull" style="font-size:1.12rem">&ldquo;An astoundingly wide variety of natural systems, including carbon atoms, water molecules, proteins, viruses, cells, tissues and even humans and other living creatures, are constructed using a common form of architecture known as tensegrity.&rdquo;</p><p class="note">Donald Ingber, cell biologist, Harvard. "The Architecture of Life", <i>Scientific American</i>, January 1998.</p></div>
+      <div class="card"><p class="pull" style="font-size:1.12rem">&ldquo;Since its inception, osteopathic medicine has sought to identify the mechanical causes of disease.&rdquo;</p><p class="note">Randel Swanson, opening a review that concludes "the architectural principles of tensegrity can be applied to biological organisms" at every scale. <a href="https://doi.org/10.7556/jaoa.2013.113.1.34">Journal of the American Osteopathic Association, 2013</a>.</p></div>
+      <div class="card"><span class="tag">Force travels through fascia</span><p>A systematic review of dissection and living-body studies found moderate evidence that tension is transmitted across every junction of the superficial back line, from the sole of the foot upward (<a href="https://doi.org/10.1111/joa.12464">Krause, Wilke et al., Journal of Anatomy, 2016</a>). Changing the length of one muscle changes the force of its neighbors by up to 20% through the connective tissue between them (<a href="https://doi.org/10.1152/japplphysiol.00328.2009">Maas and Huijing, 2009</a>).</p></div>
+      <div class="card"><span class="tag">The whole body senses through it</span><p>Researchers have proposed that the body's tensegrity web is the medium of touch and body sense itself: a whole-body structure through which the nervous system feels (<a href="https://doi.org/10.1080/00222895.2013.798252">Turvey and Fonseca, Journal of Motor Behavior, 2014</a>). And fascia is not passive: it contains contractile cells that tighten the tissue over minutes to months (<a href="https://doi.org/10.1002/ca.23391">Schleip and Klingler, 2019</a>).</p></div>
+    </div>
+    <p class="note" style="margin-top:18px">How far the tensegrity model extends to the whole body is still debated, and some loads in the body are clearly carried in compression. The simulation is how we intend to test it.</p>
+  </div>
+</section>
+
+<section class="tint">
   <div class="wrap split">
     <div>
       <h2>What the simulation is for.</h2>
@@ -44,9 +127,25 @@
   </div>
 </section>
 
-<section class="tint">
+<section id="building">
   <div class="wrap">
-    <h2>Try it: a human tensegrity.</h2>
+    <span class="eyebrow">How we are building it</span>
+    <h2>From a test model to a measured human.</h2>
+    <p class="lede">The model above is a test. The full simulation is being built from the data in our library, layer by layer, so that every dimension and every tissue property comes from a measurement.</p>
+    <div class="grid g4" style="margin-top:22px">
+      <div class="card"><span class="tag">1 · The scaffold</span><h3>79,224 cross-sections</h3><p>The Visible Human male and female, sectioned head to foot, give the true position of every bone, muscle, organ, vessel and layer of fascia in two real bodies.</p></div>
+      <div class="card"><span class="tag">2 · The materials</span><h3>Measured mechanics</h3><p>Published tests of tendon, ligament, fascia and muscle give each tissue its stiffness, stretch and limits, with the source kept for every number.</p></div>
+      <div class="card"><span class="tag">3 · The range</span><h3>Real bodies</h3><p>Body surveys, motion capture and thousands of images of elite movers set the range of sizes, proportions and movement the model must reproduce.</p></div>
+      <div class="card"><span class="tag">4 · The imperfections</span><h3>Computer vision</h3><p>Photographs of people and their symptoms can be measured by our computer vision models for anything we need: distances, angles, asymmetries and patterns, to compare against what the simulation predicts.</p></div>
+    </div>
+    <p style="margin-top:22px">Because the data covers both the ideal and the imperfect, the model can be built very thoroughly: the ideal body from the anatomy and mechanics, and the imperfections from the measured shapes of real conditions. <a href="library.html">What is in the library →</a></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Where it started</span>
+    <h2>The first teaching model: a side view.</h2>
     <p class="lede">Bones are the dark struts; fascia is the web of cables, blue when healthy. Press a node to create an imperfection: the fascia there is densified and stays that way, and the rest of the body responds.</p>
     <div class="split" style="margin-top:20px;align-items:center">
       <div>
@@ -68,16 +167,16 @@
           <li style="margin-bottom:8px">Choose <b>Line</b> and draw from the <b>throat</b> to the <b>pubis</b>: a tight front line.</li>
           <li>Choose <b>Plane</b> across the <b>lower back</b>, <b>sacrum</b> and <b>belly</b>.</li>
         </ul>
-        <p class="note">This is a simple teaching model in two dimensions. The real model will be three-dimensional, built from measured anatomy and tissue mechanics, and run in time.</p>
+        <p class="note">Our first model, in two dimensions. The 3D model above grew from it.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section>
+<section class="tint">
   <div class="wrap split" style="align-items:center">
     <div>
-      <h2>Why a tensegrity.</h2>
+      <h2>Tension travels.</h2>
       <p>In a tensegrity, rigid parts never touch; they are held in place only by continuous tension. Change the tension in one place and the whole structure adjusts. That is why, in the HMR, a small imperfection can have effects far from where it began.</p>
       <p>Tap a node on this simpler tensegrity to send a pulse of tension through it.</p>
     </div>
@@ -100,12 +199,13 @@
   </div>
 </section>
 <script src="sim.js" defer></script>
+<script src="sim3d.js" defer></script>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="health.html">A new model of health</a></li><li><a href="reality.html">A new model of reality</a></li><li><a href="simulation.html">Simulating reality</a></li><li><a href="ui.html">Defining Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="library.html">The library</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>
