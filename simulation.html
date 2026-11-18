@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulating reality | Universe Model</title>
+<meta name="description" content="The goal and design of the Universe Model simulation: physical reality with a perfect human tensegrity inside it, imperfections as points, lines and planes, and fascia-first protocols. In progress.">
+<meta property="og:title" content="Simulating reality | Universe Model"><meta property="og:description" content="The goal and design of the Universe Model simulation: physical reality with a perfect human tensegrity inside it, imperfections as points, lines and planes, and fascia-first protocols. In progress."><meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 32 32' aria-hidden='true'><g fill='none' stroke-linecap='round'><path d='M6 9 L26 23 M26 9 L6 23 M16 4 L16 28' stroke='%230E3A75' stroke-width='2.6'/><path d='M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23' stroke='%235B9BE6' stroke-width='1.2' opacity='.9'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+<nav class="nav" id="nav" aria-label="Main"><a href="health.html">Health</a><a href="reality.html">Reality</a><a href="simulation.html" aria-current="page">Simulation</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="library.html">Library</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+</div></header>
+<main>
+<div class="page-head"><div class="wrap">
+  <span class="eyebrow">Simulating reality</span>
+  <h1>A working model of physical reality, with a perfect human inside it.</h1>
+  <p class="lede">The goal is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that world and watch what follows, from health to disease and back again.</p>
+  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">In progress</span> <span class="muted small">The data for the model is being collected now. The interactive figures below are illustrations, not the model itself.</span></p>
+</div></div>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <h2>What the simulation is for.</h2>
+      <p><b>A baseline.</b> Physical reality and its laws, with an ideal adult human body, male and female, built from real measurements with real limits.</p>
+      <p><b>Disease, forwards.</b> Change the conditions: densify fascia in one place, alter a constraint of that world, and let the physics show what happens to the body's shape, its vessels, its nerves and its organs.</p>
+      <p><b>Disease, backwards.</b> Start from the measured shape of a real condition and search for the imperfections that would produce it.</p>
+      <p><b>Ways back.</b> Test practices from the ancient traditions and from modern science, from the outside in and from the inside out, and build fascia-first protocols from what the physics shows.</p>
+    </div>
+    <div class="card" style="background:var(--ice)">
+      <span class="tag">How imperfections are modeled</span>
+      <p>Every imperfection is placed in the ideal body at a point in space and a moment in time, as a <b>point</b>, a <b>line</b> or a <b>plane of imperfection</b>.</p>
+      <p>Each has a <b>boundary</b>. Inside it are its local qualities: densified tissue, and whatever runs through it, such as vessels and nerves, each with its own tolerance to compression and stretch. Outside it are the downstream effects on the rest of the body.</p>
+      <p style="margin-bottom:0">Boundaries are not smooth. Effects travel along the tissues that pass through an imperfection, especially vessels, so the local zone extends irregularly beyond a simple outline. We call this <b>creep</b>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint">
+  <div class="wrap">
+    <h2>Try it: a human tensegrity.</h2>
+    <p class="lede">Bones are the dark struts; fascia is the web of cables, blue when healthy. Press a node to create an imperfection: the fascia there is densified and stays that way, and the rest of the body responds.</p>
+    <div class="split" style="margin-top:20px;align-items:center">
+      <div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px">
+          <canvas id="body" style="width:100%;height:min(78vh,640px);display:block;touch-action:none;cursor:pointer" role="img" aria-label="A side view of a human body drawn as a tensegrity. Pressing a node densifies the fascia there, turning it red and changing the posture."></canvas>
+        </div>
+      </div>
+      <div>
+        <div class="btns" role="group" aria-label="Type of imperfection">
+          <button class="btn ghost on" data-mode="point" type="button">Point</button>
+          <button class="btn ghost" data-mode="line" type="button">Line</button>
+          <button class="btn ghost" data-mode="plane" type="button">Plane</button>
+          <button class="btn primary" id="simreset" type="button">Reset to healthy</button>
+        </div>
+        <p id="simstatus" class="note" style="margin-top:18px" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
+        <h3 style="margin-top:22px">Things to try</h3>
+        <ul>
+          <li style="margin-bottom:8px">Press the <b>upper chest</b> four or five times and watch the upper back round forward.</li>
+          <li style="margin-bottom:8px">Choose <b>Line</b> and draw from the <b>throat</b> to the <b>pubis</b>: a tight front line.</li>
+          <li>Choose <b>Plane</b> across the <b>lower back</b>, <b>sacrum</b> and <b>belly</b>.</li>
+        </ul>
+        <p class="note">This is a simple teaching model in two dimensions. The real model will be three-dimensional, built from measured anatomy and tissue mechanics, and run in time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split" style="align-items:center">
+    <div>
+      <h2>Why a tensegrity.</h2>
+      <p>In a tensegrity, rigid parts never touch; they are held in place only by continuous tension. Change the tension in one place and the whole structure adjusts. That is why, in the HMR, a small imperfection can have effects far from where it began.</p>
+      <p>Tap a node on this simpler tensegrity to send a pulse of tension through it.</p>
+    </div>
+    <div>
+      <div class="stage" id="stage" role="img" aria-label="An interactive tensegrity: dark blue struts held in place only by light blue cables."><canvas id="tg"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section class="navyband">
+  <div class="wrap split">
+    <div>
+      <h2>From model to protocols.</h2>
+      <p>Once the ideal body exists as a physical model, outside-in approaches (pressure, stretch, vibration, heat, movement) and inside-out approaches (breath, internal locks, posture, attention, hydration) can each be tested against it. The aim is fascia-first protocols grounded in physics, drawing on both the ancient traditions and modern science.</p>
+    </div>
+    <div>
+      <p class="pull">Change one thing. Let the physics decide what follows.</p>
+      <p class="note">The simulation does not script outcomes. It sets conditions from measured data and reports what the physics produces. <a href="health.html#hypothesis" style="color:#9CC3F5">The central hypothesis →</a></p>
+    </div>
+  </div>
+</section>
+<script src="sim.js" defer></script>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
+<p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
+<div><h4>Explore</h4><ul><li><a href="health.html">A new model of health</a></li><li><a href="reality.html">A new model of reality</a></li><li><a href="simulation.html">Simulating reality</a></li><li><a href="ui.html">Defining Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="library.html">The library</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li></ul></div>
+<div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
+</div></footer>
+<script src="site.js" defer></script>
+</body>
+</html>
