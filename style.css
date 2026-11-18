@@ -28,17 +28,17 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 /* header */
 .site-head{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
 .site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
-.brand{display:flex;align-items:center;gap:10px;font:700 1.08rem/1 var(--font);letter-spacing:-.01em;color:var(--navy)}
+.brand{display:flex;align-items:center;gap:10px;white-space:nowrap;font:700 1.08rem/1 var(--font);letter-spacing:-.01em;color:var(--navy)}
 .brand:hover{text-decoration:none}
 .brand svg{width:28px;height:28px}
 .nav{display:flex;gap:4px;align-items:center}
-.nav a{font:500 .94rem/1 var(--font);color:var(--soft);padding:10px 12px;border-radius:8px}
+.nav a{font:500 .94rem/1 var(--font);color:var(--soft);padding:10px 12px;border-radius:8px;white-space:nowrap}
 .nav a:hover{color:var(--navy);background:var(--mist);text-decoration:none}
 .nav a[aria-current="page"]{color:var(--blue);background:var(--ice)}
 .nav .cta{color:#fff;background:var(--blue);margin-left:6px}
 .nav .cta:hover{background:var(--blue-d);color:#fff}
 .menu{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 .9rem var(--font);color:var(--navy)}
-@media (max-width:860px){
+@media (max-width:1200px){
   .menu{display:block}
   .nav{display:none;position:absolute;left:0;right:0;top:66px;flex-direction:column;align-items:stretch;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px 14px}
   .nav.open{display:flex}
