@@ -146,9 +146,15 @@
       return S;
     };
 
+    // cutting a cable or breaking a bone removes that member; the rest of the structure finds a new balance
+    S.cut = function (k) { if (E[k] && !E[k].cut) { E[k].cut = true; S.moving = 1; return true; } return false; };
+    S.cuts = () => E.reduce((n, e) => n + (e.cut ? 1 : 0), 0);
+    S.pluck = function (i, cm) { // push one node outward from the body's centre line and let the web answer
+      if (FIXED.has(i)) return; const p = P[i], c = [0, p[1], 0], d = v3.sub(p, c), l = v3.len(d) || 1, k = (cm || 5) / l;
+      p[0] += d[0] * k; p[2] += d[2] * k; S.moving = 1; };
     S.reset = function () {
       S.imps = []; S.months = 0;
-      P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => e.slide = base.slide[k]); S.P = P;
+      P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => { e.slide = base.slide[k]; e.cut = false; }); S.P = P;
       applyImps(); S.moving = 1;
     };
 
@@ -256,7 +262,8 @@
       OLD = P; P = nxt; S.P = P;
       for (let it = 0; it < ITERS; it++) {
         for (let k = 0; k < E.length; k++) {
-          const e = E[k], pa = P[e.a], pb = P[e.b], dx = pb[0] - pa[0], dy = pb[1] - pa[1], dz = pb[2] - pa[2], d = Math.hypot(dx, dy, dz) || 1e-6;
+          const e = E[k]; if (e.cut) continue;
+          const pa = P[e.a], pb = P[e.b], dx = pb[0] - pa[0], dy = pb[1] - pa[1], dz = pb[2] - pa[2], d = Math.hypot(dx, dy, dz) || 1e-6;
           const rest = restOf(e);
           if (!e.strut && d < rest) continue; // cables only pull
           const wa = invm[e.a], wb = invm[e.b], w = wa + wb; if (!w) continue;
@@ -272,7 +279,7 @@
       }
       // fascia slides along each line toward equal tension, unless friction at the shared node holds it
       if (sliding) for (const ch of chains) for (let i = 0; i + 1 < ch.length; i++) {
-        const [k1, n] = ch[i], [k2] = ch[i + 1], e1 = E[k1], e2 = E[k2];
+        const [k1, n] = ch[i], [k2] = ch[i + 1], e1 = E[k1], e2 = E[k2]; if (e1.cut || e2.cut) continue;
         const r1 = restOf(e1), r2 = restOf(e2), d1 = v3.dist(P[e1.a], P[e1.b]), d2 = v3.dist(P[e2.a], P[e2.b]);
         const T1 = e1.k * Math.max(0, d1 - r1) / r1 - e1.T0, T2 = e2.k * Math.max(0, d2 - r2) / r2 - e2.T0; if (Math.abs(T1 - T2) < 1e-7) continue;
         const fr = Math.max(e1.fric, e2.fric), rate = SLIDE / fr;
@@ -292,7 +299,7 @@
     S.settle = n => { for (let i = 0; i < n; i++) step(); };
 
     // ---------- computed quantities ----------
-    function energy() { let s = 0; for (const e of E) { if (e.strut || (FIXED.has(e.a) && FIXED.has(e.b))) continue; const r = restOf(e), d = v3.dist(P[e.a], P[e.b]); if (d > r) { const st = (d - r) / r; s += e.k * st * st * r; } } return s; }
+    function energy() { let s = 0; for (const e of E) { if (e.strut || e.cut || (FIXED.has(e.a) && FIXED.has(e.b))) continue; const r = restOf(e), d = v3.dist(P[e.a], P[e.b]); if (d > r) { const st = (d - r) / r; s += e.k * st * st * r; } } return s; }
     function asymmetry() { // RMS distance between each left node and the mirror image of its right partner
       let s = 0, n = 0; for (const nd of N) if (nd.side === 1) { const r = IDX[nd.base + 'R'], a = P[IDX[nd.name]], b = P[r]; s += (a[0] + b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2; n++; }
       return Math.sqrt(s / n);
@@ -306,7 +313,7 @@
       let far = 0, rms = 0;
       for (let i = 0; i < N.length; i++) { const d = v3.dist(P[i], R0[i]); rms += d * d; if (origin && v3.dist(O[i], origin) > 40) far = Math.max(far, d); }
       rms = Math.sqrt(rms / N.length);
-      let slack = 0; E.forEach((e, k) => { if (isSlack(e) && !base.slack[k]) slack++; });
+      let slack = 0; E.forEach((e, k) => { if (!e.cut && isSlack(e) && !base.slack[k]) slack++; });
       const en = energy(), asym = Math.max(0, asymmetry() - base.asym);
       const extra = Math.max(0, en / base.energy - 1);
       const head = (g('brow')[2] - r('brow')[2]);
@@ -323,7 +330,7 @@
     };
     S.nodeStrain = function () { // per node: mean positive strain of its cables above the healthy reference
       const out = N.map(() => 0), cnt = N.map(() => 0);
-      E.forEach(e => { if (e.strut) return; const r = restOf(e), d = v3.dist(P[e.a], P[e.b]); const st = Math.max(0, (d - r) / r - (1 - PRE) ); out[e.a] += st; out[e.b] += st; cnt[e.a]++; cnt[e.b]++; });
+      E.forEach(e => { if (e.strut || e.cut) return; const r = restOf(e), d = v3.dist(P[e.a], P[e.b]); const st = Math.max(0, (d - r) / r - (1 - PRE) ); out[e.a] += st; out[e.b] += st; cnt[e.a]++; cnt[e.b]++; });
       const r = out.map((s, i) => cnt[i] ? s / cnt[i] : 0);
       if (!base.nodeStrain) return r;
       return r.map((v, i) => Math.max(0, v - base.nodeStrain[i]));

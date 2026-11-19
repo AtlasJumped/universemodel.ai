@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Methods | Universe Model</title>
+<meta name="description" content="How Universe Model builds the ideal human tensegrity: data sources, tissue properties, the imperfection architecture, the simulation engine, the compute, and the safeguards against fooling ourselves.">
+<meta property="og:title" content="Methods | Universe Model"><meta property="og:description" content="How Universe Model builds the ideal human tensegrity: data sources, tissue properties, the imperfection architecture, the simulation engine, the compute, and the safeguards against fooling ourselves."><meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 32 32' aria-hidden='true'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M9 7 L9 25 M23 7 L23 25' stroke='%230E3A75' stroke-width='2.6'/><path d='M2 12 Q9 6 9 7 Q16 19 23 7 Q23 6 30 12' stroke='%235B9BE6' stroke-width='1.5'/><path d='M12.5 14 L12.5 21 M16 16.8 L16 21 M19.5 14 L19.5 21' stroke='%235B9BE6' stroke-width='1.1'/><path d='M1.5 21 L30.5 21' stroke='%230E3A75' stroke-width='2.2'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=aa031f47">
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7 L9 25 M23 7 L23 25" stroke="#0E3A75" stroke-width="2.6"/><path d="M2 12 Q9 6 9 7 Q16 19 23 7 Q23 6 30 12" stroke="#5B9BE6" stroke-width="1.5"/><path d="M12.5 14 L12.5 21 M16 16.8 L16 21 M19.5 14 L19.5 21" stroke="#5B9BE6" stroke-width="1.1"/><path d="M1.5 21 L30.5 21" stroke="#0E3A75" stroke-width="2.2"/></g></svg><span>Universe Model</span></a>
+<button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Problems<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Where Science Falls Short</a><a href="fixing-exercise.html">Fixing Exercise</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Solutions<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="hmr.html">The HMR</a><a href="science-bridge.html">Science Bridge</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a><a href="health.html">Physical Health</a><a href="health-model.html">HMR Model of Human Health</a><a href="protocol.html">HMR Fascia Health Protocol</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road Ahead</a><a href="methods.html" aria-current="page">Methods</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+</div></header>
+<main>
+<style>
+.me-toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.me-toc a{font-size:.9rem;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy)}
+.me-pipe{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:18px}
+.me-pipe div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.88rem;line-height:1.4;position:relative}
+.me-pipe b{display:block;color:var(--navy);margin-bottom:4px;font-size:.94rem}
+@media (max-width:900px){.me-pipe{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.me-eq{font:600 .95rem/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--ice);color:var(--deep);border-radius:8px;padding:10px 14px;margin:10px 0;overflow-x:auto}
+.me-table{width:100%;border-collapse:collapse;font-size:.93rem;margin-top:12px}
+.me-table th,.me-table td{border-top:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+.me-table th{font-weight:650;color:var(--navy);background:var(--mist)}
+</style>
+
+<div class="page-head"><div class="wrap">
+  <span class="eyebrow">Methods</span>
+  <h1>How the model is built, and how we try not to fool ourselves.</h1>
+  <p class="lede">This page is for readers who want the method laid out the way a scientist would: what the model is made of, where its numbers come from, how it is computed, how it is tested, and what it cannot yet do.</p>
+  <nav class="me-toc" aria-label="On this page"><a href="#pipeline">Pipeline</a><a href="#layers">Layers</a><a href="#data">Data</a><a href="#physics">Physics</a><a href="#imperfections">Imperfections</a><a href="#testing">Testing</a><a href="#compute">Compute</a><a href="#site-models">The models on this site</a><a href="#limits">Limits</a></nav>
+</div></div>
+
+<section id="pipeline">
+  <div class="wrap">
+    <h2>The pipeline, end to end.</h2>
+    <div class="me-pipe">
+      <div><b>1. Collect</b>Anatomy, imaging and tissue mechanics from the literature and open datasets.</div>
+      <div><b>2. Index</b>Local AI models read, sort and link every source, including evidence against the model.</div>
+      <div><b>3. Build</b>The ideal male and female bodies, layer by layer, from measured values.</div>
+      <div><b>4. Perturb</b>Add imperfections, sampled blind to any disease label.</div>
+      <div><b>5. Simulate</b>Let each body settle to the shape its physics produces.</div>
+      <div><b>6. Compare</b>Match outcomes to real measurements, after the fact, with controls.</div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="layers">
+  <div class="wrap">
+    <h2>The approach: a perfect human tensegrity.</h2>
+    <p class="lede">We are building, from real data, a model of an ideal adult body in male and female form. It is assembled in layers that can be switched on and off, so the contribution of each layer can be measured on its own.</p>
+    <div class="grid g3" style="margin-top:28px">
+      <div class="card"><span class="tag">Layer 1</span><h3>Skeleton</h3><p>Every bone as its own exact 3D object, placed at its true distance from every other. On its own, a skeleton has no limits: the bones could drift apart freely.</p></div>
+      <div class="card"><span class="tag">Layer 2</span><h3>Fascia</h3><p>The continuous web of connective tissue around and between the bones. Adding it creates the first real limits, and the tension that holds the body together.</p></div>
+      <div class="card"><span class="tag">Layer 3</span><h3>Everything inside</h3><p>Organs, vessels, nerves, skin and hair follicles, with their shapes, depths and spacing. Each one adds new constraints and new mechanics.</p></div>
+      <div class="card"><span class="tag">Layer 4</span><h3>Mechanics</h3><p>Shear, stress, tension, friction and stretch for every tissue, from molecules to whole limbs, using measured values and physical limits.</p></div>
+      <div class="card"><span class="tag">Layer 5</span><h3>Movement</h3><p>A complete range of motion, checked against yoga, contortion and extreme athletic movement, so the model can move the way the best human bodies do.</p></div>
+      <div class="card"><span class="tag">Layer 6</span><h3>Experience</h3><p>How the nervous system reads the body's physics as sensation, and how physical and mental health interact. Kept as separate, switchable layers.</p></div>
+    </div>
+    <p style="margin-top:22px;max-width:76ch"><b>What "ideal" means, operationally.</b> Starting from measured bodies, the model asks repeatedly what shape is mechanically better: tension shared more evenly across the web, lower shear and friction between layers, less strain on vessels and nerves, more range of motion. The ideal is the shape where no such improvement remains, within measured tissue limits. It is defined by an optimization, not by an artist.</p>
+  </div>
+</section>
+
+<section id="data">
+  <div class="wrap split">
+    <div>
+      <h2>Data sources.</h2>
+      <p><b>Anatomy.</b> The U.S. National Library of Medicine's Visible Human male and female, section by section; labeled CT and MRI datasets; open 3D anatomy models; classical anatomy texts. <a href="library.html">The library, in full →</a></p>
+      <p><b>Tissue properties.</b> Published measurements of stiffness, strength, thickness, hydration, sliding and viscoelastic behavior for bone, fascia, ligament, tendon, muscle, skin and vessels, each with its source and its uncertainty recorded.</p>
+      <p><b>Ranges of motion.</b> Measured joint ranges from the clinical literature, checked against what trained yoga practitioners, dancers and contortionists can actually do, so the model is not limited by average bodies.</p>
+      <p><b>Comparison data.</b> Imaging, body shape and clinical measurements of people living with specific conditions, held separately and used only at the comparison stage.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Indexing</span>
+      <p>Everything is indexed with AI models that run on our own hardware, so the collection stays private and any question can be answered from it, with citations, in seconds. The index is built to surface contradicting evidence as readily as supporting evidence.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="physics">
+  <div class="wrap split">
+    <div>
+      <h2>The physics.</h2>
+      <p>The body is modeled as a tensegrity: bones as compression members, fascia and other connective tissue as a continuous network that carries tension, with sliding interfaces between layers. Each tension element follows a measured constitutive law: stiff in pull, slack in push, and time-dependent (creep and stress relaxation). The body's shape at any moment is the equilibrium the forces reach; nothing about posture is scripted.</p>
+      <p>For a tension element between points i and j with rest length L₀ and stiffness k:</p>
+      <p class="me-eq">F = k · max(0, |x<sub>j</sub> − x<sub>i</sub>| − L₀)</p>
+      <p>Equilibrium is found by relaxing the network until the net force on every point vanishes (within tolerance), with gravity, contact and volume constraints applied. The full model adds finite-element treatment of continuous sheets and organs, and fluid pressure in compartments.</p>
+    </div>
+    <div>
+      <div class="card">
+        <span class="tag">What is measured on each run</span>
+        <table class="me-table">
+          <tr><th>Output</th><th>Why</th></tr>
+          <tr><td>Whole-body shape and posture</td><td>Compared with photographs, 3D scans and imaging</td></tr>
+          <tr><td>Tension in every element</td><td>Where load is carried, and where it is lost</td></tr>
+          <tr><td>Shear and sliding between layers</td><td>Comparable with ultrasound shear-strain measurements</td></tr>
+          <tr><td>Strain on vessels and nerves</td><td>Candidate compression and flow effects</td></tr>
+          <tr><td>Range of motion</td><td>What the body can and cannot do</td></tr>
+          <tr><td>Symmetry</td><td>Left and right, front and back</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="imperfections">
+  <div class="wrap">
+    <h2>The imperfection architecture.</h2>
+    <p class="lede" style="max-width:74ch">An imperfection is a defined object: a geometry (point, line, plane or region) placed at a location and time, with a boundary, carrying changed tissue properties such as density, friction, adhesion, mass, volume, pressure, stiffness, strength, hydration, fiber direction, cross-linking and resting tension, and with its effects outside the boundary computed, not assumed. <a href="roadmap.html#campaign">The full property list →</a></p>
+    <p style="max-width:74ch">Combinations are sampled with space-filling designs, so the space of possible bodies is covered evenly rather than clustered around what we expect, and the sampler never sees a disease label.</p>
+  </div>
+</section>
+
+<section class="tint" id="testing">
+  <div class="wrap">
+    <h2>Testing, with safeguards.</h2>
+    <div class="grid g3" style="margin-top:18px">
+      <div class="card"><h3>Blinded design</h3><p>Imperfections are sampled without reference to any condition. The model never sees what a disease is supposed to look like.</p></div>
+      <div class="card"><h3>Pre-registered predictions</h3><p>What we expect to see is written down and dated before any comparison is made.</p></div>
+      <div class="card"><h3>Held-out data</h3><p>Part of the real data is set aside, never used while building, and used once at the end.</p></div>
+      <div class="card"><h3>Negative controls</h3><p>Random, shuffled and physically meaningless imperfections are run too. If they match disease as well as real ones, the result means nothing.</p></div>
+      <div class="card"><h3>Sensitivity analysis</h3><p>Every tissue value is varied across its measured uncertainty, to check that a result does not hang on one uncertain number.</p></div>
+      <div class="card"><h3>Failures reported</h3><p>Conditions the model cannot reproduce are published alongside those it can.</p></div>
+    </div>
+    <p style="margin-top:20px;max-width:76ch"><b>The first test</b> is the <a href="health.html#hypothesis">densification hypothesis</a>: densify the fascia in chosen places in the ideal body and see whether the shapes and strains that result match real conditions. It fails wherever the effects stay local or do not match.</p>
+  </div>
+</section>
+
+<section id="compute">
+  <div class="wrap split">
+    <div>
+      <h2>Compute.</h2>
+      <p>The campaign runs on our own GPU workstation, which is enough to design it and run its first millions of bodies. Each body is independent of the others, so the work divides cleanly, and the method is built to scale to larger clusters later without changing.</p>
+    </div>
+    <div id="site-models">
+      <h2>The models on this site.</h2>
+      <p>The interactive tensegrity toys and the 3D body on this site are teaching models, run in your browser. They use the same principles, struts in a web of tension-only cables settling to equilibrium, with far fewer elements and illustrative values. They show how a tensegrity behaves; they are not the research model. <a href="simulation.html">Try the simulation →</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="limits">
+  <div class="wrap">
+    <h2>Known limits.</h2>
+    <ul style="max-width:76ch;padding-left:1.1em">
+      <li style="margin-bottom:8px">Tissue measurements vary widely between studies, between people and between living and preserved tissue. The model inherits that uncertainty.</li>
+      <li style="margin-bottom:8px">Much of the data on fascia's long-term behavior comes from animal tissue or short experiments.</li>
+      <li style="margin-bottom:8px">A model with many parameters can fit almost anything. The safeguards above exist because of this, and results that survive them will still need independent replication.</li>
+      <li>The model describes mechanics. Where the HMR proposes more, for example about the mind or about Universal Intelligence, those claims are labeled separately as hypotheses.</li>
+    </ul>
+  </div>
+</section>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7 L9 25 M23 7 L23 25" stroke="#0E3A75" stroke-width="2.6"/><path d="M2 12 Q9 6 9 7 Q16 19 23 7 Q23 6 30 12" stroke="#5B9BE6" stroke-width="1.5"/><path d="M12.5 14 L12.5 21 M16 16.8 L16 21 M19.5 14 L19.5 21" stroke="#5B9BE6" stroke-width="1.1"/><path d="M1.5 21 L30.5 21" stroke="#0E3A75" stroke-width="2.2"/></g></svg><span>Universe Model</span></a>
+<p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
+<p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
+<div><h4>Problems</h4><ul><li><a href="reality.html">Where science falls short</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li></ul><h4 style="margin-top:18px">Solutions</h4><ul><li><a href="hmr.html">The HMR</a></li><li><a href="science-bridge.html">Science Bridge</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="health-model.html">HMR model of human health</a></li><li><a href="protocol.html">HMR Fascia Health Protocol</a></li><li><a href="mental-health.html">Mental health</a></li></ul></div>
+<div><h4>More</h4><ul><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li><li><a href="about.html">About</a></li></ul></div>
+<h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
+</div></footer>
+<script src="site.js?v=d94e4bd7" defer></script>
+<script src="fx-trail.js?v=29b48827" defer></script>
+</body>
+</html>

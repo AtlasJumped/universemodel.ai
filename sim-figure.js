@@ -23,7 +23,7 @@
     const A = norm(mix(r.A, s.A, t)), B = ortho(mix(r.B, s.B, t), A), k = scale || 1;
     return { C: mix(r.C, s.C, t), A, B, a1: (r.a1 + (s.a1 - r.a1) * t) * k, a2: (r.a2 + (s.a2 - r.a2) * t) * k, b1: (r.b1 + (s.b1 - r.b1) * t) * k, b2: (r.b2 + (s.b2 - r.b2) * t) * k, st: r.st + (s.st - r.st) * t, tag: r.tag };
   }
-  const SE = 2 / 2.35; // superellipse exponent: fuller than an ellipse, like a body cross-section
+  const SE = 2 / 2.12; // superellipse exponent: fuller than an ellipse, like a body cross-section
   function ringPts(r, n) {
     const out = [];
     for (let i = 0; i < n; i++) { const t = i / n * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
@@ -48,12 +48,12 @@
     T.push(ringAxis(add(m2('hipL', 'hipR'), add(mul(Up, -k(female ? 5 : 6.5)), mul(Fp, -k(1)))), Up, Fp, k(female ? 5.5 : 7), k(female ? 5.5 : 7), k(5), k(6), sAvg('pubis', 'coccyx')));
     T.push(ringFrom(g('trochL'), g('trochR'), g('pubis'), g('coccyx'), [k(1.2), k(1.2), k(2.5), k(5.5 + wF * 0.5)], sAvg('trochL', 'trochR', 'glutL' in I ? 'pubis' : 'pubis')));
     T.push(ringFrom(g('crestL'), g('crestR'), m2('asisL', 'asisR'), g('tlf'), [k(1.4 - wF * 0.6), k(1.4 - wF * 0.6), k(3), k(1.2)], sAvg('crestL', 'crestR', 'tlf')));
-    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-1.8 - wF * 0.9), k(-1.8 - wF * 0.9), k(-2.6), k(1.2)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
-    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(1.2 - wF * 1.2), k(1.2 - wF * 1.2), k(0.6), k(1)], sAvg('ribLowL', 'ribLowR', 'xiph')));
+    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-2.6 - wF * 0.6), k(-2.6 - wF * 0.6), k(-3.1), k(1.4)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
+    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(2.3 - wF * 2), k(2.3 - wF * 2), k(0.4), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
     if (female) T.push(lerpRing(T[T.length - 1], ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(0.8), k(0.8), k(6.5), k(1.6)]), 0.55));
-    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(2.2 - wF), k(2.2 - wF), k(female ? 4.2 : 2.6), k(2)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
-    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-1.6), k(-1.6), k(1.8), k(3.2)], sAvg('acromL', 'acromR', 'c7')));
-    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), g('c7'), [k(-1.2), k(-1.2), k(-0.4), k(1.2)], sAvg('neckSideL', 'neckSideR', 'throat')));
+    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(3.4 - wF * 1.8), k(3.4 - wF * 1.8), k(female ? 4.2 : 3.4), k(2.4)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
+    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-1.2 - wF * 0.6), k(-1.2 - wF * 0.6), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
+    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), g('c7'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
     // head frame: the skull's own axes, re-expressed so the healthy head is upright and faces straight ahead
     const hf = Q => { const e1 = norm(sub(Q[I.top], Q[I.chin])), e2 = ortho(sub(Q[I.brow], Q[I.occ]), e1); return [e1, e2, cross(e1, e2)]; };
     const fc0 = hf(o.ref || P), fc1 = hf(P), remap = v => { const c = fc0.map(e => dot(v, e)); return norm(add(add(mul(fc1[0], c[0]), mul(fc1[1], c[1])), mul(fc1[2], c[2]))); };
@@ -61,7 +61,7 @@
     T.push(ringAxis(mix(g('c1'), g('chin'), 0.35), Uh, Fh, k(4.5), k(4.5), k(4.2), k(4.6), sAvg('c1', 'scmL', 'scmR')));
     T.forEach((r, i) => r.tag = i);
     const torso = smooth(T, [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]);
-    const nT = 28;
+    const nT = 44;
     const chestIdx = T.length - 4; // the ribUp ring
     mesh(torso, nT, (ri, si) => {
       const tg = torso[ri].tag;
@@ -74,20 +74,20 @@
       const lat = s === 'L', pl = (a, b) => lat ? [g(a + s), g(b + s)] : [g(b + s), g(a + s)];
       const fwdFoot = norm(sub(g('ball' + s), g('heel' + s)));
       const R = [];
-      R.push(ringAxis(add(g('ankle' + s), [0, k(1.5), 0]), sub(g('knee' + s), g('ankle' + s)), fwdFoot, k(3.2), k(3.2), k(3.4), k(3.6), sN('ankle' + s)));
-      const [cA, cB] = pl('calfL', 'calfI'), calf = ringFrom(cA, cB, g('shinF' + s), g('calfB' + s), [k(2.3), k(2.3), k(0.4), k(2.4)], sAvg('calfL' + s, 'calfI' + s, 'calfB' + s));
-      R.push(lerpRing(R[0], calf, 0.5, 0.92));
+      R.push(ringAxis(add(g('ankle' + s), [0, k(1.5), 0]), sub(g('knee' + s), g('ankle' + s)), fwdFoot, k(2.8), k(2.8), k(3.0), k(3.2), sN('ankle' + s)));
+      const [cA, cB] = pl('calfL', 'calfI'), calf = ringFrom(cA, cB, g('shinF' + s), g('calfB' + s), [k(2.7), k(2.5), k(0.4), k(3.3)], sAvg('calfL' + s, 'calfI' + s, 'calfB' + s));
+      R.push(lerpRing(R[0], calf, 0.5, 0.86));
       R.push(calf);
       const [kA, kB] = pl('kneeLat', 'kneeMed'), knee = ringFrom(kA, kB, g('kneeF' + s), g('knee' + s), [k(1.3), k(1.3), k(0.3), k(4.6)], sAvg('knee' + s, 'kneeF' + s));
       R.push(lerpRing(calf, knee, 0.5, 1));
       R.push(knee);
-      const [tA, tB] = pl('thighL', 'thighI'), thigh = ringFrom(tA, tB, g('thighF' + s), g('thighB' + s), [k(2.7), k(2.7), k(2.2), k(2.8)], sAvg('thighL' + s, 'thighI' + s, 'thighF' + s, 'thighB' + s));
+      const [tA, tB] = pl('thighL', 'thighI'), thigh = ringFrom(tA, tB, g('thighF' + s), g('thighB' + s), [k(3.2), k(2.6), k(3.2), k(3.0)], sAvg('thighL' + s, 'thighI' + s, 'thighF' + s, 'thighB' + s));
       R.push(lerpRing(knee, thigh, 0.45, 0.98));
       R.push(thigh);
       const hc = add(mix(g('hip' + s), g('troch' + s), 0.18), mul(Up, k(0.5)));
-      R.push(ringAxis(hc, sub(hc, g('knee' + s)), Fp, k(lat ? 9 : 6.4), k(lat ? 6.4 : 9), k(7.2), k(8.2), sN('hip' + s)));
-      const leg = smooth(R, [0, 1, 1, 1, 1, 1, 1, 0]);
-      const nL = 20, top = leg.length - 1;
+      R.push(ringAxis(hc, sub(hc, g('knee' + s)), Fp, k(lat ? 7.4 : 5.9), k(lat ? 5.9 : 7.4), k(7.0), k(8.0), sN('hip' + s)));
+      const leg = smooth(R, [1, 1, 1, 1, 1, 1, 1, 0]);
+      const nL = 30, top = leg.length - 1;
       mesh(leg, nL, ri => (ri >= top - (female ? 0 : 3) ? 'suit' : 'skin'), false, true, ri => ri >= top - 1 ? -40 : 0);
       // foot: rings from heel to toe, axis along the foot, second axis up
       const up = [0, 1, 0], h = g('heel' + s), b = g('ball' + s), t = g('toe' + s), an = g('ankle' + s);
@@ -109,17 +109,20 @@
         ringAxis(mix(wr, ha, 1.05), sub(wr, ha), Ft, k(1.1), k(1.1), k(2.6), k(2), sN('hand' + s)),
         ringAxis(mix(wr, ha, 0.7), sub(wr, ha), Ft, k(1.5), k(1.5), k(4), k(3.2), sN('hand' + s)),
         ringAxis(mix(wr, ha, 0.35), sub(wr, ha), Ft, k(1.7), k(1.7), k(4.2), k(3.4), sN('hand' + s)),
-        ringAxis(wr, sub(el, wr), Ft, k(2.1 * aw), k(2.1 * aw), k(2.7 * aw), k(2.7 * aw), sN('wrist' + s)),
-        ringAxis(mix(el, wr, 0.3), sub(el, wr), Ft, k(3.7 * aw), k(3.7 * aw), k(3.5 * aw), k(3.5 * aw), sN('elbow' + s)),
+        ringAxis(wr, sub(el, wr), Ft, k(1.8 * aw), k(1.8 * aw), k(2.5 * aw), k(2.5 * aw), sN('wrist' + s)),
+        ringAxis(mix(el, wr, 0.3), sub(el, wr), Ft, k(4.1 * aw), k(4.1 * aw), k(3.7 * aw), k(3.7 * aw), sN('elbow' + s)),
         ringAxis(el, sub(ac, el), Ft, k(3.4 * aw), k(3.4 * aw), k(3.4 * aw), k(3.6 * aw), sN('elbow' + s)),
-        ringAxis(mix(el, ac, 0.55), sub(ac, el), Ft, k(4.9 * aw), k(4.9 * aw), k(4.8 * aw), k(5.1 * aw), sN('acrom' + s)),
+        ringAxis(mix(el, ac, 0.5), sub(ac, el), Ft, k(5.0 * aw), k(5.0 * aw), k(5.6 * aw), k(5.6 * aw), sN('acrom' + s)),
         ringAxis(top, sub(ac, el), Ft, k(5.2 * aw), k(5.2 * aw), k(5.2 * aw), k(5.0 * aw), sN('acrom' + s))
       ];
-      mesh(smooth(A, [0, 0, 0, 1, 1, 1, 0, 0]), 16, () => 'skin', true, true);
+      mesh(smooth(A, [0, 0, 1, 1, 1, 1, 1, 0]), 24, () => 'skin', true, true);
     }
     // shoulder caps (deltoids)
     for (const s of ['L', 'R']) { const ac = g('acrom' + s), el = g('elbow' + s), dn = norm(sub(el, ac)), out = norm(sub(g('acrom' + s), g('acrom' + (s === 'L' ? 'R' : 'L'))));
-      blob(add(add(ac, mul(dn, k(3.2))), mul(out, k(-0.4))), dn, Ft, k(female ? 4.6 : 5.6), k(female ? 5.6 : 6.6), k(female ? 4.8 : 5.8), sN('acrom' + s)); }
+      blob(add(add(ac, mul(dn, k(3.4))), mul(out, k(-0.6))), dn, Ft, k(female ? 4.5 : 5.3), k(female ? 5.6 : 6.4), k(female ? 4.7 : 5.4), sN('acrom' + s)); }
+    // seat: muscle volume anchored to the computed pelvis nodes
+    for (const s of ['L', 'R']) { const gl = mix(g('isch' + s), g('crest' + s), 0.35), bk = mul(Fp, -1);
+      blob(add(gl, add(mul(bk, k(3.2)), mul(Up, k(-2)))), Up, bk, k(female ? 6.6 : 6), k(female ? 7.4 : 6.8), k(female ? 4.6 : 4), sAvg('isch' + s, 'crest' + s)); }
     // ---------- head ----------
     const Ah = cross(Uh, Fh), hC = add(mix(mix(g('top'), g('chin'), 0.5), mix(g('brow'), g('occ'), 0.5), 0.5), mul(Fh, -k(0.6)));
     const headPt = (phi, th, out) => { // phi: -pi/2 (chin) .. pi/2 (crown); th: 0 = left side, pi/2 = face
@@ -130,7 +133,7 @@
       const r = 1 + (out || 0) / k(9);
       return add(hC, add(mul(Uh, ru * sp * r), mul(add(mul(Ah, ra * Math.cos(th)), mul(Fh, rf * Math.sin(th))), cp * r)));
     };
-    const HR = [], nh = 22, mh = 14;
+    const HR = [], nh = 32, mh = 20;
     for (let i = 0; i <= mh; i++) { const phi = -Math.PI / 2 + Math.PI * i / mh, row = []; for (let j = 0; j < nh; j++) row.push(headPt(phi, j / nh * Math.PI * 2)); HR.push(row); }
     const hairAt = (phi, th) => { const s = Math.sin(th), c = Math.cos(th);
       if (phi > 0.62) return true; if (s > 0.45) return phi > (female ? 0.5 : 0.56);
@@ -182,26 +185,27 @@
     if (facing > 0.15) {
       const P2 = (phi, th, out) => S(V(headPt(phi, th, out)));
       ctx.globalAlpha = Math.min(1, (facing - 0.15) * 3);
-      const ph = Math.PI / 2, eyeW = 0.2;
-      for (const sgn of [-1, 1]) { // eyes and brows
-        const e0 = P2(0.04, ph + sgn * 0.42 - eyeW / 2, 0.1), e1 = P2(0.04, ph + sgn * 0.42 + eyeW / 2, 0.1), ec = P2(0.04, ph + sgn * 0.42, 0.15);
-        const w = Math.hypot(e1[0] - e0[0], e1[1] - e0[1]) / 2, hgt = w * (0.42 - 0.12 * load);
-        ctx.fillStyle = '#FBF7F2'; ctx.beginPath(); ctx.ellipse(ec[0], ec[1], w, hgt, Math.atan2(e1[1] - e0[1], e1[0] - e0[0]), 0, 7); ctx.fill();
-        ctx.fillStyle = '#3B2A20'; ctx.beginPath(); ctx.arc(ec[0], ec[1], hgt * 0.95, 0, 7); ctx.fill();
-        // brows: the inner end lowers and draws together as computed load rises
-        const bIn = P2(0.2 - 0.06 * load, ph + sgn * 0.2, 0.25), bOut = P2(0.2, ph + sgn * 0.62, 0.1), bMid = P2(0.24 - 0.02 * load, ph + sgn * 0.42, 0.25);
-        ctx.strokeStyle = 'rgba(58,40,30,.85)'; ctx.lineWidth = Math.max(1, w * 0.32); ctx.lineCap = 'round';
+      const ph = Math.PI / 2, eyeW = 0.22;
+      for (const sgn of [-1, 1]) { // soft eye sockets, calm lids and fine brows: a sculptural face, not a cartoon
+        const e0 = P2(0.05, ph + sgn * 0.4 - eyeW / 2, 0.05), e1 = P2(0.05, ph + sgn * 0.4 + eyeW / 2, 0.05), ec = P2(0.06, ph + sgn * 0.4, 0.1);
+        const w = Math.hypot(e1[0] - e0[0], e1[1] - e0[1]) / 2, rot = Math.atan2(e1[1] - e0[1], e1[0] - e0[0]);
+        ctx.fillStyle = 'rgba(120,76,52,.16)'; ctx.beginPath(); ctx.ellipse(ec[0], ec[1] - w * 0.15, w * 1.35, w * 0.75, rot, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(70,44,30,.7)'; ctx.lineWidth = Math.max(0.9, w * 0.16); ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(e0[0], e0[1]); ctx.quadraticCurveTo(ec[0], ec[1] + w * (0.32 - 0.12 * load), e1[0], e1[1]); ctx.stroke();
+        const bIn = P2(0.21 - 0.05 * load, ph + sgn * 0.2, 0.2), bOut = P2(0.2, ph + sgn * 0.6, 0.05), bMid = P2(0.25 - 0.02 * load, ph + sgn * 0.4, 0.2);
+        ctx.strokeStyle = 'rgba(58,40,30,.55)'; ctx.lineWidth = Math.max(0.8, w * 0.2);
         ctx.beginPath(); ctx.moveTo(bIn[0], bIn[1]); ctx.quadraticCurveTo(bMid[0], bMid[1], bOut[0], bOut[1]); ctx.stroke();
       }
-      const nTop = P2(0.02, ph, 0.3), nTip = P2(-0.16, ph, 1.6), nL = P2(-0.2, ph - 0.12, 0.6), nR = P2(-0.2, ph + 0.12, 0.6);
-      ctx.strokeStyle = 'rgba(120,78,52,.45)'; ctx.lineWidth = 1.1;
-      ctx.beginPath(); ctx.moveTo(nTop[0], nTop[1]); ctx.lineTo(nTip[0], nTip[1]); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(nL[0], nL[1]); ctx.quadraticCurveTo(nTip[0], nTip[1] + 2, nR[0], nR[1]); ctx.stroke();
-      // mouth: the corners lift for a relaxed, healthy structure and drop as the computed load rises
-      const smile = 0.07 - 0.13 * load;
-      const mL = P2(-0.42 + smile, ph - 0.3, 0.1), mR = P2(-0.42 + smile, ph + 0.3, 0.1), mC = P2(-0.47 - smile * 0.6, ph, 0.25);
-      ctx.strokeStyle = 'rgba(150,72,64,.9)'; ctx.lineWidth = 1.8;
-      ctx.beginPath(); ctx.moveTo(mL[0], mL[1]); ctx.quadraticCurveTo(2 * mC[0] - (mL[0] + mR[0]) / 2, 2 * mC[1] - (mL[1] + mR[1]) / 2, mR[0], mR[1]); ctx.stroke();
+      const nTop = P2(0.04, ph + 0.06, 0.4), nTip = P2(-0.15, ph + 0.05, 1.2), nL = P2(-0.2, ph - 0.1, 0.5), nR = P2(-0.2, ph + 0.1, 0.5);
+      ctx.strokeStyle = 'rgba(120,76,52,.28)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(nTop[0], nTop[1]); ctx.quadraticCurveTo(nTip[0] + 1, nTip[1] - 2, nTip[0], nTip[1]); ctx.stroke();
+      ctx.fillStyle = 'rgba(120,76,52,.18)'; ctx.beginPath(); ctx.moveTo(nL[0], nL[1]); ctx.quadraticCurveTo(nTip[0], nTip[1] + 3, nR[0], nR[1]); ctx.quadraticCurveTo(nTip[0], nTip[1] + 1, nL[0], nL[1]); ctx.fill();
+      // lips: the corners settle as the computed load rises
+      const smile = 0.04 - 0.1 * load;
+      const mL = P2(-0.43 + smile, ph - 0.24, 0.1), mR = P2(-0.43 + smile, ph + 0.24, 0.1), mT = P2(-0.4, ph, 0.25), mB = P2(-0.5, ph, 0.25);
+      ctx.fillStyle = female ? 'rgba(176,92,88,.6)' : 'rgba(160,98,84,.45)';
+      ctx.beginPath(); ctx.moveTo(mL[0], mL[1]); ctx.quadraticCurveTo(mT[0], mT[1] - 1.5, mR[0], mR[1]); ctx.quadraticCurveTo(mB[0], mB[1] + 1.5, mL[0], mL[1]); ctx.fill();
+      ctx.strokeStyle = 'rgba(110,60,52,.55)'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(mL[0], mL[1]); ctx.quadraticCurveTo((mT[0] + mB[0]) / 2, (mT[1] + mB[1]) / 2, mR[0], mR[1]); ctx.stroke();
       ctx.globalAlpha = 1;
     }
     // ears
@@ -215,9 +219,9 @@
     function pushQuad(p, kind, st, c, n) { quads.push({ p, kind, st, c, n }); }
     function blob(c, up, fw, ra, ru, rf, st) { // an ellipsoid: up = long axis
       const U = norm(up), F = ortho(fw, U), A = cross(U, F), rows = [];
-      for (let i = 0; i <= 8; i++) { const phi = -Math.PI / 2 + Math.PI * i / 8, row = []; for (let j = 0; j < 14; j++) { const th = j / 14 * Math.PI * 2;
+      for (let i = 0; i <= 12; i++) { const phi = -Math.PI / 2 + Math.PI * i / 12, row = []; for (let j = 0; j < 20; j++) { const th = j / 20 * Math.PI * 2;
         row.push(add(c, add(mul(U, ru * Math.sin(phi)), mul(add(mul(A, ra * Math.cos(th)), mul(F, rf * Math.sin(th))), Math.cos(phi))))); } rows.push(row); }
-      for (let i = 0; i < 8; i++) for (let j = 0; j < 14; j++) { const qq = [rows[i][j], rows[i][(j + 1) % 14], rows[i + 1][(j + 1) % 14], rows[i + 1][j]];
+      for (let i = 0; i < 12; i++) for (let j = 0; j < 20; j++) { const qq = [rows[i][j], rows[i][(j + 1) % 20], rows[i + 1][(j + 1) % 20], rows[i + 1][j]];
         pushQuad(qq, 'skin', st, c, norm(qq.reduce((a, q) => add(a, norm(sub(q, c))), [0, 0, 0]))); }
     }
     function mesh(R, n, kindOf, capStart, capEnd, biasOf) {

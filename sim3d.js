@@ -44,7 +44,7 @@
   const LCOL = Object.fromEntries(UMSim.LINES.map(L => [L.id, L.color]));
 
   // ---------- state ----------
-  let mode = 'point', strength = 3, sel = null, linePick = null, origin = null, metrics = null, nodeStrain = null, lastChange = performance.now();
+  let hoverE = -1, mode = 'point', strength = 3, sel = null, linePick = null, origin = null, metrics = null, nodeStrain = null, lastChange = performance.now();
   const changed = () => { lastChange = performance.now(); dirty = true; };
 
   // ---------- drawing: tensegrity ----------
@@ -65,15 +65,26 @@
     }
     // imperfection zones
     for (const im of sim.imps) drawZone(ctx, im, im === sel);
+    // ribs: curved bones from the spine round to the breastbone, drawn from the computed nodes
+    if (showBones) { const g = n => P[I[n]], mix = (a, b, t) => a.map((v, k) => v + (b[k] - v) * t);
+      ctx.lineCap = 'round';
+      for (const s of ['L', 'R']) for (let r = 0; r < 6; r++) { const t = r / 5;
+        const bk = mix(g('t6'), g('t12'), t * 0.9), lat = mix(g('ribUp' + s), g('ribLow' + s), t), fr = mix(g('stTop'), g('xiph'), Math.min(1, t * 1.1));
+        const ctl = [0, 1, 2].map(k => 2 * lat[k] - (bk[k] + fr[k]) / 2), q0 = proj(bk), q1 = proj(ctl), q2 = proj(fr);
+        for (const [col, wd] of [['rgba(107,91,62,.55)', 3.4], ['rgba(233,223,200,.95)', 2]]) { ctx.strokeStyle = col; ctx.lineWidth = wd * q0[3] / 3.2; ctx.beginPath(); ctx.moveTo(q0[0], q0[1]); ctx.quadraticCurveTo(q1[0], q1[1], q2[0], q2[1]); ctx.stroke(); } } }
     const order = E.map((e, k) => [k, (Q[e.a][2] + Q[e.b][2]) / 2]).sort((u, v) => u[1] - v[1]);
     ctx.lineCap = 'round';
     for (const [k] of order) {
       const e = E[k], qa = Q[e.a], qb = Q[e.b], depth = 0.55 + 0.45 * Math.min(1, Math.max(0, ((qa[2] + qb[2]) / 2 + 30) / 60));
-      if (e.strut) { if (!showBones) continue; ctx.setLineDash([]); ctx.strokeStyle = '#0E3A75'; ctx.globalAlpha = depth; ctx.lineWidth = 0.75 * (qa[3] + qb[3]) / 2 + 1.2; }
+      if (e.cut) continue;
+      if (e.strut) { if (!showBones) continue; ctx.setLineDash([]); ctx.globalAlpha = Math.max(0.75, depth); const wd = 1.5 * (qa[3] + qb[3]) / 2 + 2.4;
+        // bone: a pale shaft with a dark outline, so the struts read as bones inside the web
+        ctx.strokeStyle = k === hoverE ? '#D33A45' : '#5C4D33'; ctx.lineWidth = wd + 2.2; ctx.beginPath(); ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); ctx.stroke();
+        ctx.strokeStyle = '#EDE4CF'; ctx.lineWidth = wd; }
       else {
         const cs = sim.cableState(k), onLine = [...e.lines].find(l => lineOn[l]);
         const marked = cs.dense > 0.004 || cs.longer;
-        if (!onLine && !showWeb && !marked) continue;
+        if (!onLine && !showWeb && !marked && k !== hoverE) continue;
         ctx.globalAlpha = depth * (onLine || marked ? 1 : 0.5);
         if (cs.slack && heat) { ctx.setLineDash([3, 4]); ctx.strokeStyle = '#B9C6D6'; ctx.lineWidth = 1; }
         else {
@@ -83,12 +94,13 @@
           ctx.lineWidth = marked ? 2.2 + 12 * Math.min(0.3, cs.dense) : onLine ? 2.2 : 1.05;
         }
       }
+      if (k === hoverE && !e.strut) { ctx.setLineDash([]); ctx.strokeStyle = '#D33A45'; ctx.lineWidth = 3.4; ctx.globalAlpha = 1; }
       ctx.beginPath(); ctx.moveTo(qa[0], qa[1]); ctx.lineTo(qb[0], qb[1]); ctx.stroke();
     }
     ctx.setLineDash([]); ctx.globalAlpha = 1;
     if (showBones) { const c = Q[I.occ], b = Q[I.brow], t = Q[I.top], ch = Q[I.chin];
       const cx = (c[0] + b[0]) / 2, cy = (t[1] + ch[1]) / 2, rx = Math.max(10, Math.hypot(c[0] - b[0], c[1] - b[1]) / 2 + 4), ry = Math.abs(ch[1] - t[1]) / 2 + 3;
-      ctx.strokeStyle = 'rgba(14,58,117,.35)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, 7); ctx.stroke(); }
+      ctx.fillStyle = 'rgba(237,228,207,.55)'; ctx.strokeStyle = 'rgba(92,77,51,.7)'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, 7); ctx.fill(); ctx.stroke(); }
     const inZone = new Set(); sim.imps.forEach(im => im._zone && im._zone.nw.forEach((w, j) => { if (w > 0.5) inZone.add(j); }));
     const joints = mode === 'torque' ? new Set(TORQUE_NODES.map(n => I[n])) : null;
     for (let i = 0; i < N.length; i++) { const q = Q[i], hot = inZone.has(i), picked = linePick === i, jt = joints && joints.has(i);
@@ -230,27 +242,43 @@
 
   // ---------- input: tap to place or select, drag to orbit, pinch or wheel to zoom ----------
   let dragging = false, lx = 0, ly = 0, moved = 0; const ptrs = new Map(); let pinch0 = 0, zoom0 = 1;
+  function nearestEdge(c, cx, cy, strut) { const r = c.getBoundingClientRect(), mx = cx - r.left, my = cy - r.top, Q = sim.P.map(proj); let best = -1, bd = 12;
+    sim.E.forEach((e, k) => { if (e.cut || !!e.strut !== strut) return; if (!strut && sim.FIXED.has(e.a) && sim.FIXED.has(e.b)) return;
+      const a = Q[e.a], b = Q[e.b], ux = b[0] - a[0], uy = b[1] - a[1], l2 = ux * ux + uy * uy || 1, t = Math.max(0, Math.min(1, ((mx - a[0]) * ux + (my - a[1]) * uy) / l2));
+      const d = Math.hypot(a[0] + t * ux - mx, a[1] + t * uy - my) - (a[2] + b[2]) * 0.01; if (d < bd) { bd = d; best = k; } }); return best; }
+  const isTool = () => mode === 'cut' || mode === 'break' || mode === 'pluck';
+  function operate(c, e) {
+    if (mode === 'pluck') { const i = nearest(c, e.clientX, e.clientY); if (i >= 0 && !sim.FIXED.has(i)) { sim.pluck(i, 6); changed(); status(`Plucked the ${pretty(i)}: watch the pulse travel through the web and settle.`); } return; }
+    const k = nearestEdge(c, e.clientX, e.clientY, mode === 'break'); if (k < 0) return;
+    const ed = sim.E[k]; sim.cut(k); hoverE = -1; changed();
+    status(mode === 'break' ? `Bone broken between the ${pretty(ed.a)} and the ${pretty(ed.b)}. The web takes the load it carried.` : `Cable cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. Tension redistributes through the rest of the web.`);
+  }
+  const setCursor = () => { for (const c of [cv, cv2].filter(Boolean)) { c.classList.remove('cur-point', 'cur-cut', 'cur-strut', 'cur-pluck'); c.classList.add(mode === 'cut' ? 'cur-cut' : mode === 'break' ? 'cur-strut' : mode === 'pluck' ? 'cur-pluck' : 'cur-point'); } };
+  setCursor();
   function nearest(c, cx, cy) { const r = c.getBoundingClientRect(), mx = cx - r.left, my = cy - r.top; let best = -1, bd = 26;
     sim.P.forEach((p, i) => { const q = proj(p), d = Math.hypot(q[0] - mx, q[1] - my) - q[2] * 0.35; if (d < bd) { bd = d; best = i; } }); return best; }
   for (const c of [cv, cv2].filter(Boolean)) {
     c.addEventListener('pointerdown', e => { ptrs.set(e.pointerId, [e.clientX, e.clientY]); try { c.setPointerCapture(e.pointerId); } catch (_) {}
       if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); zoom0 = zoom; }
       dragging = true; moved = 0; lx = e.clientX; ly = e.clientY; });
-    c.addEventListener('pointermove', e => { if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+    c.addEventListener('pointermove', e => {
+      if (!ptrs.has(e.pointerId)) { if (e.pointerType === 'mouse' && (mode === 'cut' || mode === 'break') && c === cv) { const k = nearestEdge(c, e.clientX, e.clientY, mode === 'break'); if (k !== hoverE) { hoverE = k; dirty = true; } } return; }
+      ptrs.set(e.pointerId, [e.clientX, e.clientY]);
       if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; zoom = Math.min(2.6, Math.max(0.6, zoom0 * Math.hypot(a[0] - b[0], a[1] - b[1]) / (pinch0 || 1))); moved = 99; dirty = true; return; }
       const dx = e.clientX - lx, dy = e.clientY - ly; moved += Math.abs(dx) + Math.abs(dy);
       if (moved > 6) { yaw += dx * 0.01; pitch = Math.max(-1.2, Math.min(1.2, pitch + dy * 0.006)); dirty = true; }
       lx = e.clientX; ly = e.clientY; });
     c.addEventListener('pointerup', e => { const wasTap = ptrs.size === 1 && moved <= 6; ptrs.delete(e.pointerId); if (!ptrs.size) dragging = false;
-      if (wasTap) { const i = nearest(c, e.clientX, e.clientY); if (i >= 0 && !sim.FIXED.has(i)) place(i); } });
+      if (wasTap) { if (isTool()) { operate(c, e); return; } const i = nearest(c, e.clientX, e.clientY); if (i >= 0 && !sim.FIXED.has(i)) place(i); } });
+    c.addEventListener('pointerleave', () => { if (hoverE >= 0) { hoverE = -1; dirty = true; } });
     c.addEventListener('pointercancel', e => { ptrs.delete(e.pointerId); if (!ptrs.size) dragging = false; });
     c.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.min(2.6, Math.max(0.6, zoom * (e.deltaY < 0 ? 1.08 : 0.93))); dirty = true; }, { passive: false });
   }
 
   // ---------- controls ----------
   const on = (q, ev, fn) => document.querySelectorAll(q).forEach(b => b.addEventListener(ev, () => fn(b)));
-  on('[data-imode]', 'click', b => { mode = b.dataset.imode; linePick = null; dirty = true; document.querySelectorAll('[data-imode]').forEach(x => x.classList.toggle('on', x === b));
-    status({ point: 'Point: tap any point on either figure.', line: 'Line: tap two points; the imperfection follows the fascia between them.', plane: 'Plane: tap the centre of a sheet of tissue. The sheet faces you, so turn the body to choose its angle.',
+  on('[data-imode]', 'click', b => { mode = b.dataset.imode; linePick = null; hoverE = -1; dirty = true; setCursor(); document.querySelectorAll('[data-imode]').forEach(x => x.classList.toggle('on', x === b));
+    status({ pluck: 'Pluck: tap any point to push it out and watch the web answer.', cut: 'Cut a cable: hover over the fascial web and tap a cable to cut it.', break: 'Break a bone: tap a bone (a pale strut) to break it.', point: 'Point: tap any point on either figure.', line: 'Line: tap two points; the imperfection follows the fascia between them.', plane: 'Plane: tap the centre of a sheet of tissue. The sheet faces you, so turn the body to choose its angle.',
       torque: 'Twist: tap a hip, a knee, the lower back (trunk) or the base of the neck (head). Joints you can twist are shown in orange.' }[mode]); });
   const setSpin = v => { spin = v; const c = $('sim-spin'); if (c) c.checked = v; };
   on('[data-view]', 'click', b => { setSpin(false); pitch = -0.04; yaw = { front: 0, side: -Math.PI / 2, back: Math.PI }[b.dataset.view]; dirty = true; });
