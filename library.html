@@ -16,9 +16,32 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html" aria-current="page">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html" aria-current="page">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
+<style>
+#inventory{background:radial-gradient(1200px 400px at 10% 0%,#E8F0FA 0%,rgba(232,240,250,0) 60%),#fff}
+#inventory .stat{position:relative;overflow:hidden;padding:20px 20px 18px;border-color:#CFDDF0;background:linear-gradient(160deg,#FFFFFF 0%,#F3F7FD 100%);transition:transform .18s ease,box-shadow .18s ease}
+#inventory .stat::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:linear-gradient(90deg,#1D5FD1,#5B9BE6)}
+#inventory .stat::after{content:"";position:absolute;right:-28px;bottom:-28px;width:96px;height:96px;border-radius:50%;border:12px solid rgba(91,155,230,.10)}
+#inventory .stat:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(11,37,69,.08),0 14px 30px rgba(29,95,209,.14)}
+#inventory .stat b{font-size:clamp(1.2rem,1.95vw,1.8rem);font-variant-numeric:tabular-nums;background:linear-gradient(90deg,#0B2545,#1D5FD1);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+#inventory .stat span{position:relative;z-index:1}
+.lib-fos{margin-top:14px}
+.lib-fos div{display:grid;grid-template-columns:9.5em 1fr 3.6em;gap:8px;align-items:center;font-size:.86rem;line-height:1.3;margin-bottom:5px}
+.lib-fos i{display:block;height:9px;border-radius:5px;background:linear-gradient(90deg,#1D5FD1,#5B9BE6)}
+.lib-fos em{font-style:normal;color:var(--navy);font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.lib-oa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.lib-oa div{background:var(--ice);border-radius:10px;padding:10px 12px;font-size:.86rem;line-height:1.35;color:var(--soft)}
+.lib-oa b{display:block;color:var(--navy);font-size:1.02rem}
+.lib-figrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px;align-items:start}
+.lib-animal{background:var(--ice);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-top:16px;font-size:.96rem}
+.lib-animal .tag{display:block;font:600 .74rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+@media (max-width:900px){.lib-figrow{grid-template-columns:1fr}.lib-oa{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){#inventory .stat b{font-size:1.9rem}}
+@media (max-width:560px){.lib-fos div{grid-template-columns:7.5em 1fr 3.2em}}
+</style>
+
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">The library</span>
   <h1>The data a model of the ideal body needs.</h1>
@@ -26,7 +49,7 @@
   <p class="muted small" style="margin-top:6px">Exact figures as of 18 November 2026. The library grows every day.</p>
 </div></div>
 
-<section>
+<section id="inventory">
   <div class="wrap">
     <h2>What is in it so far.</h2>
     <div class="grid g4" style="margin-top:22px">
@@ -42,7 +65,35 @@
   </div>
 </section>
 
-<section class="tint" id="scholarly-record">
+<section class="tint" id="datasets">
+  <div class="wrap">
+    <div class="split" style="align-items:center">
+      <div>
+        <span class="eyebrow">What the library is for</span>
+        <h2>Twelve datasets.</h2>
+        <p class="lede">Every item we collect is tagged with the datasets it serves. Together they are the raw material for the model of the ideal body, its imperfections, and the experience of living in it.</p>
+        <p style="margin-bottom:0">They run from the skeleton outward: bones, the fascia web around them, everything embedded in that web, how it moves, what it is made of, and how it goes wrong. The datasets steer the collection: each round, the agents are sent toward whichever is thinnest.</p>
+      </div>
+      <figure class="fig"><img src="img/al-fascia-layers.jpg" alt="A colored diagram of the layers under the skin of the thigh: epidermis, dermis, superficial fat, superficial fascia, deep fat, deep fascia and muscle, with a magnified view of the deep fascia showing collagen layers, loose connective tissue, hyaluronic acid, fibroblasts, fasciacytes and free nerve endings." loading="lazy" width="746" height="244"><figcaption>The layers datasets D2 and D3 must map, from skin to muscle, and inside the deep fascia. Ryskalin et al., <i>Life</i> 2022, figure 2, <a href="https://doi.org/10.3390/life12050743">doi:10.3390/life12050743</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</figcaption></figure>
+    </div>
+    <div class="ds" style="margin-top:26px">
+      <div class="card"><h3><span class="id">D1</span>Skeleton</h3><p>The exact 3D shape of every bone, male and female, and where each sits in space.</p><p class="src"><b>From:</b> the Visible Human sections and CT; BodyParts3D and Z-Anatomy 3D models; TotalSegmentator and AMOS22 labeled scans; OpenSim models; the osteology of Gray, Quain and Testut.</p></div>
+      <div class="card"><h3><span class="id">D2</span>Fascia network</h3><p>The continuous connective-tissue web: its layers, thickness, attachments and continuity.</p><p class="src"><b>From:</b> the fascia literature of the Padua, Ulm and Frankfurt groups and others through PubMed Central and Europe PMC; full texts from the Semantic Scholar copy; Japanese and Korean physical-therapy research; thoracolumbar fascia ultrasound data; pre-1931 monographs on aponeuroses.</p></div>
+      <div class="card"><h3><span class="id">D3</span>Contents of fascia</h3><p>Organs, vessels, nerves, skin, fat and hair follicles: their shapes, depths and spacing.</p><p class="src"><b>From:</b> the Visible Human sections; labeled organ scans; 64,314 skin and hair image files; vascular and nerve anatomy from atlases and papers.</p></div>
+      <div class="card"><h3><span class="id">D4</span>Range of motion</h3><p>Joint limits, yoga poses, contortion and extreme movement.</p><p class="src"><b>From:</b> CMU motion capture; PhysioNet and Kuopio gait databases; OpenCap and OpenSim; 55,133 images and films of elite movers; sport federation video catalogs.</p></div>
+      <div class="card"><h3><span class="id">D5</span>Mechanics, atoms to body</h3><p>Shear, stress, tension, friction and stretch for every tissue.</p><p class="src"><b>From:</b> tendon, fascia and force-transmission datasets on Dryad; tissue physics from arXiv; high-density muscle-signal recordings from PhysioNet; published material tests of human tissue.</p></div>
+      <div class="card"><h3><span class="id">D6</span>Reference bodies</h3><p>Heights, proportions and distances by sex and population.</p><p class="src"><b>From:</b> the U.S. Army ANSUR II survey; Size Korea, with 6,410 people measured 148 ways; the DINED anthropometry database; 19,431 anthropometry files in all.</p></div>
+      <div class="card"><h3><span class="id">D7</span>Imperfections</h3><p>A measurable list of the ways the ideal body can deviate: densification, scarring, posture, fat, injury.</p><p class="src"><b>From:</b> clinical and imaging research on adhesion, fibrosis, contracture and posture; and the evidence that cuts against the model, read and recorded with a verdict for each study.</p></div>
+      <div class="card"><h3><span class="id">D8</span>Nervous system</h3><p>How the body's physics becomes sensation: receptors, thresholds, interoception, pain and touch.</p><p class="src"><b>From:</b> research on the nerves within fascia, interoception and pain science, and the work of Friston and others on how the brain models the body.</p></div>
+      <div class="card"><h3><span class="id">D9</span>Mental health</h3><p>Psychology and psychiatry, stress and trauma in the body, posture and emotion.</p><p class="src"><b>From:</b> psychiatric and psychological literature, the history of psychiatry, and studies linking body and mood. Being expanded now. <a href="mental-health.html">Mental health →</a></p></div>
+      <div class="card"><h3><span class="id">D10</span>Disease shapes</h3><p>Images and measurements of people living with specific conditions.</p><p class="src"><b>From:</b> NIH chest X-rays (ChestX-ray14); captioned medical images (ROCOv2); spine MRI and X-ray sets; the literature on conditions that change the body's shape, such as ankylosing spondylitis.</p></div>
+      <div class="card"><h3><span class="id">D11</span>Development</h3><p>How the body grows from embryo to adult.</p><p class="src"><b>From:</b> embryology and the founding "mechanics of development" literature (Roux's Archiv, from 1894); growth surveys of children aged 7 to 19; fetal and scoliosis studies.</p></div>
+      <div class="card"><h3><span class="id">D12</span>Mind and traditions</h3><p>Theories of consciousness, and the contemplative and body traditions that have studied it longest.</p><p class="src"><b>From:</b> theories of consciousness and their critics; 9,949 tradition texts: Sanskrit from GRETIL and SARIT, Chinese classics from Wikisource, yoga, Ayurveda, Tamil Siddha and osteopathy books from the Internet Archive and Europe PMC.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="scholarly-record">
   <div class="wrap">
     <span class="eyebrow">The scholarly record, at home</span>
     <h2>Two complete copies of the world's research.</h2>
@@ -51,21 +102,47 @@
       <div class="card">
         <span class="tag">Semantic Scholar · Allen Institute for AI</span>
         <h3>241,023,138 papers</h3>
-        <p>The full public release of 10 November 2026: 928 files, 851,036,116,131 bytes. It holds the metadata of 241,023,138 papers, 51,361,566 abstracts, the complete citation graph linking them, and the full texts of the openly licensed papers. From it our agents have already pulled 15,419 full-text papers on fascia, tensegrity and tissue mechanics into the library, and built a catalog of 141,810 relevant records.</p>
+        <p>The full public release of 10 November 2026: 928 files, 851 GB. It holds the metadata of 241,023,138 papers, 51,361,566 abstracts, the complete citation graph linking them, and the full texts of the openly licensed papers. From it our agents have already pulled 15,419 full-text papers on fascia, tensegrity and tissue mechanics into the library, and built a catalog of 141,810 relevant records.</p>
+        <p style="margin-bottom:4px"><b>What the papers are about:</b> every discipline, not only physics or medicine. Medicine is the largest field, followed by engineering, environmental science, biology, computer science and physics, with the humanities and social sciences well represented. Papers per field, by the first field Semantic Scholar assigns:</p>
+        <div class="lib-fos">
+          <div><span>Medicine</span><i style="width:100.0%"></i><em>39.2M</em></div>
+          <div><span>Engineering</span><i style="width:40.4%"></i><em>15.8M</em></div>
+          <div><span>Environmental science</span><i style="width:30.1%"></i><em>11.8M</em></div>
+          <div><span>Biology</span><i style="width:25.4%"></i><em>10.0M</em></div>
+          <div><span>Computer science</span><i style="width:23.8%"></i><em>9.3M</em></div>
+          <div><span>Physics</span><i style="width:21.6%"></i><em>8.5M</em></div>
+          <div><span>Chemistry</span><i style="width:20.2%"></i><em>7.9M</em></div>
+          <div><span>Materials science</span><i style="width:16.1%"></i><em>6.3M</em></div>
+          <div><span>Education</span><i style="width:13.3%"></i><em>5.2M</em></div>
+          <div><span>History</span><i style="width:12.4%"></i><em>4.9M</em></div>
+          <div><span>Agricultural and food sciences</span><i style="width:11.3%"></i><em>4.4M</em></div>
+          <div><span>Psychology</span><i style="width:9.3%"></i><em>3.6M</em></div>
+        </div>
+        <p class="muted small">Then business 3.5M, mathematics 3.2M, economics 3.1M, political science 2.7M, sociology 2.7M, law 2.3M, geology 1.7M, philosophy 1.7M, art 1.6M, linguistics 1.3M and geography 0.5M. 151.0 million papers carry a field label; 90.0 million carry none. Counted on our own machines from the release.</p>
         <p class="muted small" style="margin-bottom:0">Licence: ODC-BY. Citation graph: every "who cites whom" link, so we can follow any idea forward and backward through the literature.</p>
       </div>
       <div class="card">
         <span class="tag">OpenAlex · OurResearch</span>
-        <h3>The open catalog of scholarly works</h3>
-        <p>The complete OpenAlex snapshot: 1,898 works files, 755,515,230,168 bytes. It covers works across every field with their authors, institutions, journals, topics, languages and citations, which lets us search research by country and language, not only in English.</p>
+        <h3>A map to the whole scholarly record</h3>
+        <p>The complete OpenAlex snapshot of 14 October 2026: 755.5 GB. It is not the papers themselves. It is a map to them: a record for every known scholarly work, with who wrote it, where they worked, where it was published, what it cites and who cites it, its topics and language, its abstract when one is available, and links to where the full text can be read, including the free copy when one exists.</p>
+        <div class="lib-oa">
+          <div><b>464.8M</b>works: articles, books, chapters, theses, datasets</div>
+          <div><b>101.1M</b>authors</div>
+          <div><b>143,455</b>institutions</div>
+          <div><b>268,629</b>journals and other sources</div>
+          <div><b>4,516</b>research topics</div>
+          <div><b>17.9M</b>research grants</div>
+        </div>
+        <p>With it, our agents have a compass to the entire scholarly record: they can see what exists on any question, in any language, before fetching a single paper, and go straight to the open copies.</p>
         <p class="muted small" style="margin-bottom:0">Licence: CC0. Used to find what exists in Chinese, Russian, Japanese, Portuguese and dozens of other languages, and which institutions study what.</p>
+        <div style="background:var(--ice);border-radius:12px;padding:16px 18px;margin-top:16px;font-size:.98rem"><span class="tag">How we use both</span>On our own GPUs, local AI models turn tens of millions of these papers into a searchable map of human knowledge. The map shows where research on the body is dense and where it is missing, so the agents can be sent to fill the gaps. Every answer the model gives can be traced back to the papers it came from.</p></div>
       </div>
     </div>
-    <p style="margin-top:22px"><b>How we use them:</b> on our own GPUs, local AI models turn tens of millions of these papers into a searchable map of human knowledge. The map shows where research on the body is dense and where it is missing, so the agents can be sent to fill the gaps. Every answer the model gives can be traced back to the papers it came from.</p>
+
   </div>
 </section>
 
-<section id="visible-human">
+<section class="tint" id="visible-human">
   <div class="wrap split" style="align-items:center">
     <div>
       <span class="eyebrow">The baseline bodies</span>
@@ -84,9 +161,20 @@
       <figure class="fig" style="margin-top:16px"><img src="img/vhp-female-thorax.jpg" alt="A Visible Human Project cross-section through the female chest." loading="lazy" width="1000" height="594"><figcaption>One of 12,545 female cross-sections. Visible Human Project, U.S. National Library of Medicine (public domain).</figcaption></figure>
     </div>
   </div>
+  <div class="wrap">
+    <h3 style="margin-top:34px">From slices to a working model.</h3>
+    <div class="split" style="margin-top:6px">
+      <p style="margin:0">We use these sections to determine what tissue is where: which bone, muscle, fat, organ, vessel and fascial layer occupies each point in the body. Stacked in order, the slices give the 3D layout the model is built on. Onto that layout we apply physics, mathematics and the measured characteristics of every tissue: stiffness, stretch, shear, friction and compression limits.</p>
+      <p style="margin:0">Papers tell us what each tissue looks like and how it behaves when it is optimized, and what its physics is. From there we decide what it would look like, and how it would behave, if it were made imperfect. The two figures below show the same steps in published research: a fascial structure traced on a Visible Human section and rebuilt in 3D, and a fascia model run with healthy and with weakened tissue.</p>
+    </div>
+    <div class="grid g2" style="margin-top:20px;align-items:start">
+      <figure class="fig"><img src="img/al-vhp-interfascial.jpg" alt="Visible Human cross-sections of the lower back with a small fascial triangle between the skin, the back muscles and the spine marked, a matching photograph from dissection, and a 3D reconstruction of the same fascia in blue." loading="lazy" width="708" height="400"><figcaption>A fascial structure in the lower back, located on Visible Human sections, confirmed in dissection and rebuilt in 3D (blue). van Amstel et al., <i>Frontiers in Physiology</i> 2025, figure 9, <a href="https://doi.org/10.3389/fphys.2025.1604459">doi:10.3389/fphys.2025.1604459</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; section images from the Visible Human Project (U.S. National Library of Medicine).</figcaption></figure>
+      <figure class="fig"><img src="img/al-pelvic-fe.jpg" alt="Two colored finite element models of the female pelvic floor side by side; the model with weakened fascia and ligaments shows much larger downward displacement, in blue." loading="lazy" width="747" height="307"><figcaption>Physics applied to tissue: a finite element model of the pelvic floor under strain with healthy tissue (a) and with fascia and ligaments weakened by 95% (b), which sag more than twice as far. Bhattarai and Staat, <i>Computational and Mathematical Methods in Medicine</i> 2018, figure 5, <a href="https://doi.org/10.1155/2018/9518076">doi:10.1155/2018/9518076</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY</a>.</figcaption></figure>
+    </div>
+  </div>
 </section>
 
-<section class="tint" id="images">
+<section id="images">
   <div class="wrap">
     <span class="eyebrow">Pictures and films</span>
     <h2>55,133 images, films and books of the body.</h2>
@@ -125,13 +213,23 @@
       </div>
     </div>
     <div class="gallery" style="margin-top:26px">
-      <figure class="fig"><img src="img/muybridge-gallop.jpg" alt="Eadweard Muybridge's sequence of photographs of a galloping horse." loading="lazy" width="1000" height="351"><figcaption>Eadweard Muybridge, a horse in gallop (1878). The first photographs to freeze motion, and the start of motion science (public domain).</figcaption></figure>
-      <figure class="fig"><img src="img/gray-1172.jpg" alt="An engraving from Gray's Anatomy showing glandular lobules held in compartments of connective tissue." loading="lazy" width="1000" height="738"><figcaption>Henry Vandyke Carter, Gray's Anatomy, figure 1172: tissue held in "loculi in connective tissue" (public domain).</figcaption></figure>
+      <div>
+        <figure class="fig"><img src="img/muybridge-gallop.jpg" alt="Eadweard Muybridge's sequence of photographs of a galloping horse." loading="lazy" width="1000" height="351"><figcaption>Eadweard Muybridge, a horse in gallop (1878). The first photographs to freeze motion, and the start of motion science (public domain).</figcaption></figure>
+        <div class="lib-animal">
+          <span class="tag">Beyond the human body</span>
+          A small set of our agents collects information not only about humans but about how physics and motion work in the bodies of all creatures: tendon energy storage in kangaroos and horses, spring-loaded strikes, how body size changes mechanics, grooming reach across species, the primate hand and shoulder. More than 1,100 documents on animal biomechanics are in the library so far, with classics such as Marey's <i>La machine animale</i> (1873), and 141 findings from them have been read and recorded.
+        </div>
+        <figure class="fig" style="margin-top:16px"><img src="img/al-horse-forces.jpg" alt="Photographs of a galloping racehorse with fans of red lines showing the direction of ground forces on the front and hind legs during each stance, comparing two textbook approximations with the measured forces." loading="lazy" width="651" height="400"><figcaption>Muybridge's question, answered with force plates: the ground forces (red) on a galloping horse's front and hind legs, two textbook approximations against the measured forces. Usherwood, <i>Journal of Experimental Biology</i> 2022, figure 1, <a href="https://doi.org/10.1242/jeb.243254">doi:10.1242/jeb.243254</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</figcaption></figure>
+      </div>
+      <div>
+        <figure class="fig"><img src="img/gray-1172.jpg" alt="An engraving from Gray's Anatomy showing glandular lobules held in compartments of connective tissue." loading="lazy" width="1000" height="738"><figcaption>Henry Vandyke Carter, Gray's Anatomy, figure 1172: tissue held in "loculi in connective tissue" (public domain).</figcaption></figure>
+        <figure class="fig" style="margin-top:16px"><img src="img/al-horse-dog-linkage.jpg" alt="Skeleton drawings of a horse forelimb and a dog forelimb with fans of red lines showing muscle lines of pull, and simplified linkage diagrams at early, mid and late stance." loading="lazy" width="762" height="611"><figcaption>The same mechanism in two species: horse (top) and dog (bottom) forelimbs modeled as linkages, with muscle lines of pull in red. Usherwood, <i>Journal of Experimental Biology</i> 2022, figure 3, <a href="https://doi.org/10.1242/jeb.243254">doi:10.1242/jeb.243254</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</figcaption></figure>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="authors">
+<section class="tint" id="authors">
   <div class="wrap">
     <span class="eyebrow">Who we read</span>
     <h2>The authors and institutions behind the library.</h2>
@@ -184,28 +282,7 @@
     </div>
     <div class="card" style="margin-top:18px;background:var(--ice)">
       <span class="tag">Archives and institutions we collect from</span>
-      <p style="margin-bottom:0">U.S. National Library of Medicine (Visible Human Project, PubMed Central) · Europe PMC · Semantic Scholar (Allen Institute for AI) · OpenAlex · arXiv (Cornell University) · Internet Archive · Library of Congress · Wellcome Collection · Royal College of Surgeons of England · Carnegie Mellon University · PhysioNet (MIT) · Stanford OpenSim · J-STAGE (Japan Science and Technology Agency) · KoreaScience (KISTI) · Size Korea (Korean Agency for Technology and Standards) · SciELO (Latin America) · DiVA (Swedish universities, including KTH) · DergiPark (Turkey) · GRETIL (University of Göttingen, Sanskrit texts) · SARIT · Wikisource · Zenodo (CERN) · Figshare · Dryad · Kaggle · Wikimedia Commons.</p>
-    </div>
-  </div>
-</section>
-
-<section class="tint">
-  <div class="wrap">
-    <h2>Twelve datasets.</h2>
-    <p class="lede">Every item we collect is tagged with the datasets it serves. Together they are the raw material for the model of the ideal body, its imperfections, and the experience of living in it.</p>
-    <div class="ds" style="margin-top:26px">
-      <div class="card"><h3><span class="id">D1</span>Skeleton</h3><p>The exact 3D shape of every bone, male and female, and where each sits in space.</p><p class="src"><b>From:</b> the Visible Human sections and CT; BodyParts3D and Z-Anatomy 3D models; TotalSegmentator and AMOS22 labeled scans; OpenSim models; the osteology of Gray, Quain and Testut.</p></div>
-      <div class="card"><h3><span class="id">D2</span>Fascia network</h3><p>The continuous connective-tissue web: its layers, thickness, attachments and continuity.</p><p class="src"><b>From:</b> the fascia literature of the Padua, Ulm and Frankfurt groups and others through PubMed Central and Europe PMC; full texts from the Semantic Scholar copy; Japanese and Korean physical-therapy research; thoracolumbar fascia ultrasound data; pre-1931 monographs on aponeuroses.</p></div>
-      <div class="card"><h3><span class="id">D3</span>Contents of fascia</h3><p>Organs, vessels, nerves, skin, fat and hair follicles: their shapes, depths and spacing.</p><p class="src"><b>From:</b> the Visible Human sections; labeled organ scans; 64,314 skin and hair image files; vascular and nerve anatomy from atlases and papers.</p></div>
-      <div class="card"><h3><span class="id">D4</span>Range of motion</h3><p>Joint limits, yoga poses, contortion and extreme movement.</p><p class="src"><b>From:</b> CMU motion capture; PhysioNet and Kuopio gait databases; OpenCap and OpenSim; 55,133 images and films of elite movers; sport federation video catalogs.</p></div>
-      <div class="card"><h3><span class="id">D5</span>Mechanics, atoms to body</h3><p>Shear, stress, tension, friction and stretch for every tissue.</p><p class="src"><b>From:</b> tendon, fascia and force-transmission datasets on Dryad; tissue physics from arXiv; high-density muscle-signal recordings from PhysioNet; published material tests of human tissue.</p></div>
-      <div class="card"><h3><span class="id">D6</span>Reference bodies</h3><p>Heights, proportions and distances by sex and population.</p><p class="src"><b>From:</b> the U.S. Army ANSUR II survey; Size Korea, with 6,410 people measured 148 ways; the DINED anthropometry database; 19,431 anthropometry files in all.</p></div>
-      <div class="card"><h3><span class="id">D7</span>Imperfections</h3><p>A measurable list of the ways the ideal body can deviate: densification, scarring, posture, fat, injury.</p><p class="src"><b>From:</b> clinical and imaging research on adhesion, fibrosis, contracture and posture; and the evidence that cuts against the model, read and recorded with a verdict for each study.</p></div>
-      <div class="card"><h3><span class="id">D8</span>Nervous system</h3><p>How the body's physics becomes sensation: receptors, thresholds, interoception, pain and touch.</p><p class="src"><b>From:</b> research on the nerves within fascia, interoception and pain science, and the work of Friston and others on how the brain models the body.</p></div>
-      <div class="card"><h3><span class="id">D9</span>Mental health</h3><p>Psychology and psychiatry, stress and trauma in the body, posture and emotion.</p><p class="src"><b>From:</b> psychiatric and psychological literature, the history of psychiatry, and studies linking body and mood. Being expanded now. <a href="mental-health.html">Mental health →</a></p></div>
-      <div class="card"><h3><span class="id">D10</span>Disease shapes</h3><p>Images and measurements of people living with specific conditions.</p><p class="src"><b>From:</b> NIH chest X-rays (ChestX-ray14); captioned medical images (ROCOv2); spine MRI and X-ray sets; the literature on conditions that change the body's shape, such as ankylosing spondylitis.</p></div>
-      <div class="card"><h3><span class="id">D11</span>Development</h3><p>How the body grows from embryo to adult.</p><p class="src"><b>From:</b> embryology and the founding "mechanics of development" literature (Roux's Archiv, from 1894); growth surveys of children aged 7 to 19; fetal and scoliosis studies.</p></div>
-      <div class="card"><h3><span class="id">D12</span>Mind and traditions</h3><p>Theories of consciousness, and the contemplative and body traditions that have studied it longest.</p><p class="src"><b>From:</b> theories of consciousness and their critics; 9,949 tradition texts: Sanskrit from GRETIL and SARIT, Chinese classics from Wikisource, yoga, Ayurveda, Tamil Siddha and osteopathy books from the Internet Archive and Europe PMC.</p></div>
+      <p style="margin-bottom:0;max-width:none">U.S. National Library of Medicine (Visible Human Project, PubMed Central) · Europe PMC · Semantic Scholar (Allen Institute for AI) · OpenAlex · arXiv (Cornell University) · Internet Archive · Library of Congress · Wellcome Collection · Royal College of Surgeons of England · Carnegie Mellon University · PhysioNet (MIT) · Stanford OpenSim · J-STAGE (Japan Science and Technology Agency) · KoreaScience (KISTI) · Size Korea (Korean Agency for Technology and Standards) · SciELO (Latin America) · DiVA (Swedish universities, including KTH) · DergiPark (Turkey) · GRETIL (University of Göttingen, Sanskrit texts) · SARIT · Wikisource · Zenodo (CERN) · Figshare · Dryad · Kaggle · Wikimedia Commons.</p>
     </div>
   </div>
 </section>
@@ -225,7 +302,7 @@
     <div>
       <h2>Building the collection further.</h2>
       <p>Open sources come first: open-access journals, preprint servers, university repositories across Europe, Asia and the Americas, public anatomy collections, research data archives and historic books in the public domain.</p>
-      <p><b>We are also purchasing thousands of dollars of books and other materials:</b> the anatomy atlases, fascia texts, measurement standards and key papers that open access does not reach.</p>
+      <p><b>We are purchasing books and other materials:</b> the anatomy atlases, fascia texts, measurement standards and key papers that open access does not reach.</p>
       <h2 style="margin-top:28px">How it will be used.</h2>
       <p><b>To build the model.</b> The Visible Human sections become a 3D body; papers and measurements give every tissue its real dimensions and mechanics. <b>To measure.</b> Computer vision models read the images for distances, angles and patterns. <b>To answer.</b> Local AI models index everything, so any question can be answered from the evidence, including the evidence against us. <a href="roadmap.html">The road ahead →</a></p>
       <p class="note">The library is a private research collection used to build and test the model. It is not redistributed.</p>
@@ -237,7 +314,7 @@
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>

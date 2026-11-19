@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fixing exercise | Universe Model</title>
+<meta name="description" content="Why weightlifting, running, HIIT and most stretching strain an imperfect tensegrity, what the injury research shows, and why the HMR puts an optimized fascia web first and exercise second.">
+<meta property="og:title" content="Fixing exercise | Universe Model"><meta property="og:description" content="Why weightlifting, running, HIIT and most stretching strain an imperfect tensegrity, what the injury research shows, and why the HMR puts an optimized fascia web first and exercise second."><meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 32 32' aria-hidden='true'><g fill='none' stroke-linecap='round'><path d='M6 9 L26 23 M26 9 L6 23 M16 4 L16 28' stroke='%230E3A75' stroke-width='2.6'/><path d='M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23' stroke='%235B9BE6' stroke-width='1.2' opacity='.9'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp on"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html" aria-current="page">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+</div></header>
+<main>
+<style>
+.fx-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:22px}
+@media (max-width:860px){.fx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.fx-stats .card{padding:18px 20px}
+.fx-stats b{display:block;font:750 clamp(1.5rem,2.6vw,2.1rem)/1.05 var(--font);color:var(--navy);margin-bottom:6px;letter-spacing:-.02em}
+.fx-stats span{font-size:.92rem;color:var(--soft);line-height:1.45;display:block}
+.fx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:24px}
+@media (max-width:860px){.fx-grid{grid-template-columns:1fr}}
+.fx-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;border-top:4px solid var(--fxc,#C62828)}
+.fx-card h3{margin:0 0 6px}
+.fx-card .fx-v{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:10px}
+.fx-card.bad{--fxc:#C62828}.fx-card.bad .fx-v{background:#FDECEC;color:#9B1C1C}
+.fx-card.mixed{--fxc:#D9822B}.fx-card.mixed .fx-v{background:#FFF3E6;color:#8A4B0F}
+.fx-card.good{--fxc:#2E7D5B}.fx-card.good .fx-v{background:#E7F5EE;color:#1D5C41}
+.fx-card dl{margin:10px 0 0}
+.fx-card dt{font-weight:700;color:var(--navy);font-size:.92rem;margin-top:10px}
+.fx-card dd{margin:2px 0 0;font-size:.97rem}
+.fx-card blockquote{margin:10px 0 0;padding:10px 14px;background:var(--mist);border-left:3px solid var(--fxc,#C62828);border-radius:0 10px 10px 0;font-size:.93rem}
+.fx-card blockquote cite{display:block;font-style:normal;color:var(--soft);font-size:.84rem;margin-top:4px}
+.fx-sim{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.fx-sim canvas{width:100%;height:min(62vh,520px);display:block;touch-action:manipulation;cursor:crosshair;background:linear-gradient(#F5F8FC,#fff)}
+.fx-sim .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fx-meter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.fx-meter div{background:var(--mist);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.fx-meter dt{font-size:.78rem;color:var(--soft)}.fx-meter dd{margin:0;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.fx-key{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--soft);margin-top:10px}
+.fx-key i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.fx-order{counter-reset:o;list-style:none;padding:0;margin:18px 0 0}
+.fx-order li{counter-increment:o;position:relative;padding:0 0 14px 46px}
+.fx-order li::before{content:counter(o);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+</style>
+
+<div class="page-head"><div class="wrap">
+  <span class="eyebrow">Fixing exercise</span>
+  <h1>Optimize the tensegrity first. Then exercise.</h1>
+  <p class="lede">Most exercise programs assume the body that is training is already sound. In the Holistic Model of Reality (HMR), almost no adult body is: it is an imperfect tensegrity, and an imperfect tensegrity carries force unevenly. Training it harder makes the imperfections stronger.</p>
+  <p class="note">Research and education, not medical advice. Do not change a treatment or rehabilitation plan without your clinician. Where this page states the HMR's view, it says so; where it cites research, the source is linked.</p>
+</div></div>
+
+<section class="tint" id="physics">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">The problem every program shares</span>
+      <h2>An immature tensegrity transmits force the wrong way.</h2>
+      <p>The human body behaves as a tensegrity: rigid bones held in place by a continuous, pre-tensioned web of fascia (the evidence is on <a href="health.html#ideal">Physical Health</a>). In a well-tuned tensegrity, a load applied anywhere is shared across the whole web. Every cable takes a little, none takes too much, and the structure springs back.</p>
+      <p>An immature, non-optimized tensegrity is different. Where fascia has become denser, shorter or stuck, those lines carry far more than their share, and the lines around them go slack. Force no longer spreads; it funnels. From a physics standpoint, that is the common problem behind every protocol on this page: the energy of each step, lift or sprint flows through a broken, uneven web, and the same regions are overloaded again and again.</p>
+      <p><b>The HMR's view:</b> this uneven flow is why so much exercise produces injury, why gains fade when training stops, and why the body redistributes mass in ways people do not want. The cure is not to stop moving. It is to change the order.</p>
+      <h3 style="margin-top:22px">How tension is shared, in plain physics</h3>
+      <ul>
+        <li style="margin-bottom:8px"><b>Prestress.</b> Cables are always slightly stretched. That built-in tension is what makes a tensegrity stiff; in living cells, stiffness rises in proportion to prestress (<a href="https://doi.org/10.1073/pnas.141199598">Wang et al., PNAS, 2001</a>).</li>
+        <li style="margin-bottom:8px"><b>Load sharing.</b> A push at one point changes tension in every cable a little, instead of crushing one column a lot.</li>
+        <li style="margin-bottom:8px"><b>Concentration.</b> Shorten or stiffen one cable and it becomes a hot spot: the peak tension in the web rises sharply and neighbors go slack.</li>
+        <li><b>Accommodation.</b> Cut a cable and the structure does not simply fail at that point. It sways, folds and settles into a new, worse shape, and every other part now works harder.</li>
+      </ul>
+    </div>
+    <div class="fx-sim">
+      <canvas id="fxcol" role="img" aria-label="A two-dimensional tensegrity column of four stacked modules. Struts are dark bars; cables are colored by tension from blue (low) to red (high). Tap a cable to cut it."></canvas>
+      <div class="btns">
+        <button class="chipbtn" type="button" id="fx-load" aria-pressed="false">Load it</button>
+        <button class="chipbtn" type="button" id="fx-dense">Add an imperfection</button>
+        <button class="btn primary" type="button" id="fx-reset">Reset to optimized</button>
+      </div>
+      <dl class="fx-meter">
+        <div><dt>Peak cable tension</dt><dd id="fx-peak">100%</dd></div>
+        <div><dt>Slack cables</dt><dd id="fx-slack">0</dd></div>
+        <div><dt>Top displaced vs optimized</dt><dd id="fx-sway">0% of height</dd></div>
+      </dl>
+      <div class="fx-key"><span><i style="background:#5B9BE6"></i>low tension</span><span><i style="background:#C62828"></i>high tension</span><span><i style="background:repeating-linear-gradient(90deg,#9AA9BC 0 5px,transparent 5px 9px)"></i>slack</span><span><i style="background:#0E3A75;height:7px"></i>strut (bone)</span></div>
+      <p class="small muted" style="margin:10px 0 0">Tap a cable to cut it. A simple spring model of a four-module tensegrity column, solved live in your browser. Peak tension is shown as a percentage of the optimized column under the same load. For a full body, see the <a href="simulation.html#model">3D simulation</a>.</p>
+      <blockquote style="margin:14px 0 0;padding:12px 14px;background:var(--ice);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:.95rem">&ldquo;There are no shears, bending moments or levers, just simple tension and compression, in a self organizing, hierarchical, load distributing, low energy consuming structure.&rdquo;<span style="display:block;color:var(--soft);font-size:.84rem;margin-top:4px">Stephen Levin on biotensegrity, <a href="https://www.biotensegrity.com/">biotensegrity.com</a> (researcher's own site)</span></blockquote>
+    </div>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <h2>What the injury research shows.</h2>
+    <p class="lede">These figures come from peer-reviewed studies of people training the way most programs teach. Each is linked in the protocol cards below.</p>
+    <div class="fx-stats">
+      <div class="card"><b>17.8</b><span>injuries per 1,000 hours of running in novice runners (7.7 in recreational runners)</span></div>
+      <div class="card"><b>970,801</b><span>estimated weight-training injuries in US emergency departments, 1990 to 2007</span></div>
+      <div class="card"><b>144%</b><span>rise in US injuries from HIIT-style exercise, 2012 to 2016 versus 2007 to 2011</span></div>
+      <div class="card"><b>91.3%</b><span>of adolescent competitive swimmers report shoulder pain</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="protocols">
+  <div class="wrap">
+    <span class="eyebrow">Current protocols, one by one</span>
+    <h2>What each gets right, and what the HMR finds wrong.</h2>
+    <p class="lede">Red: the HMR considers it harmful for an imperfect tensegrity. Amber: real value, with clear risks. Green: close to the HMR's approach. Quotes are copied exactly from the published abstracts.</p>
+    <div class="fx-grid">
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>Weightlifting and hypertrophy training</h3>
+        <dl>
+          <dt>What people believe</dt><dd>Lifting breaks muscle down so it rebuilds bigger and stronger, and that this is what a healthy body looks like.</dd>
+          <dt>What it gets right</dt><dd>Strength matters, and resistance training is one of the few exercise interventions shown to reduce sports injuries in trials.</dd>
+          <dt>The HMR's view</dt><dd>The picture misses the web. Heavy load travels through fascia that is not optimized, and the force reaches a region that is not ready to hold it: that is where people get hurt. Muscle is built on top of the imperfections and locks them in. When lifting stops, the unoptimized tensegrity redistributes that mass in ways people do not want, and they feel weak and soft again.</dd>
+        </dl>
+        <blockquote>&ldquo;From 1990 to 2007, 25 335 weight training injuries were seen in US emergency departments, correlating to an estimated 970 801 injuries nationwide.&rdquo; &ldquo;The most common diagnosis was sprain/strain (46.1%).&rdquo;<cite><a href="https://doi.org/10.1177/0363546509351560">Kerr, Collins and Comstock, Am J Sports Med, 2010</a> (research)</cite></blockquote>
+        <blockquote>&ldquo;There was a significant decrease in muscle size following 31-52 weeks of training cessation&rdquo;<cite><a href="https://doi.org/10.3390/ijerph192114048">Grgic, Int J Environ Res Public Health, 2022</a>, meta-analysis in older adults (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>Running and jogging</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Cardiovascular fitness, time outdoors, and a simple habit almost anyone can start.</dd>
+          <dt>The HMR's view</dt><dd>Every stride sends an impact up the body. With an uneven web, that impact is not spread: it is funneled into the same knees, shins, heels and hips, thousands of times an hour. Joints take what the fascia should have shared. Many people dislike running for a reason; the body is reporting the strain.</dd>
+        </dl>
+        <blockquote>&ldquo;The incidence of lower extremity running injuries ranged from 19.4% to 79.3%. The predominant site of these injuries was the knee.&rdquo;<cite><a href="https://doi.org/10.1136/bjsm.2006.033548">van Gent et al., Br J Sports Med, 2007</a>, systematic review (research)</cite></blockquote>
+        <blockquote>&ldquo;The meta-analyses revealed a weighted injury incidence of 17.8 (95% confidence interval [CI] 16.7-19.1) in novice runners and 7.7 (95% CI 6.9-8.7) in recreational runners.&rdquo; (per 1,000 hours)<cite><a href="https://doi.org/10.1007/s40279-015-0333-8">Videb&aelig;k et al., Sports Med, 2015</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>High-intensity interval training (HIIT)</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Short, efficient sessions with real gains in fitness.</dd>
+          <dt>The HMR's view</dt><dd>HIIT combines high speed, high load and fatigue, the exact conditions in which an imperfect web fails. Fast, explosive force gives the tissue no time to share load; it hits the weakest line first.</dd>
+        </dl>
+        <blockquote>&ldquo;From 2012-2016 versus 2007-2011, there was a 144% increase in all injuries&rdquo; &ldquo;These increases in injury incidence correlated with a 274% increase in HIIT interest.&rdquo;<cite><a href="https://doi.org/10.23736/S0022-4707.19.09407-6">Rynecki et al., J Sports Med Phys Fitness, 2019</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>CrossFit and high-intensity functional training</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Community, variety and whole-body movement.</dd>
+          <dt>The HMR's view</dt><dd>Heavy Olympic lifts, gymnastics and speed in one session: the hardest loads, done tired, through a web that has never been tuned.</dd>
+        </dl>
+        <blockquote>&ldquo;A total of 132 responses were collected with 97 (73.5%) having sustained an injury during CrossFit training.&rdquo; &ldquo;An injury rate of 3.1 per 1000 hours trained was calculated.&rdquo;<cite><a href="https://doi.org/10.1519/JSC.0000000000000318">Hak, Hodzovic and Hickey, J Strength Cond Res, 2013</a> (research)</cite></blockquote>
+        <blockquote>&ldquo;Current evidence suggests that the injury risk from CrossFit training is comparable to Olympic weightlifting, distance running, track and field, rugby, football, ice hockey, soccer, or gymnastics.&rdquo;<cite><a href="https://doi.org/10.1123/jsr.2016-0040">Klimek et al., J Sport Rehabil, 2018</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>Most stretching routines</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>The instinct that tissue needs length and range.</dd>
+          <dt>The HMR's view</dt><dd>Short, forceful stretches pull hardest on whatever is already loose and barely reach what is stuck. Holds of 20 to 30 seconds also end before fascia has time to change. Stretching, as usually taught, does not prevent injury in the trials.</dd>
+        </dl>
+        <blockquote>&ldquo;Stretching was not significantly associated with a reduction in total injuries (OR = 0.93, CI 0.78-1.11)&rdquo;<cite><a href="https://doi.org/10.1249/01.mss.0000117134.83018.f7">Thacker et al. (CDC), Med Sci Sports Exerc, 2004</a> (research)</cite></blockquote>
+        <blockquote>&ldquo;Practical durations of passive stretching resulted in significant decreases in MTS; however, these changes return to baseline levels within 10 to 20 minutes.&rdquo;<cite><a href="https://doi.org/10.2519/jospt.2008.2843">Ryan et al., J Orthop Sports Phys Ther, 2008</a> (research; MTS is musculotendinous stiffness)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>Weight-loss programs</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Excess weight does strain the body.</dd>
+          <dt>The HMR's view</dt><dd>Diets and calorie-burning exercise treat fat as the cause. In the HMR, where fat is stored is shaped by where the web is tight and where it is slack (see the <a href="health.html#hypothesis">densification hypothesis</a>). Lose the weight without fixing the web, and the body tends to rebuild the same shape.</dd>
+        </dl>
+        <blockquote>&ldquo;After 6 years, 41.0 &plusmn; 31.3 kg of the lost weight was regained&rdquo;<cite><a href="https://doi.org/10.1002/oby.21538">Fothergill et al. (NIH), Obesity, 2016</a>, follow-up of contestants who had lost 58.3 kg on average (research)</cite></blockquote>
+        <blockquote>&ldquo;Current perception is that participants of a structured weight-loss program regain all of their weight loss within 5 y.&rdquo; In that meta-analysis, people kept off on average 17% to 29% of the weight they lost.<cite><a href="https://doi.org/10.1093/ajcn/74.5.579">Anderson et al., Am J Clin Nutr, 2001</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card bad">
+        <span class="fx-v">Harmful before optimization</span>
+        <h3>Team sports</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Play, teamwork, joy and skill.</dd>
+          <dt>The HMR's view</dt><dd>Sudden cuts, tackles and sprints put peak force through the body with no warning, and the imperfect web cannot share it in time.</dd>
+        </dl>
+        <blockquote>&ldquo;Match injury incidence (36 injuries/1000 hours of exposure) was almost 10 times higher than training injury incidence rate (3.7 injuries/1000 hours of exposure).&rdquo;<cite><a href="https://doi.org/10.1136/bjsports-2018-099577">L&oacute;pez-Valenciano et al., Br J Sports Med, 2020</a>, professional football (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card mixed">
+        <span class="fx-v">Value with risks</span>
+        <h3>Cycling</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Low impact, good for the heart, easy on most joints.</dd>
+          <dt>The HMR's view</dt><dd>Hours in one folded posture, repeating one short arc of motion, shortens the front of the body and loads the lower back and knees the same way every time.</dd>
+        </dl>
+        <blockquote>&ldquo;Fifty-eight percent of all cyclists had experienced lower back pain in the previous 12 months&rdquo; &ldquo;Thirty-six percent had experienced anterior knee pain&rdquo;<cite><a href="https://doi.org/10.1177/0363546510376816">Clarsen, Krosshaug and Bahr, Am J Sports Med, 2010</a>, 109 professional road cyclists (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card mixed">
+        <span class="fx-v">Value with risks</span>
+        <h3>Swimming</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Water supports the body and removes impact; it is one of the gentlest ways to move.</dd>
+          <dt>The HMR's view</dt><dd>Competitive training repeats one stroke tens of thousands of times, through shoulders that may not be ready for it, often in adolescents whose web is still forming.</dd>
+        </dl>
+        <blockquote>&ldquo;Adolescent swimmers showed the highest rates of shoulder pain (91.3%) compared with other age groups (range = 19.4%-70.3%).&rdquo;<cite><a href="https://doi.org/10.4085/1062-6050-439-18">Feijen et al., J Athl Train, 2020</a>, systematic review (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card good">
+        <span class="fx-v">Close to the HMR</span>
+        <h3>Pilates</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>A lot. Slow, controlled movement, long holds, stretching under control and whole-body attention. It is pretty good exercise too.</dd>
+          <dt>The HMR's view</dt><dd>Pilates comes closest to working with the web instead of against it. Its limit is that it still treats the body as it is, rather than first defining what the optimized tensegrity should be.</dd>
+        </dl>
+        <blockquote>&ldquo;Two trials assessed adverse events in this review, one did not find any adverse events, and another reported minor events.&rdquo;<cite><a href="https://doi.org/10.1002/14651858.CD010265.pub2">Yamato et al., Cochrane review of Pilates for low back pain, 2015</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card good">
+        <span class="fx-v">Close to the HMR</span>
+        <h3>Yoga, especially long holds</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Long-held poses, breath and attention: the traditions refined exactly the slow, sustained loading fascia responds to. Long hip-opening and yin-style sessions are close to the HMR's protocol.</dd>
+          <dt>The risk</dt><dd>Forcing range. Pushing into a pose the web is not ready for strains the same slack regions that every other program strains.</dd>
+        </dl>
+        <blockquote>&ldquo;There were 29,590 yoga-related injuries seen in hospital emergency departments from 2001 to 2014. The trunk (46.6%) was the most frequent region injured, and sprain/strain (45.0%) accounted for the majority of diagnoses.&rdquo;<cite><a href="https://doi.org/10.1177/2325967116671703">Swain and McGwin, Orthop J Sports Med, 2016</a> (research)</cite></blockquote>
+        <figure class="fig" style="margin-top:10px"><img src="img/hx-yoga-beach.jpg" alt="An outdoor yoga class on a beach, students holding a pose on their mats." loading="lazy" width="1400" height="931"><figcaption>A long-hold yoga class, Arcachon, France. Photo: DimiTalen, CC0, <a href="https://commons.wikimedia.org/wiki/File:Beach_asana_class,_Plage_Pereire,_Arcachon,_2015.jpg">Wikimedia Commons</a>.</figcaption></figure>
+        <blockquote>&ldquo;Beginners should avoid extreme practices such as headstand, lotus position and forceful breathing.&rdquo;<cite><a href="https://doi.org/10.1371/journal.pone.0075515">Cramer, Krucoff and Dobos, PLoS One, 2013</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card good">
+        <span class="fx-v">Close to the HMR</span>
+        <h3>Tai chi and qigong</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Slow, continuous, whole-body movement with breath, at low load. Among the gentlest forms of exercise studied.</dd>
+          <dt>The HMR's view</dt><dd>Excellent for balance and attention. On its own it rarely applies the long, deep holds that change dense fascia.</dd>
+        </dl>
+        <blockquote>&ldquo;TC is unlikely to result in serious AEs, but it may be associated with minor musculoskeletal aches and pains.&rdquo;<cite><a href="https://doi.org/10.1016/j.apmr.2014.05.005">Wayne et al., Arch Phys Med Rehabil, 2014</a>, review of 153 trials (research; TC is tai chi, AEs adverse events)</cite></blockquote>
+      </article>
+    </div>
+
+    <div class="card" style="margin-top:22px;border-left:4px solid var(--blue)">
+      <h3 style="margin-top:0">Evidence that cuts the other way</h3>
+      <p style="margin-bottom:8px">We report it plainly. Weight-training sports have lower injury rates than many team sports: &ldquo;the weight-training sports appear to have relatively low rates of injury compared with common team sports&rdquo; (<a href="https://doi.org/10.1007/s40279-016-0575-0">Keogh and Winwood, Sports Med, 2017</a>). In trials, &ldquo;Strength training reduced sports injuries to less than 1/3 and overuse injuries could be almost halved&rdquo; (<a href="https://doi.org/10.1136/bjsports-2013-092538">Lauersen et al., Br J Sports Med, 2014</a>).</p>
+      <p style="margin:0">The HMR does not dispute that movement and strength beat inactivity. Its claim is about order: the same training on an optimized tensegrity should do far more good, and far less harm. That is a hypothesis to test, not a finding.</p>
+    </div>
+  </div>
+</section>
+
+<section id="order">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">The HMR's order</span>
+      <h2>Tensegrity first. Strength second.</h2>
+      <ol class="fx-order">
+        <li><b>Define the optimized tensegrity.</b> A physics model of the ideal human body, built from measurements, shows what each line of fascia should be. <a href="health.html">Physical Health →</a></li>
+        <li><b>Mature the web toward it.</b> Hydration, long holds, hands-on work and the inside-out practices that make fascia receptive to change (listed on <a href="health.html#add">Physical Health</a>).</li>
+        <li><b>Then train.</b> Once force is shared evenly, strength, speed and endurance build on a sound structure instead of on its faults.</li>
+      </ol>
+      <p>Done the other way around, exercise mostly reinforces the imperfections: the dense lines get denser and the slack ones weaker, and each year of training makes the faults harder to undo.</p>
+    </div>
+    <div class="card" style="background:var(--ice)">
+      <span class="tag">What it would feel like (the HMR's view)</span>
+      <h3>Training an optimized tensegrity</h3>
+      <ul style="margin:8px 0 0;padding-left:1.1em">
+        <li style="margin-bottom:8px"><b>No pain.</b> Load spreads through the whole web, so no single joint or tendon takes the hit.</li>
+        <li style="margin-bottom:8px"><b>Much stronger.</b> Every line contributes, so the whole body lifts, not a few overloaded muscles.</li>
+        <li style="margin-bottom:8px"><b>Lighter.</b> A well-tensioned structure holds itself up; less effort goes into bracing against its own faults.</li>
+        <li><b>More capable.</b> Range, balance and speed come from the structure itself, and gains stay when training pauses.</li>
+      </ul>
+      <p class="note" style="margin-top:14px">These are predictions of the HMR, to be tested in simulation and in people.</p>
+    </div>
+  </div>
+</section>
+
+<section class="navyband" id="solution">
+  <div class="wrap split">
+    <div>
+      <h2>The solution: teach it, share it, start with children.</h2>
+      <p>Fixing exercise is an education problem before it is a training problem. The HMR's plan: teach everyone what an optimized tensegrity is, develop open protocols that can be shared worldwide, and make fascia care as ordinary as brushing teeth.</p>
+      <p>The highest priority is children, before puberty and during it, when the web is still being built and is easiest to shape.</p>
+    </div>
+    <div>
+      <h2>A hypothesis about puberty.</h2>
+      <p>In the HMR, puberty is a signal that the growing tensegrity is reaching its bounds, and that the inner struts need to be aligned properly. If they are not, some parts grow faster than others, tension becomes uneven, and the tensegrity develops imperfections that adults then carry for life.</p>
+      <p>If that is right, the most valuable fascia care anyone ever receives is the care given to them as a child. <span style="color:#9CC3F5">(HYPOTHESIS: stated as such, to be tested.)</span></p>
+    </div>
+  </div>
+</section>
+
+<section style="padding:40px 0">
+  <div class="wrap">
+    <p class="note">Sources marked research are peer-reviewed studies; quotes are copied from their published abstracts. Statements marked as the HMR's view are hypotheses of the Holistic Model of Reality, not established findings. Nothing on this page is medical advice; talk to a qualified professional before changing how you train, especially with an injury or a medical condition.</p>
+    <div class="btns" style="margin-top:18px"><a class="btn primary" href="health.html">Physical health</a><a class="btn ghost" href="simulation.html">The simulation</a></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var cv=document.getElementById('fxcol');if(!cv)return;
+  var ctx=cv.getContext('2d');
+  function TG(mods){
+    var N=[],E=[],M=[],w=1,h=1,ov=0.3;
+    function node(x,y,fix){N.push({x:x,y:y,px:x,py:y,fx:0,fy:0,fix:!!fix});return N.length-1;}
+    function el(a,b,t){var L=Math.hypot(N[b].x-N[a].x,N[b].y-N[a].y);E.push({a:a,b:b,t:t,L0:L*(t==='c'?0.88:1),cut:false,dense:false,T:0});}
+    for(var i=0;i<mods;i++){
+      var y0=i*(h-ov),xs=(i%2?0.06:0);
+      var bl=node(-w/2+xs,y0,i===0),br=node(w/2+xs,y0,i===0),tl=node(-w/2+xs,y0+h),tr=node(w/2+xs,y0+h);
+      M.push([bl,br,tl,tr]);
+      el(bl,tr,'s');el(br,tl,'s');el(bl,br,'c');el(tl,tr,'c');el(bl,tl,'c');el(br,tr,'c');
+      if(i>0){var p=M[i-1];el(p[2],bl,'c');el(p[3],br,'c');el(p[0],bl,'c');el(p[1],br,'c');el(p[2],tl,'c');el(p[3],tr,'c');}
+    }
+    return {N:N,E:E,M:M};
+  }
+  function step(m,load,iters){
+    var N=m.N,E=m.E,ks=400,kc=12,top=m.M[m.M.length-1];
+    for(var it=0;it<iters;it++){
+      for(var i=0;i<N.length;i++){N[i].fx=0;N[i].fy=0;}
+      if(load){N[top[2]].fy-=load*0.5;N[top[3]].fy-=load*0.5;N[top[2]].fx+=load*0.15;N[top[3]].fx+=load*0.15;}
+      for(var j=0;j<E.length;j++){var e=E[j];if(e.cut){e.T=0;continue;}
+        var A=N[e.a],B=N[e.b],dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1e-9,L0=e.L0*(e.dense?0.9:1),f;
+        if(e.t==='s')f=ks*(L-L0);else f=L>L0?kc*(e.dense?2.2:1)*(L-L0):0;
+        e.T=f;var ux=dx/L,uy=dy/L;A.fx+=f*ux;A.fy+=f*uy;B.fx-=f*ux;B.fy-=f*uy;}
+      for(var k=0;k<N.length;k++){var n=N[k];if(n.fix)continue;var vx=(n.x-n.px)*0.9,vy=(n.y-n.py)*0.9;n.px=n.x;n.py=n.y;n.x+=vx+n.fx*0.0008;n.y+=vy+n.fy*0.0008;}
+    }
+  }
+  var MODS=4,LOAD=0.6;
+  function peak(m){var p=0;m.E.forEach(function(e){if(e.t==='c'&&!e.cut&&e.T>p)p=e.T;});return p;}
+  function topOf(m){var t=m.N[m.M[MODS-1][2]];return [t.x,t.y];}
+  var ref0=TG(MODS);step(ref0,0,20000);var refUn=peak(ref0),topUn=topOf(ref0);
+  step(ref0,LOAD,20000);var refLd=peak(ref0),topLd=topOf(ref0);
+  var height=topUn[1];
+  var m,loaded=false,denseIdx=[4,10,23,16],dn=0,frames=0;
+  function reset(){m=TG(MODS);step(m,0,20000);loaded=false;dn=0;frames=0;document.getElementById('fx-load').setAttribute('aria-pressed','false');document.getElementById('fx-load').textContent='Load it';}
+  var W,H,S,ox,oy;
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);S=Math.min(W/2.4,H/3.35);ox=W/2-S*0.03;oy=H-S*0.2;}
+  function P(n){return [ox+n.x*S,oy-n.y*S];}
+  function col(t){var r=t/refLd;r=Math.max(0,Math.min(1,(r-0.2)/1.1));var a=[91,155,230],b=[198,40,40];return 'rgb('+Math.round(a[0]+(b[0]-a[0])*r)+','+Math.round(a[1]+(b[1]-a[1])*r)+','+Math.round(a[2]+(b[2]-a[2])*r)+')';}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#D6E1EE';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ox-S*1.4,oy+4);ctx.lineTo(ox+S*1.4,oy+4);ctx.stroke();
+    m.E.forEach(function(e){if(e.t!=='c'||e.cut)return;var a=P(m.N[e.a]),b=P(m.N[e.b]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);
+      if(e.T<=0.0001){ctx.setLineDash([5,4]);ctx.strokeStyle='#9AA9BC';ctx.lineWidth=1.5;}else{ctx.setLineDash([]);ctx.strokeStyle=col(e.T);ctx.lineWidth=1.5+Math.min(4,e.T/refLd*2.2);}
+      ctx.stroke();ctx.setLineDash([]);
+      if(e.dense){ctx.fillStyle='#C62828';ctx.beginPath();ctx.arc((a[0]+b[0])/2,(a[1]+b[1])/2,5,0,7);ctx.fill();}});
+    m.E.forEach(function(e){if(e.t!=='s')return;var a=P(m.N[e.a]),b=P(m.N[e.b]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='#0E3A75';ctx.lineWidth=7;ctx.lineCap='round';ctx.stroke();});
+    m.N.forEach(function(n){var p=P(n);ctx.fillStyle=n.fix?'#53657E':'#fff';ctx.strokeStyle='#0E3A75';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0],p[1],4,0,7);ctx.fill();ctx.stroke();});
+    if(loaded){var t=m.M[MODS-1],a=P(m.N[t[2]]),b=P(m.N[t[3]]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2-12;ctx.strokeStyle='#1D5FD1';ctx.fillStyle='#1D5FD1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx-24,cy-40);ctx.lineTo(cx-4,cy-4);ctx.stroke();ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx-12,cy-6);ctx.lineTo(cx-4,cy-14);ctx.fill();}
+    var pk=peak(m),ref=loaded?refLd:refUn,sl=0;m.E.forEach(function(e){if(e.t==='c'&&!e.cut&&e.T<=0.0001)sl++;});
+    document.getElementById('fx-peak').textContent=Math.round(pk/ref*100)+'%';
+    document.getElementById('fx-slack').textContent=sl;
+    var tp=topOf(m),rt=loaded?topLd:topUn;document.getElementById('fx-sway').textContent=(Math.hypot(tp[0]-rt[0],tp[1]-rt[1])/height*100).toFixed(1)+'% of height';
+  }
+  function loop(){if(frames<400){step(m,loaded?LOAD:0,120);frames++;}draw();requestAnimationFrame(loop);}
+  function kick(){frames=0;}
+  document.getElementById('fx-load').addEventListener('click',function(){loaded=!loaded;this.setAttribute('aria-pressed',loaded);this.textContent=loaded?'Remove load':'Load it';kick();});
+  document.getElementById('fx-dense').addEventListener('click',function(){if(dn<denseIdx.length){m.E[denseIdx[dn]].dense=true;dn++;}kick();});
+  document.getElementById('fx-reset').addEventListener('click',function(){reset();});
+  cv.addEventListener('click',function(ev){var r=cv.getBoundingClientRect(),x=ev.clientX-r.left,y=ev.clientY-r.top,best=null,bd=14;
+    m.E.forEach(function(e){if(e.t!=='c'||e.cut)return;var a=P(m.N[e.a]),b=P(m.N[e.b]),dx=b[0]-a[0],dy=b[1]-a[1],t=((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));var d=Math.hypot(a[0]+t*dx-x,a[1]+t*dy-y);if(d<bd){bd=d;best=e;}});
+    if(best){best.cut=true;kick();}});
+  window.addEventListener('resize',size);
+  reset();size();loop();
+})();
+</script>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
+<p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
+</div></footer>
+<script src="site.js" defer></script>
+</body>
+</html>

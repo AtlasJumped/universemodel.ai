@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The science hook | Universe Model</title>
+<meta name="description" content="For skeptics, in one page: science covers what happened after the Big Bang; the Holistic Model of Reality offers a step-by-step account of the transition from non-physical to physical that never breaks logic.">
+<meta property="og:title" content="The science hook | Universe Model"><meta property="og:description" content="For skeptics, in one page: science covers what happened after the Big Bang; the Holistic Model of Reality offers a step-by-step account of the transition from non-physical to physical that never breaks logic."><meta property="og:type" content="website">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 32 32' aria-hidden='true'><g fill='none' stroke-linecap='round'><path d='M6 9 L26 23 M26 9 L6 23 M16 4 L16 28' stroke='%230E3A75' stroke-width='2.6'/><path d='M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23' stroke='%235B9BE6' stroke-width='1.2' opacity='.9'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp on"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html" aria-current="page">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+</div></header>
+<main>
+<style>
+.sh-split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(24px,4vw,52px);align-items:start}
+@media (max-width:900px){.sh-split{grid-template-columns:1fr}}
+.sh-fig{position:sticky;top:86px;background:linear-gradient(160deg,#0B2545,#123A6B);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+@media (max-width:900px){.sh-fig{position:static}}
+.sh-fig svg{display:block;width:100%;height:auto;border-radius:10px;background:radial-gradient(circle at 50% 50%,#16365F 0%,#0A1A33 75%)}
+.sh-fig svg .lay{transition:opacity .6s ease}
+.sh-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.sh-ctl .chipbtn{min-width:36px}
+.sh-ctl .chipbtn.on{background:#5B9BE6;color:#fff;border-color:#5B9BE6}
+.sh-cap{color:#DCE8F7;font-size:.95rem;margin:12px 2px 0;min-height:3.2em}
+.sh-cap b{color:#fff}
+ol.sh-steps{list-style:none;margin:0;padding:0;counter-reset:st}
+ol.sh-steps li{counter-increment:st;position:relative;padding:14px 16px 14px 58px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s}
+ol.sh-steps li::before{content:counter(st);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--ice);color:var(--deep);font:700 .9rem/28px var(--font);text-align:center}
+ol.sh-steps li.on{border-color:var(--blue);box-shadow:var(--shadow);background:#F7FAFF}
+ol.sh-steps li.on::before{background:var(--blue);color:#fff}
+ol.sh-steps h3{font-size:1.02rem;margin:0 0 4px}
+ol.sh-steps p{font-size:.95rem;margin:0 0 6px;line-height:1.6}
+ol.sh-steps p:last-child{margin-bottom:0}
+ol.sh-steps .ph{font:600 .7rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:6px}
+.sh-honest{font-size:.88rem;color:var(--soft);border-left:3px solid #F2A93B;padding-left:10px}
+.sh-cmp{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.sh-cmp>div{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1.3fr);gap:14px;padding:12px 16px;border-top:1px solid var(--line);font-size:.93rem;line-height:1.5}
+.sh-cmp>div:first-child{border-top:0;background:var(--ice);font:600 .76rem/1.3 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--deep)}
+.sh-cmp>div.hmr{background:#F2F7FF;border-top:2px solid var(--blue)}
+.sh-cmp b{color:var(--navy)}
+.sh-cmp .k{display:inline-block;font:600 .7rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:999px;margin-bottom:4px}
+.sh-cmp .k.p{background:#E3EEFC;color:#164BA8}.sh-cmp .k.t{background:#FCEFD9;color:#8A5A0B}.sh-cmp .k.h{background:#1D5FD1;color:#fff}
+@media (max-width:760px){.sh-cmp>div{grid-template-columns:1fr;gap:4px}.sh-cmp>div:first-child{display:none}}
+.sh-two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.sh-two{grid-template-columns:1fr}}
+.sh-two ul{margin:0;padding-left:1.1em}.sh-two li{margin-bottom:6px}
+a.card{color:var(--ink);display:block}
+a.card:hover{text-decoration:none;border-color:var(--sky)}
+a.card p{color:var(--soft)}
+</style>
+
+<div class="page-head"><div class="wrap split" style="align-items:end">
+  <div>
+    <span class="eyebrow">The science hook</span>
+    <h1>"You want me to believe in God. Where is the science?"</h1>
+  </div>
+  <div>
+    <p class="lede">A fair question, answered in one page. Science explains very well what happened after the Big Bang. The Holistic Model of Reality (HMR) adds what science does not attempt: a step-by-step account of how a non-physical intelligence became a physical universe, with no step that breaks logic.</p>
+    <p class="small muted" style="margin:0">The rest of the site covers the detail: <a href="reality.html">the gaps in physics</a>, <a href="ui.html">Universal Intelligence</a>, <a href="health.html">health</a>.</p>
+  </div>
+</div></div>
+
+<section style="padding-bottom:clamp(36px,5vw,60px)">
+  <div class="wrap grid g3">
+    <div class="card">
+      <span class="tag">What science covers</span>
+      <h3>After the Big Bang</h3>
+      <p>Physics traces the universe from a tiny fraction of a second after its beginning to today, 13.8 billion years later, and its predictions are confirmed again and again.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Where science stops</span>
+      <h3>The beginning itself</h3>
+      <p>Before about 10<sup>-43</sup> seconds, the Planck time, its two best theories cannot be used together, and general relativity heads toward infinities (<a href="reality.html#conflicts">where the math conflicts</a>). Why there was a Big Bang at all, science does not say.</p>
+    </div>
+    <div class="card" style="background:var(--ice)">
+      <span class="tag">What the HMR adds</span>
+      <h3>How the transition happened</h3>
+      <p>Traditions say God created the world. The HMR goes further and defines the segue: what existed first, why it changed, and the first thoughts that became geometry, distance and the physical universe.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="phases">
+  <div class="wrap">
+    <span class="eyebrow">From non-physical to physical</span>
+    <h2>The transition, step by step.</h2>
+    <p class="lede" style="max-width:70ch">Each step follows from the one before it. Step through the figure, or tap any step in the list. Every step is the HMR's hypothesis; what matters here is whether the chain holds together.</p>
+    <div class="sh-split" style="margin-top:28px">
+      <div class="sh-fig">
+        <svg id="shsvg" viewBox="0 0 520 400" role="img" aria-labelledby="shcapt">
+          <defs>
+            <radialGradient id="shglow"><stop offset="0" stop-color="#9CC3F5" stop-opacity=".9"/><stop offset="1" stop-color="#9CC3F5" stop-opacity="0"/></radialGradient>
+            <radialGradient id="shbang"><stop offset="0" stop-color="#FFF6D8"/><stop offset=".25" stop-color="#F2A93B"/><stop offset=".6" stop-color="#C2410C" stop-opacity=".6"/><stop offset="1" stop-color="#0A1A33" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g id="L-noise" class="lay"></g>
+          <g id="L-limit" class="lay" opacity="0">
+            <circle cx="260" cy="200" r="150" fill="none" stroke="#9CC3F5" stroke-width="2" stroke-dasharray="6 6"/>
+            <text x="260" y="38" fill="#9CC3F5" font-size="13" font-family="Inter,sans-serif" text-anchor="middle">a self-imposed limit: focus</text>
+          </g>
+          <g id="L-pts" class="lay" opacity="0">
+            <circle cx="200" cy="200" r="22" fill="url(#shglow)"/>
+            <circle cx="200" cy="200" r="7" fill="#5B9BE6"/>
+            <text x="200" y="232" fill="#DCE8F7" font-size="14" font-weight="600" font-family="Inter,sans-serif" text-anchor="middle">me</text>
+            <circle cx="320" cy="200" r="7" fill="#F2A93B"/>
+            <text x="320" y="232" fill="#DCE8F7" font-size="14" font-weight="600" font-family="Inter,sans-serif" text-anchor="middle">not me</text>
+          </g>
+          <g id="L-line" class="lay" opacity="0">
+            <line x1="207" y1="200" x2="313" y2="200" stroke="#DCE8F7" stroke-width="2.5"/>
+            <text x="260" y="190" fill="#fff" font-size="15" font-style="italic" font-family="Georgia,serif" text-anchor="middle">d</text>
+          </g>
+          <g id="L-circ" class="lay" opacity="0">
+            <path id="shArc" d="M320 200 A120 120 0 1 1 320 199.99" fill="none" stroke="#F2A93B" stroke-width="2.5" stroke-dasharray="754 754" stroke-dashoffset="0"/>
+            <line x1="80" y1="200" x2="200" y2="200" stroke="#DCE8F7" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="260" y="365" fill="#fff" font-size="15" font-family="Inter,sans-serif" text-anchor="middle">all of "not me" at distance d: around ÷ across =</text>
+            <text id="shPi" x="260" y="388" fill="#F2A93B" font-size="17" font-weight="700" font-family="Inter,sans-serif" text-anchor="middle">π = 3.14159…</text>
+          </g>
+          <g id="L-dim" class="lay" opacity="0">
+            <circle cx="236" cy="104" r="7" fill="#7FD1AE"/>
+            <path d="M200 200 L236 104 L320 200" fill="none" stroke="#7FD1AE" stroke-width="2"/>
+            <path d="M200 200 L150 250" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="5 4"/>
+            <circle cx="150" cy="250" r="6" fill="#C4B5FD"/>
+            <g font-family="Inter,sans-serif" font-size="12" fill="#DCE8F7"><text x="410" y="96">1 relation: a line</text><text x="410" y="116">2: a plane</text><text x="410" y="136">3: a space</text></g>
+          </g>
+          <g id="L-bang" class="lay" opacity="0">
+            <circle id="shBurst" cx="260" cy="200" r="10" fill="url(#shbang)"/>
+            <g id="shRays" stroke="#FFE3A3" stroke-width="1.4" stroke-linecap="round" opacity=".8"></g>
+            <text x="260" y="388" fill="#fff" font-size="15" font-weight="600" font-family="Inter,sans-serif" text-anchor="middle">The Big Bang: from here, physics takes over</text>
+          </g>
+        </svg>
+        <div class="sh-ctl" role="group" aria-label="Steps">
+          <button type="button" class="chipbtn" id="shPrev" aria-label="Previous step">‹</button>
+          <span id="shNums"></span>
+          <button type="button" class="chipbtn" id="shNext" aria-label="Next step">›</button>
+        </div>
+        <p class="sh-cap" id="shcapt" aria-live="polite"><b>Step 1.</b> Unlimited intelligence, every thought at once.</p>
+      </div>
+
+      <ol class="sh-steps" id="shlist">
+        <li data-s="0">
+          <span class="ph">Phase 1</span>
+          <h3>A non-physical, unlimited intelligence</h3>
+          <p>Before physical reality there is only Universal Intelligence (UI): no space, no time, no matter, and no limits. An intelligence that can think every thought at once has no reason to think one thought rather than another. In human terms that state is close to what we would call insanity, and it would not have been a pleasant one.</p>
+        </li>
+        <li data-s="1">
+          <span class="ph">Phase 2</span>
+          <h3>A limit must be imposed, and it is self-imposed</h3>
+          <p>Something unlimited can change only by taking on a limit. If UI is all that exists, nothing outside it can impose one, so the limit is self-imposed. And a chosen limit is not random: UI limited itself to focus its thoughts in more pleasant ways. The pleasant thoughts were the orderly ones, ideas that lead to further ideas, as a framework does. Mathematical thoughts make patterns, patterns make prediction possible, and predictability is a form of stability.</p>
+        </li>
+        <li data-s="2">
+          <span class="ph">The first mechanized thought</span>
+          <h3>Me, and not me</h3>
+          <p>The first framework is identity. To know what I am, I must tell myself apart from what I am not. The smallest possible distinction needs exactly two things: a point that is me, and a point imagined as not me. Nothing simpler can carry a difference.</p>
+        </li>
+        <li data-s="3">
+          <span class="ph">Distance</span>
+          <h3>Two points imply a distance, and a line</h3>
+          <p>Two points that are different cannot sit in the same place, so something must separate them: an imagined distance. Distance is the first quantity, and it is a relationship rather than a thing. The shortest path from one point to the other is a line, the first dimension. To move from a reality with no space to a reality with space, distance is exactly what has to be mechanized.</p>
+        </li>
+        <li data-s="4">
+          <span class="ph">π</span>
+          <h3>A distance with no preferred direction gives a circle, and π</h3>
+          <p>Only me exists to give "not me" a position, and nothing marks one direction as special. So "not me, at that distance" is not one point but every point at that distance: a circle in a plane, a sphere in space. The ratio of any circle's distance around to its distance across is the same number, π. It is not chosen; it is forced, once distance exists with no favored direction. This is why the HMR places π among the first thoughts. <a href="ui.html">More on π →</a></p>
+          <p class="sh-honest">Where an assumption enters: two points alone do not yield π. It appears when distance is the same in every direction and continuous. The HMR's argument is that a self-imposed limit, with nothing else in existence, has no source for a favored direction. Whether that step can be derived formally or must be assumed is open mathematical work.</p>
+        </li>
+        <li data-s="5">
+          <span class="ph">Relationship and dimension</span>
+          <h3>Each new independent relation adds a dimension</h3>
+          <p>A third point that is not on the line cannot be described by the first distance alone; it requires a second, independent direction, and the three points make a plane. A fourth point off that plane requires a third. Dimension is the number of independent relations needed to say where things are. Points, lines, planes, ratios and π: these are the original thought bases, the perspectives from which a non-spatial intelligence could think about what it is and what it is not.</p>
+        </li>
+        <li data-s="6">
+          <span class="ph">The Big Bang</span>
+          <h3>The thought becomes physical</h3>
+          <p>In the HMR, the Big Bang is the moment UI settled on me and not me, and with it on distance and π. From that structure came shapes, energies and the interactions between them: intelligence exploring what it is and what it is not, testing limits and boundaries. The stable rules of that exploration are what we measure as the laws of physics. From here, the account and mainstream science run together.</p>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Honest about the claim</span>
+    <h2>What this shows, and what it does not.</h2>
+    <div class="sh-two" style="margin-top:20px">
+      <div class="card">
+        <span class="tag">It does not</span>
+        <ul>
+          <li>Prove that UI exists. No step above is a measurement.</li>
+          <li>Replace any established result of physics.</li>
+          <li>Yet give the full mathematics that takes distance and π all the way to spacetime. That mathematics still has to be written and checked.</li>
+          <li>Ask anyone to take it on faith. Each step is labelled a hypothesis, and the step from distance to π names the assumption it rests on.</li>
+        </ul>
+        <p class="note" style="margin-top:16px">What it offers instead is a chain to inspect. A skeptic does not have to accept the conclusion; they only have to find the link that breaks.</p>
+      </div>
+      <div class="card" style="background:var(--ice)">
+        <span class="tag">It does</span>
+        <ul>
+          <li>Tell one narrative that never breaks logic, from a non-physical intelligence to the physical universe.</li>
+          <li>Include all of science within it, unchanged, from the Big Bang onward.</li>
+          <li>Add what science lacks: why there is a universe, why it runs on mathematics, and what came before.</li>
+          <li>Bridge a God that existed and the Big Bang, instead of leaving a gap between them.</li>
+          <li>Lead to practical work: a <a href="health.html">physics-based model of the healthy body</a> that can be <a href="simulation.html">simulated</a> and tested.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="pull" style="max-width:62ch;margin-top:30px">If no one can find a break in the framework, and it explains more than science while losing nothing science has established, then it carries more information than the scientific picture alone.</p>
+    <p class="muted" style="max-width:70ch">That is the HMR's standard for itself: not "believe this", but "find the step that fails".</p>
+  </div>
+</section>
+
+<section class="tint" id="compare">
+  <div class="wrap">
+    <span class="eyebrow">Checked against what exists</span>
+    <h2>Has anyone else described the transition?</h2>
+    <p class="lede" style="max-width:72ch">We looked at the best-known accounts of the beginning. Physics models describe the universe's earliest state or a prior physical phase. Theology states that God created, and some traditions describe stages. To our knowledge, none gives a step-by-step mechanism, stated in mathematics, from a non-physical intelligence to the physical universe science measures. That is the HMR's distinctive claim.</p>
+    <div class="sh-cmp" style="margin-top:24px">
+      <div><span>Account</span><span>What it says about the beginning</span><span>What it leaves open</span></div>
+      <div><span><span class="k p">Physics</span><br><b>No-boundary proposal</b><br><a href="https://doi.org/10.1103/PhysRevD.28.2960">Hartle and Hawking, 1983</a></span><span>The early universe has no sharp starting edge; time emerges smoothly from a quantum state of space.</span><span>Starts from quantum physics and spacetime already in place. No account of where the laws come from.</span></div>
+      <div><span><span class="k p">Physics</span><br><b>Creation from nothing</b><br><a href="https://doi.org/10.1016/0370-2693(82)90866-8">Vilenkin, 1982</a></span><span>A universe can appear by quantum tunnelling from a state with no classical space or time.</span><span>The "nothing" already obeys the laws of quantum mechanics.</span></div>
+      <div><span><span class="k p">Physics</span><br><b>Eternal inflation</b><br><a href="https://doi.org/10.1016/0370-2693(86)90611-8">Linde, 1986</a></span><span>Our Big Bang is one bubble in a larger, endlessly inflating physical space.</span><span>Moves the question back: where did the inflating space come from?</span></div>
+      <div><span><span class="k p">Physics</span><br><b>Conformal cyclic cosmology</b><br>Penrose, <i>Cycles of Time</i>, 2010</span><span>Our universe follows an earlier physical "aeon"; the remote future of one becomes the Big Bang of the next.</span><span>An earlier physical cycle, not a transition from the non-physical.</span></div>
+      <div><span><span class="k p">Physics</span><br><b>Mathematical universe</b><br><a href="https://doi.org/10.1007/s10701-007-9186-9">Tegmark, 2008</a></span><span>Physical reality is a mathematical structure.</span><span>Close in spirit to the HMR's math-first view, but has no intelligence, no motive and no transition.</span></div>
+      <div><span><span class="k t">Philosophy</span><br><b>Spinoza and Leibniz</b><br><a href="https://plato.stanford.edu/entries/spinoza/">SEP: Spinoza</a></span><span>Spinoza: one substance, God or Nature, of which mind and matter are aspects. Leibniz: God chose the best possible world.</span><span>Why the world exists or is as it is, not a step-by-step how.</span></div>
+      <div><span><span class="k t">Theology</span><br><b>Cosmological arguments</b><br><a href="https://plato.stanford.edu/entries/cosmological-argument/">SEP</a></span><span>Whatever begins has a cause, so the universe has a first cause, identified with God.</span><span>Argues that a creator exists; does not describe the mechanism.</span></div>
+      <div><span><span class="k t">Tradition</span><br><b>Emanation</b><br>Plotinus, <a href="https://plato.stanford.edu/entries/plotinus/">SEP</a></span><span>Reality flows in stages from the One, to Intellect, to Soul, to the material world.</span><span>The nearest structural relative: staged, but the stages are not mathematical and not tied to the Big Bang.</span></div>
+      <div><span><span class="k t">Tradition</span><br><b>Tzimtzum</b><br>Lurianic Kabbalah, <a href="https://www.jewishvirtuallibrary.org/tzimtzum">Jewish Virtual Library</a></span><span>The infinite God first contracts, limiting itself, to make room for a finite world.</span><span>A striking parallel to phase 2's self-imposed limit; the steps after it are not stated as geometry or physics.</span></div>
+      <div class="hmr"><span><span class="k h">HMR</span><br><b>Holistic Model of Reality</b></span><span>Unlimited intelligence, a self-imposed limit, me and not me, distance, line, π and dimension, then the Big Bang, then all of known physics.</span><span>The formal mathematics from distance to spacetime is still to be written. <a href="roadmap.html">The road ahead →</a></span></div>
+    </div>
+    <p class="small muted" style="margin-top:12px">Summaries are ours, in plain words; follow the links for each account in its authors' own terms. We welcome corrections, including any model we have missed: <a href="about.html#contact">get in touch</a>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap grid g4">
+    <a class="card" href="reality.html"><span class="tag">The gaps</span><h3>Physical reality</h3><p>Where physics runs out, and where its math conflicts.</p></a>
+    <a class="card" href="ui.html"><span class="tag">The intelligence</span><h3>Universal Intelligence</h3><p>A God you can understand: its life cycle and limits.</p></a>
+    <a class="card" href="health.html"><span class="tag">The test</span><h3>Physical health</h3><p>The most tangible, testable part of the HMR.</p></a>
+    <a class="card" href="values.html"><span class="tag">What follows</span><h3>HMR values</h3><p>What the model implies for how to live.</p></a>
+  </div>
+</section>
+
+<script>
+(() => {
+  const svg = document.getElementById('shsvg'); if (!svg) return;
+  const NS = 'http://www.w3.org/2000/svg', reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const noise = $('L-noise'), cols = ['#9CC3F5', '#F2A93B', '#7FD1AE', '#C4B5FD', '#FCA5A5', '#DCE8F7'];
+  const dots = [];
+  for (let i = 0; i < 180; i++) {
+    const c = document.createElementNS(NS, 'circle');
+    const x = 20 + rnd() * 480, y = 20 + rnd() * 360;
+    c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 1 + rnd() * 2.6);
+    c.setAttribute('fill', cols[i % cols.length]); c.setAttribute('opacity', .35 + rnd() * .5);
+    noise.appendChild(c); dots.push([c, x, y, rnd() * 6.28]);
+  }
+  const rays = $('shRays');
+  for (let i = 0; i < 28; i++) {
+    const l = document.createElementNS(NS, 'line'), a = i / 28 * 6.2832;
+    l.dataset.a = a; rays.appendChild(l);
+  }
+  const L = ['L-noise', 'L-limit', 'L-pts', 'L-line', 'L-circ', 'L-dim', 'L-bang'].map($);
+  const SHOW = [
+    [1, 0, 0, 0, 0, 0, 0], [.35, 1, 0, 0, 0, 0, 0], [.08, .35, 1, 0, 0, 0, 0], [0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0], [0, 0, 1, 1, .3, 1, 0], [0, 0, 0, 0, 0, 0, 1]
+  ];
+  const CAP = [
+    'Unlimited intelligence: every thought at once, with no reason to choose one.',
+    'A self-imposed limit, chosen to focus thought in more pleasant ways.',
+    'The first distinction: a point that is me, a point that is not me.',
+    'Two different points imply a distance, and a line: the first dimension.',
+    'Every point at distance d, in no favored direction: a circle, and π.',
+    'Each new independent relation adds a dimension: line, plane, space.',
+    'The structure becomes physical: the Big Bang. Physics takes over.'
+  ];
+  const nums = $('shNums'), items = [...document.querySelectorAll('#shlist li')], btns = [];
+  CAP.forEach((_, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chipbtn'; b.textContent = i + 1; b.setAttribute('aria-label', 'Step ' + (i + 1)); b.addEventListener('click', () => go(i)); nums.appendChild(b); nums.appendChild(document.createTextNode(' ')); btns.push(b); });
+  let cur = 0, t0 = performance.now();
+  function go(k) {
+    cur = Math.max(0, Math.min(6, k)); t0 = performance.now();
+    L.forEach((g, i) => g.setAttribute('opacity', SHOW[cur][i]));
+    btns.forEach((b, i) => { b.classList.toggle('on', i === cur); b.setAttribute('aria-pressed', i === cur); });
+    items.forEach((li, i) => li.classList.toggle('on', i === cur));
+    $('shcapt').innerHTML = '<b>Step ' + (cur + 1) + '.</b> ' + CAP[cur];
+    if (reduce) frame(performance.now() + 4000);
+  }
+  items.forEach((li, i) => li.addEventListener('click', e => { if (e.target.closest('a')) return; go(i); }));
+  $('shPrev').addEventListener('click', () => go(cur - 1));
+  $('shNext').addEventListener('click', () => go(cur + 1));
+  const arc = $('shArc'), piT = $('shPi'), burst = $('shBurst');
+  function frame(now) {
+    const t = (now - t0) / 1000;
+    if (cur <= 2) dots.forEach(([c, x, y, p]) => {
+      const j = cur === 0 ? 3 : 1;
+      let nx = x + Math.sin(t * 2.1 + p) * j, ny = y + Math.cos(t * 1.7 + p) * j;
+      if (cur >= 1) { const dx = nx - 260, dy = ny - 200, r = Math.hypot(dx, dy); if (r > 150) { nx = 260 + dx / r * 150; ny = 200 + dy / r * 150; } }
+      c.setAttribute('cx', nx); c.setAttribute('cy', ny);
+    });
+    if (cur === 4) { const f = Math.min(1, t / 2.2); arc.setAttribute('stroke-dashoffset', 754 * (1 - f)); piT.textContent = f < 1 ? 'π = ' + (Math.PI * f).toFixed(5) : 'π = 3.14159…'; }
+    else arc.setAttribute('stroke-dashoffset', 0);
+    if (cur === 6) {
+      const f = Math.min(1, t / 2.5), R = 10 + 240 * (1 - Math.pow(1 - f, 3));
+      burst.setAttribute('r', R);
+      [...rays.children].forEach(l => { const a = +l.dataset.a, r0 = R * .35, r1 = R * .95; l.setAttribute('x1', 260 + Math.cos(a) * r0); l.setAttribute('y1', 200 + Math.sin(a) * r0); l.setAttribute('x2', 260 + Math.cos(a) * r1); l.setAttribute('y2', 200 + Math.sin(a) * r1); });
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  go(0); if (!reduce) requestAnimationFrame(frame);
+})();
+</script>
+</main>
+<footer class="site-foot"><div class="wrap">
+<div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
+<p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
+<p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
+</div></footer>
+<script src="site.js" defer></script>
+</body>
+</html>

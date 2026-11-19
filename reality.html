@@ -16,9 +16,47 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html" aria-current="page">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp on"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html" aria-current="page">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
+<style>
+.rv-scale{margin-top:14px}
+.rv-scale .btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.rv-scale .chipbtn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.rv-scale svg{display:block;width:100%;height:auto}
+.rv-scale .rv-out{min-height:4.6em;font-size:.96rem;margin:0}
+.rv-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-two div{background:var(--mist);border-radius:10px;padding:10px 12px;font-size:.9rem;line-height:1.35}
+.rv-two b{display:block;color:var(--navy);margin-bottom:6px}
+.rv-two span{display:block;padding:4px 0;border-top:1px solid var(--line)}
+.rv-tl{list-style:none;margin:0;padding:0}
+.rv-tl li{position:relative;padding:0 0 10px 18px;border-left:2px solid var(--line);margin-left:4px;font-size:.92rem;line-height:1.45}
+.rv-tl li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--blue)}
+.rv-tl li:last-child{padding-bottom:0}
+.rv-tl b{display:block;color:var(--navy)}
+.rv-grade svg{display:block;width:100%;height:auto}
+.rv-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0 0}
+.rv-legend div{border-radius:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);font-size:.9rem;line-height:1.35}
+.rv-legend b{display:block;font-size:1.3rem;color:var(--navy)}
+.rv-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:1px}
+.rv-conf{counter-reset:rvc}
+.rv-conf .card{position:relative;padding-top:22px}
+.rv-conf .card h3{font-size:1.08rem;margin-bottom:6px}
+.rv-conf .card .rv-eq{font:600 .88rem/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--ice);color:var(--deep);border-radius:8px;padding:8px 10px;margin:0 0 10px}
+.rv-conf .card .rv-n{position:absolute;top:-12px;left:20px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font:700 .86rem/28px var(--font);text-align:center}
+.rv-hmrpos{border-left:4px solid var(--blue)}
+.rv-gifts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:22px 0 34px}
+.rv-gifts .card{padding:18px}
+.rv-gifts svg{width:30px;height:30px;color:var(--blue);margin-bottom:8px}
+.rv-gifts h3{font-size:1rem;margin-bottom:4px}
+.rv-gifts p{font-size:.93rem;margin:0}
+@media (max-width:860px){.rv-gifts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.rv-gifts{grid-template-columns:1fr}.rv-legend{grid-template-columns:1fr}}
+.navyband .fig{background:#0B1424;border-color:rgba(255,255,255,.12)}
+.navyband .fig figcaption{color:#9FB6D6}
+.navyband .fig figcaption a{color:#9CC3F5}
+</style>
+
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">A new model of reality</span>
   <h1>Where today's picture of reality runs out.</h1>
@@ -31,38 +69,174 @@
       <span class="eyebrow">What we use now</span>
       <h2>Two great theories that do not fit together.</h2>
       <p>Newton's laws described motion and gravity so well that they guided science for two centuries. Einstein then showed they were an approximation: in general relativity, gravity is the curvature of space and time. At the smallest scales, quantum mechanics describes matter and light with extraordinary precision.</p>
-      <p>Each theory is confirmed in its own domain. But they rest on different pictures of what reality is, and no one has found a way to combine them into one theory. Where they must meet, they disagree badly: the energy of empty space predicted by quantum theory exceeds what cosmology observes by a factor of roughly 10<sup>120</sup>, which has been called the worst prediction in physics (<a href="https://doi.org/10.1103/RevModPhys.61.1">Weinberg, 1989</a>).</p>
-      <p>And the visible universe is a small part of the whole. By the best current measurements, ordinary matter makes up only about 5% of the universe's contents; the rest is attributed to dark matter and dark energy, whose nature is unknown (<a href="https://doi.org/10.1051/0004-6361/201833910">Planck Collaboration, 2020</a>).</p>
+      <p>Each theory is confirmed in its own domain. But they rest on different pictures of what reality is, and no one has found a way to combine them into one theory. Where they must meet, they disagree badly.</p>
+      <h3 id="vacuum" style="margin-top:26px">The energy of empty space, in plain terms</h3>
+      <p>Take a box and remove everything from it: every atom, every particle of light. Is anything left? Quantum mechanics says yes. Empty space is never perfectly still; every field in it keeps a minimum, unremovable jitter, and that jitter carries energy. Physicists call it the energy of the vacuum.</p>
+      <p>Energy has weight, so it bends space. When physicists add up the vacuum energy that quantum theory predicts, the answer is so large that the universe should have flown apart, or collapsed, long before a single star could form. Instead, astronomers measure a tiny value: in a cubic meter of empty space, about as much energy as is locked inside the mass of a few hydrogen atoms.</p>
+      <p>The prediction and the measurement differ by a factor of roughly 10<sup>120</sup>, a 1 followed by 120 zeros. It has been called the worst prediction in physics (<a href="https://doi.org/10.1103/RevModPhys.61.1">Weinberg, 1989</a>). It is not a rounding error. It means one of our two best theories, or the way they are combined, is wrong about something basic.</p>
     </div>
-    <div class="card" style="background:var(--ice)">
-      <span class="tag">In short</span>
-      <p><b>Physics describes the rules of physical reality with great precision.</b> It does not yet have one account of those rules, and it does not say why they exist, what most of the universe is made of, or how experience arises from matter.</p>
+    <div>
+      <div class="card" style="background:var(--ice)">
+        <span class="tag">In short</span>
+        <p><b>Physics describes the rules of physical reality with great precision.</b> It does not yet have one account of those rules, and it does not say why they exist, what most of the universe is made of, or how experience arises from matter.</p>
+      </div>
+      <div class="card rv-scale" id="rvscale">
+        <span class="tag">How big is a miss of 10<sup>120</sup>?</span>
+        <p class="small muted" style="margin:0">Each mark is a factor of ten. Tap a comparison.</p>
+        <div class="btns" role="group" aria-label="Comparisons">
+          <button type="button" class="chipbtn" data-k="0">Hair vs. universe</button>
+          <button type="button" class="chipbtn" data-k="1">Atoms in the universe</button>
+          <button type="button" class="chipbtn" data-k="2">The vacuum miss</button>
+        </div>
+        <svg viewBox="0 0 400 74" role="img" aria-label="A scale of powers of ten from 1 to 10 to the 120">
+          <rect x="10" y="30" width="380" height="10" rx="5" fill="#E8F0FA"/>
+          <rect id="rvbar" x="10" y="30" width="0" height="10" rx="5" fill="#1D5FD1"/>
+          <g fill="#53657E" font-size="10" font-family="Inter,sans-serif" text-anchor="middle">
+            <text x="10" y="60">10<tspan dy="-4" font-size="7">0</tspan></text>
+            <text x="105" y="60">10<tspan dy="-4" font-size="7">30</tspan></text>
+            <text x="200" y="60">10<tspan dy="-4" font-size="7">60</tspan></text>
+            <text x="295" y="60">10<tspan dy="-4" font-size="7">90</tspan></text>
+            <text x="390" y="60">10<tspan dy="-4" font-size="7">120</tspan></text>
+          </g>
+          <g stroke="#D6E1EE"><line x1="105" y1="26" x2="105" y2="44"/><line x1="200" y1="26" x2="200" y2="44"/><line x1="295" y1="26" x2="295" y2="44"/></g>
+          <text id="rvlab" x="10" y="18" fill="#0B2545" font-size="12" font-weight="700" font-family="Inter,sans-serif"></text>
+        </svg>
+        <p class="rv-out" id="rvout" aria-live="polite">Pick a comparison above.</p>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <span class="tag">Two theories, two pictures of reality</span>
+        <div class="rv-two">
+          <div><b>General relativity</b><span>Gravity, planets, galaxies</span><span>Space and time bend and flow</span><span>Smooth and continuous</span><span>Certain, definite outcomes</span></div>
+          <div><b>Quantum mechanics</b><span>Atoms, light, particles</span><span>Space and time are a fixed stage</span><span>Comes in discrete packets</span><span>Probabilities until measured</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="dark">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">The dark universe</span>
+      <h2>We can identify about 5% of what the universe contains.</h2>
+      <p>By the best current measurements, from the European Space Agency's Planck satellite, ordinary matter (every star, planet, gas cloud and living thing, everything made of atoms) is only about 5% of the universe's contents. About 27% is called dark matter and about 68% dark energy (<a href="https://doi.org/10.1051/0004-6361/201833910">Planck Collaboration, 2020</a>; <a href="https://science.nasa.gov/universe/dark-matter-dark-energy/">NASA</a>).</p>
+      <p>"Dark" here does not describe a substance. It is a placeholder. Dark matter is the name for extra gravity that we observe but cannot trace to anything we can detect; decades of searches have not found a dark-matter particle. Dark energy is the name for whatever is making the expansion of the universe speed up. In both cases we can measure the effect and have no confirmed account of the cause. So when physicists say their nature is unknown, they mean it literally: about 95% of the contents of the universe are not understood.</p>
+      <p>Put it in school terms. A score of 90% is roughly an A. Below 50% is an F. Our understanding of what the universe is made of scores about 5%. That is not a nearly finished exam with a few hard questions left. It is a first page.</p>
+      <figure class="fig" style="margin-top:22px">
+        <img src="img/rv-hudf.jpg" alt="Hubble Ultra Deep Field: thousands of colorful galaxies against black space" loading="lazy" width="1000" height="913">
+        <figcaption>Almost every speck here is a whole galaxy. All of it together belongs to the 5%. Hubble Ultra Deep Field 2014. Credit: NASA, ESA, H. Teplitz and M. Rafelski (IPAC/Caltech), A. Koekemoer (STScI), R. Windhorst (Arizona State University), and Z. Levay (STScI). Public domain. <a href="https://commons.wikimedia.org/wiki/File:NASA-HS201427a-HubbleUltraDeepField2014-20140603.jpg">Wikimedia Commons</a>.</figcaption>
+      </figure>
+    </div>
+    <div>
+    <div class="card rv-grade">
+      <span class="tag">The universe's report card</span>
+      <svg viewBox="0 0 320 320" role="img" aria-label="Donut chart: dark energy 68 percent, dark matter 27 percent, ordinary matter 5 percent">
+        <g transform="translate(160 160) rotate(-90)" fill="none" stroke-width="46">
+          <circle r="110" stroke="#0E3A75" stroke-dasharray="470.0 691.15" stroke-dashoffset="0"/>
+          <circle r="110" stroke="#5B9BE6" stroke-dasharray="186.6 691.15" stroke-dashoffset="-470.0"/>
+          <circle r="110" stroke="#F2A93B" stroke-dasharray="34.6 691.15" stroke-dashoffset="-656.6"/>
+        </g>
+        <text x="160" y="152" text-anchor="middle" font-family="Inter,sans-serif" font-size="46" font-weight="750" fill="#0B2545">5%</text>
+        <text x="160" y="180" text-anchor="middle" font-family="Inter,sans-serif" font-size="14" fill="#53657E">identified</text>
+      </svg>
+      <div class="rv-legend">
+        <div><i style="background:#0E3A75"></i><b>68%</b>dark energy: cause unknown</div>
+        <div><i style="background:#5B9BE6"></i><b>27%</b>dark matter: never detected directly</div>
+        <div><i style="background:#F2A93B"></i><b>5%</b>ordinary matter: understood</div>
+      </div>
+      <svg viewBox="0 0 320 70" style="margin-top:18px" role="img" aria-label="Grade scale: F below 50, A from 90; the universe score is 5">
+        <rect x="10" y="22" width="150" height="16" fill="#E9B4B4"/>
+        <rect x="160" y="22" width="120" height="16" fill="#F3DDA8"/>
+        <rect x="280" y="22" width="30" height="16" fill="#A9D8B5"/>
+        <g font-family="Inter,sans-serif" font-size="11" fill="#1E3350" text-anchor="middle"><text x="85" y="56">F (below 50%)</text><text x="220" y="56">D to B</text><text x="295" y="56">A</text></g>
+        <path d="M25 6 L25 40" stroke="#0B2545" stroke-width="2.5"/><circle cx="25" cy="10" r="5" fill="#0B2545"/>
+        <text x="34" y="14" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#0B2545">5%: our score</text>
+      </svg>
+      <p class="small muted" style="margin:6px 0 0">Values from Planck 2018 (ordinary matter 4.9%, total matter 31.5%, dark energy 68.5%), rounded as NASA rounds them.</p>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <span class="tag">What "unknown" means here</span>
+      <p style="margin-bottom:8px"><b>Dark matter:</b> we see its gravity pulling on stars and galaxies. We have never seen the thing doing the pulling.</p>
+      <p><b>Dark energy:</b> we see the expansion of the universe speeding up. We do not know what is pushing it.</p>
+    </div>
+    <div class="card" style="margin-top:14px;background:var(--ice)">
+      <span class="tag">How the 5% is measured</span>
+      <p>The Planck satellite mapped the oldest light in the universe, released about 380,000 years after the Big Bang. The pattern of tiny hot and cold spots in that light depends on how much ordinary matter, dark matter and dark energy there is, which is how the proportions are fixed so precisely, even though two of the three are unexplained.</p>
+    </div>
     </div>
   </div>
 </section>
 
 <section class="navyband" id="gravity">
-  <div class="wrap split" style="align-items:center">
+  <div class="wrap split">
     <div>
       <span class="eyebrow" style="color:#9CC3F5">The biggest gap</span>
       <h2>No one knows what gravity is.</h2>
       <p>Gravity is the most familiar force there is. It holds you in your chair and the planets in their orbits. And after more than three hundred years, it is still the force physics understands least.</p>
       <ul style="margin:0 0 16px;padding-left:1.1em;color:#C9DAF0">
         <li style="margin-bottom:8px"><b style="color:#fff">It will not join the rest of physics.</b> The other three forces have quantum descriptions. Gravity does not, and every attempt to give it one, from string theory to loop quantum gravity, remains unconfirmed.</li>
-        <li style="margin-bottom:8px"><b style="color:#fff">It breaks down where it matters most.</b> At the center of a black hole and at the Big Bang, general relativity predicts infinities: places where the theory stops describing anything.</li>
+        <li style="margin-bottom:8px"><b style="color:#fff">Its mathematics breaks down where it matters most.</b> "Breaks down" is meant literally: at the center of a black hole and at the Big Bang, the equations of general relativity return infinite values for density and curvature. An infinity is not a measurement; it is the theory telling us it no longer describes what is happening. <a href="#conflicts" style="color:#9CC3F5">Every place the math conflicts →</a></li>
         <li style="margin-bottom:8px"><b style="color:#fff">It is absurdly weak.</b> Between two protons, the electric force is about 10<sup>36</sup> times stronger than gravity. No one knows why the difference is so enormous.</li>
         <li><b style="color:#fff">It does not add up.</b> Galaxies spin and cluster as if they held far more mass than we can see. Either most of the matter in the universe is invisible, or our account of gravity is wrong at large scales. Both possibilities are still open.</li>
       </ul>
+
     </div>
     <div>
-      <p class="pull">&ldquo;Gravity must be caused by an agent acting constantly according to certain laws; but whether this agent be material or immaterial is a question I have left to the consideration of my readers.&rdquo;</p>
-      <p class="note">Isaac Newton, letter to Richard Bentley, 25 February 1692/3. In the same letter he called action at a distance through empty space &ldquo;so great an absurdity&rdquo; that no competent thinker could accept it. <a href="https://newtonproject.ox.ac.uk/view/texts/normalized/THEM00258" style="color:#9CC3F5">The Newton Project transcription</a>.</p>
-      <p class="note" style="margin-top:12px">Newton gave us the law of gravity and deliberately left open what gravity is. Three centuries later, it is still open.</p>
+      <figure class="fig">
+        <img src="img/rv-m87.jpg" alt="The first image of a black hole: a glowing orange ring around a dark center, in the galaxy M87" loading="lazy" width="900" height="900">
+        <figcaption>The shadow of the black hole at the center of galaxy M87, the first ever imaged (2019). General relativity predicts the ring we see; at the center it predicts an infinity, the point where its own math stops working. Credit: Event Horizon Telescope (ESO release eso1907a). CC BY 4.0. <a href="https://commons.wikimedia.org/wiki/File:Black_hole_-_Messier_87_crop_max_res.jpg">Wikimedia Commons</a>.</figcaption>
+      </figure>
+      <p class="pull" style="margin-top:26px;font-size:clamp(1.1rem,1.8vw,1.35rem)">&ldquo;Gravity must be caused by an agent acting constantly according to certain laws; but whether this agent be material or immaterial is a question I have left to the consideration of my readers.&rdquo;</p>
+      <p class="note">Isaac Newton, letter to Richard Bentley, 25 February 1692/3. In the same letter he called action at a distance through empty space &ldquo;so great an absurdity&rdquo; that no competent thinker could accept it. <a href="https://newtonproject.ox.ac.uk/view/texts/normalized/THEM00258" style="color:#9CC3F5">The Newton Project transcription</a>. Newton gave us the law of gravity and deliberately left open what gravity is. Three centuries later, it is still open.</p>
     </div>
   </div>
 </section>
 
-<section class="tint" id="foundations">
+<section class="tint" id="conflicts">
+  <div class="wrap">
+    <span class="eyebrow">A math problem, not a gap in data</span>
+    <h2>Where the mathematics of physics conflicts.</h2>
+    <p class="lede">"No one knows what gravity is" is not a complaint about missing measurements. It is a mathematical problem, and math problems cannot be explained away. When two sets of equations, each confirmed by experiment, give contradictory or infinite answers about the same situation, one of two things is true: either the math is wrong, or the framework that tells us what the math describes is wrong. These are the places where that happens.</p>
+    <div class="grid g3 rv-conf" style="margin-top:34px;row-gap:34px">
+      <div class="card">
+        <span class="rv-n">1</span>
+        <h3>Singularities</h3>
+        <p class="rv-eq">density → ∞, curvature → ∞</p>
+        <p>General relativity itself proves that, under very general conditions, collapsing stars and the early universe must reach points where its quantities become infinite (<a href="https://doi.org/10.1103/PhysRevLett.14.57">Penrose, 1965</a>; <a href="https://doi.org/10.1098/rspa.1970.0021">Hawking and Penrose, 1970</a>). The theory predicts its own failure, at the center of every black hole and at the beginning of time.</p>
+      </div>
+      <div class="card">
+        <span class="rv-n">2</span>
+        <h3>Gravity cannot be made quantum</h3>
+        <p class="rv-eq">infinitely many unknown constants</p>
+        <p>The method that turned electromagnetism and the nuclear forces into quantum theories fails for gravity. Calculations produce infinities that cannot be absorbed into a finite set of measured numbers, so at high energies the theory predicts nothing (<a href="https://doi.org/10.1016/0550-3213(86)90193-8">Goroff and Sagnotti, 1986</a>). Physicists call gravity "non-renormalizable".</p>
+      </div>
+      <div class="card">
+        <span class="rv-n">3</span>
+        <h3>The energy of empty space</h3>
+        <p class="rv-eq">predicted ÷ measured ≈ 10<sup>120</sup></p>
+        <p>Quantum theory's estimate of the vacuum energy, fed into general relativity, disagrees with the measured expansion of the universe by about 120 orders of magnitude (<a href="https://doi.org/10.1103/RevModPhys.61.1">Weinberg, 1989</a>). <a href="#vacuum">Explained above</a>.</p>
+      </div>
+      <div class="card">
+        <span class="rv-n">4</span>
+        <h3>Two kinds of time</h3>
+        <p class="rv-eq">H&Psi; = 0 (no time variable)</p>
+        <p>In quantum mechanics, time is a fixed background clock. In general relativity, time bends and is part of what the equations solve for. When the two are combined directly, time drops out of the central equation altogether (<a href="https://doi.org/10.1103/PhysRev.160.1113">DeWitt, 1967</a>). This is known as the problem of time.</p>
+      </div>
+      <div class="card">
+        <span class="rv-n">5</span>
+        <h3>Black holes and lost information</h3>
+        <p class="rv-eq">pure state → mixed state</p>
+        <p>Hawking showed that black holes slowly radiate away. His calculation implies that what fell in is erased, which quantum mechanics forbids (<a href="https://doi.org/10.1103/PhysRevD.14.2460">Hawking, 1976</a>). Fifty years later the "information paradox" is still argued over.</p>
+      </div>
+      <div class="card rv-hmrpos" style="background:#fff">
+        <span class="tag">The HMR's position</span>
+        <p><b>The HMR does not say the math is wrong.</b> Each equation above works superbly in its own domain. The HMR's view is that the framework, the perspective from which the math is read, is wrong: physics treats space, time and matter as the bottom layer of reality. In the HMR they are not the bottom layer; they emerge from Universal Intelligence (UI). Conflicts appearing exactly where physics pushes back toward an origin (the Big Bang, the center of a black hole, empty space itself) is what one would expect if the foundations sit one level deeper. <a href="science-hook.html">The science hook →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="foundations">
   <div class="wrap">
     <span class="eyebrow">What a material view has not explained</span>
     <h2>Open questions at the foundations.</h2>
@@ -86,17 +260,17 @@
       <div class="card">
         <span class="tag">Gravity</span>
         <h3>The force that will not fit</h3>
-        <p>No quantum theory of gravity has been confirmed, and general relativity breaks down at black holes and at the Big Bang. <a href="#gravity">More above</a>.</p>
+        <p>No quantum theory of gravity has been confirmed, and the equations of general relativity return infinities at black holes and at the Big Bang. <a href="#conflicts">Where the math conflicts</a>.</p>
       </div>
       <div class="card">
         <span class="tag">The dark universe</span>
         <h3>95% of everything, unidentified</h3>
-        <p>Dark matter and dark energy are names for effects, not explanations. Decades of searches have not detected a dark-matter particle, and the nature of dark energy is unknown (<a href="https://doi.org/10.1051/0004-6361/201833910">Planck Collaboration, 2020</a>).</p>
+        <p>Dark matter and dark energy are names for effects, not explanations. Decades of searches have not detected a dark-matter particle, and the cause of dark energy is unknown (<a href="https://doi.org/10.1051/0004-6361/201833910">Planck Collaboration, 2020</a>). <a href="#dark">The 5% report card</a>.</p>
       </div>
       <div class="card">
         <span class="tag">The beginning</span>
         <h3>Why there is something, and why these laws</h3>
-        <p>Cosmology traces the universe back to the Big Bang, but not what came before it, why it began in such an improbably ordered state, or why its constants fall within the narrow range that allows atoms, stars and life. These questions have no agreed scientific answer.</p>
+        <p>Cosmology traces the universe back to the Big Bang, but not what came before it, why it began in such an improbably ordered state, or why its constants fall within the narrow range that allows atoms, stars and life. These questions have no agreed scientific answer. <a href="science-hook.html">The HMR's account of the transition →</a></p>
       </div>
       <div class="card">
         <span class="tag">Mathematics</span>
@@ -117,32 +291,71 @@
   </div>
 </section>
 
-<section>
-  <div class="wrap split">
-    <div>
-      <span class="eyebrow">What the gaps add up to</span>
-      <h2>Science is incomplete, and seriously so.</h2>
-      <p>Put the list together and the picture is plain. Science cannot say what most of the universe is made of. It cannot reconcile its two best theories. It cannot say what gravity is, what came before the Big Bang, why the laws are what they are, why mathematics describes them, what life is, how it began, or why there is experience at all.</p>
-      <p>These are not small gaps at the edge of knowledge. They sit at the foundations, under everything else we think we know. A materialist account of reality is not a finished picture with a few details missing. It is a precise description of how physical reality behaves, with no agreed account of what that reality is.</p>
-      <p><b>That is why a holistic model of reality is needed today:</b> one that keeps everything science has established, and also offers an account of the foundations that science leaves open.</p>
+<section class="tint" id="incomplete">
+  <div class="wrap">
+    <span class="eyebrow">Credit where it is due</span>
+    <h2>What science has given us.</h2>
+    <p class="lede" style="max-width:none">Before naming what science has not done, it deserves real thanks for what it has. The ideas on this site were thought through, written, and shared on computers that science made possible.</p>
+    <div class="rv-gifts">
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><h3>Computers and the internet</h3><p>Tools to think, write and share ideas with anyone, anywhere.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M12 13c-1.5 1.5-1.5 3 0 4.5 1.5-1.5 1.5-3 0-4.5z"/></svg><h3>Warm and cool homes</h3><p>Heating, air conditioning, clean water and light on demand.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M12 10v7M8.5 13.5h7"/></svg><h3>Medicine</h3><p>Vaccines, antibiotics, surgery and imaging that have saved countless lives.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3 7h-6z"/><path d="M9 9v6l-3 4h12l-3-4V9"/><path d="M10 22h4"/></svg><h3>Technology</h3><p>Flight, satellites, power grids and machines that extend what a person can do.</p></div>
     </div>
-    <div class="card" style="background:var(--ice)">
-      <span class="tag">The foundations, in one table</span>
-      <ul style="margin:0;padding-left:1.1em">
-        <li style="margin-bottom:6px"><b>What is matter?</b> About 5% identified.</li>
-        <li style="margin-bottom:6px"><b>What is gravity?</b> Unknown at the quantum level.</li>
-        <li style="margin-bottom:6px"><b>Where did it all come from?</b> Unknown.</li>
-        <li style="margin-bottom:6px"><b>Why these laws?</b> Unknown.</li>
-        <li style="margin-bottom:6px"><b>Why does math work?</b> Unknown.</li>
-        <li style="margin-bottom:6px"><b>What is life?</b> No agreed definition.</li>
-        <li style="margin-bottom:6px"><b>What is consciousness?</b> Unexplained.</li>
-        <li><b>What is a healthy human?</b> Never defined.</li>
-      </ul>
+    <div class="split">
+      <div>
+        <span class="eyebrow">What the gaps add up to</span>
+        <h2>Science is incomplete, and seriously so.</h2>
+        <p>Humanity has a habit: in almost every era, it has felt close to having figured everything out. At the end of the nineteenth century, many physicists believed the foundations of their subject were essentially complete. Within a few years came the quantum (1900) and relativity (1905), and the foundations were rebuilt. We are very likely in the same position today, and further from the full picture than it feels.</p>
+        <p>Put the list together and the picture is plain. Science cannot say what most of the universe is made of. It cannot reconcile its two best theories. It cannot say what gravity is, what came before the Big Bang, why the laws are what they are, why mathematics describes them, what life is, how it began, or why there is experience at all. These are not small gaps at the edge of knowledge. They sit at the foundations, under everything else we think we know.</p>
+        <p>The Holistic Model of Reality (HMR) proposes a model far from where mainstream thinking is today. It requires changes at the foundations, chiefly two: that physical reality emerges from Universal Intelligence (UI), and that fascia is the body's primary system for health. Those two changes move the model of reality from the mainstream to something new, and they open a green field for many of the answers science is still looking for.</p>
+        <p>A materialist account of reality is not a finished picture with a few details missing. It is a precise description of how physical reality behaves, with no agreed account of what that reality is.</p>
+        <p>Even so, many people who hold a materialist view are quite sure about the deepest questions: what is sane and what is insane, what is real and what is not. The science does not back that certainty. It cannot yet say what consciousness is, what a measurement does, or <a href="mental-health.html">where sanity ends</a>. Confidence about those questions is a belief, not a finding.</p>
+        <p><b>That is why a holistic model of reality is needed today:</b> one that keeps everything science has established and also offers an account of the foundations science leaves open. Once the full picture is understood, the questions that feel unanswerable become answerable: what life is, what death is, what to do with our day, and what right and wrong behavior are. <a href="values.html">The HMR's values, a first draft →</a></p>
+      </div>
+      <div>
+        <div class="card" style="background:var(--ice)">
+          <span class="tag">The foundations, in one table</span>
+          <ul style="margin:0;padding-left:1.1em">
+            <li style="margin-bottom:6px"><b>What is matter?</b> About 5% identified.</li>
+            <li style="margin-bottom:6px"><b>What is gravity?</b> Its two theories conflict mathematically.</li>
+            <li style="margin-bottom:6px"><b>Where did it all come from?</b> Unknown.</li>
+            <li style="margin-bottom:6px"><b>Why these laws?</b> Unknown.</li>
+            <li style="margin-bottom:6px"><b>Why does math work?</b> Unknown.</li>
+            <li style="margin-bottom:6px"><b>What is life?</b> No agreed definition.</li>
+            <li style="margin-bottom:6px"><b>What is consciousness?</b> Unexplained.</li>
+            <li><b>What is a healthy human?</b> Never defined.</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">Two foundation changes</span>
+          <p style="margin-bottom:10px"><b>1. Intelligence first.</b> Space, time and matter emerge from UI, not the other way round. <a href="ui.html">Defining UI →</a></p>
+          <p><b>2. Fascia first.</b> The connective web that holds the body together is treated as the main lever of health. <a href="health.html">A new model of health →</a></p>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">The questions a full picture answers</span>
+          <ul class="plain" style="margin:0;padding-left:1.1em">
+            <li>What is life?</li><li>What is death?</li><li>What should I do with my day?</li><li>What is right, and what is wrong?</li>
+          </ul>
+          <p style="margin-top:10px"><a href="values.html">HMR values →</a></p>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">A habit of feeling finished</span>
+          <ul class="rv-tl">
+            <li><b>1890s</b>Many physicists see their subject as nearly complete.</li>
+            <li><b>1900</b>Planck's quantum: energy comes in packets.</li>
+            <li><b>1905</b>Einstein's relativity: space and time are not absolute.</li>
+            <li><b>1929</b>The universe is expanding (<a href="https://doi.org/10.1073/pnas.15.3.168">Hubble</a>).</li>
+            <li><b>1998</b>The expansion is speeding up, and dark energy is named (<a href="https://doi.org/10.1086/300499">Riess et al.</a>; <a href="https://doi.org/10.1086/307221">Perlmutter et al.</a>).</li>
+            <li><b>Today</b>About 95% of the universe unidentified.</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="tint" id="values">
+<section id="values">
   <div class="wrap">
     <span class="eyebrow">For readers who trust science</span>
     <h2>If you value reason, these gaps are a question for you.</h2>
@@ -169,19 +382,23 @@
   </div>
 </section>
 
-<section>
+<section class="tint">
   <div class="wrap split">
     <div>
       <span class="eyebrow">The Holistic Model of Reality</span>
       <h2>One account, from before the Big Bang to today.</h2>
-      <p>The HMR proposes that physical reality emerges from Universal Intelligence (UI), a non-physical intelligence whose changes over time trend toward greater coherence. The laws of physics are the stable rules that make a complex physical reality possible. Living bodies are the vessels through which that intelligence experiences what it has made, and each human is one such instance. <a href="ui.html">Defining Universal Intelligence →</a></p>
+      <p>The HMR proposes that physical reality emerges from UI, a non-physical intelligence whose changes over time trend toward greater coherence. The laws of physics are the stable rules that make a complex physical reality possible. Living bodies are the vessels through which that intelligence experiences what it has made, and each human is one such instance. <a href="ui.html">Defining Universal Intelligence →</a></p>
       <p>Seen this way, the open questions above stop being anomalies. Non-local connection, the role of observation and the existence of experience are what one would expect if intelligence comes first and matter second.</p>
       <p>We believe the HMR is the most holistic model of reality yet put forward. It offers one narrative that runs from before the Big Bang to the present, accounts for science and for human consciousness, contradicts no established science, and finds a place for what the world's religions have described. Breadth is not proof, and the HMR is not yet empirically established. That is why we are testing its most tangible part first: <a href="health.html">a new model of health</a>.</p>
     </div>
     <div>
       <div class="card">
         <span class="tag">How the HMR earns a hearing</span>
-        <p>If a model of the human body derived from the HMR can simulate, explain and help reverse real disease in ways that modern medicine cannot, then the larger account it comes from deserves a serious look.</p>
+        <p>If a model of the human body derived from the HMR can simulate, explain and help reverse real disease in ways that modern medicine cannot, then the HMR theory it comes from deserves a serious look.</p>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <span class="tag">For skeptics, in one page</span>
+        <p>"Where is the science?" The HMR's step-by-step account of how a non-physical intelligence became a physical universe. <a href="science-hook.html">The science hook →</a></p>
       </div>
       <div class="card" style="margin-top:14px">
         <span class="tag">Across traditions</span>
@@ -190,6 +407,30 @@
     </div>
   </div>
 </section>
+
+<script>
+(() => {
+  const box = document.getElementById('rvscale'); if (!box) return;
+  const bar = document.getElementById('rvbar'), lab = document.getElementById('rvlab'), out = document.getElementById('rvout');
+  const D = [
+    [31, '10^31', 'Guess the width of a human hair and answer with the width of the observable universe: you would be wrong by about 10^31.'],
+    [80, '10^80', 'The estimated number of atoms in the entire observable universe is about 10^80. Still far short.'],
+    [120, '10^120', 'The vacuum energy miss: about 10^120. That is 10^40 times larger again than the number of atoms in the universe.']
+  ];
+  const sup = s => s.replace(/10\^(\d+)/g, '10<sup>$1</sup>');
+  const btns = box.querySelectorAll('button');
+  const show = k => {
+    const [p, t, txt] = D[k], w = 380 * p / 120;
+    bar.setAttribute('width', w);
+    lab.textContent = ''; lab.setAttribute('x', Math.min(10 + w, 340));
+    lab.innerHTML = '10<tspan dy="-5" font-size="8">' + p + '</tspan>';
+    out.innerHTML = sup(txt);
+    btns.forEach((b, i) => b.classList.toggle('on', i === k)); btns.forEach((b, i) => b.setAttribute('aria-pressed', i === k));
+  };
+  btns.forEach((b, i) => b.addEventListener('click', () => show(i)));
+  show(2);
+})();
+</script>
 
 <section class="navyband" id="voices">
   <div class="wrap">
@@ -227,7 +468,7 @@
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>

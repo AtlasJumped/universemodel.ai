@@ -16,13 +16,46 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html">Simulation</a><a href="roadmap.html" aria-current="page">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html" aria-current="page">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
+<style>
+.rm-dims{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:18px}
+.rm-dims .card{padding:16px 16px 14px}
+.rm-dims b{display:block;color:var(--navy);font-size:1rem;margin-bottom:4px}
+.rm-dims span{display:block;font-size:.9rem;line-height:1.5;color:var(--soft)}
+.rm-dims .card{border-top:3px solid #D9473F}
+.rm-steps{counter-reset:k;display:grid;gap:14px;margin-top:22px}
+.rm-step{position:relative;padding:20px 22px 20px 74px}
+.rm-step::before{counter-increment:k;content:counter(k);position:absolute;left:20px;top:18px;width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font:700 1rem/36px var(--font);text-align:center}
+.rm-step h3{margin-bottom:6px}
+.rm-step p:last-child{margin-bottom:0}
+.rm-step p{max-width:none}
+.rm-out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.rm-out div{background:var(--ice);border-radius:12px;padding:14px 16px;font-size:.96rem;line-height:1.55}
+.rm-out b{display:block;color:var(--navy);margin-bottom:2px}
+.rm-guard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.rm-guard div{background:var(--ice);border-radius:12px;padding:14px 16px;font-size:.94rem;line-height:1.55}
+.rm-guard b{display:block;color:var(--navy);margin-bottom:2px}
+.rm-calc{background:linear-gradient(135deg,#0B2545 0%,#123A6B 100%);color:#DCE8F7;border:0}
+.rm-calc .tag{color:#9CC3F5}
+.rm-calc label{display:block;font-size:.9rem;margin:12px 0 2px;color:#C9DAF0}
+.rm-calc input[type=range]{width:100%;accent-color:#5B9BE6}
+.rm-calc output{font-weight:700;color:#fff}
+.rm-big{font:750 clamp(1.6rem,3vw,2.2rem)/1.1 var(--font);color:#fff;margin:16px 0 4px;letter-spacing:-.02em}
+.rm-calc p{color:#C9DAF0;font-size:.92rem}
+.rm-vis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.rm-vis .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);padding:18px}
+.rm-vis h3{font-size:1.02rem;margin-bottom:6px}
+.rm-vis p{font-size:.93rem;margin:0}
+@media (max-width:980px){.rm-out{grid-template-columns:1fr}.rm-dims{grid-template-columns:repeat(2,minmax(0,1fr))}.rm-guard{grid-template-columns:1fr}.rm-vis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.rm-vis{grid-template-columns:1fr}.rm-step{padding:64px 18px 18px}.rm-step::before{left:18px;top:16px}.rm-dims{grid-template-columns:1fr 1fr;gap:8px}}
+</style>
+
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">The road ahead</span>
   <h1>From a library to a new paradigm for health.</h1>
-  <p class="lede">The work moves in stages. Each one depends on the last, and we would rather move carefully than early.</p>
+  <p class="lede">The work moves in stages. Each one depends on the last, and we would rather move carefully than early. Building a model of the ideal human body is only the start: once it exists, we put it to work.</p>
 </div></div>
 
 <section>
@@ -31,14 +64,88 @@
       <li class="now"><span class="when">Now</span><h3>Collect</h3><p>Gather the research, anatomy, measurements and images that the twelve datasets need. Free and open sources first, then the most useful paid ones.</p></li>
       <li><span class="when">Next</span><h3>Index and organize</h3><p>Use local AI models on our own hardware to read, sort and connect everything, so any question can be answered from the evidence in seconds, including the evidence against us.</p></li>
       <li><span class="when">Next</span><h3>Model the ideal human body</h3><p>Build the male and female reference bodies layer by layer, bones to experience, with real measurements and real limits, and check them against what real bodies can and cannot do. Then run the first test: the <a href="health.html#hypothesis">densification hypothesis</a>.</p></li>
-      <li><span class="when">Then</span><h3>Trace disease</h3><p>Add imperfections to the ideal, compare the results with images and measurements of people living with specific conditions, and look for the paths that connect them.</p></li>
-      <li><span class="when">Then</span><h3>Test</h3><p>Turn the model's predictions into tests that others can run, and publish what holds up and what does not.</p></li>
-      <li><span class="when">Later</span><h3>Share and build</h3><p>Explain the work openly, to researchers and to the public, and build the partnerships needed to take it further.</p></li>
+      <li><span class="when">Then</span><h3>Run the simulation campaign</h3><p>Deploy millions of simulated bodies carrying millions to billions of different combinations of imperfections, and let the physics show which combinations produce which conditions. <a href="#campaign">The plan below →</a></p></li>
+      <li><span class="when">Then</span><h3>Trace disease and test</h3><p>Compare what the simulations produce with images and measurements of people living with specific conditions, turn the matches into predictions others can test, and publish what holds up and what does not.</p></li>
+      <li><span class="when">Later</span><h3>Share and build</h3><p>Explain the work openly, to researchers and to the public, and build the partnerships, materials, products and centers needed to take it further.</p></li>
     </ol>
   </div>
 </section>
 
-<section class="tint">
+<section class="tint" id="campaign">
+  <div class="wrap">
+    <span class="eyebrow">The simulation campaign</span>
+    <h2>Not one body tuned by hand. Millions, tested by physics.</h2>
+    <div class="split" style="margin-top:8px">
+      <div>
+        <p class="lede" style="color:var(--ink)">Clicking around a single model until it looks like a disease would prove nothing. The plan is to build one ideal body, define every way it can be made imperfect, and then run the combinations at a scale no person could search by hand.</p>
+        <p>If a perfect tensegrity and a complete set of imperfections reproduce the shapes and measurements of real conditions, without anyone telling the model what those conditions look like, that is evidence the model is describing reality. If they do not, we learn exactly where it is wrong.</p>
+        <p class="note">Compute today: the two RTX 5090 GPUs on our own workstation, which is enough to design the campaign and run its first millions of bodies. The design is meant to scale to larger clusters later without changing the method.</p>
+      </div>
+      <div class="card rm-calc" aria-live="polite">
+        <span class="tag">Why it has to be millions</span>
+        <label for="rmSites">Places on the body an imperfection can sit: <output id="rmSitesO">500</output></label>
+        <input type="range" id="rmSites" min="50" max="5000" step="50" value="500">
+        <label for="rmLevels">Settings for each quality (density, friction, mass, volume, torque, boundary): <output id="rmLevelsO">3</output></label>
+        <input type="range" id="rmLevels" min="2" max="6" step="1" value="3">
+        <label for="rmN">Imperfections in one body: <output id="rmNO">3</output></label>
+        <input type="range" id="rmN" min="1" max="8" step="1" value="3">
+        <div class="rm-big" id="rmOut">about 10 to the power of 17</div>
+        <p style="margin:0">distinct bodies, counting 3 shapes (point, line, plane) per imperfection. Even modest settings outrun any manual search, so the campaign samples this space systematically.</p>
+      </div>
+    </div>
+
+    <div class="rm-steps">
+      <div class="card rm-step">
+        <h3>The ideal tensegrity, set up once.</h3>
+        <p>A male and a female body at time zero: every bone, every fascial layer and every embedded structure, each tissue given its measured stiffness, stretch, shear and compression limits from the literature. Healthy tissue is shown in blue. Nothing in this body is tuned to produce a disease.</p>
+      </div>
+      <div class="card rm-step">
+        <h3>An architecture of every way to be imperfect.</h3>
+        <p>Each imperfection is a defined object placed at a location and a time, with a boundary: inside it are its local qualities, outside it are its downstream effects. Imperfections are shown in red. The dimensions it can vary along:</p>
+        <div class="rm-dims">
+          <div class="card"><b>Points</b><span>A single site of change, with a boundary around it.</span></div>
+          <div class="card"><b>Lines</b><span>A band of change along a tension line or seam.</span></div>
+          <div class="card"><b>Planes</b><span>A sheet of change across a fascial layer.</span></div>
+          <div class="card"><b>Torque</b><span>A joint or limb twisted the wrong way by changed tension.</span></div>
+          <div class="card"><b>Density</b><span>How much denser the tissue is than ideal.</span></div>
+          <div class="card"><b>Friction</b><span>How much less freely layers slide over each other.</span></div>
+          <div class="card"><b>Mass</b><span>Relative mass added or lost at the site.</span></div>
+          <div class="card"><b>Volume</b><span>Relative swelling or shrinking at the site.</span></div>
+          <div class="card"><b>Boundaries</b><span>The territory of local effect, and its creep along vessels and nerves.</span></div>
+          <div class="card"><b>Time</b><span>When it begins, and how it grows or fades.</span></div>
+        </div>
+      </div>
+      <div class="card rm-step">
+        <h3>Deploy at scale.</h3>
+        <p>Millions of simulated tensegrities, each carrying a different sampled combination of imperfections, run forward in time on the GPUs. Every run is recorded: where tension redistributed, which vessels and nerves were compressed, how posture and symmetry changed.</p>
+      </div>
+      <div class="card rm-step">
+        <h3>Prove it models reality, without architecting the answers.</h3>
+        <p>The hardest part is honesty. A model with enough knobs can be made to produce anything, so the campaign is built so that it cannot be steered toward the result we hope for:</p>
+        <div class="rm-guard">
+          <div><b>Blinded design</b>Imperfections are sampled without reference to any disease label. The model never sees what a condition is supposed to look like.</div>
+          <div><b>Compared afterwards</b>Outcomes are matched, only after the runs, against measured disease shapes from real data: imaging, body shape and clinical numbers.</div>
+          <div><b>Pre-registered predictions</b>What we expect to see is written down and dated before the comparison is made.</div>
+          <div><b>Held-out data</b>Part of the real data is set aside and never used while the model is built, then used once to test it.</div>
+          <div><b>Negative controls</b>Random, shuffled and physically meaningless imperfections are run too. If they match disease as well as the real ones, the result means nothing.</div>
+          <div><b>Failures reported</b>Conditions the model cannot reproduce are published alongside the ones it can.</div>
+        </div>
+      </div>
+      <div class="card rm-step">
+        <h3>Turn results into something useful.</h3>
+        <div class="rm-out">
+          <div><b>A map of each condition</b>If we can start from the perfect tensegrity, add specific imperfections and arrive at a measured condition, we have a step-by-step account of how that condition may develop, from the first change to the last.</div>
+          <div><b>A way back</b>A path that can be run forward can be studied in reverse. For each mapped condition, the model can propose which imperfections, released in which order, would lead back toward the ideal, as research hypotheses to be tested properly.</div>
+          <div><b>What else is going on</b>The same runs show every other change the imperfections cause: distant tension, compressed vessels, altered posture. Some may be things in the body medicine is not yet accounting for, and they become new questions for researchers and clinicians.</div>
+        </div>
+      </div>
+    </div>
+    <p class="pull" style="margin-top:26px;max-width:none">We are not just modeling the ideal human body. We are doing a great deal with it.</p>
+    <p class="note">All of this is research. Nothing the model proposes is medical advice, and no one should change a treatment because of it.</p>
+  </div>
+</section>
+
+<section>
   <div class="wrap split">
     <div>
       <h2>How the model will be used.</h2>
@@ -47,33 +154,70 @@
       <p><b>As a test bed.</b> A way to ask, before anyone tries anything on a person, what a change to the body's mechanics would be expected to do.</p>
       <p><b>As a teacher.</b> A body that can be watched moving through every yoga pose and extreme movement, showing what the human design allows.</p>
     </div>
+    <div>
     <div class="card">
       <span class="tag">How we will know if we are wrong</span>
       <p>A model of the ideal body makes predictions. If it produces something real bodies show to be impossible, or fails to explain the shapes that conditions actually produce, it is wrong in that place, and we will say so.</p>
-      <p>That is why the evidence against the model is collected from the very start.</p>
+      <p>That is why the evidence against the model is collected from the very start, and why the campaign runs negative controls and reports its failures.</p>
+    </div>
+    <figure class="fig" style="margin-top:16px"><img src="img/al-pelvic-fe.jpg" alt="Two colored finite element models of the female pelvic floor; the one with weakened fascia and ligaments sags much further, shown in blue." loading="lazy" width="747" height="307"><figcaption>What a test bed looks like in published research: a pelvic floor model with healthy tissue (a) and with fascia and ligaments weakened by 95% (b). Bhattarai and Staat, <i>Computational and Mathematical Methods in Medicine</i> 2018, figure 5, <a href="https://doi.org/10.1155/2018/9518076">doi:10.1155/2018/9518076</a>. Licence: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY</a>.</figcaption></figure>
     </div>
   </div>
 </section>
 
 <section class="navyband">
-  <div class="wrap split">
-    <div>
-      <h2>The long-term vision.</h2>
-      <p>If the model holds up, it offers something health care has never had: a clear picture of what full health is, and a way to measure the distance to it. That would change how conditions are diagnosed, how root causes are searched for, and how treatment approaches are designed and tested.</p>
-      <p>We imagine long-term studies with large groups of volunteers, open education that teaches people how their own bodies work, and affordable tools that make the work accessible everywhere, not only where health care is expensive.</p>
+  <div class="wrap">
+    <span class="eyebrow" style="color:#9CC3F5">The long-term vision</span>
+    <h2>A fascia care protocol for every person on Earth.</h2>
+    <div class="split" style="margin-top:8px">
+      <div>
+        <p>The long-term vision is simple to state: every human being has a fascia care protocol as a basic part of their daily health routine, as ordinary as brushing their teeth. Ask anyone what their fascia protocol is, and they can tell you.</p>
+        <p>If the model holds up, it gives that protocol a foundation health care has never had: a clear picture of what full health is, and a way to measure the distance to it. This site exists to help create the materials the full protocol needs, and to keep them grounded in physics and evidence.</p>
+      </div>
+      <div>
+        <p class="pull">As common as brushing your teeth.</p>
+        <p>We have already used well over a hundred different tools and moisturizers in this work, and have many ideas for how they could be held, shaped and optimized for the protocol.</p>
+      </div>
     </div>
-    <div>
-      <p class="pull">A more hopeful picture of what a human being is, and what a human body can become.</p>
-      <p class="note">This is the direction, not a promise. Each stage has to earn the next.</p>
+    <div class="rm-vis">
+      <div class="card"><h3>Education</h3><p>Open materials that teach how the body works as a tensegrity and how to care for its fascia, for adults and especially for children as they grow.</p></div>
+      <div class="card"><h3>Products</h3><p>Tools and moisturizers designed for the protocol, informed by long hands-on use of what exists today.</p></div>
+      <div class="card"><h3>Fascia health centers</h3><p>Places dedicated to fascia care. What they look like and the equipment they include have already been designed.</p></div>
+      <div class="card"><h3>Better devices</h3><p>Many device designs already thought through: improvements, often slight, over the tools used so far.</p></div>
     </div>
+    <p class="note" style="margin-top:22px">This is the direction, not a promise. Each stage has to earn the next, and nothing here is medical advice.</p>
   </div>
 </section>
+
+<script>
+(function(){
+  var s=document.getElementById('rmSites'),l=document.getElementById('rmLevels'),n=document.getElementById('rmN'),o=document.getElementById('rmOut');
+  if(!s||!l||!n||!o)return;
+  var names=[[3,'thousand'],[6,'million'],[9,'billion'],[12,'trillion']];
+  function words(lg){
+    if(lg<3)return 'about '+Math.round(Math.pow(10,lg)).toLocaleString('en-US');
+    if(lg<15){var k=names[0];for(var i=0;i<names.length;i++)if(lg>=names[i][0])k=names[i];return 'about '+Math.round(Math.pow(10,lg-k[0]))+' '+k[1];}
+    return 'about 10 to the power of '+Math.floor(lg);
+  }
+  function upd(){
+    var S=+s.value,L=+l.value,N=+n.value;
+    document.getElementById('rmSitesO').textContent=S.toLocaleString('en-US');
+    document.getElementById('rmLevelsO').textContent=L;
+    document.getElementById('rmNO').textContent=N;
+    var per=Math.log10(S)+Math.log10(3)+6*Math.log10(L);
+    var lg=0;for(var i=0;i<N;i++)lg+=Math.log10(Math.pow(10,per)-i);
+    for(var j=2;j<=N;j++)lg-=Math.log10(j);
+    o.textContent=words(lg);
+  }
+  [s,l,n].forEach(function(e){e.addEventListener('input',upd)});upd();
+})();
+</script>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>

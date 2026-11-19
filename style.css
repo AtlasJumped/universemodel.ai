@@ -198,3 +198,18 @@ ul.plain b{font-variant-numeric:tabular-nums;color:var(--navy)}
 .navyband a.card h3{color:var(--navy)}
 .navyband a.card p{color:var(--soft)}
 @media (max-width:640px){.simstatus{position:static;margin:0 10px 10px;font-size:.88rem}}
+/* 2026-11-18 (recordings h, i): grouped nav with dropdowns */
+.nav .grp{position:relative}
+.nav .grpbtn{font:500 .9rem/1 var(--font);color:var(--soft);background:none;border:0;padding:9px 9px;border-radius:8px;cursor:pointer;display:flex;gap:5px;align-items:center}
+.nav .grpbtn span{font-size:.7rem;opacity:.7}
+.nav .grp.on>.grpbtn{color:var(--blue);background:var(--ice)}
+.nav .grpbtn:hover{color:var(--navy);background:var(--mist)}
+.nav .drop{display:none;position:absolute;top:100%;left:0;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:50;flex-direction:column}
+.nav .drop a{display:block;padding:10px 12px}
+.nav .grp:hover .drop,.nav .grp:focus-within .drop{display:flex}
+@media (max-width:1400px){
+  .nav .grpbtn{padding:12px 12px 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;cursor:default}
+  .nav .grpbtn span{display:none}
+  .nav .grp.on>.grpbtn{background:none}
+  .nav .drop{display:flex;position:static;border:0;box-shadow:none;padding:0 0 0 8px;min-width:0}
+}

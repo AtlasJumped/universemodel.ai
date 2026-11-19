@@ -16,28 +16,103 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html" aria-current="page">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html" aria-current="page">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
-<div class="page-head"><div class="wrap">
-  <span class="eyebrow">Simulating reality</span>
-  <h1>A working model of physical reality, with a perfect human inside it.</h1>
-  <p class="lede">The goal is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that world and watch what follows, from health to disease and back again.</p>
-  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">Test phase</span> <span class="muted small">The data for the full model is being collected now. The interactive figures below are test models, not the finished simulation.</span></p>
+<style>
+.simbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 10px 0}
+.simbar .sp{flex:1}
+.simbar label.chipbtn{display:inline-flex;gap:7px;align-items:center}
+.simbar label.chipbtn input{margin:0;accent-color:var(--blue)}
+.simpair{display:grid;grid-template-columns:1fr 1fr}
+.simcell{position:relative;min-width:0}
+.simcell+.simcell{border-left:1px dashed var(--line)}
+.simlab{position:absolute;top:6px;left:0;right:0;text-align:center;font:600 .74rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);pointer-events:none}
+.simstage .simpair canvas{height:min(74vh,660px)}
+.simstage .simstatus{position:static;margin:0 10px 10px}
+.simload{display:flex;align-items:center;gap:10px;margin:2px 12px 10px;font-size:.84rem;color:var(--soft)}
+.simload .bar{flex:1;height:8px;border-radius:99px;background:var(--mist);overflow:hidden}
+.simload .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5B9BE6,#F0A940,#D93B3B);transition:width .3s}
+.simload b{color:var(--navy);min-width:72px;text-align:right}
+.chipbtn.on{background:var(--ice);border-color:var(--blue);color:var(--blue)}
+.implist{display:flex;flex-wrap:wrap;gap:6px}
+.edbox{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.edbox h4{margin:0 0 4px;font-size:.95rem;color:var(--navy)}
+.edf{display:grid;gap:3px;margin-top:10px}
+.edn{display:flex;justify-content:space-between;font-size:.9rem}
+.edn b{color:var(--navy);font-variant-numeric:tabular-nums}
+.edf input{accent-color:#D93B3B}
+.edf small{color:var(--soft);font-size:.78rem;line-height:1.4}
+.simhow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.simhow .card{padding:18px 20px}
+.simhow ul{margin:6px 0 0;padding-left:18px}.simhow li{margin-bottom:6px;font-size:.94rem}
+.symkey{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px}
+.symkey span{display:inline-flex;align-items:center;gap:7px;font-size:.86rem}
+.symkey svg{width:34px;height:20px;border:1px solid var(--line);border-radius:5px;background:#fff}
+.page-head.simhead{padding:30px 0 22px}
+.page-head.simhead .wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:12px 36px;align-items:center}
+.page-head.simhead h1{margin-bottom:0}.page-head.simhead .lede{font-size:1.08rem;margin-bottom:10px}
+@media (max-width:900px){.page-head.simhead .wrap{grid-template-columns:1fr}}
+@media (max-width:760px){.simhow{grid-template-columns:1fr}}
+@media (max-width:960px){.simgrid>.simleft{display:contents}.simgrid .simstage{order:1}.simgrid .simpanel{order:2}.simgrid .simhow{order:3;margin-top:0}}
+@media (max-width:640px){.simload>span:first-child{font-size:.76rem;max-width:90px;line-height:1.2}}
+@media (max-width:640px){.simstage .simpair canvas{height:min(60vh,500px)}.simlab{font-size:.66rem}.simbar .chipbtn{padding:7px 9px;font-size:.78rem}}
+</style>
+<div class="page-head simhead"><div class="wrap">
+  <div><span class="eyebrow">Simulating reality</span>
+  <h1>A working model of physical reality, with a perfect human inside it.</h1></div>
+  <div><p class="lede">One goal of this work is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that simulation and watch what follows, from health to disease and back again. We are reverse engineering disease: from the optimal state and from every non-optimal state, we walk back how each non-optimal state came to exist.</p>
+  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">Test phase</span> <span class="muted small">The 3D model below is a very simplified version of that work. The data for the full model is being collected now.</span></p></div>
 </div></div>
 
-<section class="tint" id="model">
+<section class="tint" id="model" style="padding-top:28px">
   <div class="wrap">
-    <h2>Try it: a human tensegrity in 3D.</h2>
-    <p class="lede">Bones are the dark struts. Fascia is the web of cables, with the body's main fascial lines in color. Tap the body to create an imperfection: the fascia there is densified and stays that way, and the physics decides how the rest of the body answers.</p>
-    <div class="simgrid" style="margin-top:20px">
-      <div class="simstage">
-        <canvas id="body3d" role="img" aria-label="A rotating three-dimensional human figure built as a tensegrity: dark bone struts held by a web of fascia cables, with the main fascial lines in color. Tapping the figure densifies the fascia at that point."></canvas>
-        <div class="simview" role="group" aria-label="View">
-          <button type="button" class="chipbtn" data-view="front">Front</button><button type="button" class="chipbtn" data-view="side">Side</button><button type="button" class="chipbtn" data-view="back">Back</button>
-          <button type="button" class="chipbtn" id="sim-zoomin" aria-label="Zoom in">+</button><button type="button" class="chipbtn" id="sim-zoomout" aria-label="Zoom out">−</button>
+    <h2 style="margin-bottom:14px">Try it: a human tensegrity, and the person it holds up.</h2>
+    <div class="simgrid">
+      <div class="simleft">
+        <div class="simstage">
+          <div class="simbar" role="group" aria-label="View">
+            <button type="button" class="chipbtn" data-view="front">Front</button><button type="button" class="chipbtn" data-view="side">Side</button><button type="button" class="chipbtn" data-view="back">Back</button>
+            <button type="button" class="chipbtn" id="sim-zoomin" aria-label="Zoom in">+</button><button type="button" class="chipbtn" id="sim-zoomout" aria-label="Zoom out">&minus;</button>
+            <span class="sp"></span>
+            <label class="chipbtn"><input type="checkbox" id="sim-spin"> Spin</label>
+          </div>
+          <div class="simpair">
+            <div class="simcell"><span class="simlab">Tensegrity: bones and fascia</span><canvas id="body3d" role="img" aria-label="A three-dimensional human figure built as a tensegrity: dark bone struts held by a web of fascia cables, with the main fascial lines in color. Tapping it places an imperfection."></canvas></div>
+            <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas></div>
+          </div>
+          <div class="simload"><span>Computed load on the structure</span><span class="bar"><i id="sim-load"></i></span><b id="sim-load-v">at rest</b></div>
+          <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
         </div>
-        <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
+        <div class="simhow">
+          <div class="card">
+            <span class="tag">How to use it</span>
+            <ul>
+              <li><b>Tap</b> either figure to place an imperfection. Choose <b>Point</b>, <b>Line</b>, <b>Plane</b> or <b>Twist</b> first.</li>
+              <li><b>Drag</b> to turn the body all the way around; pinch or scroll to zoom. A tap without a drag still picks a point. It stays still unless you switch on <b>Spin</b>.</li>
+              <li>Each imperfection opens an <b>editor</b>: density, friction, mass, volume and the boundary of its zone. They persist, and stack.</li>
+              <li><b>Let time pass</b> and the change creeps outward along the fascial lines that leave the zone.</li>
+              <li>The person on the right is drawn on the same computed skeleton. Their posture, symmetry, load and expression come only from the physics.</li>
+            </ul>
+          </div>
+          <div class="card" style="background:var(--ice)">
+            <span class="tag">This is real math</span>
+            <p>Simple, but not a cartoon. One hundred points, about a hundred bone struts and some 340 tension-only fascia cables are solved as a constraint system many times a second. Every tap truly redistributes force along these lines, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
+            <p style="margin-bottom:0">A weak pull toward the healthy shape stands in for muscle tone and balance; fascia slides along its lines toward even tension unless friction holds it.</p>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <span class="tag">Where the model is going</span>
+            <p>This is a very simplified tensegrity. The back-end model will grow in fidelity, every version true to the science and still fun to use: as close to the molecule as the data allows, with the real lines of fascia, specific joints and specific bones, and the surface of the skin itself, so that skin tags, hair growth patterns and areas of excessive sweating can be placed and followed. Symptoms will get a code, like the body diagrams clinics already use, so a person's symptoms can be mapped onto the model and compared with what it predicts:</p>
+            <div class="symkey" aria-label="Planned symptom code">
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#1D5FD1"><circle cx="7" cy="6" r="1.6"/><circle cx="15" cy="10" r="1.6"/><circle cx="23" cy="6" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="27" cy="14" r="1.6"/></g></svg>Pins and needles</span>
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M6 17 L12 3 M14 17 L20 3 M22 17 L28 3" stroke="#D93B3B" stroke-width="1.8"/></svg>Burning</span>
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M5 6 H29 M5 10 H29 M5 14 H29" stroke="#0E3A75" stroke-width="1.6"/></svg>Numbness</span>
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M7 5 L13 11 M13 5 L7 11 M20 9 L26 15 M26 9 L20 15" stroke="#9A5B00" stroke-width="1.8"/></svg>Stabbing</span>
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M4 10 Q8 4 12 10 T20 10 T28 10" fill="none" stroke="#0F9C8E" stroke-width="1.8"/></svg>Aching</span>
+              <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#7C4DD6" opacity=".55"><circle cx="10" cy="10" r="5"/><circle cx="23" cy="10" r="5"/></g></svg>Sweating</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="simpanel">
         <div class="pgroup">
@@ -46,23 +121,23 @@
         </div>
         <div class="pgroup">
           <h3>Make an imperfection</h3>
-          <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button></div>
+          <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button><button class="btn ghost" data-imode="torque" type="button">Twist</button></div>
           <label class="range">Strength <input type="range" id="sim-strength" min="1" max="6" value="3"></label>
-          <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (densification creeps along the lines)</label>
+          <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (imperfections creep along the lines)</label>
+          <div class="edbox">
+            <h4>Imperfections in this body</h4>
+            <div id="sim-implist" class="implist"></div>
+            <div id="sim-editor" hidden>
+              <h4 id="sim-ed-title" style="margin-top:12px"></h4>
+              <div id="sim-ed-fields"></div>
+              <div class="btns" style="margin-top:12px"><button class="btn ghost" id="sim-ed-remove" type="button">Remove</button><button class="btn ghost" id="sim-ed-done" type="button">Done</button></div>
+            </div>
+          </div>
         </div>
         <div class="pgroup">
           <h3>Try a scenario</h3>
-          <div class="btns"><button class="btn ghost" data-preset="desk" type="button">Desk posture</button><button class="btn ghost" data-preset="back" type="button">Tight lower back</button><button class="btn ghost" data-preset="hip" type="button">One-sided hip</button><button class="btn ghost" data-preset="foot" type="button">Tight foot</button></div>
+          <div class="btns" id="sim-scenarios"></div>
           <button class="btn primary" id="sim3d-reset" type="button" style="margin-top:10px">Reset to healthy</button>
-        </div>
-        <div class="pgroup">
-          <h3>Show</h3>
-          <label class="tog"><input type="checkbox" id="sim-skin" checked> Body outline</label>
-          <label class="tog"><input type="checkbox" id="sim-bones" checked> Bones</label>
-          <label class="tog"><input type="checkbox" id="sim-web" checked> Fascial web</label>
-          <label class="tog"><input type="checkbox" id="sim-heat"> Tension map (blue relaxed, red strained, dashed slack)</label>
-          <label class="tog"><input type="checkbox" id="sim-spin" checked> Turn slowly</label>
-          <div id="sim-lines" class="lines" aria-label="Fascial lines"></div>
         </div>
         <div class="pgroup">
           <h3>What changed</h3>
@@ -70,15 +145,29 @@
             <div><dt>Height</dt><dd id="m-height">0.0 cm</dd></div>
             <div><dt>Head forward</dt><dd id="m-head">0.0 cm</dd></div>
             <div><dt>Shoulders</dt><dd id="m-shoulders">level</dd></div>
-            <div><dt>Pelvis</dt><dd id="m-pelvis">level</dd></div>
-            <div><dt>Largest shift 40+ cm away</dt><dd id="m-far">—</dd></div>
+            <div><dt>Pelvis, side to side</dt><dd id="m-pelvis">level</dd></div>
+            <div><dt>Pelvic tilt</dt><dd id="m-tilt">0°</dd></div>
+            <div><dt>Trunk twist</dt><dd id="m-twist">none</dd></div>
+            <div><dt>Kneecaps</dt><dd id="m-knees">ahead</dd></div>
+            <div><dt>Symmetry</dt><dd id="m-sym">symmetric</dd></div>
+            <div><dt>Extra tension</dt><dd id="m-extra">none</dd></div>
+            <div><dt>Largest shift 40+ cm away</dt><dd id="m-far">none</dd></div>
             <div><dt>Newly slack fascia</dt><dd id="m-slack">none</dd></div>
             <div><dt>Time</dt><dd id="m-time">paused</dd></div>
           </dl>
         </div>
+        <div class="pgroup">
+          <h3>Show</h3>
+          <label class="tog"><input type="checkbox" id="sim-skin" checked> Body outline on the tensegrity</label>
+          <label class="tog"><input type="checkbox" id="sim-bones" checked> Bones</label>
+          <label class="tog"><input type="checkbox" id="sim-web" checked> Fascial web</label>
+          <label class="tog"><input type="checkbox" id="sim-heat"> Tension map (blue relaxed, red strained, dashed slack)</label>
+          <label class="tog"><input type="checkbox" id="sim-tint" checked> Strain on the skin (computed per point)</label>
+          <div id="sim-lines" class="lines" aria-label="Fascial lines"></div>
+          <p class="note" style="margin:10px 0 0">The colored lines follow the myofascial chains described in anatomy, with the thoracolumbar fascia and the deep hip and knee rotators added. Densified cables turn red; cables remodeled longer by a twist are dashed orange.</p>
+        </div>
       </div>
     </div>
-    <p class="note" style="margin-top:18px">Drag to turn the body all the way around; pinch or scroll to zoom. This is a teaching model with about a hundred points. The real model is being built from measured anatomy and tissue mechanics, and will run in time. The colored lines follow the myofascial chains described in anatomy (superficial back and front lines, lateral, spiral and deep front lines, arm and functional lines).</p>
   </div>
 </section>
 
@@ -91,10 +180,18 @@
         <p class="lede" style="color:var(--ink)">Medicine has treated the body as a set of separate systems built like a building: bones as columns, stacked to carry a load from above, with muscles and organs attached. That is a compression structure, and it calls for one toolkit. A tensegrity calls for a completely different one.</p>
         <p>In a tensegrity, the rigid parts do not rest on each other. They are held apart and in place by a continuous web of tension. Change the tension anywhere and the whole structure changes shape. Push on one part, and the load spreads through the web instead of down a column.</p>
         <p>If the body works this way, then many of today's tools are the wrong wrench. Treating a sore knee as a knee, or a stiff neck as a neck, is like tightening one bolt on a suspension bridge without looking at the cables. The mistake is not care or effort; it is the model. <b>If the body is a tensegrity, the HMR is already a significant improvement on how we understand health</b>, before any of its larger claims are considered.</p>
+        <p>There is a deeper problem. In the HMR's view the human body is not yet mature: its tensegrity has not reached the optimized state it is built to reach. So medicine is treating the symptoms of an unfinished body. Modern medicine's mission is the biggest possible toolkit: surgery, protocols, prescriptions, creams and pills, each a way to attack a symptom. The HMR's mission is different: optimize the whole system so it can take care of itself. That is more than finding the right wrench. <b>The right tool is an entirely different model of health.</b></p>
       </div>
       <div class="compare" style="grid-template-columns:1fr">
         <div class="now"><h3>A compression model</h3><ul><li>Bones stack; joints bear the load.</li><li>Problems are local: fix the part that hurts.</li><li>Each specialty treats its own system.</li><li>Soft tissue is packing around the frame.</li></ul></div>
         <div class="new" style="border-left:0;border-top:1px solid var(--line)"><h3>A tensegrity model</h3><ul><li>Bones float in a continuous web of fascia.</li><li>Problems can be global: tension travels.</li><li>The body is studied as one connected structure.</li><li>Fascia shapes the whole body, and everything inside it.</li></ul></div>
+        <div style="border-top:1px solid var(--line);padding:18px 22px;background:var(--navy);color:#fff">
+          <h3 style="color:#fff;margin-bottom:8px">Two missions</h3>
+          <ul style="margin:0;padding-left:18px;color:#DCE8F8">
+            <li style="margin-bottom:6px"><b style="color:#fff">Today:</b> a bigger and bigger toolkit of surgery, protocols, prescriptions, creams and pills, each aimed at a symptom.</li>
+            <li><b style="color:#fff">The HMR:</b> a body whose tensegrity is optimized and mature, so the whole system takes care of itself.</li>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -122,6 +219,7 @@
       <span class="tag">How imperfections are modeled</span>
       <p>Every imperfection is placed in the ideal body at a point in space and a moment in time, as a <b>point</b>, a <b>line</b> or a <b>plane of imperfection</b>.</p>
       <p>Each has a <b>boundary</b>. Inside it are its local qualities: densified tissue, and whatever runs through it, such as vessels and nerves, each with its own tolerance to compression and stretch. Outside it are the downstream effects on the rest of the body.</p>
+      <p>In the model above each imperfection carries five numbers: a relative <b>density</b> (shorter, stiffer fascia), its effect on <b>friction</b> (how freely fascia slides through it), a relative <b>mass</b>, a relative <b>volume</b>, and the <b>radius</b> of its boundary. A <b>twist</b> remodels the tissue that crosses a joint.</p>
       <p style="margin-bottom:0">Boundaries are not smooth. Effects travel along the tissues that pass through an imperfection, especially vessels, so the local zone extends irregularly beyond a simple outline. We call this <b>creep</b>.</p>
     </div>
   </div>
@@ -142,43 +240,12 @@
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <span class="eyebrow">Where it started</span>
-    <h2>The first teaching model: a side view.</h2>
-    <p class="lede">Bones are the dark struts; fascia is the web of cables, blue when healthy. Press a node to create an imperfection: the fascia there is densified and stays that way, and the rest of the body responds.</p>
-    <div class="split" style="margin-top:20px;align-items:center">
-      <div>
-        <div style="background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px">
-          <canvas id="body" style="width:100%;height:min(78vh,640px);display:block;touch-action:none;cursor:pointer" role="img" aria-label="A side view of a human body drawn as a tensegrity. Pressing a node densifies the fascia there, turning it red and changing the posture."></canvas>
-        </div>
-      </div>
-      <div>
-        <div class="btns" role="group" aria-label="Type of imperfection">
-          <button class="btn ghost on" data-mode="point" type="button">Point</button>
-          <button class="btn ghost" data-mode="line" type="button">Line</button>
-          <button class="btn ghost" data-mode="plane" type="button">Plane</button>
-          <button class="btn primary" id="simreset" type="button">Reset to healthy</button>
-        </div>
-        <p id="simstatus" class="note" style="margin-top:18px" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
-        <h3 style="margin-top:22px">Things to try</h3>
-        <ul>
-          <li style="margin-bottom:8px">Press the <b>upper chest</b> four or five times and watch the upper back round forward.</li>
-          <li style="margin-bottom:8px">Choose <b>Line</b> and draw from the <b>throat</b> to the <b>pubis</b>: a tight front line.</li>
-          <li>Choose <b>Plane</b> across the <b>lower back</b>, <b>sacrum</b> and <b>belly</b>.</li>
-        </ul>
-        <p class="note">Our first model, in two dimensions. The 3D model above grew from it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="tint">
   <div class="wrap split" style="align-items:center">
     <div>
       <h2>Tension travels.</h2>
       <p>In a tensegrity, rigid parts never touch; they are held in place only by continuous tension. Change the tension in one place and the whole structure adjusts. That is why, in the HMR, a small imperfection can have effects far from where it began.</p>
-      <p>Tap a node on this simpler tensegrity to send a pulse of tension through it.</p>
+      <p>Tap a node on this simpler tensegrity to send a pulse of tension through it. Then cut a cable or collapse a strut and watch the whole structure settle into a new shape, slow the motion right down to follow the force, or switch to other everyday tensegrities, such as a tent, to see the same rule at work.</p>
     </div>
     <div>
       <div class="stage" id="stage" role="img" aria-label="An interactive tensegrity: dark blue struts held in place only by light blue cables."><canvas id="tg"></canvas></div>
@@ -198,14 +265,15 @@
     </div>
   </div>
 </section>
-<script src="sim.js" defer></script>
+<script src="sim-core.js" defer></script>
+<script src="sim-figure.js" defer></script>
 <script src="sim3d.js" defer></script>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>

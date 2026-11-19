@@ -16,29 +16,123 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html" aria-current="page">East and West</a><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp on"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html" aria-current="page">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
+<style>
+.ew-fig{margin:0}
+.ew-fig img{max-height:560px;object-fit:cover;object-position:center top}
+.ew-fig.tall img{max-height:620px}
+.ew-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(20px,4vw,48px);align-items:start}
+.ew-row.rev{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+@media (max-width:860px){.ew-row,.ew-row.rev{grid-template-columns:1fr}}
+.ew-q{margin:0 0 12px;padding:12px 16px;border-left:4px solid var(--blue);background:#fff;border-radius:0 12px 12px 0;box-shadow:var(--shadow)}
+.ew-q p{margin:0 0 4px;font-style:italic;color:var(--navy)}
+.ew-q cite{font-style:normal;font-size:.86rem;color:var(--soft)}
+.ew-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:22px}
+.ew-tbl{width:100%;min-width:640px;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:.93rem;box-shadow:var(--shadow)}
+.ew-tbl th,.ew-tbl td{text-align:left;padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+.ew-tbl th{background:var(--ice);color:var(--navy);font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;border-top:0}
+.ew-tbl td:first-child{font-weight:700;color:var(--navy);white-space:nowrap}
+.ew-res h3{margin:22px 0 6px}
+.ew-res ul{margin:6px 0 0;padding-left:1.1em}
+.ew-res li{margin-bottom:7px;font-size:.94rem;line-height:1.5}
+.ew-str{display:inline-block;font-size:.68rem;font-weight:750;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:999px;margin-right:6px;vertical-align:1px}
+.ew-str.s{background:#DDF3E8;color:#14613C}.ew-str.m{background:#E3ECFB;color:#1D4FA8}.ew-str.w{background:#EFEFEF;color:#555}.ew-str.c{background:#FBE6E3;color:#8A2A1C}
+.ew-dated{background:#fff;border:1px solid var(--line);border-left:4px solid #C9A227;border-radius:12px;padding:16px 20px;box-shadow:var(--shadow)}
+.ew-more{display:inline-block;margin-top:8px;font-size:.9rem;font-weight:600}
+.ew-hyp .tag{display:inline-block;width:auto;background:#FFF3D6;color:#7A5A00;padding:2px 8px;border-radius:999px}
+.ew-dated{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.ew-dated p{max-width:none;margin:0}
+@media (max-width:860px){.ew-dated{grid-template-columns:1fr}}
+.ew-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.ew-pair{grid-template-columns:1fr}}
+.ew-cols{columns:2;column-gap:36px}
+@media (max-width:860px){.ew-cols{columns:1}}
+.ew-cols>div{break-inside:avoid}
+</style>
+
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">East and West</span>
   <h1>One reality, described in many languages.</h1>
-  <p class="lede">Long before laboratories, people sat in caves and forests with nothing but their bodies and their minds, and studied both for a lifetime. The HMR holds that what they found, about the body and about reality, fits with modern science, and that what has been missing is a shared language.</p>
-  <p class="lede" style="margin-top:10px"><b style="color:var(--navy)">A key goal of the HMR is to provide that language.</b></p>
+  <div class="ew-row" style="margin-top:6px">
+    <div>
+      <p class="lede">Eastern traditions such as yoga, Chinese medicine, tai chi and Ayurveda are thousands of years old. They were built by smart, capable people with every mental faculty we have today, who chose to focus those faculties on the body. For materialist science to discount them is a mistake.</p>
+      <p class="lede" style="margin-top:10px">Humanity should expect a theory that makes sense of them. If these traditions are all wrong, then generations of careful people were strangely incapable. If they are right, then modern science does not yet understand what it is doing in this area. Either way, something needs explaining.</p>
+      <p class="lede" style="margin-top:10px"><b style="color:var(--navy)">A key goal of the Holistic Model of Reality (HMR) is to provide the language that joins East and West, scientifically and in detail, for the first time.</b> If no one has shown you a scientific marriage of East and West before, we ask you to take this work seriously.</p>
+    </div>
+    <figure class="fig ew-fig"><img src="img/ew-meridian.jpg" alt="An eighteenth century Chinese watercolour of a standing figure with the liver channel of the foot traced as a blue line from the big toe up the inner leg and trunk." loading="lazy" width="1000" height="1289" style="max-height:470px"><figcaption>A Chinese acupuncture chart, 18th century: the liver channel of the foot, traced from the big toe up the inner leg. Unknown artist, Public Domain Mark, via <a href="https://wellcomecollection.org/works/fd226447">Wellcome Collection</a>.</figcaption></figure>
+  </div>
 </div></div>
 
-<section>
-  <div class="wrap split">
-    <div>
-      <span class="eyebrow">The body</span>
-      <h2>Practices that work on the fascia web.</h2>
-      <p>Without anatomy books, contemplatives mapped the body from the inside: the bandhas, or "locks", of hatha yoga; the channels of prana called nadis; the meridians and qi of Chinese medicine; the slow, spiraling movements of tai chi and qigong; the marma points of Ayurveda.</p>
-      <p>The HMR's view is that these traditions were working, with great precision, on the fascia web, the body's continuous connective tissue: holding, lengthening, hydrating and releasing fascia through breath, posture, pressure and attention. Science is beginning to look in the same places. One anatomical study found that acupuncture points and meridians correspond closely to the planes of connective tissue between and within muscles (<a href="https://doi.org/10.1002/ar.10185">Langevin and Yandow, 2002</a>).</p>
+<section class="tint" id="language">
+  <div class="wrap">
+    <h2>The language of the HMR.</h2>
+    <div class="ew-row" style="margin-top:4px">
+      <p class="lede" style="margin:0">We do not ask anyone to believe this right away. We invite you to imagine a world in which we all agree on it. We are used to disagreement about the deepest questions; it feels like just how life is. But life would be far better if we agreed on the fundamentals and shared the values that follow from them.</p>
+      <p style="margin:0">The HMR needs only a small set of terms. Humanity already has words for these things, but many are vague, overlapping, or tied to one tradition. The aim is to identify what is actually true and name it precisely, so that science and the traditions can be read in the same words.</p>
     </div>
-    <div>
-      <span class="eyebrow">Reality</span>
-      <h2>Inquiry that turned inward.</h2>
-      <p>The same traditions reached conclusions about the nature of reality that the HMR shares: that what we call the world rests on something deeper, conscious and whole, and that each person is an expression of it. They also studied the sky and developed mathematics of remarkable depth, from Indian astronomy and the use of zero to the calendars of the Maya.</p>
-      <p>The HMR suggests the two discoveries are connected. As practitioners came into closer contact with their own bodies, they also came closer to the nature of reality itself.</p>
+    <div class="grid g3" style="margin-top:22px">
+      <div class="card"><span class="tag">Physical reality</span><p>Everything that can be measured: matter, energy, space and time, and the laws that govern them. What is usually just called "reality".</p></div>
+      <div class="card"><span class="tag">Universal Intelligence (UI)</span><p>The non-physical intelligence from which physical reality emerges, and the process by which it does so; the two are one. UI is another name for God, or for any higher power. <a href="ui.html">Defining UI →</a></p></div>
+      <div class="card"><span class="tag">God</span><p>One of humanity's names for UI, alongside Brahman, the Tao, Allah and many others. The names differ; the source is the same.</p></div>
+      <div class="card"><span class="tag">Physical laws</span><p>The stable rules UI holds fixed so that many separate beings can share one physical reality. Science is the study of these rules.</p></div>
+      <div class="card"><span class="tag">Life</span><p>Any instance of UI experiencing physical reality, from a single cell or a blade of grass to a human being.</p></div>
+      <div class="card"><span class="tag">Human</span><p>An instance of UI embedded within physical reality, able to experience it through an interface: the human body. In Hindu thought, closest to Atman.</p></div>
+      <div class="card"><span class="tag">Body</span><p>The physical interface through which an instance of UI senses and acts in physical reality. In humans, a tensegrity held together by fascia.</p></div>
+      <div class="card"><span class="tag">Mind</span><p>The part of a human through which UI thinks, remembers, chooses and makes meaning within a single life.</p></div>
+      <div class="card"><span class="tag">Emotions</span><p>Felt signals, carried through body and mind, that report how an experience stands: calm or threat, joy or grief, connection or loss.</p></div>
+      <div class="card"><span class="tag">Consciousness</span><p>Experience itself. In the HMR it is fundamental: not produced by matter, but the ground from which matter emerges.</p></div>
+      <div class="card"><span class="tag">Coherence</span><p>Order, harmony and integration. The direction in which UI, and every life, tends to develop.</p></div>
+      <div class="card" id="death"><span class="tag">Death</span><h3 style="margin-top:4px">A transformation, not an end.</h3><p>UI does not wait for a life to end to learn from it. In the HMR, UI experiences each life here and now, in every moment of it. Death is the point where that life's form in physical reality changes, and it is different for every life form. <a href="#beyond">More below →</a></p></div>
+    </div>
+  </div>
+</section>
+
+<section id="beyond">
+  <div class="wrap">
+    <span class="eyebrow">Death, and what may lie past it</span>
+    <h2>What the HMR proposes about death.</h2>
+    <div class="ew-row" style="margin-top:14px">
+      <div>
+        <p class="lede" style="margin-top:0">Every tradition has an account of death. These are the HMR's hypotheses, stated plainly as hypotheses. None of them is a medical claim.</p>
+        <div class="grid g2" style="margin-top:18px">
+          <div class="card ew-hyp"><span class="tag">Hypothesis</span><h3>Different for every life</h3><p>Life forms that never reach a high resonance with their purpose may, after death, largely dissolve. Others persist more. What carries on depends on how fully a life became what it was for.</p></div>
+          <div class="card ew-hyp"><span class="tag">Hypothesis</span><h3>Death may be overcome</h3><p>Eastern traditions hold that death can be overcome through a kind of enlightenment. The HMR takes that seriously across its whole range: from a death followed by an afterlife, to a life extended far beyond the usual span. Siddha traditions in India describe practitioners who sought a perfected, deathless body (<a href="https://press.uchicago.edu/ucp/books/book/chicago/A/bo3683579.html">White, The Alchemical Body, University of Chicago Press</a>), and their stories tell of lives lasting several hundred years.</p></div>
+          <div class="card ew-hyp"><span class="tag">Hypothesis</span><h3>A perfect tensegrity might not age</h3><p>A body is kept alive by moving nutrients in and waste out, and by regenerating tissue. If a perfect tensegrity distributed nutrients and removed waste optimally while its cells kept regenerating, it is hard to name what would wear it down. The HMR holds that such a body could, in principle, be ageless.</p></div>
+          <div class="card ew-hyp"><span class="tag">Hypothesis</span><h3>The laws themselves may change</h3><p>If physical reality emerges from UI, its laws are rules UI holds fixed, not limits on UI. A sufficiently mature UI might change them. In that case even the limits we treat as absolute, death among them, are not final.</p></div>
+        </div>
+      </div>
+      <div>
+      <figure class="fig ew-fig tall"><img src="img/ew-siddhas.jpg" alt="An eighteenth century Tibetan painting of eight Mahasiddhas, accomplished yogis, seated in a landscape around a central figure." loading="lazy" width="1100" height="1597"><figcaption>Eight Mahasiddhas, the "great accomplished ones" of Tibetan and Indian tradition, Tibet, 18th century. Unknown artist, public domain, via <a href="https://commons.wikimedia.org/wiki/File:Eight_Mahasiddhas_-_Google_Art_Project.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig ew-fig" style="margin-top:16px"><img src="img/ew-siddha-charpatinath.jpg" alt="An Indian manuscript painting of Charpatinath, a Nath siddha, seated in a landscape." loading="lazy" width="1200" height="1061" style="max-height:420px"><figcaption>Charpatinath, one of the Nath siddhas, in an Indian manuscript of about 1715. Unknown artist, CC BY 4.0, via <a href="https://commons.wikimedia.org/wiki/File:Illustrated_manuscript_depiction_of_Charpath_Nath,_ca.1715.jpg">Wellcome Collection and Wikimedia Commons</a>.</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="body">
+  <div class="wrap">
+    <span class="eyebrow">The body</span>
+    <h2>Practices that work on the fascia web.</h2>
+    <div class="ew-row" style="margin-top:14px">
+      <div>
+        <p>Without anatomy books, contemplatives mapped the body from the inside: the bandhas, or "locks", of hatha yoga; the channels of prana called nadis; the meridians and qi of Chinese medicine; the slow, spiraling movements of tai chi and qigong; the marma points of Ayurveda.</p>
+        <p>The HMR's view is that these traditions were working, with great precision, on the fascia web, the body's continuous connective tissue: holding, lengthening, hydrating and releasing fascia through breath, posture, pressure and attention. They knew what they were doing. They described it in a different language, prana and qi, that Western medicine has typically not taken seriously. That has been a mistake, and one to correct soon: these traditions hold thousands of practices that, read through fascia, are all aimed at the same goal, optimizing the human tensegrity.</p>
+        <h3 style="margin-top:22px">Science is beginning to look in the same places.</h3>
+        <p class="small muted" style="margin-bottom:12px">Exact words from peer-reviewed abstracts. Quoting them does not mean these authors endorse the HMR.</p>
+        <blockquote class="ew-q"><p>"We hypothesize that the network of acupuncture points and meridians can be viewed as a representation of the network formed by interstitial connective tissue."</p><cite>Langevin and Yandow, 2002, Anatomical Record. <a href="https://doi.org/10.1002/ar.10185">doi:10.1002/ar.10185</a></cite></blockquote>
+        <blockquote class="ew-q"><p>"Connective tissue thus may function as a previously unrecognized whole body communication system."</p><cite>Langevin, 2006, Medical Hypotheses. <a href="https://pubmed.ncbi.nlm.nih.gov/16483726/">PubMed 16483726</a></cite></blockquote>
+        <blockquote class="ew-q"><p>"The reviewed evidence supports the view that the human body's fascia network may be the physical substrate represented by the meridians of TCM."</p><cite>Bai et al., 2011, Evidence-Based Complementary and Alternative Medicine. <a href="https://doi.org/10.1155/2011/260510">doi:10.1155/2011/260510</a></cite></blockquote>
+        <blockquote class="ew-q"><p>"This paper reconsiders acupuncture, positing that the fascia is the mechanism of action of acupuncture therapy."</p><cite>Finando and Finando, 2011, Journal of Bodywork and Movement Therapies. <a href="https://pubmed.ncbi.nlm.nih.gov/21419357/">PubMed 21419357</a></cite></blockquote>
+        <blockquote class="ew-q"><p>"The proposed analogy bridges a foundational TCM theory with contemporary biomedical science."</p><cite>Xia et al., 2026, Frontiers in Physiology. <a href="https://doi.org/10.3389/fphys.2026.1795656">doi:10.3389/fphys.2026.1795656</a></cite></blockquote>
+        <blockquote class="ew-q"><p>"A tensegrity-based interpretation allows acupuncture to be studied as an architectural intervention targeting impaired plasticity rather than as a purely neuro-reflexive therapy."</p><cite>Carballo, 2026, Frontiers in Physiology. <a href="https://doi.org/10.3389/fphys.2026.1779725">doi:10.3389/fphys.2026.1779725</a></cite></blockquote>
+        <p class="small muted">The field is careful: one 2026 review frames these links as analogies rather than proven equivalences (<a href="https://doi.org/10.3389/fmed.2026.1881739">Liu et al., 2026</a>). Who is making which part of the claim: <a href="#resources">resources →</a></p>
+      </div>
+      <div>
+        <figure class="fig ew-fig"><img src="img/ew-fascia.jpg" alt="A stained micrograph of loose connective tissue: pink collagen fibres, thin dark elastic fibres and scattered cell nuclei." loading="lazy" width="1400" height="789"><figcaption>Loose (areolar) connective tissue under the microscope: pink collagen, dark elastic fibres, and the fibroblasts that remodel them. Berkshire Community College Bioscience Image Library, CC0, via <a href="https://commons.wikimedia.org/wiki/File:Connective_Tissue_Loose_Aerolar_(41743649122).jpg">Wikimedia Commons</a>.</figcaption></figure>
+        <figure class="fig ew-fig" style="margin-top:16px"><img src="img/ew-chakra.jpg" alt="An Indian manuscript painting of a seated yogin with the chakras drawn as colored lotuses along the spine and the Kundalini serpent at its base." loading="lazy" width="1100" height="1427"><figcaption>An Indian painting of the subtle body: chakras as lotuses along the midline, nadis, and the coiled Kundalini. Unknown artist, public domain, via <a href="https://commons.wikimedia.org/wiki/File:Yogin_in_meditation_chakras_kundalini_snake.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      </div>
     </div>
   </div>
 </section>
@@ -47,11 +141,14 @@
   <div class="wrap">
     <span class="eyebrow">Where the maps meet</span>
     <h2>Chakras, meridians and the lines of fascia.</h2>
-    <p class="lede">The traditions' maps of the body and modern maps of fascia are starting to be compared. Some correspondences are already measured; others are noted but not yet tested.</p>
+    <p class="lede">The traditions' maps of the body and modern maps of fascia are being compared. Some correspondences are measured; others are proposed but not yet tested.</p>
     <div class="grid g3" style="margin-top:22px">
-      <div class="card"><span class="tag">Measured</span><h3>Meridians follow fascial planes</h3><p>Mapping the arm, researchers found that about 80% of acupuncture points, and most meridian paths, lie along planes of connective tissue between or within muscles (<a href="https://doi.org/10.1002/ar.10185">Langevin and Yandow, 2002</a>). A later review proposed the fascia network as the anatomical basis of acupoints and meridians (<a href="https://doi.org/10.1155/2011/260510">Bai et al., 2011</a>).</p></div>
-      <div class="card"><span class="tag">Measured</span><h3>Lines of fascia carry force</h3><p>Modern anatomy describes long myofascial chains running the length of the body. A systematic review of dissection studies found strong evidence for three of them, including the superficial back line from the soles of the feet to the brow (<a href="https://doi.org/10.1016/j.apmr.2015.07.023">Wilke et al., 2016</a>), echoing the long channels mapped by yoga and Chinese medicine.</p></div>
-      <div class="card"><span class="tag">Noted, to be tested</span><h3>Chakras and the body's junctions</h3><p>The traditional chakras sit along the body's midline at places of anatomical convergence: near the major nerve plexuses, the diaphragm, the throat and the pelvic floor, where layers of fascia meet and the bandhas are applied. The correspondence is often noted but has not yet been rigorously studied. It is one the HMR aims to test.</p></div>
+      <div class="card"><span class="tag">Measured</span><h3>Meridians follow fascial planes</h3><p>Mapping the arm, researchers found an 80% correspondence between acupuncture points and planes of connective tissue between or within muscles (<a href="https://doi.org/10.1002/ar.10185">Langevin and Yandow, 2002</a>). Reviews from China proposed the fascia network as the anatomical basis of acupoints and meridians and named a field, "fasciaology" (<a href="https://doi.org/10.1016/s2005-2901(10)60023-4">Bai et al., 2010</a>; <a href="https://doi.org/10.1155/2011/260510">2011</a>).</p></div>
+      <div class="card"><span class="tag">Measured</span><h3>Lines of fascia carry force</h3><p>A systematic review of dissection studies found strong evidence for three long myofascial chains, including the superficial back line from the soles of the feet to the brow (<a href="https://doi.org/10.1016/j.apmr.2015.07.023">Wilke et al., 2016</a>), echoing the long channels mapped by yoga and Chinese medicine.</p></div>
+      <div class="card"><span class="tag">Measured</span><h3>Trigger points and meridians</h3><p>Referred-pain patterns from myofascial trigger points predicted the paths of all 12 principal meridians, especially in the limbs (<a href="https://doi.org/10.1016/j.jpain.2008.12.010">Dorsher, 2009</a>). A later review found trigger points closely match "Ashi" points in particular (<a href="https://doi.org/10.3389/fnins.2022.947884">Lee, Lee and Chae, 2022</a>).</p></div>
+      <div class="card"><span class="tag">Measured, mixed</span><h3>Meridians and collagen bands</h3><p>Along one meridian, lower electrical impedance went with bands of collagen under the skin; two other meridians showed no difference (<a href="https://doi.org/10.1371/journal.pone.0011907">Ahn et al., 2010</a>). A result worth following, not yet a rule.</p></div>
+      <div class="card"><span class="tag">Proposed</span><h3>Qi as fascial activity</h3><p>Acupuncturists and researchers have proposed that the activity of fascia is what the classics called the qi of the channels (<a href="https://doi.org/10.1089/acm.2011.0599">Finando and Finando, 2012</a>), and that the classical "Sanjiao" passageway of qi and fluids matches the fascial-interstitial system (<a href="https://doi.org/10.3389/fphys.2026.1795656">Xia et al., 2026</a>).</p></div>
+      <div class="card"><span class="tag">Noted, to be tested</span><h3>Chakras and the body's junctions</h3><p>The traditional chakras sit along the midline at places of anatomical convergence: near the major nerve plexuses, the diaphragm, the throat and the pelvic floor, where layers of fascia meet and the bandhas are applied. We found no rigorous study of this correspondence. It is one the HMR aims to test.</p></div>
     </div>
   </div>
 </section>
@@ -60,20 +157,78 @@
   <div class="wrap">
     <span class="eyebrow">The hidden variable</span>
     <h2>Timing: why slow movement reaches fascia differently.</h2>
-    <p class="lede">Most of what people do with their bodies happens at one speed: the speed of ordinary life. The traditions changed the speed. They held positions for minutes, moved slower than anyone moves by accident, or repeated a motion in a steady rhythm. The HMR's view is that timing is one of the main ways these practices reach the fascia.</p>
-    <div class="grid g3" style="margin-top:22px">
-      <div class="card"><span class="tag">Measured</span><h3>Fascia answers to time</h3><p>Fascia is viscoelastic: under a sustained load it keeps lengthening slowly, and under a sustained stretch its tension slowly eases. A quick stretch and a long hold are different events to the tissue. In connective tissue held stretched, the cells themselves expand and remodel within minutes (<a href="https://doi.org/10.1002/jcp.24356">Langevin et al., 2013</a>), and fascia's own contractile cells act over minutes to months, not seconds (<a href="https://doi.org/10.1002/ca.23391">Schleip and Klingler, 2019</a>).</p></div>
-      <div class="card"><span class="tag">Measured</span><h3>Slow pressure reaches different sensors</h3><p>Fascia is rich in nerve endings. Some respond best to slow, sustained pressure and lateral stretch rather than quick movement, and are linked to calming of the nervous system (<a href="https://doi.org/10.1016/S1360-8592(02)00067-0">Schleip, 2003</a>). Moving slowly does not just do less of the same thing; it speaks to different receptors.</p></div>
-      <div class="card"><span class="tag">Hypothesis</span><h3>A calibration session for the mind</h3><p>When movement is far slower than anything in daily life, as in tai chi, the mind cannot run its usual automatic patterns. It has to attend to each moment of tension. The HMR proposes that this puts the mind into a calibration session, in which it can sense and reach the fascia in a way it normally cannot, and that every slow Eastern practice works partly this way.</p></div>
+    <div class="ew-row" style="margin-top:14px">
+      <div>
+        <p class="lede" style="margin-top:0">The traditions changed the speed of the body. They held positions for minutes, moved slower than anyone moves by accident, or repeated a motion in a steady rhythm. Timing is well understood by people who study fascia: tissue responds differently to 10 seconds, 30 seconds, 90 seconds and several minutes. The HMR's view is that timing is one of the main ways these practices reach the fascia.</p>
+        <blockquote class="ew-q"><p>"Over 180 seconds of stretching was required to decrease DPT and stiffness, but isometric muscle force decreased regardless of the stretching duration."</p><cite>Matsuo et al., 2013, Journal of Strength and Conditioning Research. <a href="https://pubmed.ncbi.nlm.nih.gov/23524367/">PubMed 23524367</a> (DPT: passive torque)</cite></blockquote>
+      </div>
+      <div>
+      <figure class="fig ew-fig"><img src="img/ew-taichi.jpg" alt="A group of people practicing tai chi together outdoors in a city park in the morning." loading="lazy" width="1400" height="837"><figcaption>Morning tai chi in Bryant Park, New York. Carl from New York, CC BY-SA 2.0, via <a href="https://commons.wikimedia.org/wiki/File:Morning_Tai_Chi_in_Bryant_Park.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <div style="margin-top:16px">
+        <blockquote class="ew-q"><p>"Fibroblasts in whole areolar connective tissue respond to static stretching of the tissue by expanding and remodeling their cytoskeleton within minutes both ex vivo and in vivo."</p><cite>Langevin et al., 2013, Journal of Cellular Physiology. <a href="https://doi.org/10.1002/jcp.24356">doi:10.1002/jcp.24356</a></cite></blockquote>
+      </div>
+      </div>
     </div>
-    <div class="compare" style="margin-top:24px">
-      <div class="now"><h3>Ordinary life</h3><ul><li><b>Speed:</b> quick, habitual, mostly unattended.</li><li><b>Holds:</b> seconds, rarely more.</li><li><b>Effect on fascia:</b> the same lines loaded the same way, every day, reinforcing whatever pattern is already there.</li></ul></div>
-      <div class="new"><h3>The traditions</h3><ul><li><b>Speed:</b> slowed to a crawl (tai chi, qigong), or set by the breath (yoga flows).</li><li><b>Holds:</b> minutes (yin yoga, standing meditation, long asana holds).</li><li><b>Effect on fascia, as the HMR proposes:</b> time for the tissue to creep and release, new sensors engaged, and attention brought to tension the mind normally ignores.</li></ul></div>
+    <div class="ew-scroll">
+      <table class="ew-tbl">
+        <thead><tr><th>Hold</th><th>What the studies found</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>First 10 to 20 s</td><td>Most of the quick drop in tension happens here. At the ankle, tension fell about 21% within 15 s and did not fall further by 60 s.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/11252058/">McNair et al., 2001</a></td></tr>
+          <tr><td>30 s vs 60 s</td><td>For lasting hamstring range over six weeks, 30 s a day worked as well as 60 s, and both beat 15 s. More time or more sessions a day added nothing.</td><td><a href="https://doi.org/10.1093/ptj/74.9.845">Bandy and Irion, 1994</a>; <a href="https://doi.org/10.1093/ptj/77.10.1090">Bandy et al., 1997</a></td></tr>
+          <tr><td>45 to 90 s</td><td>During a 90 s hold, resistance fell 33 to 38%, with no muscle activity, even in people with complete spinal cord injury: the tissue itself relaxes (viscoelastic stress relaxation). The drop is significant up to about 45 s.</td><td><a href="https://doi.org/10.1111/j.1600-0838.1996.tb00101.x">Magnusson et al., 1996</a>; <a href="https://doi.org/10.1111/j.1600-0838.1995.tb00056.x">1995</a></td></tr>
+          <tr><td>90 to 120 s</td><td>Myofascial release holds pressure for at least 90 to 120 s "to allow the tissue to begin to release". This is a clinical convention, not yet tested against other times. In self-massage, at least 90 s per area was needed to change a deep squat score.</td><td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3184472/">Cubick et al., 2011</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/28217420/">Monteiro et al., 2017</a></td></tr>
+          <tr><td>3 to 5 min</td><td>Comparing single holds of 20, 60, 180 and 300 s, only 180 s and longer reduced muscle stiffness. Strength dropped at every duration, so long holds belong after training, not before.</td><td><a href="https://pubmed.ncbi.nlm.nih.gov/23524367/">Matsuo et al., 2013</a>; <a href="https://doi.org/10.1249/MSS.0b013e318225cb27">Kay and Blazevich, 2012</a></td></tr>
+          <tr><td>10 min and more</td><td>In connective tissue held stretched, fibroblasts expand and remodel within minutes; held for 2 h, their cell bodies grew markedly larger. In rats, stretching 10 min twice a day reduced connective tissue inflammation.</td><td><a href="https://doi.org/10.1152/ajpcell.00420.2004">Langevin et al., 2005</a>; <a href="https://doi.org/10.1371/journal.pone.0029831">Corey et al., 2012</a>; <a href="https://doi.org/10.1002/jcp.25263">Berrueta et al., 2016</a></td></tr>
+          <tr><td>Hold, then rest</td><td>Fascia stretched for 15 min lost water, then during 30 min of rest took up more than before and became stiffer: a super-compensation, not simple "melting".</td><td><a href="https://doi.org/10.1016/j.jbmt.2011.09.003">Schleip et al., 2012</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid g3" style="margin-top:22px">
+      <div class="card"><span class="tag">Measured</span><h3>Slow pressure reaches different sensors</h3><p>Fascia is densely innervated, and Schleip proposed that much of what hands feel as "release" comes through its nerve endings and the nervous system's response rather than from stretching dense tissue (<a href="https://doi.org/10.1016/S1360-8592(02)00067-0">Schleip, 2003</a>). Dense fascia barely deforms under normal forces (<a href="https://doi.org/10.7556/jaoa.2008.108.8.379">Chaudhry et al., 2008</a>).</p></div>
+      <div class="card"><span class="tag">Measured, with limits</span><h3>What these studies do not show</h3><p>The human studies measure the whole muscle and tendon, and partly stretch tolerance; none isolates fascia. The cell results come from loose connective tissue in rodents. Long-term change in human fascia from long holds is still a hypothesis.</p></div>
+      <div class="card"><span class="tag">Hypothesis</span><h3>A calibration session for the mind</h3><p>When movement is far slower than anything in daily life, as in tai chi, the mind cannot run its automatic patterns. It has to attend to each moment of tension. The HMR proposes that this lets the mind sense and reach the fascia in a way it normally cannot, and that every slow Eastern practice works partly this way.</p></div>
+    </div>
+    <h3 style="margin-top:28px">Teachers whose long-hold protocols fit a fascia-first approach</h3>
+    <p class="small muted" style="margin-bottom:10px">Practitioners, not research. Linked to their own official sites. Listing them is not an endorsement either way.</p>
+    <div class="grid g3">
+      <div class="card"><span class="tag">Yin yoga</span><h3>Paul Grilley</h3><p>A founder of yin yoga: relaxed floor postures held about three to five minutes, taught with Chinese meridian theory. <a href="https://www.paulgrilley.com/">paulgrilley.com</a></p></div>
+      <div class="card"><span class="tag">Yin yoga</span><h3>Bernie Clark</h3><p>Holds of at least one minute, often three to five and sometimes ten or more, with long essays on the science of time under load. <a href="https://yinyoga.com/yinsights/holding-for-time">yinyoga.com</a></p></div>
+      <div class="card"><span class="tag">Hip opening</span><h3>YOGABODY (Lucas Rockwood)</h3><p>Long-hold stretching and hip-opening programs, typically two to five minutes per pose. A program we recommend: its long-hold hip-opening sessions fit a fascia-first protocol well. Instagram: <a href="https://www.instagram.com/yogabody/">@yogabody</a>. <a href="https://yogabody.com/">yogabody.com</a></p></div>
+      <div class="card"><span class="tag">Anatomy Trains</span><h3>Thomas Myers</h3><p>Suggests holding about three minutes, counted from the moment the muscle lets go, because deep fascia is reached only after that. <a href="https://www.anatomytrains.com/blog/2016/09/13/qa-tom-optimal-time-hold-yoga-pose">anatomytrains.com</a></p></div>
+      <div class="card"><span class="tag">Yin and meditation</span><h3>Sarah Powers</h3><p>Insight Yoga: long-held floor poses joined with meridian theory and Buddhist meditation. <a href="https://www.sarahandtypowers.com/">sarahandtypowers.com</a></p></div>
+      <div class="card"><span class="tag">Yin and Chinese medicine</span><h3>Josh Summers and Biff Mithoefer</h3><p>Long-held yin postures taught with Chinese medicine theory. <a href="https://joshsummers.net/">joshsummers.net</a>; <a href="https://biffmithoeferyoga.com/">biffmithoeferyoga.com</a></p></div>
+    </div>
+    <p class="note" style="margin-top:18px">Research and education, not medical advice. Long holds are not right for every body or condition; learn from a qualified teacher.</p>
+  </div>
+</section>
+
+<section id="maps">
+  <div class="wrap">
+    <span class="eyebrow">Two maps of the body</span>
+    <h2>The brain maps the body. The HMR proposes it holds two maps.</h2>
+    <div class="ew-row rev" style="margin-top:14px">
+      <div>
+      <figure class="fig ew-fig"><img src="img/ew-homunculus.jpg" alt="A diagram of the sensory homunculus: body parts drawn along a cross-section of the brain's sensory cortex, with large hands, lips and face." loading="lazy" width="1280" height="1275"><figcaption>The sensory homunculus: how the cortex maps the body, with hands, lips and face given the most space. OpenStax College, CC BY 3.0, via <a href="https://commons.wikimedia.org/wiki/File:1421_Sensory_Homunculus.jpg">Wikimedia Commons</a>.</figcaption></figure>
+        <blockquote class="ew-q" style="margin-top:16px"><p>"the neural network, or 'neuromatrix', that subserves body sensation has a genetically determined substrate that is modified by sensory experience."</p><cite>Melzack, 1990, Trends in Neurosciences. <a href="https://pubmed.ncbi.nlm.nih.gov/1691874/">PubMed 1691874</a></cite></blockquote>
+        <p>An inborn map shaped by experience is the closest point science has reached to the HMR's two maps; the HMR goes further in proposing that the inborn map encodes the ideal. Practitioners of slow, attentive practices report moments of sensing that ideal and noticing where the body does not match it. The HMR proposes that attending to those places with breath and muscle, held over time, can change the tissue there. This is a hypothesis to test, not an established finding.</p>
+      </div>
+      <div>
+        <div class="grid g2">
+          <div class="card"><span class="tag">Measured</span><h3>What science knows</h3><ul style="margin:0;padding-left:1.1em;font-size:.95rem">
+            <li style="margin-bottom:6px">The cortex holds maps of the body, found by stimulating the brain in surgery (<a href="https://doi.org/10.1093/brain/60.4.389">Penfield and Boldrey, 1937</a>).</li>
+            <li style="margin-bottom:6px">The brain keeps an updated postural model of the body, the body schema (<a href="https://doi.org/10.1093/brain/34.2-3.102">Head and Holmes, 1911</a>), separate from the conscious body image (<a href="https://pubmed.ncbi.nlm.nih.gov/19786038/">de Vignemont, 2010</a>).</li>
+            <li style="margin-bottom:6px">Interoception maps the body's inner state, "the material me" (<a href="https://pubmed.ncbi.nlm.nih.gov/12154366/">Craig, 2002</a>).</li>
+            <li style="margin-bottom:6px">Some children born without a limb still feel it, which suggests part of the body map is inborn (<a href="https://pubmed.ncbi.nlm.nih.gov/1691874/">Melzack, 1990</a>).</li>
+            <li>In chronic back pain, the brain's image of the painful area is disrupted (<a href="https://pubmed.ncbi.nlm.nih.gov/18786763/">Moseley, 2008</a>).</li>
+          </ul></div>
+          <div class="card ew-hyp"><span class="tag">Hypothesis</span><h3>What the HMR proposes</h3><p>Beneath the learned maps, the brain holds a subconscious, ideal map of the body: the optimal tensegrity, given by UI. Alongside it is a learned map of the body as it actually is, imperfections included.</p><p>Every movement is a blend of the two, and the psyche is constantly trying to reconcile them, whether we know it or not.</p></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="practices">
+<section class="tint" id="practices">
   <div class="wrap">
     <span class="eyebrow">Practices and what they do</span>
     <h2>They were onto something, without the words we have now.</h2>
@@ -94,18 +249,24 @@
         <span class="tag">Tai chi and qigong</span>
         <h3>Slow spirals and standing still</h3>
         <p>Tai chi moves the whole body continuously in slow spirals, with the weight shifting from leg to leg. Spiral movement loads the long diagonal lines of fascia that wrap the trunk and limbs, and the slowness gives the tissue time to respond (see <a href="#timing">Timing</a>).</p>
-        <p style="margin-bottom:0">Zhan zhuang, "standing like a post", holds one posture for many minutes. Nothing appears to happen, but the body must keep making tiny adjustments to stay upright, and the fascia carries the posture for minutes at a time instead of seconds.</p>
+        <p>Zhan zhuang, "standing like a post", holds one posture for many minutes. Nothing appears to happen, but the body must keep making tiny adjustments to stay upright, and the fascia carries the posture for minutes at a time instead of seconds.</p>
+        <p style="margin-bottom:0">Yijinjing, the "sinew-changing classic" of qigong, is named for exactly this tissue; a 2026 review reads it alongside modern Fascial Manipulation (<a href="https://doi.org/10.3389/fmed.2026.1881739">Liu et al., 2026</a>).</p>
       </div>
       <div class="card">
         <span class="tag">Yoga, breath and holds</span>
         <h3>Long holds, breath and inversion</h3>
-        <p>Long-held postures, as in yin yoga, place a low, steady load on connective tissue for minutes, the time scale on which fascia creeps and its cells remodel. Pranayama, breath control, moves the diaphragm through its full range and changes pressure inside the trunk with every breath. Inversions reverse the pull of gravity on the whole web.</p>
+        <div class="ew-pair" style="margin-bottom:12px">
+          <img src="img/ew-yoga.jpg" alt="An 1830 Indian painting of a yogi seated in lotus posture." loading="lazy" width="476" height="834" style="width:100%;height:220px;object-fit:cover;border-radius:10px">
+          <img src="img/ew-yoga-virasana.jpg" alt="A c. 1600 Mughal painting of a yogi seated in Virasana." loading="lazy" width="960" height="1573" style="width:100%;height:220px;object-fit:cover;border-radius:10px">
+        </div>
+        <p class="small muted">Left: Padmasana, Joga Pradipika (1830). Right: a Kanphata yogi in Virasana, Bahr al-Hayat (c. 1600). Both public domain, via Wikimedia Commons (<a href="https://commons.wikimedia.org/wiki/File:Jogapradipika_2_Padmasana.jpg">1</a>, <a href="https://commons.wikimedia.org/wiki/File:Kanphata_yogi_seated_in_Virasana_(sahajasana)_position_(CBL_In_16.10a).jpg">2</a>).</p>
+        <p>Long-held postures, as in yin yoga, place a low, steady load on connective tissue for minutes, the time scale on which fascia creeps and its cells remodel. Pranayama moves the diaphragm through its full range and changes pressure inside the trunk with every breath. Inversions reverse the pull of gravity on the whole web.</p>
         <p style="margin-bottom:0">Sun salutations link the front and back lines of the body in one repeated sequence, timed to the breath.</p>
       </div>
       <div class="card">
         <span class="tag">Outside in</span>
         <h3>Pressure, scraping and suction</h3>
-        <p>Many traditions also work on fascia from the outside. Gua sha scrapes the skin along lines of the body; cupping lifts the skin and tissue beneath it with suction; Thai and Chinese massage apply slow pressure along the meridians; Ayurvedic marma therapy presses specific points.</p>
+        <p>Many traditions also work on fascia from the outside. Gua sha scrapes the skin along lines of the body; cupping lifts the skin and tissue beneath it with suction; Thai and Chinese massage apply slow pressure along the meridians; Ayurvedic marma therapy presses specific points. Ultrasound studies have begun to measure changes in the fascia of the low back after gua sha and after acupuncture (<a href="https://doi.org/10.1097/MD.0000000000044233">Wang et al., 2025</a>; <a href="https://doi.org/10.1186/s41747-026-00754-7">Tomita et al., 2026</a>).</p>
         <p style="margin-bottom:0">In the HMR, these are outside-in tools for the same web the bandhas and slow movement reach from the inside. Each is most useful as part of a whole protocol, not as a single technique tested alone.</p>
       </div>
     </div>
@@ -113,42 +274,89 @@
   </div>
 </section>
 
-<section class="tint">
-  <div class="wrap">
-    <h2>The language of the HMR.</h2>
-    <p class="lede">The HMR needs only a small set of terms. Humanity already has words for these things, but many of them are vague, overlapping, or tied to one tradition. The aim is to identify what is actually true and name it precisely, so that science and the traditions can be read in the same words.</p>
-    <div class="grid g3" style="margin-top:22px">
-      <div class="card"><span class="tag">Physical reality</span><p>Everything that can be measured: matter, energy, space and time, and the laws that govern them. What is usually just called "reality".</p></div>
-      <div class="card"><span class="tag">Universal Intelligence (UI)</span><p>The non-physical intelligence from which physical reality emerges, and the process by which it does so; the two are one. UI is another name for God, or for any higher power. <a href="ui.html">Defining UI →</a></p></div>
-      <div class="card"><span class="tag">God</span><p>One of humanity's names for UI, alongside Brahman, the Tao, Allah and many others. The names differ; the source is the same.</p></div>
-      <div class="card"><span class="tag">Physical laws</span><p>The stable rules UI holds fixed so that many separate beings can share one physical reality. Science is the study of these rules.</p></div>
-      <div class="card"><span class="tag">Life</span><p>Any instance of UI experiencing physical reality, from a single cell or a blade of grass to a human being.</p></div>
-      <div class="card"><span class="tag">Human</span><p>An instance of UI embedded within physical reality, able to experience it through an interface: the human body. In Hindu thought, closest to Atman.</p></div>
-      <div class="card"><span class="tag">Body</span><p>The physical interface through which an instance of UI senses and acts in physical reality. In humans, a tensegrity held together by fascia.</p></div>
-      <div class="card"><span class="tag">Mind</span><p>The part of a human through which UI thinks, remembers, chooses and makes meaning within a single life.</p></div>
-      <div class="card"><span class="tag">Emotions</span><p>Felt signals, carried through body and mind, that report how an experience stands: calm or threat, joy or grief, connection or loss.</p></div>
-      <div class="card"><span class="tag">Consciousness</span><p>Experience itself. In the HMR it is fundamental: not produced by matter, but the ground from which matter emerges.</p></div>
-      <div class="card"><span class="tag">Coherence</span><p>Order, harmony and integration. The direction in which UI, and every life, tends to develop.</p></div>
-      <div class="card"><span class="tag">Death</span><p>A transition from experience within physical reality back to non-physical existence, in which the experience of that life is kept and added to UI's understanding of what physical life is like.</p></div>
-    </div>
-    <p class="note" style="margin-top:22px">The HMR is not affiliated with any religion. Hindu terms appear because they are among the most precise available, not to place one tradition above the others. This vocabulary is a first version and will grow.</p>
-  </div>
-</section>
-
 <section>
   <div class="wrap">
     <h2>Many names, one source.</h2>
-    <p class="lede">Viewed through the HMR, the world's traditions do not contradict each other. Each names and describes different aspects of the same Universal Intelligence (UI). An intelligence able to generate physical reality could be called by any name, and could be understood as one, as many, or as everything.</p>
+    <p class="lede">Viewed through the HMR, the world's traditions do not contradict each other. Each names and describes different aspects of the same UI. An intelligence able to generate physical reality could be called by any name, and could be understood as one, as many, or as everything. Each card links to a reputable place to read more.</p>
     <div class="grid g3" style="margin-top:22px">
-      <div class="card"><span class="tag">Hindu traditions</span><h3>Brahman and Atman</h3><p>The Upanishads teach that the self within is one with the ground of all being: "tat tvam asi", you are that. Yoga, its bandhas and pranayama, and the Kundalini tradition work through the body toward that recognition.</p></div>
-      <div class="card"><span class="tag">Buddhist traditions</span><h3>Mind and awareness</h3><p>Centuries of systematic introspection into attention, perception and suffering, with practices of breath and posture that train the body and mind together.</p></div>
-      <div class="card"><span class="tag">Taoist and Chinese traditions</span><h3>The Tao and qi</h3><p>An unnamed source from which all things arise, and a living energy moving along mapped channels, cultivated through tai chi, qigong and acupuncture.</p></div>
-      <div class="card"><span class="tag">Japanese and Tibetan traditions</span><h3>Ki and the subtle body</h3><p>Aikido and shiatsu work with ki; Tibetan yogas describe channels, winds and drops, practiced through breath and movement.</p></div>
-      <div class="card"><span class="tag">Abrahamic mystical traditions</span><h3>The one behind the many</h3><p>Kabbalah's Ein Sof, the infinite beyond description; Sufi practices of breath, movement and remembrance; the breath prayer of Christian contemplatives.</p></div>
-      <div class="card"><span class="tag">Greek and Western philosophy</span><h3>The One and the whole</h3><p>From Pythagoras and Plato to Plotinus and Spinoza, a line of thinkers who saw reality as one ordered whole, with mind at its root.</p></div>
-      <div class="card"><span class="tag">Indigenous traditions</span><h3>A living world</h3><p>Many Indigenous traditions describe a sacred, living intelligence present in all things, and practices that keep a person in right relation with it.</p></div>
-      <div class="card"><span class="tag">Modern science</span><h3>The rules of physical reality</h3><p>In the HMR, the laws of physics are the stable rules that make a complex physical reality possible at all. Science describes those rules; it is one more way of reading the same source.</p></div>
-      <div class="card" style="background:var(--ice)"><span class="tag">Where science stops</span><h3>The open questions</h3><p>Physics itself has deep unanswered questions, from gravity to entanglement, measurement and consciousness. <a href="reality.html">Physical reality →</a></p></div>
+      <div class="card"><span class="tag">Hindu traditions</span><h3>Brahman and Atman</h3><p>The Upanishads teach that the self within is one with the ground of all being: "tat tvam asi", you are that. Yoga, its bandhas and pranayama, and the Kundalini tradition work through the body toward that recognition.</p><a class="ew-more" href="https://iep.utm.edu/upanisad/">The Upanishads, Internet Encyclopedia of Philosophy →</a></div>
+      <div class="card"><span class="tag">Buddhist traditions</span><h3>Mind and awareness</h3><p>Centuries of systematic introspection into attention, perception and suffering, with practices of breath and posture that train body and mind together. Neuroscience now measures their effects.</p><a class="ew-more" href="https://doi.org/10.1038/nrn3916">The neuroscience of mindfulness meditation, Nature Reviews Neuroscience →</a></div>
+      <div class="card"><span class="tag">Taoist and Chinese traditions</span><h3>The Tao and qi</h3><p>An unnamed source from which all things arise, and a living energy moving along mapped channels, cultivated through tai chi, qigong and acupuncture. Those channels follow the connective tissue.</p><a class="ew-more" href="https://doi.org/10.1002/ar.10185">Acupuncture points and connective tissue planes, Anatomical Record →</a></div>
+      <div class="card"><span class="tag">Japanese and Tibetan traditions</span><h3>Ki and the subtle body</h3><p>Aikido and shiatsu work with ki; Tibetan yogas describe channels, winds and drops, practiced through breath and movement. Monks practicing g-tummo raised their body temperature into the fever range by breath alone.</p><a class="ew-more" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0058244">G-tummo meditation measured, PLoS One →</a></div>
+      <div class="card"><span class="tag">Abrahamic mystical traditions</span><h3>The one behind the many</h3><p>Kabbalah's Ein Sof, the infinite beyond description; Sufi practices of breath, movement and remembrance; the breath prayer of Christian contemplatives. The rosary and a yoga mantra slow the breath and heart in the same way.</p><a class="ew-more" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC61046/">Rosary prayer and yoga mantras, BMJ →</a></div>
+      <div class="card"><span class="tag">Greek and Western philosophy</span><h3>The One and the whole</h3><p>From Pythagoras and Plato to Plotinus and Spinoza, a line of thinkers who saw reality as one ordered whole, with mind at its root.</p><a class="ew-more" href="https://plato.stanford.edu/entries/plotinus/">Plotinus, Stanford Encyclopedia of Philosophy →</a></div>
+      <div class="card"><span class="tag">Indigenous traditions</span><h3>A living world</h3><p>Many Indigenous traditions describe a sacred, living intelligence present in all things, and practices that keep a person in right relation with it.</p><a class="ew-more" href="https://doi.org/10.1086/200061">"Animism" revisited, Current Anthropology →</a></div>
+      <div class="card"><span class="tag">Modern science</span><h3>The rules of physical reality</h3><p>In the HMR, the laws of physics are the stable rules that make a complex physical reality possible at all. Physics finds them finely tuned for life. Science describes those rules; it is one more way of reading the same source.</p><a class="ew-more" href="https://plato.stanford.edu/entries/fine-tuning/">Fine-tuning, Stanford Encyclopedia of Philosophy →</a></div>
+      <div class="card" style="background:var(--ice)"><span class="tag">Where science stops</span><h3>The open questions</h3><p>Physics itself has deep unanswered questions, from gravity to entanglement, measurement and consciousness. <a href="reality.html">Physical reality →</a></p><a class="ew-more" href="https://plato.stanford.edu/entries/qt-issues/">Philosophical issues in quantum theory, SEP →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="resources">
+  <div class="wrap ew-res">
+    <span class="eyebrow">Resources</span>
+    <h2>Who else connects fascia and the Eastern traditions.</h2>
+    <div class="ew-dated" style="margin-top:14px">
+      <p><b>Search note, 18 November 2026.</b> We searched the web (search engines, PubMed, Europe PMC, publisher sites, and practitioner sites and blogs) and the 176,583 items indexed in our own library, of which 97 distinct items mention both fascia or connective tissue and an Eastern practice term.</p>
+      <p><b>Result.</b> Many people make parts of the claim, and we link them below. Fascia as the anatomical basis of the meridians has been argued in peer-reviewed journals since at least 1998, strongly so since 2010, and qi has been proposed as fascial activity. Yin yoga teachers link long holds, fascia and meridians. A few writers bring fascia and consciousness together, mostly as metaphor or in collagen biophysics. Tensegrity has been applied to acupuncture as a mechanical model.</p>
+      <p><b>Where the HMR goes further.</b> The HMR proposes a full scientific marriage of East and West: fascia and tensegrity physics as the common ground for meridians, qi, prana, the bandhas and the chakras, joined to one model of consciousness and reality. As of 18 November 2026 we found no one else making this claim as fully. We found no credible work yet that links fascia to the nadis, chakras, bandhas or marma.</p>
+    </div>
+    <p class="small muted" style="margin-top:12px"><span class="ew-str s">Strong</span> argues fascia is the anatomical basis of a tradition's map. <span class="ew-str m">Moderate</span> argues a correspondence. <span class="ew-str w">Weak</span> mentions a link. <span class="ew-str c">Critic</span> argues against. Personal and practitioner sites are linked, not copied.</p>
+    <div class="ew-cols">
+      <div>
+        <h3>Research: fascia and the meridians</h3>
+        <ul>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.1002/ar.10185">Langevin and Yandow, 2002</a>: acupuncture points and meridians as a representation of the interstitial connective tissue network. Meridians and points.</li>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.1016/s2005-2901(10)60023-4">Bai, Yuan et al., 2010</a> and <a href="https://doi.org/10.1155/2011/260510">Bai et al., 2011</a>: the fascia network as the anatomical basis of acupoints and meridians; proposes "fasciaology". Meridians and a whole-body TCM anatomy.</li>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.1016/j.jbmt.2010.03.001">Finando and Finando, 2011</a>: fascia as the mechanism of acupuncture. <a href="https://doi.org/10.1089/acm.2011.0599">2012</a>: fascial activity as the qi of the channels. Qi and channels.</li>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.1016/j.jpain.2008.12.010">Dorsher, 2009</a>; <a href="https://doi.org/10.1089/acm.2007.0810">2008</a>: trigger point referred pain predicts the meridians. Meridians and points (disputed by some acupuncture scholars).</li>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.1142/s0192415x98000294">Ho and Knight, 1998</a>: the collagen of connective tissue as the acupuncture system and a "body consciousness". Meridians, energy and consciousness, through collagen biophysics; the nearest precedent to the HMR's scope.</li>
+          <li><span class="ew-str s">Strong</span><a href="https://doi.org/10.3389/fphys.2026.1795656">Xia et al., 2026</a>: the classical Sanjiao and Mocou as the fascial-interstitial system, the substrate of meridians. Meridians, qi transport.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.1096/fj.01-0015hyp">Langevin et al., 2001</a> and <a href="https://doi.org/10.1096/fj.01-0925fje">2002</a>: de qi and "needle grasp" as connective tissue mechanics. Needling.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.1371/journal.pone.0011907">Ahn et al., 2010</a>: lower impedance with collagen bands at one meridian of three. Meridians.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.13703/j.0255-2930.20230329-0001">Lin et al., 2023</a>; <a href="https://doi.org/10.13703/j.0255-2930.20230330-0017">Ma and Wang, 2023</a>; <a href="https://doi.org/10.51507/j.jams.2022.15.4.201">Jaimes et al., 2022</a>: meridian sinews (jingjin) and defensive qi read through fascia. Jingjin.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.3389/fmed.2026.1881739">Liu et al., 2026</a>: Yijinjing, meridian sinew and Fascial Manipulation, explicitly as analogies. Qigong and jingjin.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://doi.org/10.3389/fnins.2022.947884">Lee, Lee and Chae, 2022</a>: trigger points match Ashi points, not classical points in general. Points.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://doi.org/10.1016/j.mehy.2005.12.032">Langevin, 2006</a>: connective tissue as a body-wide signaling network. Indirect.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://www.nature.com/articles/s41598-018-23062-6">Benias, Theise et al., 2018</a>: a body-wide fluid-filled interstitium; the acupuncture link was made only in media remarks.</li>
+        </ul>
+        <h3>Research: tensegrity, acupuncture and the whole body</h3>
+        <ul>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.3389/fmed.2022.952159">Plaut, 2023</a>; <a href="https://doi.org/10.1089/acu.2024.0159">Audette, 2025</a>; <a href="https://doi.org/10.3389/fphys.2026.1779725">Carballo, 2026</a>: acupuncture as an intervention in a tensegrity network. Mechanism only.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.1016/j.jbmt.2008.06.005">Oschman, 2009</a> and his books on the "living matrix": connective tissue as an energetic communication system linked to acupuncture. Criticized as vitalistic.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://doi.org/10.7759/cureus.54513">Bordoni et al., 2024</a>: a fascial continuum "capable of interacting consciously", through cellular tensegrity. No Eastern content.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://doi.org/10.1016/j.jbmt.2018.02.002">Gracovetsky, 2018</a>: yoga, fascia and thermodynamics (editorial).</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://doi.org/10.1016/j.apmr.2015.07.023">Wilke et al., 2016</a>: evidence for myofascial chains, the Western half of the comparison.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Practitioners and teachers</h3>
+        <ul>
+          <li><span class="ew-str s">Strong</span>Paul Grilley, drawing on Hiroshi Motoyama: meridians run through the water-rich phase of connective tissue, worked by yin yoga. <a href="https://www.yogauonline.com/yoga-anatomy/working-fascia-yoga-online-yoga-talk-yin-yoga-teacher-paul-grilley">Interview</a>; <a href="https://www.paulgrilley.com/">paulgrilley.com</a>. Yoga and meridians.</li>
+          <li><span class="ew-str s">Strong</span>Daniel Keown, physician and acupuncturist, <a href="https://aus.singingdragon.com/products/the-spark-in-the-machine">The Spark in the Machine</a>: qi follows fascial planes; acupoints and embryology.</li>
+          <li><span class="ew-str m">Moderate</span>Bernie Clark: prana and chi as "communication energy", with the caution that fascia is not simply the meridian system. <a href="https://yinyoga.com/prana-and-chi-communication-energy/">yinyoga.com</a>. Prana, qi, yoga.</li>
+          <li><span class="ew-str m">Moderate</span>Joanne Avison, Yoga, Fascia, Anatomy and Movement: biotensegrity and yoga, with tensegrity as a metaphor for consciousness. <a href="https://www.hachette.co.uk/titles/joanne-avison/yoga-fascia-anatomy-and-movement-second-edition/9781913426057">Publisher</a>.</li>
+          <li><span class="ew-str m">Moderate</span>Luigi Stecco, Acupuncture, Western Medicine, Fascial Manipulation (2020): meridians and points compared with fascial centres. <a href="https://en.wikipedia.org/wiki/Fascial_Manipulation">Overview</a>.</li>
+          <li><span class="ew-str w">Weak</span>Thomas Myers: saw the parallels between Anatomy Trains and the meridians but chose not to merge them. <a href="https://www.anatomytrains.com/?p=190542">anatomytrains.com</a>.</li>
+          <li><span class="ew-str w">Weak</span>Sarah Powers, Insight Yoga: yin yoga, meridians and meditation. <a href="https://www.sarahandtypowers.com/">sarahandtypowers.com</a>.</li>
+          <li><span class="ew-str w">Weak</span>Gil Hedley: open but agnostic on meridians in fascia. <a href="https://mpamedia.com/mpacms/at/article.php?id=33012">Interview</a>.</li>
+          <li><span class="ew-str w">Weak</span>Robert Schleip: yoga as a whole-body approach to fascia. <a href="https://yogamedicine.com/podcast-27">Podcast</a>.</li>
+          <li><span class="ew-str w">Weak</span>Tias Little: nadis and the body's fluid systems. <a href="https://yogauonline.com/courses/free-download-wth-tias-little-subtle-energy-the-nadis-health-new-light-on-the-lymphatic-system/">Course</a>.</li>
+        </ul>
+        <h3>Blogs, websites and organizations</h3>
+        <ul>
+          <li><span class="ew-str s">Strong</span>Journal of Chinese Medicine: <a href="https://www.journalofchinesemedicine.com/the-connective-tissue-hypothesis-for-acupuncture-mechanisms.html">the connective tissue hypothesis</a>; <a href="https://www.journalofchinesemedicine.com/an-introduction-to-classical-fascia-acupuncture.html">classical fascia acupuncture</a>.</li>
+          <li><span class="ew-str s">Strong</span>Yoga Anytime, <a href="https://www.yogaanytime.com/blog/wellness/meridians-decoded">Meridians Decoded</a>.</li>
+          <li><span class="ew-str m">Moderate</span><a href="https://fasciaguide.com/research/review-of-evidence-suggesting-that-the-fascia-network-could-be-the-anatomical-basis-for-acupoints-and-meridians-in-the-human-body">Fascia Guide</a>, a research digest; <a href="https://karin-sang.squarespace.com/en/writings/meridian-yoga-modern-meridian-theory">Karin Sang, Meridian Yoga</a>; <a href="https://www.with-yinyoga.com/en/articles/le-yin-yoga-une-plateforme-pour-la-mtc">Yin yoga as a platform for TCM</a>; <a href="https://yogamedicine.com/fascia-acupuncture/">Yoga Medicine, fascia and acupuncture</a>.</li>
+          <li><span class="ew-str w">Weak</span><a href="https://fasciaresearchsociety.org/2015.php">Fascia Research Society</a>: the 2015 Fascia Research Congress held a day on fascia and acupuncture; <a href="https://www.nccih.nih.gov/about/offices/od/director/past-messages/article-spotlights-an-often-neglected-part-of-the-body">NCCIH</a> on fascia.</li>
+        </ul>
+        <h3>Critics, for balance</h3>
+        <ul>
+          <li><span class="ew-str c">Critic</span><a href="https://theness.com/neurologicablog/?p=10696">NeuroLogica</a> and <a href="https://sciencebasedmedicine.org/a-blast-from-the-past-the-interstitium-the-inspiration-for-that-recent-awful-nyt-acupuncture-article/">Science-Based Medicine</a>: the interstitium does not validate meridians or qi.</li>
+          <li><span class="ew-str c">Critic</span><a href="https://www.painscience.com/blog/because-fascia.html">PainScience, "Because fascia"</a>: fascia claims in manual therapy are often overstated.</li>
+          <li><span class="ew-str c">Critic</span><a href="https://doi.org/10.13702/j.1000-0607.180068">Li, 2018</a>: "superficial fascia" is often misused in acupuncture writing.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -157,12 +365,11 @@
   <div class="wrap split">
     <div>
       <h2>The goal: a shared language.</h2>
-      <p>The traditions had the practices and the insight, but not the anatomy. Science has the anatomy and the measurements, but no place for consciousness. The HMR aims to build the vocabulary that lets each be read in the terms of the other.</p>
-      <p>Fascia is where that work starts. If a physics-based model of the body can show why these practices work, it will also be the first step toward showing that the traditions were right about the nature of reality.</p>
+      <p>The traditions had the practices; science has the anatomy and the measurements. Fascia is where the two meet, and where the HMR starts.</p>
     </div>
     <div>
-      <p class="pull">The body practices were the method. The fascia was the medium. The insight was about reality.</p>
-      <p class="note">This is the HMR's hypothesis, stated as one. <a href="health.html" style="color:#9CC3F5">How we test the body side →</a></p>
+      <p class="pull">The practices were the method. Fascia was the medium.</p>
+      <p class="note">The HMR's hypothesis. <a href="health.html" style="color:#9CC3F5">How we test the body side →</a></p>
     </div>
   </div>
 </section>
@@ -171,7 +378,7 @@
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>

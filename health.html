@@ -16,32 +16,144 @@
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="reality.html">Physical Reality</a><a href="health.html" aria-current="page">Physical Health</a><a href="mental-health.html">Mental Health</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="about.html">About</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Reality<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Physical Reality</a><a href="science-hook.html">Science Hook</a><a href="ui.html">Universal Intelligence</a><a href="east-west.html">East and West</a><a href="values.html">HMR Values</a></div></div><div class="grp on"><button type="button" class="grpbtn" aria-haspopup="true">Health<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="health.html" aria-current="page">Physical Health</a><a href="fixing-exercise.html">Fixing Exercise</a><a href="mental-health.html">Mental Health</a></div></div><a href="simulation.html">Simulation</a><a href="roadmap.html">Road ahead</a><a href="library.html">Library</a><a href="about.html">About</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
 </div></header>
 <main>
+<style>
+.hx-quotes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:860px){.hx-quotes{grid-template-columns:1fr}}
+.hx-q{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.hx-q p{margin:0;font-size:1rem;color:var(--navy)}
+.hx-q cite{display:block;font-style:normal;color:var(--soft);font-size:.84rem;margin-top:8px}
+.hx-proto{background:linear-gradient(135deg,#0E3A75,#1D5FD1);color:#fff;border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow)}
+.hx-proto{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:860px){.hx-proto{grid-template-columns:1fr}}
+.hx-proto-cmp{display:grid;gap:10px}
+.hx-proto-cmp div{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 14px}
+.hx-proto-cmp b{display:block;color:#fff}.hx-proto-cmp span{font-size:.92rem;color:#E3EEFC}
+.hx-proto h3{color:#fff;margin-top:0}.hx-proto a{color:#CFE1FA}.hx-proto .tag{font:600 .74rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#CFE1FA;margin-bottom:10px;display:block}
+.hx-proto p{max-width:none}
+.hx-add{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+@media (max-width:960px){.hx-add{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.hx-add{grid-template-columns:1fr}}
+.hx-add .card{padding:18px 20px;border-top:4px solid #2E7D5B}
+.hx-add h3{margin:0 0 6px;font-size:1.05rem}
+.hx-add p{margin:0 0 6px;font-size:.95rem}
+.hx-add .ev{font-size:.85rem;color:var(--soft)}
+.hx-add .dir{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#1D5C41;background:#E7F5EE;border-radius:999px;padding:2px 8px;margin-bottom:8px}
+.hx-stop{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+@media (max-width:960px){.hx-stop{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.hx-stop{grid-template-columns:1fr}}
+.hx-stop .card{padding:18px 20px;border:1px solid #F3C4C4;border-left:5px solid #C62828;background:#FFF7F7}
+.hx-stop h3{margin:0 0 6px;font-size:1.05rem;color:#9B1C1C}
+.hx-stop p{margin:0;font-size:.95rem}
+.hx-tl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;margin-top:24px}
+@media (max-width:760px){.hx-tl{grid-template-columns:1fr}}
+.hx-tl article{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-left:4px solid #8A5A2B}
+.hx-tl article b{color:var(--navy);font-size:.95rem}
+.hx-tl article p{margin:4px 0 6px;font-size:.95rem}
+.hx-tl cite{font-style:normal;font-size:.82rem;color:var(--soft)}
+.hx-era{grid-column:1/-1;font:700 .8rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#8A5A2B;margin-top:10px}
+.hx-figs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-top:22px}
+@media (max-width:1100px){.hx-figs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.hx-figs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hx-figs figcaption{font-size:.78rem}
+.hx-figs .fig img{aspect-ratio:4/3;object-fit:cover}
+.hx-alien{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:14px}
+.hx-alien div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.9rem;text-align:center}
+.hx-alien span{font-size:1.3rem;color:var(--blue)}
+</style>
+
 <div class="page-head"><div class="wrap">
   <span class="eyebrow">A new model of health</span>
   <h1>Start from the ideal. Measure everything else against it.</h1>
-  <p class="lede">Today, health is mostly defined by what goes wrong. We propose defining it by what fully right looks like, and then treating every condition as a measurable distance from it.</p>
+  <p class="lede">Today, health is mostly defined by what goes wrong. In the Holistic Model of Reality (HMR), we define it by what fully right looks like: the optimized human tensegrity. Then every condition becomes a measurable distance from it.</p>
 </div></div>
 
-<section>
-  <div class="wrap split">
-    <div>
-      <h2>The problem: the wrong reference point.</h2>
-      <p>Medicine has made enormous progress by studying disease. But almost everything it knows about health was learned from unhealthy people, and from comparison groups who are only less unhealthy. No one has ever studied a human body that is fully healthy in every tissue at once.</p>
-      <p>Built into that baseline is an assumption that aging means a steady, expected slide into stiffness, pain and disease. In a body understood as a tensegrity, much of that decline is not destiny: it is a deviation from the body's design that physics can describe, and that may be prevented or reversed.</p>
-      <p>We also tend to assume that people are too different for any single standard to apply. Highly trained athletes, dancers and contortionists suggest otherwise: they show how much more of the body's design is available than most people ever use.</p>
+<section id="ideal">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <span class="eyebrow">Not a nebulous ideal</span>
+        <h2>The ideal comes from physics, not from imagination.</h2>
+        <p>We are not inventing a vague picture of perfection. Researchers in anatomy, cell biology and fascia science have argued for decades that the human body is built as a tensegrity: rigid bones that do not stack like bricks, but float in a continuous, pre-tensioned web of fascia and connective tissue. Their words are below, quoted exactly.</p>
+        <p>If the body is a tensegrity, a remarkable thing follows. Tensegrities obey physics we understand very well. So we can take measurements of real, imperfect human bodies and ask a precise question: <b>what is mechanically a better shape than this?</b> Asked again and again, that question defines the optimized tensegrity: the shape in which tension is shared evenly, every layer glides, and nothing strains.</p>
+        <p>In an optimized mechanical system, shear and friction between sliding layers are zero or close to zero. Fascia research shows the body is designed for exactly that, and shows what happens when it is lost (below). Physics can be applied to the human body directly. That it has not been done systematically is odd. It is due time.</p>
+      </div>
+      <div style="display:grid;gap:16px">
+      <figure class="fig">
+        <img src="img/hx-tensegrity-model.jpg" alt="A tensegrity model: six wooden struts that never touch each other, held in a rounded shape by thin tensed cables." loading="lazy" width="725" height="649">
+        <figcaption>A self-stabilizing tensegrity: six struts, no strut touching another, held only by tensed cables. Press it flat and it springs back. Figure 1 from Ingber, <a href="https://doi.org/10.1042/BCJ20220303">Biochemical Journal, 2023</a>, CC BY 4.0.</figcaption>
+      </figure>
+      <figure class="fig"><img src="img/hx-cytoskeleton-cells.jpg" alt="Cells under a fluorescence microscope: blue nuclei, green actin filaments and red mitochondria." loading="lazy" width="1280" height="968"><figcaption>The same principle inside every cell: actin filaments (green) of the cytoskeleton, which Ingber's work models as a tensegrity. Photo: Erin Rod, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:Bovine_Pulmonary_Artery_Endothelial_Cells_Fluorescent_Image.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      </div>
     </div>
-    <div class="card" style="background:var(--ice)">
-      <span class="tag">The question we start from</span>
-      <p class="pull" style="font-size:1.35rem">What would a fully healthy adult human body be, measured exactly?</p>
-      <p class="muted">Its bones, its connective tissue, its organs and vessels, its range of motion, its mechanics down to the molecules, and how it feels to live in it.</p>
+
+    <div class="hx-quotes">
+      <div class="hx-q"><p>&ldquo;the skeleton, rather than being a frame of support to which the muscles and ligaments and tendons attach, has to be considered as compression components suspended within a continuous tension network.&rdquo;</p><cite>Stephen Levin, orthopedic surgeon, who coined the term biotensegrity: <a href="https://www.biotensegrity.com/resources/1980-address.pdf">"Continuous Tension, Discontinuous Compression", 1980 address</a></cite></div>
+      <div class="hx-q"><p>&ldquo;Research conducted during the past 25 years has demonstrated that the architectural principles of tensegrity can be applied to biological organisms (termed biotensegrity) and that these principles can demonstrate the mechanical structure-function relationship at all size scales in the human body.&rdquo;</p><cite>Randel Swanson, <a href="https://doi.org/10.7556/jaoa.2013.113.1.34">Journal of the American Osteopathic Association, 2013</a></cite></div>
+      <div class="hx-q"><p>&ldquo;I delved further into the use of hierarchical tensegrities in living systems and explained how this architectural principle stabilizes form at all size scales, from individual molecules, subcellular structures, organelles, and cells to tissues, organs, and whole organisms&rdquo;</p><cite>Donald Ingber, Harvard Wyss Institute, <a href="https://doi.org/10.1042/BCJ20220303">Biochemical Journal, 2023</a></cite></div>
+      <div class="hx-q"><p>&ldquo;Fascial continuity suggests that the myofascia acts like an adjustable tensegrity around the skeleton&rdquo;</p><cite>Thomas Myers, author of <i>Anatomy Trains</i> (practitioner): <a href="https://www.anatomytrains.com/fascia/tensegrity/">Anatomy Trains, "Tensegrity"</a></cite></div>
+      <div class="hx-q"><p>&ldquo;The fascial system builds a three-dimensional continuum of soft, collagen-containing, loose and dense fibrous connective tissue that permeates the body and enables all body systems to operate in an integrated manner.&rdquo;</p><cite>Z&uuml;gel, Schleip, Hodges and colleagues, consensus statement, <a href="https://doi.org/10.1136/bjsports-2018-099308">British Journal of Sports Medicine, 2018</a></cite></div>
+      <div class="hx-q"><p>&ldquo;the shear modulus increased linearly with increasing prestress as predicted.&rdquo;</p><cite>Wang, Ingber and colleagues, measuring living cells: <a href="https://doi.org/10.1073/pnas.141199598">PNAS, 2001</a>. Graham Scarr makes the case for biotensegrity over lever mechanics in <a href="https://doi.org/10.1016/j.jbmt.2019.09.006">J Bodyw Mov Ther, 2020</a>.</cite></div>
+    </div>
+    <p class="small muted" style="margin-top:12px">These researchers describe the body or its cells as tensegrities. None of them has endorsed the HMR; the step from their work to an optimized human tensegrity is ours.</p>
+
+    <div class="split" style="margin-top:36px;align-items:center">
+      <figure class="fig">
+        <img src="img/hx-fascia-shear-map.jpg" alt="Ultrasound of the lower back with color maps of tissue displacement and shear strain between the skin, fascia and muscle layers." loading="lazy" width="600" height="322">
+        <figcaption>Measuring how fascial layers slide: ultrasound of the thoracolumbar fascia (A), cumulative displacement (B) and shear strain (C) as the trunk bends. Figure 5 from Langevin et al., <a href="https://doi.org/10.1186/1471-2474-12-203">BMC Musculoskeletal Disorders, 2011</a>, CC BY 2.0.</figcaption>
+      </figure>
+      <div>
+        <h3>Layers built to glide, and what happens when they stop</h3>
+        <p>Fascia is layered, and the layers are lubricated. Carla Stecco's group found hyaluronan between the sheets of deep fascia: &ldquo;The HA within the deep fascia facilitates the free sliding of two adjacent fibrous fascial layers, thus promoting the normal function associated with the deep fascia.&rdquo; (<a href="https://doi.org/10.1007/s00276-011-0876-9">Stecco et al., Surgical and Radiologic Anatomy, 2011</a>). And &ldquo;Immobility can increase the concentration of HA, increase the viscosity, and reduce lubrication and gliding of the layers of connective tissue and muscle.&rdquo; (<a href="https://doi.org/10.12688/f1000research.6885.1">Cowman et al., F1000Research, 2015</a>)</p>
+        <p>Helene Langevin's team measured that gliding with ultrasound in 121 people: &ldquo;Thoracolumbar fascia shear strain was ~20% lower in human subjects with chronic low back pain.&rdquo; (56.4% versus 70.2%; <a href="https://doi.org/10.1186/1471-2474-12-203">Langevin et al., 2011</a>)</p>
+        <p>Low-friction sliding is the design. Lost sliding is measurable. That is exactly the kind of quantity an optimized tensegrity can be defined by.</p>
+      </div>
+    </div>
+
+    <div class="hx-proto" style="margin-top:36px">
+      <div>
+      <span class="tag">The HMR's fascia protocol</span>
+      <h3>Fascia that is attended to becomes receptive to change.</h3>
+      <p style="margin-bottom:8px">The HMR's protocol works on fascia directly, from the outside in and the inside out. In the HMR's experience, once fascia has been attended to this way it becomes highly receptive to manipulation from outside the body and from within, and the changes it makes hold: they become lasting, rather than the temporary changes most exercise and stretching produce.</p>
+      <p style="margin:0">This is a hypothesis, stated as such, to be tested in the model and in people. <a href="#add">What the protocol adds →</a></p>
+      </div>
+      <div class="hx-proto-cmp">
+        <div><b>Ordinary stretching</b><span>Measured stiffness changes &ldquo;return to baseline levels within 10 to 20 minutes&rdquo; (<a href="https://doi.org/10.2519/jospt.2008.2843">Ryan et al., 2008</a>).</span></div>
+        <div><b>Receptive fascia (HMR hypothesis)</b><span>Changes made after the fascia has been attended to directly are expected to hold, and to build on each other day after day.</span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="tint" id="today">
+<section class="tint" id="reference">
+  <div class="wrap split">
+    <div>
+      <h2>The problem: the wrong reference point.</h2>
+      <p>The correct reference point for human health is the optimized, ideal human tensegrity. Because medicine has never had it, it has studied broken tensegrities instead. Almost everything it knows about health was learned from unhealthy people, and from comparison groups who are only less unhealthy. No one has ever studied a human body that is fully healthy in every tissue at once.</p>
+      <p>That matters more than it sounds, because in physics an optimized tensegrity and an imperfect one are different objects. Their prestress, stiffness and load paths differ; the way vibration and signals travel through them differs; their balance differs. One small fault, a single line too short or too stiff, changes the whole system: posture, movement, the tension on every vessel and nerve. Cut one line and the structure does not just fail there; it folds, sways and settles into a new shape to accommodate the loss. You can try it on the <a href="fixing-exercise.html#physics">tensegrity column</a> and on the <a href="simulation.html#model">3D body simulation</a>.</p>
+      <p>Built into today's baseline is the assumption that aging means a steady slide into stiffness, pain and disease, and that people are too different for one standard to apply. Highly trained athletes, dancers and contortionists suggest otherwise. Without a defined ideal, medicine has been studying without a compass.</p>
+    </div>
+    <div>
+      <div class="card" style="background:var(--ice)">
+        <span class="tag">An analogy</span>
+        <h3>The alien who only read elementary school papers</h3>
+        <p>Imagine an alien asked to grade humanity's writing, who has only ever read papers by elementary school children. It would learn what good and bad look like at that level, and it could coach children to write good elementary papers.</p>
+        <p>But until it had read a PhD thesis, it would never know where the bar really is, and it would never coach anyone past it.</p>
+        <div class="hx-alien" aria-hidden="true"><div>Coaching people toward a better <b>imperfect</b> tensegrity</div><span>→</span><div>Training on the <b>optimized</b> tensegrity, and how to get people there</div></div>
+        <p style="margin-top:14px;margin-bottom:0">Doctors today coach people to be better imperfect tensegrities. In the HMR, medicine needs to be trained on the optimized tensegrity, and on how to bring people to it, with fascia at the center.</p>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <span class="tag">The question we start from</span>
+        <p class="pull" style="font-size:1.25rem;margin-bottom:6px">What would a fully healthy adult human body be, measured exactly?</p>
+        <p class="muted" style="margin:0">Its bones, connective tissue, organs and vessels, its range of motion, its mechanics down to the molecules, and how it feels to live in it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="today">
   <div class="wrap">
     <h2>How disease is assessed today, and what physics adds.</h2>
     <div class="compare" style="margin-top:22px">
@@ -57,34 +169,46 @@
       <div class="new">
         <h3>Physics as the baseline tool</h3>
         <ul>
-          <li><b>Start from the ideal body.</b> A measured model of a fully healthy human, built from all of humanity's research and data.</li>
+          <li><b>Start from the ideal body.</b> A measured model of the optimized human tensegrity, built from all of humanity's research and data.</li>
           <li><b>Read the body as a physical system.</b> Tension, compression, pressure, friction, stretch and shape, in every tissue at once.</li>
           <li><b>Find the mechanical cause.</b> Ask which change in that system produces this shape and these symptoms, and where it began.</li>
           <li><b>One connected body.</b> In a tensegrity, a change anywhere is felt everywhere, so the parts are studied together.</li>
         </ul>
       </div>
     </div>
-    <p class="lede" style="margin-top:24px">Physics is the most precise tool humanity has. Using it as the baseline for health, alongside everything medicine already knows, opens a kind of question medicine cannot ask today: not only "what disease is this?" but "what happened to this body's physics, and how do we undo it?"</p>
-  </div>
-</section>
-
-<section>
-  <div class="wrap split">
-    <div>
-      <h2>The body as a physical system.</h2>
-      <p>In the HMR, fascia is not packing material. It is a continuous, living web that holds the body's shape under tension, carries force from one region to another, lets layers slide over each other, and is densely supplied with nerves.</p>
-      <p>When fascia is healthy it is hydrated, mobile and evenly tensioned. When it becomes denser or stuck in one place, the tension of the whole web shifts: posture changes, movement narrows, and the vessels, nerves and organs that run through the tissue can be squeezed or strained.</p>
-    </div>
-    <div>
-      <h2>Why that view matters.</h2>
-      <p>If the body is a physical system, then many conditions that look unrelated may share a mechanical starting point. And mechanics can be measured, simulated and changed.</p>
-      <p>That is why the first thing we are building is not a theory but a model: a body made of real measurements, in which those mechanics can be tested one change at a time.</p>
-      <p class="note">These are hypotheses, stated as such, to be tested against data.</p>
+    <div class="split" style="margin-top:28px">
+      <div>
+        <p class="lede" style="margin-top:0">Physics is the most precise tool humanity has. Using it as the baseline for health, alongside everything medicine already knows, opens a question medicine cannot ask today: not only "what disease is this?" but "what happened to this body's physics, and how do we undo it?"</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--blue)">
+        <h3 style="margin-top:0">This may sound too easy to be true. It is not.</h3>
+        <p>Humanity has landed on the Moon and worked out quantum mechanics. It has never built a model of the human body grounded in physics. That is a crucial turning point waiting to happen.</p>
+        <p>It is not impossible. It is not even that hard. Anyone who understands physics can, to some degree of detail, build a model of the human body that stays true to physical reality. What Universe Model is doing is taking that further than anyone has.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="tint">
+  <div class="wrap split">
+    <div>
+      <h2>The body as a physical system.</h2>
+      <p>In the HMR, fascia is not packing material. It is a continuous, living web that holds the body's shape under tension, carries force from one region to another, lets layers slide over each other, and is densely supplied with nerves. That is what a tensegrity is: a structure whose shape is set by the balance of its tensions.</p>
+      <p>When fascia is healthy it is hydrated, mobile and evenly tensioned, and its layers glide with almost no friction. When it becomes denser or stuck in one place, the tension of the whole web shifts: posture changes, movement narrows, and the vessels, nerves and organs that run through the tissue can be squeezed or strained.</p>
+      <p>None of this needs new physics. Tension, compression, shear and friction are the same in a bridge, a cell and a back. The body has simply never been modeled as one.</p>
+    </div>
+    <div>
+      <h2>Why that view matters.</h2>
+      <p>If the body is a physical system, then many conditions that look unrelated may share a mechanical starting point. And mechanics can be measured, simulated and changed.</p>
+      <p>It also means health has a target. Once the optimized tensegrity is defined, every body can be measured against it, every imperfection can be located, and every treatment can be judged by whether it moves the body closer to the ideal or further away.</p>
+      <p>That is why the first thing we are building is not a theory but a model: a body made of real measurements, in which those mechanics can be tested one change at a time. <a href="simulation.html">The simulation →</a></p>
+      <p class="note">These are hypotheses, stated as such, to be tested against data.</p>
+      <figure class="fig" style="margin-top:18px"><img src="img/hx-thoracolumbar-fascia.jpg" alt="A dissection of the human back showing the broad white sheet of the thoracolumbar fascia across the spine." loading="lazy" width="960" height="720"><figcaption>The thoracolumbar fascia: one continuous sheet linking the shoulders, spine, pelvis and legs. Photo: Anatomist90, CC BY-SA 3.0, <a href="https://commons.wikimedia.org/wiki/File:Thoracolumbar_fascia.JPG">Wikimedia Commons</a>.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section>
   <div class="wrap">
     <h2>The approach: a perfect human tensegrity.</h2>
     <p class="lede">We are building, from real data, a model of an ideal adult body in male and female form. It is assembled in layers that can be switched on and off.</p>
@@ -99,7 +223,7 @@
   </div>
 </section>
 
-<section>
+<section class="tint">
   <div class="wrap split">
     <div>
       <h2>Disease as deviation.</h2>
@@ -121,14 +245,50 @@
     <p class="lede">In the new model of health, care starts with the fascia web, and it can be reached from two directions.</p>
     <div class="grid g2" style="margin-top:22px">
       <div class="card"><span class="tag">Outside in</span><h3>Working on the web from the surface</h3><p>Pressure, scraping, stretching, vibration, heat, movement and hydration applied from outside the body, to free tissue that has become dense or stuck and to restore how its layers slide.</p></div>
-      <div class="card"><span class="tag">Inside out</span><h3>Working on the web from within</h3><p>Breath, internal locks and holds, posture, attention, hydration and nutrition: the internal methods that the world's traditions refined over thousands of years, now read through physics.</p></div>
+      <div class="card"><span class="tag">Inside out</span><h3>Working on the web from within</h3><p>Breath, internal locks and holds, sound, posture, attention, hydration and nutrition: the internal methods that the world's traditions refined over thousands of years, now read through physics.</p></div>
     </div>
-    <p style="margin-top:22px">Both draw on ancient practice and modern science. The simulation is how they will be refined: once the ideal body exists as a physical model, each approach can be tested against it, and protocols can be built from what the physics shows. <a href="simulation.html">Simulating reality →</a></p>
-    <p class="note">This describes the direction of the research. It is not medical advice, and no protocol is offered here.</p>
+  </div>
+  <div class="wrap" id="add" style="margin-top:44px">
+    <span class="eyebrow">What people will add</span>
+    <h2>A clear, specific protocol for fascia, open to anyone.</h2>
+    <p class="lede">The HMR's fascia protocol has been refined through five years of daily practice. Nothing in it needs a clinic or special equipment: a moisturizer, a scraper, your own hands, warm water, time and breath. People who want to optimize their health in this model will do some of these things more, and some for the first time.</p>
+    <div class="hx-add">
+      <div class="card"><span class="dir">Outside in</span><h3>Moisturize strongly, every day</h3><p>A generous daily moisturizing routine, possibly including hyaluronic acid, to hydrate the tissue from the outside in.</p><p class="ev">Research: topical 0.1% hyaluronic acid creams "led to significant improvement in skin hydration and elasticity" (<a href="https://pubmed.ncbi.nlm.nih.gov/22052267/">Pavicic et al., J Drugs Dermatol, 2011</a>). That study measured skin; that it reaches fascia is the HMR's view.</p></div>
+      <div class="card"><span class="dir">Outside in</span><h3>Tissue scraping</h3><p>Smooth-edged scraping tools drawn slowly along the skin to load and mobilize the layers beneath.</p><p class="ev">Research: instrument-assisted soft tissue mobilization "produced significant (P&lt;.05) short term gains up to 24 hours", though evidence for treating disease is weak (<a href="https://pubmed.ncbi.nlm.nih.gov/27713575/">Cheatham et al., J Can Chiropr Assoc, 2016</a>). The HMR holds that on receptive fascia, gains last.</p></div>
+      <div class="card"><span class="dir">Outside in</span><h3>Active self-massage with the hands, daily</h3><p>Using your own hands to find, press, knead and stretch your own tissue, every day.</p><p class="ev">Research: self-myofascial release with a foam roller "had a large positive effect on ROM" (range of motion) compared with no exercise (<a href="https://doi.org/10.1007/s40279-019-01205-7">Wilke et al., Sports Med, 2020</a>). Hands are the HMR's preferred tool.</p></div>
+      <div class="card"><span class="dir">Outside in</span><h3>Professional massage</h3><p>Regular bodywork from a trained therapist, reaching what your own hands cannot.</p><p class="ev">Research: after exercise damage, "massage attenuated the production of the inflammatory cytokines" TNF-&alpha; and IL-6 and activated mechanotransduction signaling (<a href="https://doi.org/10.1126/scitranslmed.3002882">Crane et al., Sci Transl Med, 2012</a>).</p></div>
+      <div class="card"><span class="dir">Outside in</span><h3>Acupuncture</h3><p>Needling that grips and winds the connective tissue, from a licensed practitioner.</p><p class="ev">Research: rotating a needle winds connective tissue around it (<a href="https://doi.org/10.1096/fj.01-0925fje">Langevin et al., FASEB J, 2002</a>); in 20,827 patients, &ldquo;Acupuncture was superior to sham as well as no acupuncture control for each pain condition&rdquo; (<a href="https://doi.org/10.1016/j.jpain.2017.11.005">Vickers et al., J Pain, 2018</a>).</p></div>
+      <div class="card"><span class="dir">Outside in</span><h3>Longer, warmer showers</h3><p>Time in warm water to hydrate and soften tissue before and after the work.</p><p class="ev">Research: in tendon, "the lower loads applied at elevated temperatures for prolonged periods were found to produce significantly greater residual elongation" (<a href="https://pubmed.ncbi.nlm.nih.gov/1267581/">Warren et al., Arch Phys Med Rehabil, 1976</a>, animal tissue). Showers as fascia care is the HMR's view.</p></div>
+      <div class="card"><span class="dir">Both</span><h3>Long-hold poses and long yoga sessions</h3><p>Holding stretches for minutes, not seconds, in long sessions such as hip-opening and yin-style practice.</p><p class="ev">Research: after a sustained stretch and rest, fascia showed "matrix hydration higher than initial levels" (<a href="https://doi.org/10.1016/j.jbmt.2011.09.003">Schleip et al., J Bodyw Mov Ther, 2012</a>, animal tissue); human lumbar fascia "may be able to change its stiffness in a time frame of minutes to hours" (<a href="https://doi.org/10.3389/fphys.2019.00336">Schleip et al., Front Physiol, 2019</a>).</p></div>
+      <div class="card"><span class="dir">Inside out</span><h3>Eat and drink for fascia</h3><p>Water through the day, and foods that supply what collagen is built from, such as protein, gelatin and vitamin C.</p><p class="ev">Research: 15 g of gelatin with vitamin C before exercise doubled a blood marker of collagen synthesis (<a href="https://doi.org/10.3945/ajcn.116.138594">Shaw et al., Am J Clin Nutr, 2017</a>, 8 men). The full fascia diet is the HMR's view, still being defined.</p></div>
+      <div class="card"><span class="dir">Inside out</span><h3>Bandhas, humming and chanting Aum</h3><p>The yogic locks (bandhas) engage the deep web from within; humming and chanting Aum vibrate the body from the inside.</p><p class="ev">Research: &ldquo;NO increased 15-fold during humming compared with quiet exhalation&rdquo; (<a href="https://doi.org/10.1164/rccm.200202-138BC">Weitzberg and Lundberg, 2002</a>, nasal nitric oxide); chanting OM was linked to "limbic deactivation" on fMRI (<a href="https://doi.org/10.4103/0973-6131.78171">Kalyani et al., Int J Yoga, 2011</a>); mula bandha gave modest gains in a pelvic floor trial (<a href="https://doi.org/10.4103/ijoy.IJOY_32_17">Sweta et al., 2018</a>). Effects on fascia are the HMR's view.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px;border-top:4px solid #2E7D5B">
+      <h3 style="margin-top:0">Do it for children, especially through puberty</h3>
+      <p style="margin:0">Parents will do all of this for their children, and most of all as they go through puberty, when the web is growing fastest and is easiest to shape. In the HMR's view this is the most valuable fascia care anyone receives. <a href="fixing-exercise.html#solution">Why puberty matters →</a></p>
+    </div>
+    <p class="note" style="margin-top:16px">Small studies are labeled as such; where a link to fascia is the HMR's view rather than a finding, it says so. This is education, not medical advice: check with a qualified professional before starting anything new, especially with a medical condition, during pregnancy or for a child.</p>
   </div>
 </section>
 
-<section class="tint" id="hypothesis">
+<section class="tint" id="stop">
+  <div class="wrap">
+    <span class="eyebrow" style="color:#C62828">What people will stop doing</span>
+    <h2>Habits that strain an imperfect tensegrity.</h2>
+    <p class="lede">Just as important as what people add is what they stop. Many of these are things people believe are healthy. The full case, with injury statistics, is on <a href="fixing-exercise.html">Fixing Exercise</a>.</p>
+    <div class="hx-stop">
+      <div class="card"><h3>Lifting heavy before the web is ready</h3><p>Hypertrophy training on an unoptimized tensegrity sends load into regions that cannot hold it, and builds muscle on top of the imperfections. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+      <div class="card"><h3>Running and jogging through the strain</h3><p>Thousands of impacts an hour, funneled into the same knees, shins and heels. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+      <div class="card"><h3>HIIT and CrossFit-style overload</h3><p>Maximum force, at speed, while tired: the conditions in which an imperfect web fails first. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+      <div class="card"><h3>Short, forceful stretching</h3><p>Pulling hardest on what is already loose, for too few seconds to change what is stuck. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+      <div class="card"><h3>Weight loss that ignores the web</h3><p>Losing weight without changing the structure that decides where weight goes, then regaining it. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+      <div class="card"><h3>Forcing range</h3><p>Pushing into poses or splits the tissue is not ready for, in yoga or anywhere else. <a href="fixing-exercise.html#protocols">Why →</a></p></div>
+    </div>
+    <p class="note" style="margin-top:16px">The HMR's view, not medical advice. Movement beats inactivity; the HMR's claim is about order: optimize the tensegrity first, then exercise. Never stop a treatment or rehabilitation plan without talking to your clinician.</p>
+  </div>
+</section>
+
+<section id="hypothesis">
   <div class="wrap">
     <span class="eyebrow">Our central hypothesis</span>
     <h2>Tighten the web in one place, and the whole body answers.</h2>
@@ -171,13 +331,68 @@
   </div>
 </section>
 
+<section class="tint" id="history">
+  <div class="wrap">
+    <span class="eyebrow">Medicine's mistakes through history</span>
+    <h2>Whole professions have been sure, and wrong.</h2>
+    <p class="lede">Across every continent and every century, the best-trained healers of the day used treatments that later generations recognized as useless or harmful. They were not foolish. They were measuring against the wrong reference model. This list is long on purpose.</p>
+    <div class="hx-figs">
+      <figure class="fig"><img src="img/hx-trepanned-skull.jpg" alt="A Neolithic human skull with a large healed hole cut into it." loading="lazy" width="1400" height="1051"><figcaption>Trepanned skull, B&ouml;rnecke, Germany, about 3300 BCE. Photo: Daderot, public domain, <a href="https://commons.wikimedia.org/wiki/File:Trepanned_skull,_found_at_B%C3%B6rnecke_Sch%C3%BCtzenholz,_c._3300_BC,_human_skull_-_Braunschweigisches_Landesmuseum_-_DSC04591.JPG">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig"><img src="img/hx-four-humours.jpg" alt="A circular diagram linking the four elements, qualities, humours, seasons and ages of man." loading="lazy" width="1400" height="1170"><figcaption>The four humours, linked to elements, seasons and ages. Wellcome Collection, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:The_four_elements,_four_qualities,_four_humours,_four_season_Wellcome_V0048018.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig"><img src="img/hx-bloodletting.jpg" alt="An oil painting of a surgeon bandaging a woman's arm after bleeding her into a bowl." loading="lazy" width="1264" height="1600"><figcaption>A surgeon binding a woman's arm after bloodletting. Jacob Toorenvliet, 1666; photo Wellcome Collection, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:A_surgeon_binding_up_a_woman%27s_arm_after_bloodletting._Oil_p_Wellcome_L0016891.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig"><img src="img/hx-washington-deathbed.jpg" alt="A colored lithograph of George Washington on his deathbed surrounded by family and physicians." loading="lazy" width="1400" height="1027"><figcaption>Death of Washington, December 14, 1799. Lithograph by N. Currier, public domain (Library of Congress), <a href="https://commons.wikimedia.org/wiki/File:Death_of_Washington,_Dec._14._A.D._1799_LCCN91794998.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig"><img src="img/hx-tobacco-enema-kit.jpg" alt="A wooden case holding bellows, tubes and nozzles of a resuscitation set." loading="lazy" width="1400" height="932"><figcaption>A resuscitation set, Europe, 1801 to 1850, with bellows for blowing tobacco smoke. Wellcome Collection, CC BY 4.0, <a href="https://commons.wikimedia.org/wiki/File:Resuscitation_set,_Europe,_1801-1850_Wellcome_L0057782.jpg">Wikimedia Commons</a>.</figcaption></figure>
+      <figure class="fig"><img src="img/hx-radithor.jpg" alt="A small glass bottle labeled Radithor, certified radioactive water." loading="lazy" width="1064" height="1600"><figcaption>Radithor, radium water sold as a tonic in the 1920s. Photo: Sam LaRussa, CC BY-SA 2.0, <a href="https://commons.wikimedia.org/wiki/File:Radithor_bottle_(25799475341).jpg">Wikimedia Commons</a>.</figcaption></figure>
+    </div>
+    <div class="hx-tl">
+      <div class="hx-era">Before 1790</div>
+      <article><b>From about 7000 BCE. Europe, the Andes, Africa and Asia.</b><p>Trepanation: holes are cut or scraped into living people's skulls. Many patients survived, and one long-standing interpretation is that the openings were meant to release evil spirits; the motive is still debated.</p><cite><a href="https://doi.org/10.4103/2152-7806.156634">Faria, Surgical Neurology International, 2015</a></cite></article>
+      <article><b>About 1550 BCE. Egypt.</b><p>The Ebers Papyrus, one of the oldest medical texts, records nearly 900 prescriptions; many mix minerals and plants with human and animal excrement.</p><cite><a href="https://www.ub.uni-leipzig.de/en/about-us/exhibitions/permanent-exhibition/ebers-papyrus">Leipzig University Library</a></cite></article>
+      <article><b>About 400 BCE to the 1800s. Greece, Rome, the Islamic world and Europe.</b><p>Humoral theory: health is a balance of four fluids (blood, phlegm, yellow bile and black bile). For more than two thousand years it justifies bleeding, purging and vomiting as standard care.</p><cite><a href="https://www.britannica.com/science/humorism">Encyclopaedia Britannica, "Humorism"</a></cite></article>
+      <article><b>2nd century CE to 1543. The Roman world to Renaissance Europe.</b><p>Galen's anatomy, drawn largely from animal dissection, is taught as authority for centuries, until Andreas Vesalius's <i>Fabrica</i> (1543) corrects it from human dissection.</p><cite><a href="https://doi.org/10.5115/acb.19.102">Anatomy &amp; Cell Biology, 2019</a></cite></article>
+      <article><b>618 to 907 CE. Tang dynasty China.</b><p>At least five emperors are known to have died after taking mercurial "elixirs of immortality"; for over a thousand years, elites kept taking them.</p><cite><a href="https://press-files.anu.edu.au/downloads/press/n7034/html/08-fluid-being/index.html">ANU Press, "Fluid Being"</a></cite></article>
+      <article><b>About the 10th century to 1949. China.</b><p>Foot binding breaks and folds girls' feet to keep them small. In 1990s Beijing, 38% of women aged 80 and over still had the deformities, with lasting disability.</p><cite><a href="https://doi.org/10.2105/ajph.87.10.1677">Cummings, Ling and Stone, American Journal of Public Health, 1997</a></cite></article>
+      <article><b>1500s to 1700s. Europe.</b><p>Corpse medicine: powdered Egyptian mummy, human fat, blood and skull are sold by apothecaries and prescribed by physicians, royals included.</p><cite><a href="https://www.smithsonianmag.com/history/the-gruesome-history-of-eating-corpses-as-medicine-82360284/">Smithsonian Magazine</a></cite></article>
+      <article><b>About 1500 to the 1940s. Europe and beyond.</b><p>Mercury, by mouth, ointment and vapor, is the standard treatment for syphilis for over four centuries, poisoning patients along the way.</p><cite><a href="https://doi.org/10.1177/014107689008300619">O'Shea, Journal of the Royal Society of Medicine, 1990</a></cite></article>
+      <article><b>1740s to about 1800. Venice, Amsterdam, London.</b><p>Tobacco smoke is blown into the rectum to revive the apparently drowned, with public kits placed along rivers.</p><cite><a href="https://muse.jhu.edu/article/754099">Bamji, Bulletin of the History of Medicine, 2020</a></cite></article>
+      <article><b>1770s to 1784. Vienna and Paris.</b><p>Franz Anton Mesmer treats fashionable Paris with "animal magnetism". A royal commission led by Benjamin Franklin and Antoine Lavoisier tests it with blinded and sham procedures and finds no magnetic fluid, an early model of the controlled trial.</p><cite><a href="https://doi.org/10.1016/j.urolonc.2005.02.003">Herr, Urologic Oncology, 2005</a></cite></article>
+      <div class="hx-era">After 1790</div>
+      <article><b>December 1799. Mount Vernon, Virginia.</b><p>George Washington, with a severe throat infection, is bled by his physicians of more than 2,500 mL of blood in less than a day, and dies that night.</p><cite><a href="https://pubmed.ncbi.nlm.nih.gov/18705585/">American Surgeon, 2008</a></cite></article>
+      <article><b>1890s to 1920s. Britain and the United States.</b><p>Arsenic "complexion wafers" are sold to women to whiten the skin, sometimes advertising the arsenic as a selling point.</p><cite><a href="https://prestonparkmuseum.co.uk/victorian-beauty">Preston Park Museum</a></cite></article>
+      <article><b>1890s to 1980s. Worldwide.</b><p>Halsted's radical mastectomy, removing the breast, chest muscles and lymph nodes, is standard for breast cancer for most of a century. A 1985 trial finds no survival advantage over less extensive surgery.</p><cite><a href="https://doi.org/10.1056/NEJM198503143121102">Fisher et al., New England Journal of Medicine, 1985</a></cite></article>
+      <article><b>1898. Germany, then the world.</b><p>Bayer markets heroin as a cough medicine, claimed to be more effective than codeine with a fraction of its toxicity. Production stops after addiction spreads.</p><cite><a href="https://hekint.org/2023/05/30/from-poppy-to-morphine-and-heroin/">Hektoen International</a></cite></article>
+      <article><b>1910s to about 1960. Europe, North America, Israel and beyond.</b><p>Children with scalp ringworm are treated by X-ray irradiation of the head. Israel later set up a national center to compensate the "Scalp Ringworm Victims" for hair loss and other harms.</p><cite><a href="https://doi.org/10.3390/ijerph17207388">Segal-Engelchin and Shvarts, Int J Environ Res Public Health, 2020</a></cite></article>
+      <article><b>1920s to 1950s. United States and Europe.</b><p>Shoe stores X-ray children's feet in fluoroscopes to check the fit, exposing customers and staff to radiation.</p><cite><a href="https://doi.org/10.1148/rg.345130033">RadioGraphics, 2014</a></cite></article>
+      <article><b>1925 to 1931. New Jersey.</b><p>Radithor, distilled water with dissolved radium, sells over 400,000 bottles as a tonic. The industrialist Eben Byers drinks it daily and dies of radiation poisoning in 1932.</p><cite><a href="https://www.orau.org/health-physics-museum/collection/radioactive-quack-cures/pills-potions-and-other-miscellany/radithor.html">Oak Ridge Associated Universities, Health Physics Museum</a></cite></article>
+      <article><b>1928 to 1932. United States.</b><p>Lucky Strike advertisements claim that 20,679 physicians found the cigarettes "less irritating": cigarette makers borrow the authority of doctors for decades before the harm is accepted.</p><cite><a href="https://tobacco.stanford.edu/cigarettes/doctors-smoking/20679-physicians/">Stanford Research into the Impact of Tobacco Advertising</a></cite></article>
+      <article><b>1932 to 1972. Macon County, Alabama.</b><p>The US Public Health Service follows 399 Black men with syphilis without effective treatment, even after penicillin is widely available. "There is no evidence that researchers obtained informed consent from participants."</p><cite><a href="https://www.cdc.gov/tuskegee/about/index.html">US Centers for Disease Control and Prevention</a></cite></article>
+      <article><b>1940 to 1971. United States and other countries.</b><p>Diethylstilbestrol (DES) is prescribed to pregnant women to prevent miscarriage. It does not, and it raises cancer risk in the daughters exposed in the womb.</p><cite><a href="https://www.cancer.gov/about-cancer/causes-prevention/risk/hormones/des-fact-sheet">US National Cancer Institute</a></cite></article>
+      <article><b>1957 to 1961. Dozens of countries.</b><p>Thalidomide is sold as a safe sedative for pregnant women and is shown to cause severe birth defects in thousands of babies. A US reviewer, Frances Kelsey, refuses to approve it.</p><cite><a href="https://www.fda.gov/about-fda/fda-history-exhibits/frances-oldham-kelsey-medical-reviewer-famous-averting-public-health-tragedy">US Food and Drug Administration</a></cite></article>
+      <article><b>1965. United States.</b><p>A sugar industry group funds a Harvard review that plays down sugar and blames dietary fat for heart disease, shaping nutrition advice for decades.</p><cite><a href="https://doi.org/10.1001/jamainternmed.2016.5394">Kearns, Schmidt and Glantz, JAMA Internal Medicine, 2016</a></cite></article>
+      <article><b>1980 to the 2010s. North America.</b><p>A five-sentence 1980 letter on hospital patients is cited hundreds of times as proof that opioid addiction is rare, helping fuel the opioid crisis.</p><cite><a href="https://doi.org/10.1056/NEJMc1700150">Leung et al., New England Journal of Medicine, 2017</a></cite></article>
+      <article><b>Until 1982 to 2005. Worldwide.</b><p>Peptic ulcers are blamed on stress and acid. Barry Marshall and Robin Warren show that a bacterium, <i>Helicobacter pylori</i>, is the main cause, against fierce resistance, and win the 2005 Nobel Prize.</p><cite><a href="https://www.nobelprize.org/prizes/medicine/2005/summary/">The Nobel Prize</a></cite></article>
+      <article><b>1990s to 2002. United States and Europe.</b><p>Hormone therapy is widely prescribed to protect postmenopausal women's hearts, until a large trial is stopped early when the risks are found to exceed the benefits.</p><cite><a href="https://doi.org/10.1001/jama.288.3.321">Women's Health Initiative, JAMA, 2002</a></cite></article>
+      <article><b>Mental health.</b><p>Chains, the tranquilizing chair, insulin comas, lobotomy and more are covered on our Mental Health page, alongside Semmelweis and the smoking doctors of the 1940s.</p><cite><a href="mental-health.html">Every era was sure it had figured it out →</a></cite></article>
+    </div>
+    <div class="split" style="margin-top:28px;align-items:center">
+      <div>
+        <h3>The lesson</h3>
+        <p>In each case, practitioners measured against the best reference model of their time: balanced humours, the authority of an ancient text, the habits of the profession, the claims of an industry. When the reference was wrong, careful work made things worse.</p>
+      </div>
+      <div class="card" style="background:var(--ice)">
+        <p class="pull" style="font-size:1.25rem;margin:0">The reference model matters more than the effort. The HMR proposes a better one: the optimized human tensegrity, defined by physics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <h2>What we are careful about.</h2>
     <div class="grid g3" style="margin-top:22px">
       <div class="card"><h3>Hypotheses, labeled</h3><p>Every claim is marked as established evidence or as hypothesis. The ideal body is a model to be tested, not a fact.</p></div>
       <div class="card"><h3>Evidence against</h3><p>We collect the studies that challenge the model as carefully as the ones that support it, and say plainly where it does not yet hold.</p></div>
-      <div class="card"><h3>No medical advice</h3><p>This is research. We do not diagnose, treat or offer protocols, and nothing here should replace care from a qualified professional.</p></div>
+      <div class="card"><h3>No medical advice</h3><p>This is research and education. The HMR's protocol is shared so it can be studied and tested; we do not diagnose or treat, and nothing here should replace care from a qualified professional.</p></div>
     </div>
     <div class="btns" style="margin-top:28px"><a class="btn primary" href="library.html">See the data behind it</a><a class="btn ghost" href="roadmap.html">The road ahead</a></div>
   </div>
@@ -187,7 +402,7 @@
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke-linecap="round"><path d="M6 9 L26 23 M26 9 L6 23 M16 4 L16 28" stroke="#0E3A75" stroke-width="2.6"/><path d="M6 9 L16 4 L26 9 L26 23 L16 28 L6 23 Z M6 9 L26 23" stroke="#5B9BE6" stroke-width="1.2" opacity=".9"/></g></svg><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p class="small">Research and education only. Nothing on this site is medical advice, and no treatment is offered.</p></div>
-<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="health.html">Physical health</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
+<div><h4>Explore</h4><ul><li><a href="reality.html">Physical reality</a></li><li><a href="science-hook.html">Science hook</a></li><li><a href="values.html">HMR values</a></li><li><a href="health.html">Physical health</a></li><li><a href="fixing-exercise.html">Fixing exercise</a></li><li><a href="mental-health.html">Mental health</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="east-west.html">East and West</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">The road ahead</a></li><li><a href="about.html">About</a></li><li><a href="library.html">The library</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
 <script src="site.js" defer></script>
