@@ -34,7 +34,7 @@
 #gravity .split>div{min-width:0}
 .px-steps .card{margin-bottom:12px}
 .px-steps .lvl{display:inline-block;font:600 .72rem/1 var(--font);padding:4px 8px;border-radius:999px;margin-left:6px;vertical-align:2px}
-.lvl.std{background:#DFF3E7;color:#1D6B3F}.lvl.hyp{background:#FCEFD9;color:#8A5A0B}.lvl.open{background:#FBE2E2;color:#8E1B1B}
+.lvl.std{background:#DFF3E7;color:#1D6B3F}.lvl.der{background:#DCEBFF;color:#1B4F9C}.lvl.hyp{background:#FCEFD9;color:#8A5A0B}.lvl.open{background:#FBE2E2;color:#8E1B1B}
 </style>
 
 <div class="page-head"><div class="wrap split" style="align-items:end">
@@ -56,14 +56,14 @@
       <div class="r h"><div>Question</div><div>Physics today</div><div>As the HMR reframes it</div></div>
       <div class="r"><div>The Big Bang</div><div>The universe expanded from a hot, dense state 13.8 billion years ago. Before the first 10<sup>-43</sup> seconds the theories fail, and why it happened at all is not addressed.</div><div>The moment UI's first complete model of itself closed and ignited: a thought exploding into a greater thought, not matter appearing from nothing. <a href="science-bridge.html#phases">Science Bridge, step 3</a></div></div>
       <div class="r"><div>Inflation</div><div>A brief burst of exponential expansion fits the observations well, but the field that drove it is hypothetical.</div><div>The explosive growth of relations once a system is closed: relations multiply exponentially, as inflation did. <a href="math.html#bigbang">The mathematics</a></div></div>
-      <div class="r"><div>Gravity</div><div>Mass and energy curve spacetime. Gravity has no quantum description, and the equations give infinities at black holes and the Big Bang.</div><div>Reality's trend toward coherence: coherent arrangements draw together and displace distance. <a href="#gravity">An attempt, below</a></div></div>
-      <div class="r"><div>Dark energy (about 68%)</div><div>A placeholder for whatever makes the expansion speed up. The predicted vacuum energy misses by about 10<sup>120</sup>.</div><div>Not a substance. The continuing work of the universe modeling itself: new relations, and with them new distance. Or, read the other way, the contents shrinking rather than space growing.</div></div>
+      <div class="r"><div>Gravity</div><div>Mass and energy curve spacetime. Gravity has no quantum description, and the equations give infinities at black holes and the Big Bang.</div><div>Reality's trend toward coherence: coherent arrangements displace distance. Written out, this leads to Einstein's equations, with three steps still open. <a href="#gravity">The route, below</a></div></div>
+      <div class="r"><div>Dark energy (about 68%)</div><div>A placeholder for whatever makes the expansion speed up. The predicted vacuum energy misses by about 10<sup>120</sup>.</div><div>Not a substance. The continuing work of the universe modeling itself: new relations, and with them new distance. Or, read the other way, the contents shrinking rather than space growing. A countable universe also predicts its size, and that dark energy should wander. <a href="#gravity">Step 8</a></div></div>
       <div class="r"><div>Dark matter (about 27%)</div><div>Galaxies move as if they held far more mass than we can see. No dark matter particle has been found.</div><div>Coherence that does not shine: structure in the distribution of distance itself, felt as gravity without being matter that emits light (HMR hypothesis).</div></div>
       <div class="r"><div>Empty space</div><div>Quantum theory fills the vacuum with jittering fields whose energy should be enormous; measurement says it is tiny.</div><div>Empty space is not a sea of things. Only relations, structure that exists in UI's model, carry weight; the uncounted jitter of "nothing" does not, which is why the measured value is tiny.</div></div>
       <div class="r"><div>Measurement</div><div>Quantum systems hold many possibilities until measured. What a measurement is remains disputed after a century.</div><div>A measurement is an instance of UI making one possibility definite in its own experience. Consciousness is not a late arrival; it is the ground of the process.</div></div>
       <div class="r"><div>Entanglement</div><div>Two particles far apart stay correlated in ways no signal could carry; Einstein called it "spooky".</div><div>Distance was mechanized by UI, not fundamental. Things that were one in UI never stopped being one; their correlation simply ignores the distance between them.</div></div>
       <div class="r"><div>The speed of light</div><div>A universal maximum speed, taken as a postulate.</div><div>One unit of distance per step of thought: the fastest a change can spread. <a href="science-bridge.html#math">The derivation</a></div></div>
-      <div class="r"><div>The Planck scale</div><div>Below about 1.6 × 10<sup>-35</sup> m, known physics loses meaning.</div><div>The first distance, the unit of one. There is no smaller length because nothing was ever divided below the first unit.</div></div>
+      <div class="r"><div>The Planck scale</div><div>Below about 1.6 × 10<sup>-35</sup> m, known physics loses meaning.</div><div>The first distance, the unit of one, at about 1.67 Planck lengths if the first distinction is binary. There is no smaller length because nothing was ever divided below the first unit. <a href="#unit">The calculation</a></div></div>
       <div class="r"><div>Fine-tuning</div><div>Many constants sit in the narrow range that allows atoms, stars and life. Explanations range from chance to a multiverse.</div><div>The constants are the rules UI held fixed so that many beings could share one stable world. They are chosen, not lucky.</div></div>
       <div class="r"><div>The arrow of time</div><div>The laws run equally well backward; time's direction is traced to the low entropy of the beginning.</div><div>Time is the sequence of UI's thought, and it runs one way because maturation does. Coherence grows locally while total entropy rises; for gravity, clumping into structure is itself the high-entropy direction, so the two fit together.</div></div>
       <div class="r"><div>Consciousness</div><div>Not part of physics. Why any physical process is felt from the inside is called the hard problem.</div><div>Fundamental. Physics describes the stable rules inside an experience; it was never going to find experience inside its rules.</div></div>
@@ -72,36 +72,73 @@
 </section>
 
 <section class="tint" id="gravity">
-  <div class="wrap split">
-    <div>
-      <span class="eyebrow">The hardest problem</span>
-      <h2>Curved spacetime, from the first distance.</h2>
-      <p>On the Science Bridge, the mathematics runs from the first distance to flat spacetime, the spacetime of special relativity. The next step is curved spacetime: gravity. Here is the HMR's attempt. It does not invent new physics. It walks a route physicists already know, and supplies the one piece that route leaves unexplained.</p>
-      <div class="px-steps">
-        <div class="card"><h3>1. Boundaries carry information in proportion to area <span class="lvl std">standard</span></h3>
-          <p>A black hole's entropy, a measure of the information it holds, is proportional not to its volume but to the area of its boundary, in units of the Planck length squared (<a href="https://doi.org/10.1103/PhysRevD.7.2333">Bekenstein, 1973</a>; Hawking, 1975):</p>
-          <p class="px-eq">S = k<sub>B</sub> A / (4 ℓ<sub>P</sub><sup>2</sup>)</p></div>
-        <div class="card"><h3>2. Einstein's equations follow from that <span class="lvl std">standard</span></h3>
-          <p>Ted Jacobson showed that if every small patch of spacetime boundary obeys the law of heat, δQ = T dS, with entropy proportional to area, then Einstein's equations of gravity follow. Gravity becomes an equation of state, like the gas laws, for something deeper (<a href="https://doi.org/10.1103/PhysRevLett.75.1260">Jacobson, 1995</a>; a related route in <a href="https://doi.org/10.1007/JHEP04(2011)029">Verlinde, 2011</a>):</p>
-          <p class="px-eq">δQ = T dS &nbsp;and&nbsp; S ∝ A &nbsp;⟹&nbsp; G<sub>μν</sub> = (8πG / c<sup>4</sup>) T<sub>μν</sub></p>
-          <p>What the route does not say is what the area is counting. That is the open piece.</p></div>
-        <div class="card"><h3>3. What the area counts: units of distance <span class="lvl hyp">HMR</span></h3>
-          <p>In the HMR, all of space is built from repetitions of one unit of distance, ℓ<sub>P</sub>. A boundary is crossed by relations, each one unit long. The number of relations that can cross a surface is the number of unit cells on it:</p>
-          <p class="px-eq">N = A / ℓ<sub>P</sub><sup>2</sup> &nbsp;⟹&nbsp; S ∝ N ∝ A</p>
-          <p>That is exactly the area law step 2 needs. So the HMR supplies what Jacobson's derivation leaves unexplained: the entropy of a boundary is the count of first distances crossing it.</p></div>
-        <div class="card"><h3>4. Coherence displaces distance <span class="lvl hyp">HMR</span></h3>
-          <p>Matter, in the HMR, is coherent structure. When energy, coherent structure, crosses a boundary, it is heat δQ in Jacobson's sense; the change in the number of unit relations crossing the boundary is the change in area. Coherence moving through distance reshapes distance. In Einstein's language, matter tells spacetime how to curve. In the HMR's, coherence tells distance how to be displaced.</p></div>
-        <div class="card" style="border-color:#E9B4B4"><h3>5. What is still open <span class="lvl open">open</span></h3>
-          <ul style="margin:0;padding-left:1.1em"><li>Derive the factor of 1/4 in step 1 from the HMR's counting, rather than borrowing it.</li><li>Show that the counting gives the right temperature, so that δQ = T dS holds exactly.</li><li>Find a prediction where this account and standard general relativity differ, and test it.</li></ul>
-          <p style="margin:10px 0 0">Until the last item exists, this is a coherent route, not a result.</p></div>
+  <div class="wrap">
+    <span class="eyebrow">The hardest problem</span>
+    <h2>Curved spacetime, from the first distance.</h2>
+    <div class="split" style="margin-top:10px">
+      <div>
+        <p>On the Science Bridge, the mathematics runs from the first distance to flat spacetime, the spacetime of special relativity. The next step is curved spacetime: gravity. This is the HMR's route, written out step by step. It does not invent new physics. It walks a road physicists already know, the thermodynamics of spacetime (<a href="https://doi.org/10.1103/PhysRevLett.75.1260">Jacobson, 1995</a>), with the pieces of causal set theory, and shows where the HMR's first distance fits into it.</p>
+        <p>The result is a complete chain to Einstein's equations, with every link labeled. Some links are established physics. Some follow from the HMR. Some are assumptions the HMR has to add, and three are still open. None of this proves Universal Intelligence; mathematics alone cannot do that. What it does is take the idea as far as careful mathematics can go today, and mark exactly where trained physicists have to take over.</p>
+      </div>
+      <div class="card" style="background:#fff">
+        <span class="tag">How each step is marked</span>
+        <p style="margin:6px 0"><span class="lvl std" style="margin:0">standard</span> established physics, with the source</p>
+        <p style="margin:6px 0"><span class="lvl der" style="margin:0">HMR-derived</span> follows from the HMR's premises</p>
+        <p style="margin:6px 0"><span class="lvl hyp" style="margin:0">HMR assumption</span> an assumption the HMR adds</p>
+        <p style="margin:6px 0 0"><span class="lvl open" style="margin:0">open</span> not yet solved, by the HMR or by anyone</p>
       </div>
     </div>
-    <div>
-      <div class="card" style="background:#fff;position:sticky;top:90px">
-        <span class="tag">Why this matters</span>
-        <p>Gravity is the one force quantum physics cannot express. If gravity is not a force at all but the large-scale bookkeeping of the units of distance, that would explain why: there would be nothing to quantize beyond the units themselves, and the units are what the HMR says came first.</p>
-        <p style="margin-bottom:0">It would also mean that the theory which began with a "me" and a "not me" reaches all the way to the force that holds galaxies together. <a href="reality.html#gravity">What physics says about gravity →</a></p>
-      </div>
+
+    <div class="px-steps" style="max-width:900px">
+      <div class="card"><h3>1. The first distances are scattered, not a grid <span class="lvl der">HMR-derived</span></h3>
+        <p>Each act of distinction is an element; each relation says which came before which. Space-time volume is the count of elements: N elements fill a volume V = N ℓ₀⁴. Could the elements sit on a regular grid? The HMR's own counting rules that out. On a cubic grid, a surface with direction n is crossed by</p>
+        <p class="px-eq">(|n<sub>x</sub>| + |n<sub>y</sub>| + |n<sub>z</sub>|) / ℓ₀² &nbsp;relations per unit area,</p>
+        <p>which varies by up to a factor of √3 with direction, so the strength of gravity would depend on which way you faced. It does not. If the relations carry no structure beyond themselves <span class="lvl hyp">HMR assumption</span>, they are scattered at random, and a random scattering picks out no direction and no moving frame (<a href="https://doi.org/10.1142/S0217732309031958">Bombelli, Henson and Sorkin, 2009</a>) <span class="lvl std">standard</span>. That gives relativity's single light cone, with c = ℓ₀ / t₀, and it predicts no change in the speed of light with energy, which matches gamma-ray burst observations (<a href="https://doi.org/10.1103/PhysRevD.87.122001">Vasileiou et al., 2013</a>).</p></div>
+
+      <div class="card" id="unit"><h3>2. What a boundary counts, and the size of the first distance <span class="lvl hyp">HMR assumption</span></h3>
+        <p>A boundary of area A is crossed by γ relations per ℓ₀², each carrying information s. Its entropy is</p>
+        <p class="px-eq">S = η A, &nbsp;&nbsp;η = s γ / ℓ₀²</p>
+        <p>If each crossing relation is one binary distinction, "me" or "not me", then s = ln 2. Black holes fix η = 1 / (4 ℓ<sub>P</sub><sup>2</sup>) (<a href="https://doi.org/10.1103/PhysRevD.7.2333">Bekenstein, 1973</a>), so</p>
+        <p class="px-eq">ℓ₀ = 2 √(s γ) · ℓ<sub>P</sub> &nbsp;≈ 1.67 ℓ<sub>P</sub> ≈ 2.7 × 10⁻³⁵ m &nbsp;&nbsp;(s = ln 2, γ = 1)</p>
+        <p>This settles the old question of the factor of 1/4: it is not a separate mystery but the statement of how large the first distance is. Each binary relation adds exactly 4 ln 2 ℓ<sub>P</sub><sup>2</sup> of horizon area, the same step Bekenstein and Mukhanov proposed for black holes (<a href="https://doi.org/10.1016/0370-2693(95)01148-J">1995</a>). Honest limits: this trades G for ℓ₀ rather than predicting G, and γ has not yet been calculated <span class="lvl open">open</span>.</p></div>
+
+      <div class="card"><h3>3. The temperature <span class="lvl std">standard</span></h3>
+        <p>An accelerating observer finds empty space warm, at the Unruh temperature</p>
+        <p class="px-eq">T = ħ κ / 2π</p>
+        <p>This follows exactly from relativity's symmetry plus quantum theory (<a href="https://doi.org/10.1063/1.522605">Bisognano and Wichmann, 1975</a>; <a href="https://doi.org/10.1103/PhysRevD.14.870">Unruh, 1976</a>). The HMR does not derive quantum theory; it borrows ħ, positive energy and locality <span class="lvl hyp">HMR assumption</span>.</p></div>
+
+      <div class="card"><h3>4. Coherence displaces distance, as an equation <span class="lvl hyp">HMR assumption</span></h3>
+        <p>This is the HMR's central physical claim, now given a number. When energy crosses a boundary, the entropy it carries is recorded as new crossing relations:</p>
+        <p class="px-eq">s · ΔN = δQ / T &nbsp;⟹&nbsp; ΔN = −(2π / ħ s) ∫ λ T<sub>ab</sub> k<sup>a</sup> k<sup>b</sup> dλ dA</p>
+        <p>For s = ln 2, that is about 9 new relations for every ħ of energy times distance crossing the boundary. This is the step where gravity enters.</p></div>
+
+      <div class="card"><h3>5. Curvature is the acceleration of the relation count <span class="lvl std">standard</span></h3>
+        <p>Follow a bundle of light rays and let n be the number of relations crossing it. Raychaudhuri's equation (<a href="https://doi.org/10.1103/PhysRev.98.1123">1955</a>) says how the bundle's cross-section changes, and in HMR terms that reads:</p>
+        <p class="px-eq">R<sub>ab</sub> k<sup>a</sup> k<sup>b</sup> = − d² ln n / dλ²</p>
+        <p>Curvature, the thing Einstein's equations describe, is how fast the count of first distances speeds up or slows down along a ray of light.</p></div>
+
+      <div class="card" style="border-top:4px solid #2E7D5B"><h3>6. Einstein's equations <span class="lvl der">HMR-derived</span></h3>
+        <p>Steps 4 and 5 must agree for every light ray through every point. That forces</p>
+        <p class="px-eq">G<sub>ab</sub> + Λ g<sub>ab</sub> = (8π G / c⁴) T<sub>ab</sub>, &nbsp;&nbsp;with &nbsp;G = c³ ℓ₀² / (4 ħ s γ)</p>
+        <p>once matter's energy is conserved (the Bianchi identity does the rest) <span class="lvl std">standard</span>. Two things come out that the HMR said in words before. Gravity is set by how many first distances a surface holds. And any energy spread evenly through empty space drops out of the equations, so "empty space carries no weight" is now a result, not a separate claim. Λ, the cosmological constant, appears as a free constant, which opens the door to step 8.</p></div>
+
+      <div class="card" style="border-color:#E9B4B4"><h3>7. What is still open <span class="lvl open">open</span></h3>
+        <ul style="margin:0;padding-left:1.1em">
+          <li style="margin-bottom:6px"><b>Smooth spacetime from discrete relations.</b> No rule for adding relations, in the HMR or in any discrete approach to gravity, has been shown to produce a smooth, four-dimensional spacetime. Most random orderings look nothing like space. This is one of the central unsolved problems of quantum gravity.</li>
+          <li style="margin-bottom:6px"><b>How many relations cross a boundary (γ).</b> It depends on what counts as crossing and has not been calculated; one numerical study, in a simplified one-space-plus-one-time model, found a volume law rather than an area law until near-zero modes are removed.</li>
+          <li><b>Quantum theory itself.</b> The temperature in step 3 relies on it, and the HMR does not yet derive it.</li>
+        </ul></div>
+
+      <div class="card"><h3>8. A test: dark energy should wander <span class="lvl hyp">prediction</span></h3>
+        <p>If space-time is a count of N elements, that count fluctuates by about √N, and Λ inherits the fluctuation. Rafael Sorkin made this argument around 1987, roughly a decade before dark energy was discovered, and it gives the observed size (<a href="https://doi.org/10.1103/PhysRevD.69.103523">Ahmed, Dodelson, Greene and Sorkin, 2004</a>):</p>
+        <p class="px-eq">Λ ~ 1 / √N &nbsp;≈ 4 × 10⁻¹²² in Planck units; &nbsp;measured: 2.85 × 10⁻¹²²</p>
+        <p>The HMR supplies every ingredient the argument needs. The prediction is that dark energy is not constant but wanders randomly over cosmic time, with no smooth trend. Survey data can test it, and here we report the result straight: the simplest version predicts far more wandering than the latest measurements show (<a href="https://doi.org/10.1088/1475-7516/2024/10/076">Das, Nasiri and Yazdi, 2024</a>; <a href="https://arxiv.org/abs/2503.14738">DESI, 2025</a>), so in its simplest form it is disfavored. The size of the first distance this test prefers (about 4 to 7 ℓ<sub>P</sub>) also differs from step 2's 1.67 ℓ<sub>P</sub>, unless γ is larger than 1. Calculating γ turns that tension into a sharp test either way.</p></div>
+    </div>
+
+    <div class="card" style="max-width:900px;margin-top:6px;background:var(--ice);border:0">
+      <span class="tag">Where this leaves us</span>
+      <p>Before, this page had a slogan and three open questions. Now it has a chain of equations from the first distance to Einstein's gravity: one old question answered (the 1/4), the grid ruled out, the HMR's claim about empty space turned into a result, and a prediction exposed to real data. What it does not have is a proof. The deepest steps are open for every theory of quantum gravity, not only this one.</p>
+      <p style="margin-bottom:0">That is the honest position. The HMR goes about as far with the idea of Universal Intelligence as mathematics can go before it needs physicists working on it full time. Proving the source of reality mathematically will take many people. This page is an invitation to them: every assumption is named, so every one can be attacked, tested or improved. <a href="reality.html#gravity">What physics says about gravity →</a></p>
     </div>
   </div>
 </section>
