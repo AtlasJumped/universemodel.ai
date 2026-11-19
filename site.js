@@ -533,7 +533,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 <div class="tgc-row" role="group" aria-label="Playback">
   <button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button>
   <span class="tgc-seg">Speed <button type="button" class="chipbtn on" data-s="1">1x</button><button type="button" class="chipbtn" data-s="0.25">0.25x</button><button type="button" class="chipbtn" data-s="0.1">0.1x</button></span>
-  <button type="button" class="chipbtn" data-a="spin" aria-pressed="${spin}">${spin ? 'Spin: on' : 'Spin: off'}</button>
+  <button type="button" class="spinsw" data-a="spin" aria-pressed="${spin}"><span class="sw" aria-hidden="true"></span><span class="st"></span></button>
   <button type="button" class="chipbtn" data-a="reset">Reset</button>
 </div>
 <div class="tgc-row" role="group" aria-label="What a tap does">
@@ -567,7 +567,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       if (b.dataset.m) { mode = b.dataset.m; chips('m', mode); setCursor(); hover = -1; say(); }
       const a = b.dataset.a;
       if (a === 'play') { running = !running; b.textContent = running ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', !running); say(); }
-      if (a === 'spin') { spin = !spin; b.textContent = spin ? 'Spin: on' : 'Spin: off'; b.setAttribute('aria-pressed', spin); }
+      if (a === 'spin') { spin = !spin; b.setAttribute('aria-pressed', spin); }
       if (a === 'reset') { TG.reset(S); cuts = removed = 0; cars = []; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; say(); }
     });
 
