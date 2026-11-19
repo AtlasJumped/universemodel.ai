@@ -76,6 +76,16 @@
     ctx.lineCap = 'round';
     for (const [k] of order) {
       const e = E[k], qa = Q[e.a], qb = Q[e.b], depth = 0.55 + 0.45 * Math.min(1, Math.max(0, ((qa[2] + qb[2]) / 2 + 30) / 60));
+      if (e.cut && e.broken && showBones) { // a broken bone: two fragments, each still on its own end, with a jagged gap where it snapped
+        const t = e.breakT ?? 0.5, dx = qb[0] - qa[0], dy = qb[1] - qa[1], d = Math.hypot(dx, dy) || 1, L = e.L0 * (qa[3] + qb[3]) / 2;
+        const la = Math.min(d * t, L * t) - 2, lb = Math.min(d * (1 - t), L * (1 - t)) - 2, ux = dx / d, uy = dy / d, wd = 1.5 * (qa[3] + qb[3]) / 2 + 2.4;
+        ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.lineCap = 'butt';
+        for (const [x0, y0, x1, y1] of [[qa[0], qa[1], qa[0] + ux * la, qa[1] + uy * la], [qb[0], qb[1], qb[0] - ux * lb, qb[1] - uy * lb]]) {
+          ctx.strokeStyle = '#5C4D33'; ctx.lineWidth = wd + 2.2; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+          ctx.strokeStyle = '#EDE4CF'; ctx.lineWidth = wd; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+          ctx.strokeStyle = '#D33A45'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(x1 - uy * (wd / 2 + 2), y1 + ux * (wd / 2 + 2)); ctx.lineTo(x1 + ux * 2, y1 + uy * 2); ctx.lineTo(x1 + uy * (wd / 2 + 2), y1 - ux * (wd / 2 + 2)); ctx.stroke();
+        }
+        ctx.lineCap = 'round'; continue; }
       if (e.cut) continue;
       if (e.strut) { if (!showBones) continue; ctx.setLineDash([]); ctx.globalAlpha = Math.max(0.75, depth); const wd = 1.5 * (qa[3] + qb[3]) / 2 + 2.4;
         // bone: a pale shaft with a dark outline, so the struts read as bones inside the web
@@ -86,7 +96,8 @@
         const marked = cs.dense > 0.004 || cs.longer;
         if (!onLine && !showWeb && !marked && k !== hoverE) continue;
         ctx.globalAlpha = depth * (onLine || marked ? 1 : 0.5);
-        if (cs.slack && heat) { ctx.setLineDash([3, 4]); ctx.strokeStyle = '#B9C6D6'; ctx.lineWidth = 1; }
+        if (e.released) { ctx.setLineDash([2, 5]); ctx.strokeStyle = '#C9A0A4'; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.9; }
+        else if (cs.slack && heat) { ctx.setLineDash([3, 4]); ctx.strokeStyle = '#B9C6D6'; ctx.lineWidth = 1; }
         else {
           ctx.setLineDash(cs.longer && !heat ? [6, 3] : []);
           const t = heat ? Math.min(1, Math.max(0, cs.strain / 0.08)) : 0;
@@ -146,7 +157,7 @@
   function frame(now) {
     if (spin && !dragging) { yaw += 0.004; dirty = true; }
     const active = sim.moving > 2e-4 || sim.creep && sim.imps.length || now - lastChange < 1500;
-    if (active) { sim.step(); sim.step(); dirty = true; }
+    if (active) { sim.step(); sim.step(); if (sim.damaged) { sim.step(); sim.step(); } dirty = true; }
     if (now - lastM > 250 && (active || !metrics)) { lastM = now; metrics = sim.metrics(origin); nodeStrain = sim.nodeStrain(); readout(); }
     if (dirty) { drawTensegrity(); drawPerson(); dirty = false; frames++; }
     requestAnimationFrame(frame);
@@ -250,8 +261,18 @@
   function operate(c, e) {
     if (mode === 'pluck') { const i = nearest(c, e.clientX, e.clientY); if (i >= 0 && !sim.FIXED.has(i)) { sim.pluck(i, 6); changed(); status(`Plucked the ${pretty(i)}: watch the pulse travel through the web and settle.`); } return; }
     const k = nearestEdge(c, e.clientX, e.clientY, mode === 'break'); if (k < 0) return;
-    const ed = sim.E[k]; sim.cut(k); hoverE = -1; changed();
-    status(mode === 'break' ? `Bone broken between the ${pretty(ed.a)} and the ${pretty(ed.b)}. The web takes the load it carried.` : `Cable cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. Tension redistributes through the rest of the web.`);
+    const ed = sim.E[k];
+    if (mode === 'break') {
+      // where along the bone the tap landed
+      const r = c.getBoundingClientRect(), Q = sim.P.map(proj), a = Q[ed.a], b = Q[ed.b], dx = b[0] - a[0], dy = b[1] - a[1];
+      const t = Math.max(0.15, Math.min(0.85, ((e.clientX - r.left - a[0]) * dx + (e.clientY - r.top - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+      sim.breakBone(k); sim.E.forEach(f => { if (f.broken && f.breakT === undefined) f.breakT = (f.a === ed.a || f.b === ed.b) ? t : (f.a === ed.b || f.b === ed.a) ? 1 - t : t; });
+      hoverE = -1; changed();
+      const un = sim.unsupported || [], lost = un.filter(v => v > 0.9).length / un.length;
+      status(`Bone broken between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (lost > 0.5 ? 'The column that carried the body to the ground is gone: the web cannot hold the weight alone, and the body collapses.' : lost > 0.02 ? 'Everything beyond the break has lost its bone path to the ground and hangs from the fascia.' : 'Other struts still carry the load here, so the body holds, with more strain in the web.'));
+      return; }
+    sim.cut(k); hoverE = -1; changed();
+    status(`Cable cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (ed.lines.size ? 'A fascial line is one continuous band: the whole stretch between its anchors has gone slack (dotted), and the tissue it held sags.' : 'The nodes it held have lost part of their support.'));
   }
   const setCursor = () => { for (const c of [cv, cv2].filter(Boolean)) { c.classList.remove('cur-point', 'cur-cut', 'cur-strut', 'cur-pluck'); c.classList.add(mode === 'cut' ? 'cur-cut' : mode === 'break' ? 'cur-strut' : mode === 'pluck' ? 'cur-pluck' : 'cur-point'); } };
   setCursor();

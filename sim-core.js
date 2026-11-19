@@ -79,6 +79,14 @@
   const DAMP = 0.82;          // velocity kept per step
   const ITERS = 14;
   const TONE = 0.0006;        // postural tone: a weak pull toward the healthy shape (stands in for muscle tone and balance control)
+  // Weight. In the healthy body every node's weight is carried: by the bone column down to both feet, and by the
+  // fascia that meets at the node. Damage takes that carrying away. A node that has lost its bone path to the
+  // ground, or some of its cables, feels that share of gravity and loses that share of tone.
+  const GRAV = 0.02;          // gravity on unsupported weight, cm per step squared
+  const CUT_GAIN = 5;         // share of a node's support lost per share of its cables cut
+  const DAMP_FALL = 0.965;    // falling parts are not held back by tissue damping
+  // long bones are drawn with several struts; a break severs every strut that spans the fracture
+  const LONG_BONES = [[['hip','troch'],['knee','kneeLat','kneeMed','kneeF']], [['knee','tibTub'],['ankle']]];
   const SLIDE = 0.15;         // how fast fascia slides along a line to even out tension (healthy, low friction)
   const G = 0.012;            // gravity on added mass, cm per step squared
   const SHORTEN = 0.11;       // rest-length shortening per unit of added relative density
@@ -86,7 +94,7 @@
 
   function create(opt) {
     const S = { sex: (opt && opt.sex) || 'male', HEIGHT: 183, LINES, JOINTS, BASE, imps: [], months: 0, creep: false };
-    let sliding = true, N, IDX, E, adj, FIXED, P, O, OLD, chains, m0, mass, invm, dampN, extF, spacers, base;
+    let sliding = true, N, IDX, E, adj, FIXED, P, O, OLD, chains, m0, mass, invm, dampN, extF, spacers, base, unsup = null, damaged = false;
 
     S.build = function (sex) {
       if (sex) S.sex = sex;
@@ -147,14 +155,47 @@
     };
 
     // cutting a cable or breaking a bone removes that member; the rest of the structure finds a new balance
-    S.cut = function (k) { if (E[k] && !E[k].cut) { E[k].cut = true; S.moving = 1; return true; } return false; };
+    // a fascial line is one continuous band that slides over the points between its anchors: cut it anywhere and
+    // the whole band between those anchors goes slack
+    S.cut = function (k) { if (!E[k] || E[k].cut) return false; E[k].cut = true;
+      if (!E[k].strut) for (const ch of chains) if (ch.some(([j]) => j === k)) for (const [j] of ch) if (!E[j].cut) E[j].released = true;
+      support(); S.moving = 1; return true; };
+    // breaking a bone: the clicked strut snaps; in a long bone every strut that spans the fracture goes with it
+    S.breakBone = function (k) {
+      const e = E[k]; if (!e || !e.strut || e.cut) return 0;
+      const na = N[e.a], nb = N[e.b]; let n = 0;
+      const snap = j => { if (!E[j].cut) { E[j].cut = true; E[j].broken = true; n++; } };
+      snap(k);
+      if (na.side && na.side === nb.side) for (const [prox, dist] of LONG_BONES) {
+        const span = (x, y) => prox.includes(x.base) && dist.includes(y.base);
+        if (!(span(na, nb) || span(nb, na))) continue;
+        E.forEach((f, j) => { if (!f.strut) return; const fa = N[f.a], fb = N[f.b]; if (fa.side !== na.side || fb.side !== na.side) return; if (span(fa, fb) || span(fb, fa)) snap(j); });
+      }
+      support(); S.moving = 1; return n;
+    };
+    // which share of each node's weight is no longer carried
+    function support() {
+      const bone = N.map(() => []), cab = N.map(() => [0, 0]);
+      E.forEach(e => { if (e.strut) { if (!e.cut) { bone[e.a].push(e.b); bone[e.b].push(e.a); } } else { cab[e.a][1]++; cab[e.b][1]++; const w = e.cut ? 0 : e.released ? 0.5 : 1; cab[e.a][0] += w; cab[e.b][0] += w; } });
+      const reach = side => { const seen = new Set(), q = []; FIXED.forEach(i => { if (N[i].side === side) { seen.add(i); q.push(i); } });
+        while (q.length) { const u = q.pop(); for (const v of bone[u]) if (!seen.has(v)) { seen.add(v); q.push(v); } } return seen; };
+      const L = reach(1), R = reach(-1);
+      const hasBone = N.map((_, i) => E.some(e => e.strut && (e.a === i || e.b === i)));
+      const u = N.map((_, i) => hasBone[i] ? (L.has(i) && R.has(i) ? 0 : 1) : -1);
+      // soft tissue anchors hang from what they are tied to
+      for (let pass = 0; pass < 3; pass++) N.forEach((_, i) => { if (hasBone[i]) return; let s = 0, n = 0; for (const [j, k] of adj[i]) if (!E[k].cut && u[j] >= 0) { s += u[j]; n++; } u[i] = n ? s / n : 1; });
+      damaged = false;
+      unsup = u.map((x, i) => { const lost = cab[i][1] ? 1 - cab[i][0] / cab[i][1] : 0; const v = FIXED.has(i) ? 0 : Math.min(1, Math.max(0, x) + CUT_GAIN * lost); if (v > 0) damaged = true; return v; });
+      S.unsupported = unsup; S.damaged = damaged;
+      if (!damaged) unsup = null;
+    }
     S.cuts = () => E.reduce((n, e) => n + (e.cut ? 1 : 0), 0);
     S.pluck = function (i, cm) { // push one node outward from the body's centre line and let the web answer
       if (FIXED.has(i)) return; const p = P[i], c = [0, p[1], 0], d = v3.sub(p, c), l = v3.len(d) || 1, k = (cm || 5) / l;
       p[0] += d[0] * k; p[2] += d[2] * k; S.moving = 1; };
     S.reset = function () {
       S.imps = []; S.months = 0;
-      P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => { e.slide = base.slide[k]; e.cut = false; }); S.P = P;
+      P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => { e.slide = base.slide[k]; e.cut = false; e.broken = false; e.released = false; e.breakT = undefined; }); unsup = null; damaged = false; S.damaged = false; S.P = P;
       applyImps(); S.moving = 1;
     };
 
@@ -257,12 +298,12 @@
     function step() {
       if (!OLD) OLD = P.map(p => [...p]);
       let mv = 0;
-      const nxt = P.map((p, i) => { if (FIXED.has(i)) return [...O[i]]; const d = dampN[i], f = extF[i];
-        return [p[0] + (p[0] - OLD[i][0]) * d + f[0], p[1] + (p[1] - OLD[i][1]) * d + f[1], p[2] + (p[2] - OLD[i][2]) * d + f[2]]; });
+      const nxt = P.map((p, i) => { if (FIXED.has(i)) return [...O[i]]; const u = unsup ? unsup[i] : 0, d = dampN[i] + (DAMP_FALL - dampN[i]) * u, f = extF[i];
+        return [p[0] + (p[0] - OLD[i][0]) * d + f[0], p[1] + (p[1] - OLD[i][1]) * d + f[1] - GRAV * u, p[2] + (p[2] - OLD[i][2]) * d + f[2]]; });
       OLD = P; P = nxt; S.P = P;
       for (let it = 0; it < ITERS; it++) {
         for (let k = 0; k < E.length; k++) {
-          const e = E[k]; if (e.cut) continue;
+          const e = E[k]; if (e.cut || e.released) continue;
           const pa = P[e.a], pb = P[e.b], dx = pb[0] - pa[0], dy = pb[1] - pa[1], dz = pb[2] - pa[2], d = Math.hypot(dx, dy, dz) || 1e-6;
           const rest = restOf(e);
           if (!e.strut && d < rest) continue; // cables only pull
@@ -275,11 +316,12 @@
           for (const [j, d0, w] of sp.nodes) { if (d0 < 0.5) continue; const p = P[j], v = v3.sub(p, c), d = v3.len(v) || 1e-6, target = d0 * (1 + (sp.s - 1) * w);
             const corr = (target - d) / d * 0.12; p[0] += v[0] * corr; p[1] += v[1] * corr; p[2] += v[2] * corr; }
         }
-        for (let i = 0; i < P.length; i++) if (!FIXED.has(i)) { const p = P[i], o = O[i]; p[0] += (o[0] - p[0]) * TONE; p[1] += (o[1] - p[1]) * TONE; p[2] += (o[2] - p[2]) * TONE; }
+        for (let i = 0; i < P.length; i++) if (!FIXED.has(i)) { const p = P[i], o = O[i], t = unsup ? TONE * (1 - unsup[i]) : TONE; p[0] += (o[0] - p[0]) * t; p[1] += (o[1] - p[1]) * t; p[2] += (o[2] - p[2]) * t;
+          if (unsup && p[1] < 0.6) { p[1] = 0.6; const q = OLD[i]; p[0] = q[0] + (p[0] - q[0]) * 0.4; p[2] = q[2] + (p[2] - q[2]) * 0.4; } }
       }
       // fascia slides along each line toward equal tension, unless friction at the shared node holds it
       if (sliding) for (const ch of chains) for (let i = 0; i + 1 < ch.length; i++) {
-        const [k1, n] = ch[i], [k2] = ch[i + 1], e1 = E[k1], e2 = E[k2]; if (e1.cut || e2.cut) continue;
+        const [k1, n] = ch[i], [k2] = ch[i + 1], e1 = E[k1], e2 = E[k2]; if (e1.cut || e2.cut || e1.released || e2.released) continue;
         const r1 = restOf(e1), r2 = restOf(e2), d1 = v3.dist(P[e1.a], P[e1.b]), d2 = v3.dist(P[e2.a], P[e2.b]);
         const T1 = e1.k * Math.max(0, d1 - r1) / r1 - e1.T0, T2 = e2.k * Math.max(0, d2 - r2) / r2 - e2.T0; if (Math.abs(T1 - T2) < 1e-7) continue;
         const fr = Math.max(e1.fric, e2.fric), rate = SLIDE / fr;

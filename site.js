@@ -559,7 +559,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       status.textContent = m;
     };
     const chips = (attr, val) => box.querySelectorAll(`[data-${attr}]`).forEach(b => b.classList.toggle('on', b.dataset[attr] === String(val)));
-    function load(key) { S = TG.make(key); yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; fit(); setInfo(); say(); draw(); }
+    function load(key) { S = TG.make(key); S.deckSeg = null; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; fit(); setInfo(); say(); draw(); }
     sel.addEventListener('change', () => load(sel.value));
     box.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
@@ -650,9 +650,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       });
       // traffic on the deck
       if (S.deck && traffic) cars.forEach(c => {
-        const p = carPos(c); if (!p) return;
+        const p = c.free ? c.p : carPos(c); if (!p) return;
         const q = pr(p[0], p[1] + 0.035, p[2]), w = 9 * q[3] * Math.min(1.3, Math.min(W, H) / 420);
-        ctx.fillStyle = c.col; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(q[0] - w, q[1] - w * 0.55, 2 * w, w * 1.1, 3) : ctx.rect(q[0] - w, q[1] - w * 0.55, 2 * w, w * 1.1); ctx.fill();
+        ctx.save(); ctx.translate(q[0], q[1]); if (c.free) ctx.rotate(c.rot); ctx.globalAlpha = c.free && c.sunk ? Math.max(0, 1 - c.sunk / 1.6) : 1;
+        ctx.fillStyle = c.col; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-w, -w * 0.55, 2 * w, w * 1.1, 3) : ctx.rect(-w, -w * 0.55, 2 * w, w * 1.1); ctx.fill(); ctx.restore();
+        if (c.free && c.sunk && c.sunk < 0.9) { const k = c.sunk / 0.9, wet = S.water && water && p[0] > S.water[0] && p[0] < S.water[1]; ctx.strokeStyle = wet ? `rgba(91,155,230,${1 - k})` : `rgba(120,110,90,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(q[0], q[1], (6 + 26 * k) * q[3], (2 + 9 * k) * q[3], 0, 0, 7); ctx.stroke(); }
       });
       // a head for the human figure
       if (S.head && S.C.some(c => c.grp === 'head' && c.alive)) {
@@ -685,9 +687,26 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       if (!S.deck || !traffic) return;
       if (Math.random() < dt * 0.9 && cars.length < 8) { const lane = Math.random() < 0.5 ? 0 : 1, dir = lane ? 1 : -1; cars.push({ lane, dir, x: dir > 0 ? S.span[0] : S.span[1], v: 0.28 + Math.random() * 0.12, col: COLS[Math.floor(Math.random() * COLS.length)] }); }
       S.ay.set(S.ay0);
-      cars = cars.filter(c => { c.x += c.dir * c.v * dt; return c.x >= S.span[0] && c.x <= S.span[1]; });
+      if (!S.deckSeg) { // the strut under each stretch of road, and how long and how high it was built
+        S.deckSeg = S.deck.map(d => d.slice(0, -1).map((a, i) => { const b = d[i + 1], x = S.x; return { c: S.C.find(c => c.kind === 'strut' && (c.a === a && c.b === b || c.a === b && c.b === a)), L: Math.hypot(x[3 * b] - x[3 * a], x[3 * b + 1] - x[3 * a + 1], x[3 * b + 2] - x[3 * a + 2]), y: (x[3 * a + 1] + x[3 * b + 1]) / 2 }; }));
+      }
+      cars = cars.filter(c => {
+        if (c.free) { // off the road: a falling body
+          c.vy -= 9.81 * 0.35 * dt; c.p[0] += c.vx * dt; c.p[1] += c.vy * dt; c.rot += c.spin * dt;
+          if (c.p[1] <= 0.02) { c.p[1] = 0.02; c.vx *= 0.9; c.spin = 0; c.vy = 0; c.sunk = (c.sunk || 0) + dt; }
+          return !(c.sunk > 1.6);
+        }
+        c.x += c.dir * c.v * dt; if (c.x < S.span[0] || c.x > S.span[1]) return false;
+        const p = carPos(c); if (!p) return false;
+        const d = S.deck[c.lane], i = p[3], sg = S.deckSeg[c.lane][i], x = S.x, a = 3 * d[i], b = 3 * d[i + 1];
+        const len = Math.hypot(x[b] - x[a], x[b + 1] - x[a + 1], x[b + 2] - x[a + 2]), slope = Math.abs(x[b + 1] - x[a + 1]) / (Math.abs(x[b] - x[a]) + 1e-6);
+        // the road is gone, torn open, too steep to hold a car, or has dropped out from under it
+        if ((sg.c && !sg.c.alive) || len > sg.L * 1.25 || slope > 0.6 || p[1] < sg.y - 0.3) {
+          c.free = true; c.p = [p[0], p[1], p[2]]; c.vx = c.dir * c.v * 0.8; c.vy = 0; c.rot = 0; c.spin = c.dir * (2 + Math.random() * 3); }
+        return true;
+      });
       cars.forEach(c => {
-        const p = carPos(c); if (!p) return; const d = S.deck[c.lane], i = p[3], f = p[4], push = -9.81 * 1.2;
+        if (c.free) return; const p = carPos(c); if (!p) return; const d = S.deck[c.lane], i = p[3], f = p[4], push = -9.81 * 1.2;
         if (S.w[d[i]]) S.ay[d[i]] += push * (1 - f); if (S.w[d[i + 1]]) S.ay[d[i + 1]] += push * f;
       });
     }
