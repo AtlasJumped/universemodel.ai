@@ -577,6 +577,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 .stage.pick{cursor:crosshair}
 .tgc{max-width:560px;width:100%;margin:10px auto 0;display:grid;gap:8px;font-size:.9rem}
 .tgc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tgc-two{justify-content:space-between;gap:8px 14px}
+.tgc-grp{display:inline-flex;flex-wrap:wrap;gap:6px}
+.stage .tg-spin{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2;font-size:.98rem;padding:9px 18px 9px 11px;box-shadow:0 2px 10px rgba(11,37,69,.12)}
+.stage .tg-spin .sw{width:42px;height:22px}
+.stage .tg-spin .sw::after{width:18px;height:18px}
+.stage .tg-spin[aria-pressed="true"] .sw::after{transform:translateX(20px)}
 .tgc label.tgc-sel{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:600 .86rem/1.2 var(--font);color:var(--navy)}
 .tgc select{font:600 .88rem/1.2 var(--font);color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 30px 8px 10px;max-width:100%;cursor:pointer}
 .tgc select:hover{border-color:var(--sky)}
@@ -615,21 +621,18 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     box.innerHTML = `
 <div class="tgc-row"><label class="tgc-sel">Change the tensegrity <select>${[...new Set(TG.SHAPES.map(s => s[3]))].map(g => `<optgroup label="${g}">${TG.SHAPES.filter(s => s[3] === g).map(s => `<option value="${s[0]}"${s[0] === start ? ' selected' : ''}>${s[1]}</option>`).join('')}</optgroup>`).join('')}</select></label>
   <span class="tgc-seg tgc-bridge"><label class="tgc-chk"><input type="checkbox" data-o="water" checked> Water</label><label class="tgc-chk"><input type="checkbox" data-o="traffic" checked> Traffic</label></span></div>
-<div class="tgc-row" role="group" aria-label="Playback">
-  <button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button>
-  <span class="tgc-seg">Speed <button type="button" class="chipbtn on" data-s="1">1x</button><button type="button" class="chipbtn" data-s="0.25">0.25x</button><button type="button" class="chipbtn" data-s="0.1">0.1x</button></span>
-  <button type="button" class="spinsw" data-a="spin" aria-pressed="${spin}"><span class="sw" aria-hidden="true"></span><span class="st"></span></button>
-  <button type="button" class="chipbtn" data-a="reset">Reset</button>
-</div>
-<div class="tgc-row" role="group" aria-label="What a tap does">
-  <button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button>
-  <button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button>
-  <button type="button" class="chipbtn cut" data-m="strut">Break a strut</button>
+<div class="tgc-row tgc-two">
+  <span class="tgc-grp" role="group" aria-label="What a tap does"><button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button><button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button><button type="button" class="chipbtn cut" data-m="strut">Break a strut</button></span>
+  <span class="tgc-grp" role="group" aria-label="Playback"><button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button><button type="button" class="chipbtn" data-a="speed" aria-label="Speed, tap to change">Speed 1x</button><button type="button" class="chipbtn" data-a="reset">Reset</button></span>
 </div>
 <p class="tgc-info"><span class="tgc-text"></span>
 <span class="tgc-key"><span><i style="height:6px;background:var(--deep)"></i>strut: compression</span><span><i style="height:3px;background:var(--sky)"></i>cable: tension</span><span><i style="height:0;border-top:2px dashed #A9B8CC"></i>slack cable</span><span><i style="height:4px;background:#1D5FD1;box-shadow:0 0 6px #5B9BE6"></i>tension changing</span></span></p>
 <p class="tgc-status" aria-live="polite"></p>`;
     stage.insertAdjacentElement('afterend', box);
+    const spinBtn = document.createElement('button'); spinBtn.type = 'button'; spinBtn.className = 'spinsw tg-spin'; spinBtn.setAttribute('aria-pressed', spin); spinBtn.innerHTML = '<span class="sw" aria-hidden="true"></span><span class="st"></span>';
+    stage.appendChild(spinBtn);
+    ['pointerdown', 'pointerup', 'pointermove'].forEach(ev => spinBtn.addEventListener(ev, e => e.stopPropagation()));
+    spinBtn.addEventListener('click', e => { e.stopPropagation(); spin = !spin; spinBtn.setAttribute('aria-pressed', spin); });
     const $ = q => box.querySelector(q), sel = $('select'), status = $('.tgc-status');
     const setInfo = () => { $('.tgc-text').textContent = S.info; $('.tgc-bridge').style.display = S.deck ? '' : 'none'; };
     box.querySelectorAll('[data-o]').forEach(c => c.addEventListener('change', () => { if (c.dataset.o === 'water') water = c.checked; else { traffic = c.checked; if (!traffic) { cars = []; S.ay.set(S.ay0); } } }));
@@ -648,11 +651,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     sel.addEventListener('change', () => load(sel.value));
     box.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.s) { speed = +b.dataset.s; chips('s', b.dataset.s); }
       if (b.dataset.m) { mode = b.dataset.m; chips('m', mode); setCursor(); hover = -1; say(); }
       const a = b.dataset.a;
       if (a === 'play') { running = !running; b.textContent = running ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', !running); say(); }
-      if (a === 'spin') { spin = !spin; b.setAttribute('aria-pressed', spin); }
+      if (a === 'speed') { speed = speed === 1 ? 0.25 : speed === 0.25 ? 0.1 : 1; b.textContent = 'Speed ' + speed + 'x'; b.classList.toggle('on', speed !== 1); }
       if (a === 'reset') { TG.reset(S); cuts = removed = 0; cars = []; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; say(); }
     });
 
