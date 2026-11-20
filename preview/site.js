@@ -407,6 +407,7 @@ const TG = (() => {
     nd('sac', 0, .6, -.065); nd('pub', 0, .52, .055); nd('l3', 0, .68, -.045);
     nd('t12', 0, .75, -.055); nd('t6', 0, .85, -.07); nd('c7', 0, .93, -.05); nd('st', 0, .91, .045); nd('xi', 0, .8, .075);
     nd('occ', 0, .97, -.045, .02); nd('top', 0, 1.08, 0, .02); nd('brow', 0, 1.02, .075, .02); nd('chin', 0, .95, .065, .02);
+    nd('nape', 0, 1.0, -.105, .02); // the back of the skull, behind the pivot, where the neck's extensors attach
     const n = k => N[k], P = (a, c) => [n(a), n(c)];
     ['L', 'R'].forEach(q => {
       b.body(['heel', 'toe', 'ank', 'fl', 'fm'].map(k => n(k + q)), [P('heel' + q, 'toe' + q), P('heel' + q, 'ank' + q), P('ank' + q, 'toe' + q)], 'foot' + q);
@@ -422,7 +423,7 @@ const TG = (() => {
     b.body(['t12', 't6', 'c7', 'st', 'xi', 'ribL', 'ribR', 'acL', 'acR', 'scL', 'scR'].map(n),
       [P('t12', 't6'), P('t6', 'c7'), P('st', 'xi'), P('t6', 'ribL'), P('t6', 'ribR'), P('ribL', 'xi'), P('ribR', 'xi'), P('st', 'acL'), P('st', 'acR'), P('acL', 'scL'), P('acR', 'scR'), P('t12', 'ribL'), P('t12', 'ribR')], 'thorax');
     b.add(n('c7'), n('occ'), 'strut', { grp: 'neck' });
-    b.body(['occ', 'top', 'brow', 'chin', 'earL', 'earR'].map(n), [P('occ', 'top'), P('top', 'brow'), P('brow', 'chin'), P('chin', 'occ'), P('earL', 'top'), P('earR', 'top'), P('earL', 'chin'), P('earR', 'chin')], 'head');
+    b.body(['occ', 'top', 'brow', 'chin', 'earL', 'earR', 'nape'].map(n), [P('occ', 'top'), P('top', 'brow'), P('brow', 'chin'), P('chin', 'occ'), P('earL', 'top'), P('earR', 'top'), P('earL', 'chin'), P('earR', 'chin'), P('top', 'nape'), P('nape', 'occ')], 'head');
     // fascia: cables across every joint, front, back, sides and spirals
     const cab = (a, c) => b.add(n(a), n(c), 'cable');
     ['L', 'R'].forEach(q => {
@@ -432,8 +433,9 @@ const TG = (() => {
       cab('l3', 'tm' + q); cab('crest' + q, 'l3'); cab('crest' + q, 'rib' + q); cab('sac', 'sc' + q); cab('isch' + q, 't12');
       cab('ac' + q, 'ear' + q); cab('sc' + q, 'occ'); cab('el' + q, 'rib' + q); cab('el' + q, 'sc' + q); cab('wr' + q, 'ac' + q);
     });
+    cab('nape', 't6'); cab('nape', 'scL'); cab('nape', 'scR'); // the nuchal line: holds the head up against its own forward weight
     cab('pub', 'xi'); cab('asisL', 'ribR'); cab('asisR', 'ribL'); cab('st', 'chin'); cab('l3', 'scL'); cab('l3', 'scR'); cab('crestL', 'scL'); cab('crestR', 'scR'); cab('scL', 'earL'); cab('scR', 'earR'); cab('asisL', 'xi'); cab('asisR', 'xi');
-    return { b, ea: 3000, strain: 0.0005, kb: 8000, iters: 6, kick: 0.9, view: [0.3, 0.1], thin: 0.55, head: ['occ', 'top', 'brow', 'chin', 'earL', 'earR'].map(n),
+    return { b, ea: 3000, strain: 0.0005, kb: 8000, iters: 6, kick: 0.9, view: [0.3, 0.1], thin: 0.55, head: ['occ', 'top', 'brow', 'chin', 'earL', 'earR', 'nape'].map(n),
       info: 'A simplified human tensegrity: the bones are struts, and the fascia is a web of cables in tension crossing every joint, front, back and sides. Nothing holds it upright but tension.' };
   }
 

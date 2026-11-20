@@ -30,13 +30,25 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
 .brand{display:flex;align-items:center;gap:10px;white-space:nowrap;font:700 1.08rem/1 var(--font);letter-spacing:-.01em;color:var(--navy)}
 .brand:hover{text-decoration:none}
-.brand svg{width:34px;height:34px}
-/* the name in the top bar: a slow cloud of sparkles behind it and a slow sheen across the letters */
+.brand .lg{flex:none;display:block;width:34px;height:34px;border-radius:50%;background:#0B2545;color:#fff}
+.brand .lg i{display:block;width:100%;height:100%;background-color:#fff;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M7.5 10.5V16.5a3.5 3.5 0 0 0 7 0M14.5 21.5V10.5L19.5 18L24.5 10.5V21.5%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.7%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M7.5 10.5V16.5a3.5 3.5 0 0 0 7 0M14.5 21.5V10.5L19.5 18L24.5 10.5V21.5%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.7%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") center/100% 100% no-repeat}
+/* the name in the top bar: a slow cloud of sparkles behind it */
 .brand-aura{position:absolute;left:0;top:0;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%)}
 .site-head .wrap{position:relative;z-index:1}
-.site-head .brand span{background:linear-gradient(100deg,var(--navy) 0%,var(--navy) 38%,#1D5FD1 46%,#6D4AFF 51%,#F2A93B 56%,var(--navy) 64%,var(--navy) 100%);background-size:320% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:brandsheen 5s linear infinite}
-@keyframes brandsheen{0%{background-position:100% 0}100%{background-position:0% 0}}
-@media (prefers-reduced-motion:reduce){.site-head .brand span{animation:none;background:none;-webkit-text-fill-color:currentColor;color:var(--navy)}}
+/* One sheen through the whole top bar, in sync. Every piece of header text, and the monogram, shows the same
+   gradient, fixed to the window and three windows wide, so a single band of colour crosses logo, name and menu. */
+.site-head .brand span,.site-head .brand .lg i,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{
+  --hb:transparent;
+  background-image:linear-gradient(100deg,currentColor 0%,currentColor 47.4%,#1D5FD1 48.7%,#6D4AFF 50%,#F2A93B 51.3%,currentColor 52.6%,currentColor 100%),linear-gradient(var(--hb),var(--hb));
+  background-size:300% 100%,auto;background-attachment:fixed,scroll;background-position:100% 0,0 0;background-repeat:no-repeat;
+  -webkit-background-clip:text,padding-box;background-clip:text,padding-box;-webkit-text-fill-color:transparent;
+  animation:headsheen 7s linear infinite}
+.site-head .brand .lg i{-webkit-background-clip:border-box,border-box;background-clip:border-box,border-box}
+.site-head .nav a:not(.cta):hover,.site-head .nav .grpbtn:hover{--hb:var(--mist)}
+.site-head .nav a[aria-current="page"]{--hb:var(--ice)}
+.site-head .nav .grp.on>.grpbtn{--hb:var(--ice)}
+@keyframes headsheen{from{background-position:100% 0,0 0}to{background-position:0% 0,0 0}}
+@media (prefers-reduced-motion:reduce){.site-head .brand span,.site-head .brand .lg i,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{animation:none;background-position:100% 0,0 0}}
 .nav{display:flex;gap:4px;align-items:center}
 .nav a{font:500 .94rem/1 var(--font);color:var(--soft);padding:10px 12px;border-radius:8px;white-space:nowrap}
 .nav a:hover{color:var(--navy);background:var(--mist);text-decoration:none}
