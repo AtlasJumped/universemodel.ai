@@ -40,9 +40,12 @@
 .ab-big p{max-width:none}
 .ab-hyp{display:inline-block;font:600 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#0B2545;background:#9CC3F5;border-radius:6px;padding:5px 7px;margin-bottom:10px}
 .ab-shuf{margin-top:22px;background:#fff}
-.ab-bind{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:center;margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.ab-bind{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:26px;align-items:start;margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.ab-bind figure{margin:0}
 .ab-bind img{width:100%;height:auto;border-radius:12px;display:block}
-.ab-bind figcaption{font-size:1rem;line-height:1.6;color:var(--ink);max-width:none}
+.ab-bind figcaption{font-size:.84rem;line-height:1.45;color:var(--soft);margin-top:7px;max-width:none}
+.ab-bind p{max-width:none}
+.ab-bind div figure{margin:14px 0}
 @media (max-width:760px){.ab-bind{grid-template-columns:1fr}}
 .ab-shuf-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
 .ab-shuf-h h3{font-size:1.45rem;margin:6px 0 0}
@@ -118,10 +121,15 @@
         <div class="ab-no"><b>Wrong</b><p id="ab-a"></p></div>
         <div class="ab-yes"><b>Right, or simply normal</b><p id="ab-b"></p></div>
       </div>
-      <figure class="ab-bind">
-        <img src="../img/head-binding.svg" alt="Diagram of a Chinookan cradleboard seen from the side: an infant lies swaddled on a long board, and a second board hinged at the head end is bound down at an angle across the forehead." loading="lazy" width="560" height="300">
-        <figcaption><b>The first example, drawn.</b> Among the Chinookan peoples of the Columbia River, a baby lay on a cradleboard for its first year, with a second board bound across the forehead at an angle. The soft skull grew into a long, flat wedge. To them it was beautiful, and it marked a person of standing: slaves and outsiders did not have it. The custom lasted into the twentieth century. Parents did this out of care for their child, on the best model of reality they had. <span class="small muted">A diagram, not a portrait. Source: <a href="https://bodyarts.prm.ox.ac.uk/index.php/permanent-body-arts/reshaping-and-piercing/163-head-shaping-flattening.html">Pitt Rivers Museum, University of Oxford</a>.</span></figcaption>
-      </figure>
+      <div class="ab-bind">
+        <figure><img src="../img/hx-kane-flat-head-woman-and-child.jpg" alt="Oil painting by Paul Kane: a woman seen in profile, her forehead sloping back in a long flat line, holds an infant strapped into a wooden cradle with a board hinged over its forehead." loading="lazy" width="889" height="1070"><figcaption>Paul Kane, <i>Flat Head Woman and Child</i>, about 1849 to 1852. Montreal Museum of Fine Arts. Public domain, via <a href="https://commons.wikimedia.org/wiki/File:Kane_Caw_Wacham.jpg">Wikimedia Commons</a>.</figcaption></figure>
+        <div>
+          <p><b>The first example, as an artist who went there painted it.</b> On the Columbia River and the coast north of it, a baby spent its first year strapped to a cradleboard, with a second board bound across the forehead. The soft skull grew into a long, flat slope. Look at the woman's profile: her head was shaped the same way when she was a baby. To her people it was beautiful, and it marked a free person of standing. Slaves and outsiders did not have it. Kane, who travelled there in 1847, called it a “distinguishing mark of freedom”.</p>
+          <p>The parents who did this were not cruel. They did it out of care for their child, on the best model of reality they had.</p>
+          <figure><img src="../img/hx-kane-child-in-cradle.jpg" alt="Watercolour sketch by Paul Kane of an infant bound into a wooden cradle, with the forehead board raised on cords." loading="lazy" width="600" height="422"><figcaption>Kane's field sketch, 1847, labelled in his own hand “Chinook child undergoing process of flattening the head”. Public domain, via <a href="https://commons.wikimedia.org/wiki/File:Kane_Flathead_Child.jpg">Wikimedia Commons</a>.</figcaption></figure>
+          <p class="small muted" style="margin-bottom:0">The oil painting is a studio composite: Kane combined his separate field sketches of a woman and of an infant, and shows the board lifted rather than pressing (<a href="https://aci-iac.ca/art-books/paul-kane/key-works/flat-head-woman-and-child">Art Canada Institute</a>). How the cradle worked, and that the custom lasted into the twentieth century: <a href="https://bodyarts.prm.ox.ac.uk/index.php/permanent-body-arts/reshaping-and-piercing/163-head-shaping-flattening.html">Pitt Rivers Museum, University of Oxford</a>.</p>
+        </div>
+      </div>
       <p class="small muted" style="margin:14px 0 0;max-width:none">None of these people is careless. Each is following a model of what is real, and the verdict comes from the model. That is why a value system is only as good as the model under it, and why a partial model can lead sincere people to opposite conclusions.</p>
     </div>
   </div>
