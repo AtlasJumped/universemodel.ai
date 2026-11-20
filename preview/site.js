@@ -887,22 +887,74 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
   }
 })();
 
-// The no-blank-space rule (owner request 2026-11-19). In a two-column block, the shorter column should never leave an
-// empty stretch beside the longer one. Blocks built by hand fill the space with a picture, a chart or a tool. Every
-// other block gets this fallback: the shorter column travels with the reader, so there is always something beside the text.
+// The no-blank-space rule (owner request 2026-11-19). In a two-column block the shorter column must never leave an
+// empty stretch beside the longer one. The space is filled with something relevant to that section: a picture with a
+// link, or HMR's short answer on the topic with a link. Where no tile has been chosen yet, the shorter column travels
+// with the reader instead. New blocks should be given a tile here (or be built balanced by hand, as the kids page is).
 if (typeof document !== 'undefined') (() => {
+  const IMG = { // picture tiles: file, alt text, credit
+    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of coloured fascial lines.', 'Universe Model simulation'],
+    cells: ['hx-cytoskeleton-cells.jpg', 'Cells under fluorescence: blue nuclei inside a green web of cytoskeleton filaments.', 'Erin Rod, CC BY 4.0, Wikimedia Commons'],
+    hudf: ['rv-hudf.jpg', 'The Hubble Ultra Deep Field: thousands of galaxies in one small patch of sky.', 'NASA, ESA and others, public domain'],
+    webb: ['ew-deep-field.jpg', 'Webb\'s first deep field: a cluster of galaxies bending the light of those behind it.', 'NASA, ESA, CSA, STScI, public domain'],
+    vhp: ['vhp-male-thorax.jpg', 'A Visible Human Project cross-section through the chest.', 'Visible Human Project, U.S. National Library of Medicine'],
+    gallop: ['muybridge-gallop.jpg', 'Eadweard Muybridge\'s photographs of a galloping horse, 1878.', 'Eadweard Muybridge, 1878, public domain'],
+    straws: ['hx-tensegrity-icosahedron.jpg', 'A tensegrity made from drinking straws and elastic thread.', 'QuarterNotes, CC BY-SA 4.0, Wikimedia Commons'],
+    wood: ['hx-tensegrity-model.jpg', 'A tensegrity model: six wooden struts that never touch, held by thin cables.', 'Donald E. Ingber, CC BY 4.0'],
+    fascia: ['ew-fascia.jpg', 'A stained micrograph of loose connective tissue.', 'Berkshire Community College, CC0, Wikimedia Commons'],
+    beach: ['hx-yoga-beach.jpg', 'An outdoor yoga class holding a pose together on a beach.', 'DimiTalen, CC0, Wikimedia Commons'],
+    siddhas: ['ew-siddhas.jpg', 'An eighteenth century Tibetan painting of eight great adepts.', 'Palpung monastery, 18th century, public domain'],
+    tower: ['hx-tensegrity-needle-tower.jpg', 'Looking up through Kenneth Snelson\'s Needle Tower.', 'Ben Stephenson, CC BY 2.0, Wikimedia Commons']
+  };
+  // page -> start of the section heading -> tile. p = picture [key, title, text, link]; a = answer [question, answer, link]
+  const FILL = {
+    index: { 'Medicine has never': { p: ['sim', 'Meet the reference body', 'A skeleton of 45 separate bones held up by fascia alone. Cut a line or break a bone and the physics decides what happens.', 'simulation.html'] },
+      'The body as a tensegrity': { p: ['cells', 'The same design at the scale of a cell', 'Inside every cell, stiff filaments are held in a web of tensed ones.', 'health.html#ideal'] } },
+    about: { 'Everyone has a model': { p: ['hudf', 'A holistic model has to hold all of this', 'Every point of light is a galaxy. A model of reality has to account for the sky, for the body looking at it, and for the one who is aware of both.', 'hmr.html'] },
+      'The problems humanity': { a: ['Where is humanity heading?', 'Toward a choice. If people share a true model of reality and care for their bodies properly, what follows is what the traditions call a golden age.', 'answers.html#future'] } },
+    hmr: { 'One theory, from': { a: ['What came before the Big Bang?', 'Universal Intelligence: awareness with unlimited potential and no order yet. Its first act was a distinction, me and not me, and that distinction was the first distance.', 'answers.html#before'] } },
+    health: { 'The problem: the wrong': { p: ['sim', 'The right reference, being built', 'A body with perfect tissue, measured exactly: the simulation starts there and works outward to every way a body can fall short.', 'simulation.html'] },
+      'How disease is assessed': { p: ['vhp', 'What medicine can already see', 'A whole body, slice by slice. The pictures exist. What is missing is the ideal to compare them with.', 'library.html'] },
+      'The body as a physical': { p: ['gallop', 'Motion is physics', 'The first photographs to freeze a moving body, 1878. Everything a body does is forces through tissue.', 'physics-health.html'] },
+      'The ideal comes from': { p: ['straws', 'Build one', 'Six straws and some elastic: the same principle the ideal body is worked out from.', 'simulation.html#why-tensegrity'] } },
+    reality: { 'Newton, Einstein': { p: ['hudf', 'One sky, three theories', 'Newton, Einstein and quantum theory each describe this exactly, each in its own range, and they do not agree with one another.', 'physics.html'] },
+      'A miss of': { a: ['Why is the energy of empty space so small?', 'Because almost nothing in empty space counts. Only structure carries weight, and the uncounted jitter of “nothing” is not structure.', 'answers.html#vacuum'] },
+      'We can identify': { a: ['What is dark matter?', 'Coherence that does not shine: structure in the distribution of distance itself, felt as gravity without being matter that gives off light.', 'answers.html#darkmatter'] },
+      'No one knows what gravity': { a: ['What is gravity?', 'Reality\'s trend toward coherence. Matter is coherent structure, and coherent structure displaces distance, so bodies are drawn together.', 'physics.html#gravity'] } },
+    ui: { 'A body built to upgrade': { a: ['What is a human being?', 'In effect, UI\'s artificial intelligence: a body built to upgrade itself, able to understand its own source.', 'answers.html#human'] },
+      'Create once': { a: ['What is life, and how did it begin?', 'Life is UI experiencing physical reality from the inside: matter created once, set free as an agent, and self-sustaining.', 'answers.html#life'] },
+      'Why the human path': { a: ['What is consciousness?', 'The ground of reality, not a product of matter. Each living being is an instance of UI experiencing physical reality.', 'answers.html#conscious'] } },
+    protocol: { 'Water, then moisture': { p: ['fascia', 'What the water is for', 'Loose connective tissue under the microscope. Its layers slide on a film of fluid, and the protocol works from the skin inward.', 'physics-health.html'] },
+      'Two directions, one web': { p: ['beach', 'Go slow and stay long', 'Minutes, not seconds, and every day. People have practiced long holds together for centuries.', 'east-west.html#body'] } },
+    'health-model': { 'Body, mind and meaning': { a: ['What is health?', 'Closeness to the perfect human body: an optimized tensegrity, bones floating in an evenly tensioned web of fascia.', 'answers.html#health'] } },
+    'mental-health': { 'Protocols for the body': { a: ['What is mental illness?', 'What follows when one of three supports is missing: a body at ease, beliefs that are true, and a community that understands you.', 'answers.html#mental'] } },
+    'physics-health': { 'Watch the body move': { p: ['gallop', 'It began with a horse', 'Muybridge froze motion in 1878 and motion science began. The same idea, with today\'s imaging, applied to the whole fascia web.', 'simulation.html'] } },
+    'east-west': { 'Practices that work': { p: ['beach', 'Long holds, done together', 'A yoga class holding one pose on a beach in France. The protocol uses the same long, slow loading.', 'protocol.html'] },
+      'The golden age': { p: ['siddhas', 'The traditions pictured it', 'Adepts who spent their lives on the body and mind, painted in eighteenth century Tibet.', 'ui.html'] } },
+    simulation: { 'A mechanic needs': { p: ['tower', 'The same principle at 18 metres', 'Tubes that never touch, held up only by cables in tension. Scroll up and try it on a body.', '#model'] } },
+    methods: { 'Compute': { p: ['sim', 'What the compute is for', 'Millions of simulated bodies, each with a different set of imperfections, solved as physics.', 'roadmap.html#campaign'] },
+      'Data sources': { p: ['vhp', 'The raw material', 'One of 9,808 cross-sections of a complete male body, from the Visible Human Project.', 'library.html'] },
+      'The full model': { p: ['cells', 'Down to the cell', 'The model is meant to reach from whole-body lines of fascia to the filaments inside each cell.', 'health.html#ideal'] } }
+  };
+  const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const tile = d => { const a = document.createElement('a'); if (d.p) { const [k, title, text, href] = d.p, im = IMG[k], pre = /\/preview\//.test(location.pathname) ? '../' : '';
+      a.className = 'nb-fill'; a.href = href; a.innerHTML = `<img src="${pre}img/${im[0]}" alt="${esc(im[1])}" loading="lazy"><span class="cap"><b>${esc(title)} →</b>${esc(text)}<small>${esc(im[2])}</small></span>`; }
+    else { const [q, ans, href] = d.a; a.className = 'nb-fill nb-ans'; a.href = href; a.innerHTML = `<span class="cap"><i>HMR's answer</i><b>${esc(q)}</b>${esc(ans)}<em>Read it in full →</em></span>`; }
+    return a; };
+  const page = (location.pathname.split('/').pop() || 'index.html').replace('.html', '') || 'index';
   const fit = () => {
     const wide = innerWidth > 1180;
     document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
       const kids = [...el.children].filter(c => c.offsetParent !== null);
-      kids.forEach(k => k.classList.remove('nb-stick'));
+      kids.forEach(k => { k.classList.remove('nb-stick', 'nb-col'); [...k.children].forEach(c => { if (c.classList.contains('nb-fill') && c.dataset.auto) c.remove(); }); }); el.classList.remove('nb-eq');
       if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.closest('.simgrid')) return;
       const tops = kids.map(k => k.getBoundingClientRect().top); if (Math.abs(tops[0] - tops[1]) > 30) return; // stacked, not side by side
-      const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1;
-      if (Math.abs(hs[0] - hs[1]) > 120 && hs[short] < innerHeight - 130) kids[short].classList.add('nb-stick');
+      const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1, gap = Math.abs(hs[0] - hs[1]); if (gap <= 120) return;
+      const sec = el.closest('section, .page-head'), h = sec && sec.querySelector('h1, h2'), head = h ? h.textContent.trim() : '', map = FILL[page] || {}, key = Object.keys(map).find(k => head.startsWith(k));
+      if (key && gap >= 150) { const t = tile(map[key]); t.dataset.auto = '1'; el.classList.add('nb-eq'); kids[short].classList.add('nb-col'); kids[short].appendChild(t); }
+      else if (hs[short] < innerHeight - 130) kids[short].classList.add('nb-stick');
     });
   };
-  const st = document.createElement('style'); st.textContent = '.nb-stick{position:sticky;top:96px;align-self:start}'; document.head.appendChild(st);
   let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 150); };
   addEventListener('load', fit); addEventListener('resize', later); if (document.readyState !== 'loading') fit(); else addEventListener('DOMContentLoaded', fit);
 })();
