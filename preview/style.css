@@ -30,7 +30,13 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
 .brand{display:flex;align-items:center;gap:10px;white-space:nowrap;font:700 1.08rem/1 var(--font);letter-spacing:-.01em;color:var(--navy)}
 .brand:hover{text-decoration:none}
-.brand svg{width:28px;height:28px}
+.brand svg{width:34px;height:34px}
+/* the name in the top bar: a slow cloud of sparkles behind it and a slow sheen across the letters */
+.brand-aura{position:absolute;left:0;top:0;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%)}
+.site-head .wrap{position:relative;z-index:1}
+.site-head .brand span{background:linear-gradient(100deg,var(--navy) 0%,var(--navy) 38%,#1D5FD1 46%,#6D4AFF 51%,#F2A93B 56%,var(--navy) 64%,var(--navy) 100%);background-size:320% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:brandsheen 16s linear infinite}
+@keyframes brandsheen{0%{background-position:100% 0}60%{background-position:0% 0}100%{background-position:0% 0}}
+@media (prefers-reduced-motion:reduce){.site-head .brand span{animation:none;background:none;-webkit-text-fill-color:currentColor;color:var(--navy)}}
 .nav{display:flex;gap:4px;align-items:center}
 .nav a{font:500 .94rem/1 var(--font);color:var(--soft);padding:10px 12px;border-radius:8px;white-space:nowrap}
 .nav a:hover{color:var(--navy);background:var(--mist);text-decoration:none}

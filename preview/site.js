@@ -167,6 +167,73 @@ const TG = (() => {
       info: 'The poles are in compression; the guy lines, ridge line and fabric are in tension. Cut a guy line or take out a pole and the tent comes down.' };
   }
 
+  // A big marquee: two king poles under a ridge, a ring of fourteen side poles, each held out by its own guy line.
+  function mansionTent() {
+    const b = builder(), xk = 1.0, c = 1.5, He = 1.3, Hk = 2.6, m = 3, R = 3, fan = 3;
+    const ridge = [];
+    for (let k = 0; k <= m; k++) { const x = xk - 2 * xk * k / m, king = k === 0 || k === m; ridge.push(b.node(x, king ? Hk : Hk - 0.05, 0, king ? 0.4 : 0.06)); }
+    [0, m].forEach(k => { const foot = b.node(b.P[ridge[k]][0], 0, 0, 0.1, true); b.add(foot, ridge[k], 'strut'); });
+    const fab = {}, key = (p, q) => Math.min(p, q) + '-' + Math.max(p, q);
+    for (let k = 0; k < m; k++) fab[key(ridge[k], ridge[k + 1])] = b.add(ridge[k], ridge[k + 1], 'cable', { strain: 0.03 });
+    const F = (p, q) => { const k = key(p, q); if (fab[k] === undefined) fab[k] = b.add(p, q, 'fabric'); return fab[k]; };
+    // the eave runs round a stadium shape: two straight sides and two rounded ends. Each eave point hangs from a ridge node.
+    const cols = [];
+    const col = (inner, ex, ez, nx, nz) => { const ip = b.P[inner], ids = [inner];
+      for (let r = 1; r <= R; r++) { const t = r / R, sag = 0.2 * Math.sin(Math.PI * t); ids.push(b.node(ip[0] + (ex - ip[0]) * t, ip[1] + (He - ip[1]) * t - sag, ip[2] + (ez - ip[2]) * t, r === R ? 0.25 : 0.05)); }
+      const top = ids[R], foot = b.node(ex, 0, ez, 0.1, true), stake = b.node(ex + nx * 0.95, 0, ez + nz * 0.95, 0.1, true);
+      b.add(foot, top, 'strut'); b.add(top, stake, 'cable'); ids.hem = b.node(ex + nx * 0.04, He - 0.42, ez + nz * 0.04, 0.03); cols.push(ids); };
+    for (let k = 0; k <= m; k++) col(ridge[k], b.P[ridge[k]][0], c, 0, 1);
+    for (let f = 1; f <= fan; f++) { const a = Math.PI / 2 + Math.PI * f / (fan + 1); col(ridge[m], -xk + c * Math.cos(a), c * Math.sin(a), Math.cos(a), Math.sin(a)); }
+    for (let k = m; k >= 0; k--) col(ridge[k], b.P[ridge[k]][0], -c, 0, -1);
+    for (let f = 1; f <= fan; f++) { const a = -Math.PI / 2 + Math.PI * f / (fan + 1); col(ridge[0], xk + c * Math.cos(a), c * Math.sin(a), Math.cos(a), Math.sin(a)); }
+    cols.forEach((A, j) => { const B = cols[(j + 1) % cols.length];
+      for (let r = 0; r < R; r++) { const p = A[r], pr = B[r], dn = A[r + 1], dr = B[r + 1], e5 = F(p, dn), e4 = F(dn, dr);
+        if (p === pr) { const e3 = F(p, dr); b.tri(p, dr, dn, e3, e4, e5); }
+        else { const e1 = F(p, pr), e2 = F(pr, dr), e3 = F(p, dr); F(pr, dn); b.tri(p, pr, dr, e1, e2, e3); b.tri(p, dr, dn, e3, e4, e5); } } });
+    // a valance hangs from the eave all the way round
+    cols.forEach((A, j) => { const B = cols[(j + 1) % cols.length], p = A[R], q = B[R], e1 = F(p, q), e2 = F(q, B.hem), e3 = F(p, B.hem), e4 = F(A.hem, B.hem), e5 = F(p, A.hem); b.tri(p, q, B.hem, e1, e2, e3); b.tri(p, B.hem, A.hem, e3, e4, e5); });
+    return { b, ea: 600, eaFabric: 300, strain: 0.03, strainFabric: 0.015, kick: 2.4, view: [0.7, 0.36], thin: 0.6,
+      info: 'A big marquee. Two king poles and fourteen side poles are in compression; the ridge line, the fabric and fourteen guy lines are in tension. Cut guy lines or take out poles and watch which part of the roof comes down.' };
+  }
+
+  // A neighbourhood of treehouses: each house hangs from the branches of its tree, and rope bridges join the houses.
+  function treehouses() {
+    const b = builder(), houses = [];
+    const trees = [[-2.4, -0.5, 3.0, 0.3], [-0.8, 0.75, 3.4, 1.1], [0.85, -0.6, 3.1, 0.2], [2.4, 0.65, 3.5, 0.9]]; // x, z, height, turn
+    trees.forEach(([tx, tz, H, turn], ti) => {
+      const g = 'tree' + ti, roots = [[0, 0], [0.55, 0.3], [-0.45, 0.45], [0, -0.6]].map(([dx, dz]) => b.node(tx + dx, 0, tz + dz, 1, true));
+      const crown = b.node(tx, H, tz, 0.6);
+      b.add(roots[0], crown, 'strut', { grp: g }); roots.slice(1).forEach(r => b.add(r, crown, 'brace', { grp: g }));
+      const tips = [0, 1, 2, 3].map(k => { const a = turn + Math.PI / 4 + k * Math.PI / 2, t = b.node(tx + 0.85 * Math.cos(a), H + 0.3, tz + 0.85 * Math.sin(a), 0.2);
+        b.add(crown, t, 'strut', { grp: g }); roots.forEach(r => b.add(r, t, 'brace', { grp: g })); return t; });
+      // the house: a floor and a pitched roof frame, one rigid piece, hung from the four branch tips
+      const hy = H - 1.55 - (ti % 2) * 0.3, s = 0.6;
+      const fl = [0, 1, 2, 3].map(k => { const a = turn + Math.PI / 4 + k * Math.PI / 2; return b.node(tx + s * Math.cos(a), hy, tz + s * Math.sin(a), 0.5); });
+      const mid = (i, j, y) => { const p = b.P[fl[i]], q = b.P[fl[j]]; return b.node((p[0] + q[0]) / 2, y, (p[2] + q[2]) / 2, 0.2); };
+      const rA = mid(0, 1, hy + 0.78), rB = mid(2, 3, hy + 0.78);
+      b.body([...fl, rA, rB], [[fl[0], fl[1]], [fl[1], fl[2]], [fl[2], fl[3]], [fl[3], fl[0]], [fl[0], rA], [fl[1], rA], [fl[2], rB], [fl[3], rB], [rA, rB]], 'house' + ti);
+      fl.forEach((f, k) => b.add(f, tips[k], 'cable'));
+      houses.push({ fl, tips, crown });
+    });
+    // rope bridges: two ropes with planks between them, sagging between neighbouring houses
+    const d2 = (i, j) => { const p = b.P[i], q = b.P[j]; return (p[0] - q[0]) ** 2 + (p[2] - q[2]) ** 2; };
+    for (let h = 0; h + 1 < houses.length; h++) { const A = houses[h].fl, B = houses[h + 1].fl, cb = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[B[k]][0] / 4, 0, acc[2] + b.P[B[k]][2] / 4], [0, 0, 0]), ca = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[A[k]][0] / 4, 0, acc[2] + b.P[A[k]][2] / 4], [0, 0, 0]);
+      const near = (F, c) => F.slice().sort((i, j) => ((b.P[i][0] - c[0]) ** 2 + (b.P[i][2] - c[2]) ** 2) - ((b.P[j][0] - c[0]) ** 2 + (b.P[j][2] - c[2]) ** 2)).slice(0, 2);
+      let [a1, a2] = near(A, cb), [b1, b2] = near(B, ca); if (d2(a1, b1) + d2(a2, b2) > d2(a1, b2) + d2(a2, b1)) [b1, b2] = [b2, b1];
+      const n = 6, rope = (p, q) => { const P0 = b.P[p], P1 = b.P[q], ids = [p]; for (let k = 1; k < n; k++) { const t = k / n; ids.push(b.node(P0[0] + (P1[0] - P0[0]) * t, P0[1] + (P1[1] - P0[1]) * t - 0.42 * 4 * t * (1 - t), P0[2] + (P1[2] - P0[2]) * t, 0.08)); } ids.push(q);
+        for (let k = 0; k < n; k++) b.add(ids[k], ids[k + 1], 'cable', { strain: 0 }); return ids; };
+      const r1 = rope(a1, b1), r2 = rope(a2, b2); for (let k = 1; k < n; k++) b.add(r1[k], r2[k], 'strut'); }
+    // a rope ladder down from the first house, and a swing under the last tree
+    { const A = houses[0].fl, p = b.P[A[2]], q = b.P[A[3]], n = 5, side = P0 => { const ids = []; let prev = null; for (let k = 0; k <= n; k++) { const t = k / n, id = k === 0 ? null : b.node(P0[0] - 0.25 * t, P0[1] * (1 - t), P0[2], 0.06, k === n); ids.push(id); } return ids; };
+      const L = side(p), Rr = side(q); L[0] = A[2]; Rr[0] = A[3];
+      for (let k = 0; k < n; k++) { b.add(L[k], L[k + 1], 'cable', { strain: 0 }); b.add(Rr[k], Rr[k + 1], 'cable', { strain: 0 }); } for (let k = 1; k < n; k++) b.add(L[k], Rr[k], 'strut'); }
+    { const t = houses[3].tips, pa = b.P[t[0]], pb = b.P[t[3]], sA = b.node(pa[0] + 0.5, 0.55, pa[2] + 0.35, 0.5), sB = b.node(pa[0] + 0.85, 0.55, pa[2] + 0.1, 0.5), hook = b.node(pa[0] + 0.7, pa[1] + 0.05, pa[2] + 0.25, 0.2);
+      b.add(t[0], hook, 'strut', { grp: 'tree3' }); b.add(t[3], hook, 'brace', { grp: 'tree3' }); b.add(houses[3].crown, hook, 'brace', { grp: 'tree3' }); void pb;
+      b.add(hook, sA, 'cable', { strain: 0 }); b.add(hook, sB, 'cable', { strain: 0 }); b.add(sA, sB, 'strut'); }
+    return { b, ea: 900, strain: 0.004, iters: 2, kick: 1.6, view: [0.45, 0.3], thin: 0.6,
+      info: 'A neighbourhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbours.' };
+  }
+
   function wheel() {
     const b = builder(), n = 24, R = 0.33, y0 = R + 0.06, rh = 0.03, nh = 12;
     const fl = [-0.05, 0.05].map(z => { const ring = []; for (let k = 0; k < nh; k++) { const a = 2 * Math.PI * (k + 0.5) / nh; ring.push(b.node(rh * Math.cos(a), y0 + rh * Math.sin(a), z, 0.1, true)); } return ring; });
@@ -379,7 +446,9 @@ const TG = (() => {
     ['table', 'Tensegrity table', table, 'Tensegrities'],
     ['human', 'A simplified human', human, 'The body'],
     ['balloon', 'Hot air balloon', balloon, 'Everyday tension'],
-    ['tent', 'A tent', tent, 'Everyday tension'],
+    ['tent', 'A tent', tent, 'Tents and treehouses'],
+    ['mansion', 'A mansion of a tent', mansionTent, 'Tents and treehouses'],
+    ['treehouse', 'Treehouse neighbourhood', treehouses, 'Tents and treehouses'],
     ['wheel', 'Bicycle wheel', wheel, 'Everyday tension'],
   ];
 
@@ -816,4 +885,24 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     if (auto) setTimeout(() => TG.pluck(S, 3, S.kick), 900);
     requestAnimationFrame(frame);
   }
+})();
+
+// The no-blank-space rule (owner request 2026-11-19). In a two-column block, the shorter column should never leave an
+// empty stretch beside the longer one. Blocks built by hand fill the space with a picture, a chart or a tool. Every
+// other block gets this fallback: the shorter column travels with the reader, so there is always something beside the text.
+if (typeof document !== 'undefined') (() => {
+  const fit = () => {
+    const wide = innerWidth > 1180;
+    document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
+      const kids = [...el.children].filter(c => c.offsetParent !== null);
+      kids.forEach(k => k.classList.remove('nb-stick'));
+      if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.closest('.simgrid')) return;
+      const tops = kids.map(k => k.getBoundingClientRect().top); if (Math.abs(tops[0] - tops[1]) > 30) return; // stacked, not side by side
+      const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1;
+      if (Math.abs(hs[0] - hs[1]) > 120 && hs[short] < innerHeight - 130) kids[short].classList.add('nb-stick');
+    });
+  };
+  const st = document.createElement('style'); st.textContent = '.nb-stick{position:sticky;top:96px;align-self:start}'; document.head.appendChild(st);
+  let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 150); };
+  addEventListener('load', fit); addEventListener('resize', later); if (document.readyState !== 'loading') fit(); else addEventListener('DOMContentLoaded', fit);
 })();
