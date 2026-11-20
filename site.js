@@ -167,6 +167,73 @@ const TG = (() => {
       info: 'The poles are in compression; the guy lines, ridge line and fabric are in tension. Cut a guy line or take out a pole and the tent comes down.' };
   }
 
+  // A big marquee: two king poles under a ridge, a ring of fourteen side poles, each held out by its own guy line.
+  function mansionTent() {
+    const b = builder(), xk = 1.0, c = 1.5, He = 1.3, Hk = 2.6, m = 3, R = 3, fan = 3;
+    const ridge = [];
+    for (let k = 0; k <= m; k++) { const x = xk - 2 * xk * k / m, king = k === 0 || k === m; ridge.push(b.node(x, king ? Hk : Hk - 0.05, 0, king ? 0.4 : 0.06)); }
+    [0, m].forEach(k => { const foot = b.node(b.P[ridge[k]][0], 0, 0, 0.1, true); b.add(foot, ridge[k], 'strut'); });
+    const fab = {}, key = (p, q) => Math.min(p, q) + '-' + Math.max(p, q);
+    for (let k = 0; k < m; k++) fab[key(ridge[k], ridge[k + 1])] = b.add(ridge[k], ridge[k + 1], 'cable', { strain: 0.03 });
+    const F = (p, q) => { const k = key(p, q); if (fab[k] === undefined) fab[k] = b.add(p, q, 'fabric'); return fab[k]; };
+    // the eave runs round a stadium shape: two straight sides and two rounded ends. Each eave point hangs from a ridge node.
+    const cols = [];
+    const col = (inner, ex, ez, nx, nz) => { const ip = b.P[inner], ids = [inner];
+      for (let r = 1; r <= R; r++) { const t = r / R, sag = 0.2 * Math.sin(Math.PI * t); ids.push(b.node(ip[0] + (ex - ip[0]) * t, ip[1] + (He - ip[1]) * t - sag, ip[2] + (ez - ip[2]) * t, r === R ? 0.25 : 0.05)); }
+      const top = ids[R], foot = b.node(ex, 0, ez, 0.1, true), stake = b.node(ex + nx * 0.95, 0, ez + nz * 0.95, 0.1, true);
+      b.add(foot, top, 'strut'); b.add(top, stake, 'cable'); ids.hem = b.node(ex + nx * 0.04, He - 0.42, ez + nz * 0.04, 0.03); cols.push(ids); };
+    for (let k = 0; k <= m; k++) col(ridge[k], b.P[ridge[k]][0], c, 0, 1);
+    for (let f = 1; f <= fan; f++) { const a = Math.PI / 2 + Math.PI * f / (fan + 1); col(ridge[m], -xk + c * Math.cos(a), c * Math.sin(a), Math.cos(a), Math.sin(a)); }
+    for (let k = m; k >= 0; k--) col(ridge[k], b.P[ridge[k]][0], -c, 0, -1);
+    for (let f = 1; f <= fan; f++) { const a = -Math.PI / 2 + Math.PI * f / (fan + 1); col(ridge[0], xk + c * Math.cos(a), c * Math.sin(a), Math.cos(a), Math.sin(a)); }
+    cols.forEach((A, j) => { const B = cols[(j + 1) % cols.length];
+      for (let r = 0; r < R; r++) { const p = A[r], pr = B[r], dn = A[r + 1], dr = B[r + 1], e5 = F(p, dn), e4 = F(dn, dr);
+        if (p === pr) { const e3 = F(p, dr); b.tri(p, dr, dn, e3, e4, e5); }
+        else { const e1 = F(p, pr), e2 = F(pr, dr), e3 = F(p, dr); F(pr, dn); b.tri(p, pr, dr, e1, e2, e3); b.tri(p, dr, dn, e3, e4, e5); } } });
+    // a valance hangs from the eave all the way round
+    cols.forEach((A, j) => { const B = cols[(j + 1) % cols.length], p = A[R], q = B[R], e1 = F(p, q), e2 = F(q, B.hem), e3 = F(p, B.hem), e4 = F(A.hem, B.hem), e5 = F(p, A.hem); b.tri(p, q, B.hem, e1, e2, e3); b.tri(p, B.hem, A.hem, e3, e4, e5); });
+    return { b, ea: 600, eaFabric: 300, strain: 0.03, strainFabric: 0.015, kick: 2.4, view: [0.7, 0.36], thin: 0.6,
+      info: 'A big marquee. Two king poles and fourteen side poles are in compression; the ridge line, the fabric and fourteen guy lines are in tension. Cut guy lines or take out poles and watch which part of the roof comes down.' };
+  }
+
+  // A neighbourhood of treehouses: each house hangs from the branches of its tree, and rope bridges join the houses.
+  function treehouses() {
+    const b = builder(), houses = [];
+    const trees = [[-2.4, -0.5, 3.0, 0.3], [-0.8, 0.75, 3.4, 1.1], [0.85, -0.6, 3.1, 0.2], [2.4, 0.65, 3.5, 0.9]]; // x, z, height, turn
+    trees.forEach(([tx, tz, H, turn], ti) => {
+      const g = 'tree' + ti, roots = [[0, 0], [0.55, 0.3], [-0.45, 0.45], [0, -0.6]].map(([dx, dz]) => b.node(tx + dx, 0, tz + dz, 1, true));
+      const crown = b.node(tx, H, tz, 0.6);
+      b.add(roots[0], crown, 'strut', { grp: g }); roots.slice(1).forEach(r => b.add(r, crown, 'brace', { grp: g }));
+      const tips = [0, 1, 2, 3].map(k => { const a = turn + Math.PI / 4 + k * Math.PI / 2, t = b.node(tx + 0.85 * Math.cos(a), H + 0.3, tz + 0.85 * Math.sin(a), 0.2);
+        b.add(crown, t, 'strut', { grp: g }); roots.forEach(r => b.add(r, t, 'brace', { grp: g })); return t; });
+      // the house: a floor and a pitched roof frame, one rigid piece, hung from the four branch tips
+      const hy = H - 1.55 - (ti % 2) * 0.3, s = 0.6;
+      const fl = [0, 1, 2, 3].map(k => { const a = turn + Math.PI / 4 + k * Math.PI / 2; return b.node(tx + s * Math.cos(a), hy, tz + s * Math.sin(a), 0.5); });
+      const mid = (i, j, y) => { const p = b.P[fl[i]], q = b.P[fl[j]]; return b.node((p[0] + q[0]) / 2, y, (p[2] + q[2]) / 2, 0.2); };
+      const rA = mid(0, 1, hy + 0.78), rB = mid(2, 3, hy + 0.78);
+      b.body([...fl, rA, rB], [[fl[0], fl[1]], [fl[1], fl[2]], [fl[2], fl[3]], [fl[3], fl[0]], [fl[0], rA], [fl[1], rA], [fl[2], rB], [fl[3], rB], [rA, rB]], 'house' + ti);
+      fl.forEach((f, k) => b.add(f, tips[k], 'cable'));
+      houses.push({ fl, tips, crown });
+    });
+    // rope bridges: two ropes with planks between them, sagging between neighbouring houses
+    const d2 = (i, j) => { const p = b.P[i], q = b.P[j]; return (p[0] - q[0]) ** 2 + (p[2] - q[2]) ** 2; };
+    for (let h = 0; h + 1 < houses.length; h++) { const A = houses[h].fl, B = houses[h + 1].fl, cb = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[B[k]][0] / 4, 0, acc[2] + b.P[B[k]][2] / 4], [0, 0, 0]), ca = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[A[k]][0] / 4, 0, acc[2] + b.P[A[k]][2] / 4], [0, 0, 0]);
+      const near = (F, c) => F.slice().sort((i, j) => ((b.P[i][0] - c[0]) ** 2 + (b.P[i][2] - c[2]) ** 2) - ((b.P[j][0] - c[0]) ** 2 + (b.P[j][2] - c[2]) ** 2)).slice(0, 2);
+      let [a1, a2] = near(A, cb), [b1, b2] = near(B, ca); if (d2(a1, b1) + d2(a2, b2) > d2(a1, b2) + d2(a2, b1)) [b1, b2] = [b2, b1];
+      const n = 6, rope = (p, q) => { const P0 = b.P[p], P1 = b.P[q], ids = [p]; for (let k = 1; k < n; k++) { const t = k / n; ids.push(b.node(P0[0] + (P1[0] - P0[0]) * t, P0[1] + (P1[1] - P0[1]) * t - 0.42 * 4 * t * (1 - t), P0[2] + (P1[2] - P0[2]) * t, 0.08)); } ids.push(q);
+        for (let k = 0; k < n; k++) b.add(ids[k], ids[k + 1], 'cable', { strain: 0 }); return ids; };
+      const r1 = rope(a1, b1), r2 = rope(a2, b2); for (let k = 1; k < n; k++) b.add(r1[k], r2[k], 'strut'); }
+    // a rope ladder down from the first house, and a swing under the last tree
+    { const A = houses[0].fl, p = b.P[A[2]], q = b.P[A[3]], n = 5, side = P0 => { const ids = []; let prev = null; for (let k = 0; k <= n; k++) { const t = k / n, id = k === 0 ? null : b.node(P0[0] - 0.25 * t, P0[1] * (1 - t), P0[2], 0.06, k === n); ids.push(id); } return ids; };
+      const L = side(p), Rr = side(q); L[0] = A[2]; Rr[0] = A[3];
+      for (let k = 0; k < n; k++) { b.add(L[k], L[k + 1], 'cable', { strain: 0 }); b.add(Rr[k], Rr[k + 1], 'cable', { strain: 0 }); } for (let k = 1; k < n; k++) b.add(L[k], Rr[k], 'strut'); }
+    { const t = houses[3].tips, pa = b.P[t[0]], pb = b.P[t[3]], sA = b.node(pa[0] + 0.5, 0.55, pa[2] + 0.35, 0.5), sB = b.node(pa[0] + 0.85, 0.55, pa[2] + 0.1, 0.5), hook = b.node(pa[0] + 0.7, pa[1] + 0.05, pa[2] + 0.25, 0.2);
+      b.add(t[0], hook, 'strut', { grp: 'tree3' }); b.add(t[3], hook, 'brace', { grp: 'tree3' }); b.add(houses[3].crown, hook, 'brace', { grp: 'tree3' }); void pb;
+      b.add(hook, sA, 'cable', { strain: 0 }); b.add(hook, sB, 'cable', { strain: 0 }); b.add(sA, sB, 'strut'); }
+    return { b, ea: 900, strain: 0.004, iters: 2, kick: 1.6, view: [0.45, 0.3], thin: 0.6,
+      info: 'A neighbourhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbours.' };
+  }
+
   function wheel() {
     const b = builder(), n = 24, R = 0.33, y0 = R + 0.06, rh = 0.03, nh = 12;
     const fl = [-0.05, 0.05].map(z => { const ring = []; for (let k = 0; k < nh; k++) { const a = 2 * Math.PI * (k + 0.5) / nh; ring.push(b.node(rh * Math.cos(a), y0 + rh * Math.sin(a), z, 0.1, true)); } return ring; });
@@ -340,6 +407,7 @@ const TG = (() => {
     nd('sac', 0, .6, -.065); nd('pub', 0, .52, .055); nd('l3', 0, .68, -.045);
     nd('t12', 0, .75, -.055); nd('t6', 0, .85, -.07); nd('c7', 0, .93, -.05); nd('st', 0, .91, .045); nd('xi', 0, .8, .075);
     nd('occ', 0, .97, -.045, .02); nd('top', 0, 1.08, 0, .02); nd('brow', 0, 1.02, .075, .02); nd('chin', 0, .95, .065, .02);
+    nd('nape', 0, 1.0, -.105, .02); // the back of the skull, behind the pivot, where the neck's extensors attach
     const n = k => N[k], P = (a, c) => [n(a), n(c)];
     ['L', 'R'].forEach(q => {
       b.body(['heel', 'toe', 'ank', 'fl', 'fm'].map(k => n(k + q)), [P('heel' + q, 'toe' + q), P('heel' + q, 'ank' + q), P('ank' + q, 'toe' + q)], 'foot' + q);
@@ -355,7 +423,7 @@ const TG = (() => {
     b.body(['t12', 't6', 'c7', 'st', 'xi', 'ribL', 'ribR', 'acL', 'acR', 'scL', 'scR'].map(n),
       [P('t12', 't6'), P('t6', 'c7'), P('st', 'xi'), P('t6', 'ribL'), P('t6', 'ribR'), P('ribL', 'xi'), P('ribR', 'xi'), P('st', 'acL'), P('st', 'acR'), P('acL', 'scL'), P('acR', 'scR'), P('t12', 'ribL'), P('t12', 'ribR')], 'thorax');
     b.add(n('c7'), n('occ'), 'strut', { grp: 'neck' });
-    b.body(['occ', 'top', 'brow', 'chin', 'earL', 'earR'].map(n), [P('occ', 'top'), P('top', 'brow'), P('brow', 'chin'), P('chin', 'occ'), P('earL', 'top'), P('earR', 'top'), P('earL', 'chin'), P('earR', 'chin')], 'head');
+    b.body(['occ', 'top', 'brow', 'chin', 'earL', 'earR', 'nape'].map(n), [P('occ', 'top'), P('top', 'brow'), P('brow', 'chin'), P('chin', 'occ'), P('earL', 'top'), P('earR', 'top'), P('earL', 'chin'), P('earR', 'chin'), P('top', 'nape'), P('nape', 'occ')], 'head');
     // fascia: cables across every joint, front, back, sides and spirals
     const cab = (a, c) => b.add(n(a), n(c), 'cable');
     ['L', 'R'].forEach(q => {
@@ -365,9 +433,105 @@ const TG = (() => {
       cab('l3', 'tm' + q); cab('crest' + q, 'l3'); cab('crest' + q, 'rib' + q); cab('sac', 'sc' + q); cab('isch' + q, 't12');
       cab('ac' + q, 'ear' + q); cab('sc' + q, 'occ'); cab('el' + q, 'rib' + q); cab('el' + q, 'sc' + q); cab('wr' + q, 'ac' + q);
     });
+    cab('nape', 't6'); cab('nape', 'scL'); cab('nape', 'scR'); // the nuchal line: holds the head up against its own forward weight
     cab('pub', 'xi'); cab('asisL', 'ribR'); cab('asisR', 'ribL'); cab('st', 'chin'); cab('l3', 'scL'); cab('l3', 'scR'); cab('crestL', 'scL'); cab('crestR', 'scR'); cab('scL', 'earL'); cab('scR', 'earR'); cab('asisL', 'xi'); cab('asisR', 'xi');
-    return { b, ea: 3000, strain: 0.0005, kb: 8000, iters: 6, kick: 0.9, view: [0.3, 0.1], thin: 0.55, head: ['occ', 'top', 'brow', 'chin', 'earL', 'earR'].map(n),
+    return { b, ea: 3000, strain: 0.0005, kb: 8000, iters: 6, kick: 0.9, view: [0.3, 0.1], thin: 0.55, head: ['occ', 'top', 'brow', 'chin', 'earL', 'earR', 'nape'].map(n),
       info: 'A simplified human tensegrity: the bones are struts, and the fascia is a web of cables in tension crossing every joint, front, back and sides. Nothing holds it upright but tension.' };
+  }
+
+
+  /* ----- a life on the line: five scenes with someone in them. The people are rigid stick figures. Someone standing on
+     a deck is held to it by their footing, and the footing lets go when the deck tilts past about 37 degrees. ----- */
+  // turn = true puts the figure's left-right axis along z (so it faces along x). o.stance: half the gap between the feet. o.hands: [out, up, forward].
+  function person(b, x, y, z, s, grp, pin, turn, o) {
+    o = o || {}; const st = o.stance === undefined ? 0.09 : o.stance, hd = o.hands || [0.22, 0.52, 0.05], mk = o.m || 1;
+    const nd = (dl, dy, df, m, p) => turn ? b.node(x + df * s, y + dy * s, z + dl * s, m * mk, p) : b.node(x + dl * s, y + dy * s, z + df * s, m * mk, p);
+    const fL = nd(-st, 0, 0, 0.5, pin), fR = nd(st, 0, 0, 0.5, pin), hip = nd(0, 0.48, 0, 1.2), neck = nd(0, 0.8, 0, 0.8), head = nd(0, 0.93, 0, 0.5), hL = nd(-hd[0], hd[1], hd[2], 0.2), hR = nd(hd[0], hd[1], hd[2], 0.2);
+    const c0 = b.C.length, all = [fL, fR, hip, neck, head, hL, hR];
+    if (pin) all.push(nd(0, 0, 0.16, 0.5, true));
+    b.body(all, [[fL, hip], [fR, hip], [hip, neck], [neck, head], [neck, hL], [neck, hR]], grp);
+    for (let i = c0; i < b.C.length; i++) if (b.C[i].kind === 'strut') { b.C[i].col = '#D9661F'; b.C[i].thin = 0.62; }
+    return { fL, fR, hip, neck, head, hL, hR, grp, strut: c0, y0: y + 0.93 * s };
+  }
+  // footing: hidden rigid ties from both feet and the hips to what the person stands on. Returns the tie indexes.
+  function footing(b, P, deck) { const cs = []; [P.fL, P.fR, P.hip].forEach(i => deck.forEach(d => cs.push(b.add(i, d, 'brace')))); return cs; }
+  const spikes = (b, x0, x1, z, n) => { for (let k = 0; k < n; k++) { const x = x0 + (x1 - x0) * k / (n - 1), a = b.node(x - 0.07, 0, z, 1, true), c = b.node(x + 0.07, 0, z, 1, true), tip = b.node(x, 0.3, z, 1, true); const i = b.add(a, tip, 'strut'), j = b.add(c, tip, 'strut'); b.C[i].col = b.C[j].col = '#B4232F'; b.C[i].thin = b.C[j].thin = 0.45; } };
+  const sagRope = (b, p, q, n, sag, m) => { const P0 = b.P[p], P1 = b.P[q], ids = [p]; for (let k = 1; k < n; k++) { const u = k / n; ids.push(b.node(P0[0] + (P1[0] - P0[0]) * u, P0[1] + (P1[1] - P0[1]) * u - sag * 4 * u * (1 - u), P0[2] + (P1[2] - P0[2]) * u, m)); } ids.push(q);
+    for (let k = 0; k < n; k++) b.add(ids[k], ids[k + 1], 'cable', { strain: 0 }); return ids; };
+
+  function piano() {
+    const b = builder(), H = 3.4, X = 1.3;
+    const baseL = b.node(-X, 0, 0, 1, true), baseR = b.node(X, 0, 0, 1, true), topL = b.node(-X, H, 0, 0.6), topR = b.node(X, H, 0, 0.6), hkL = b.node(-0.45, H, 0, 0.3), hkR = b.node(0.45, H, 0, 0.3), apex = b.node(0, H + 0.55, 0, 0.3);
+    b.add(baseL, topL, 'strut'); b.add(baseR, topR, 'strut');
+    b.body([topL, topR, hkL, hkR, apex], [[topL, hkL], [hkL, hkR], [hkR, topR], [topL, apex], [apex, topR], [apex, hkL], [apex, hkR]]);
+    [[topL, -1], [topR, 1]].forEach(([tp, s]) => [[s * (X + 1.5), 0], [s * X, 1.8], [s * X, -1.8]].forEach(([ax, az]) => b.add(tp, b.node(ax, 0, az, 1, true), 'cable')));
+    // the piano: one rigid box
+    const bx = [], w = 0.45, d = 0.22, y0 = 2.25, y1 = 2.75;
+    [y0, y1].forEach(y => [-w, w].forEach(x => [-d, d].forEach(z => bx.push(b.node(x, y, z, 3)))));
+    const keel = b.node(0, y0, 0, 1), eyeL = b.node(-w, y1, 0, 0.5), eyeR = b.node(w, y1, 0, 0.5), E = (i, j) => [bx[i], bx[j]];
+    b.body([...bx, keel, eyeL, eyeR], [E(0, 1), E(2, 3), E(0, 2), E(1, 3), E(4, 5), E(6, 7), E(4, 6), E(5, 7), E(0, 4), E(1, 5), E(2, 6), E(3, 7)], 'piano');
+    b.add(hkL, eyeL, 'cable'); b.add(hkR, eyeR, 'cable');
+    const P = person(b, 0, 0, 0, 1.7, 'p0', true);
+    return { b, ea: 5000, strain: 0.002, iters: 4, kick: 1.2, view: [0.5, 0.16], thin: 0.7, people: [P], crush: { by: [keel, bx[0], bx[1], bx[2], bx[3]], r: 0.3 },
+      info: 'A piano hangs from a gantry by two ropes, and someone is standing under it. The posts are in compression and stand only because six guy lines hold them. Cut a rope, or a guy line, and the physics decides where the piano goes.' };
+  }
+
+  function gorge() {
+    const b = builder(), Hh = 2.4, half = 2.2, w = 0.3, n = 8, k = 4, s = 0.95;
+    const side = q => [-w, w].map(z => { const top = b.node(q * half, Hh, z, 1, true), rail = b.node(q * half, Hh + 0.5, z, 1, true), foot = b.node(q * (half + 0.3), 0, z, 1, true); b.add(foot, top, 'strut'); b.add(top, rail, 'strut'); return { top, rail }; });
+    const A = side(-1), B = side(1);
+    const d1 = sagRope(b, A[0].top, B[0].top, n, 0.32, 0.3), d2 = sagRope(b, A[1].top, B[1].top, n, 0.32, 0.3);
+    for (let i = 1; i < n; i++) b.add(d1[i], d2[i], 'strut');
+    const h1 = sagRope(b, A[0].rail, B[0].rail, n, 0.3, 0.1), h2 = sagRope(b, A[1].rail, B[1].rail, n, 0.3, 0.1);
+    // short hangers tie each handrail down to the deck. At the walker's plank the walker is the tie: feet on the plank, a hand on each rail.
+    for (let i = 1; i < n; i++) if (i !== k) { b.add(h1[i], d1[i], 'cable', { strain: 0 }); b.add(h2[i], d2[i], 'cable', { strain: 0 }); }
+    const p = b.P[d1[k]], up = (b.P[h1[k]][1] - p[1]) / s, P = person(b, p[0], p[1], 0, s, 'p0', false, true, { hands: [w / s, up, 0] });
+    const cs = footing(b, P, [d1[k], d2[k]]); [[P.hL, h1[k]], [P.hR, h2[k]], [P.hip, h1[k]], [P.hip, h2[k]]].forEach(([i, r]) => cs.push(b.add(i, r, 'brace')));
+    spikes(b, -1.2, 1.2, 0, 7);
+    return { b, ea: 2500, strain: 0.004, iters: 4, kick: 1.4, view: [0.42, 0.2], thin: 0.6, people: [P], grips: [{ cs, pairs: [[d1[k], d2[k]], [d1[k - 1], d1[k + 1]], [d2[k - 1], d2[k + 1]]], max: 0.6 }],
+      info: 'A rope bridge over a gorge, with someone halfway across, feet on a plank and a hand on each rail. Two ropes carry the planks and two more are the handrails, tied down to the deck by short hangers. Everything is in tension between the two cliffs. One cut rope can be survived, because the others take the load. Try two.' };
+  }
+
+  function highSwing() {
+    const b = builder(), H = 3.2, zf = 0.7;
+    const apex = [zf, -zf].map(z => { const a = b.node(0, H, z, 0.5); [-1.15, 1.15].forEach(x => b.add(b.node(x, 0, z, 1, true), a, 'strut')); b.add(a, b.node(0, 0, z + Math.sign(z) * 1.7, 1, true), 'cable'); return a; });
+    b.add(apex[0], apex[1], 'strut');
+    const sy = 1.65, sz = 0.36, sx = 0.13, c = [[-sx, sz], [sx, sz], [-sx, -sz], [sx, -sz]].map(([x, z]) => b.node(x, sy, z, 0.4)), eA = b.node(0, sy, sz, 0.2), eB = b.node(0, sy, -sz, 0.2);
+    b.body([...c, eA, eB], [[c[0], c[1]], [c[2], c[3]], [c[0], c[2]], [c[1], c[3]]], 'seat');
+    // a bridle of two ropes to each end of the seat, so the seat cannot roll over under the rider
+    b.add(apex[0], c[0], 'cable'); b.add(apex[0], c[1], 'cable'); b.add(apex[1], c[2], 'cable'); b.add(apex[1], c[3], 'cable');
+    const P = person(b, 0, sy, 0, 0.95, 'p0', false, true), grips = [{ cs: footing(b, P, c), pairs: [[eA, eB], [c[0], c[1]]], max: 0.6 }];
+    spikes(b, -0.9, 0.9, 0, 6);
+    return { b, ea: 3000, strain: 0.003, iters: 4, kick: 2.2, view: [0.9, 0.18], thin: 0.65, people: [P], grips,
+      info: 'Someone is standing on a swing, well above the ground. Two A-frames in compression carry a top bar, two guy lines keep the frames from folding flat, and four ropes hold the seat, two to each end. Pluck the seat to set it swinging. Cut a rope and the seat tips. Cut a guy line and the whole frame goes.' };
+  }
+
+  function cleaners() {
+    const b = builder(), H = 4.2, zf = 1.0, xa = 0.62, xb = 1.18, col = [[-0.2, zf], [-0.2, -zf], [-1.3, zf], [-1.3, -zf]];
+    const base = col.map(([x, z]) => b.node(x, 0, z, 1, true)), top = col.map(([x, z]) => b.node(x, H, z, 1)), o1 = [zf, -zf].map(z => b.node(xa, H, z, 0.4)), o2 = [zf, -zf].map(z => b.node(xb, H, z, 0.4));
+    b.body([...base, ...top, ...o1, ...o2], [[base[0], top[0]], [base[1], top[1]], [base[2], top[2]], [base[3], top[3]], [top[0], top[1]], [top[2], top[3]], [top[0], top[2]], [top[1], top[3]], [top[0], o1[0]], [o1[0], o2[0]], [top[1], o1[1]], [o1[1], o2[1]], [base[0], base[1]]], 'building');
+    const py = 2.5, c = [[xa, zf], [xb, zf], [xa, -zf], [xb, -zf]].map(([x, z]) => b.node(x, py, z, 0.6)), eA = b.node(0.9, py, zf, 0.2), eB = b.node(0.9, py, -zf, 0.2);
+    b.body([...c, eA, eB], [[c[0], c[1]], [c[2], c[3]], [c[0], c[2]], [c[1], c[3]]], 'platform');
+    b.add(o1[0], c[0], 'cable'); b.add(o2[0], c[1], 'cable'); b.add(o1[1], c[2], 'cable'); b.add(o2[1], c[3], 'cable');
+    const people = [0.45, -0.45].map((z, i) => person(b, 0.9, py, z, 0.95, 'p' + i, false, true));
+    const grips = people.map(P => ({ cs: footing(b, P, c), pairs: [[eA, eB], [c[0], c[1]]], max: 0.6 }));
+    // one of the two is clipped to a safety line, which hangs slack until it is needed
+    b.add(people[1].neck, o2[1], 'cable', { strain: -0.12 });
+    return { b, ea: 3500, strain: 0.003, iters: 4, kick: 1.6, view: [0.95, 0.2], thin: 0.65, people, grips,
+      info: 'Two window cleaners on a platform, four storeys up. The building and its roof beams are in compression. The platform hangs from the beams by four ropes, one at each corner. One cleaner is clipped to a safety line, the dashed one, which hangs slack until it is needed. The other is not. Cut ropes and see what a second line of support is worth.' };
+  }
+
+  function tightrope() {
+    const b = builder(), X = 2.3, H = 2.7, n = 10, k = 5, s = 0.95;
+    const top = [-1, 1].map(q => { const tp = b.node(q * X, H, 0, 0.6); b.add(b.node(q * X, 0, 0, 1, true), tp, 'strut'); [-1, 1].forEach(u => b.add(tp, b.node(q * (X + 1.6), 0, u * 1.0, 1, true), 'cable')); return tp; });
+    const r = sagRope(b, top[0], top[1], n, 0.12, 0.06), at = b.P[r[k]], x = at[0], y = at[1];
+    const P = person(b, x, y, 0, s, 'p0', false, true, { stance: 0.02, m: 0.5 }), poleL = b.node(x, y - 0.55, -1.35, 1.6), poleR = b.node(x, y - 0.55, 1.35, 1.6), c0 = b.C.length;
+    b.body([P.fL, P.fR, P.hip, P.neck, P.head, P.hL, P.hR, poleL, poleR], [[P.hL, poleL], [P.hR, poleR], [P.hL, P.hR]], 'p0');
+    for (let i = c0; i < b.C.length; i++) if (b.C[i].kind === 'strut') { b.C[i].col = '#8A5A0B'; b.C[i].thin = 0.4; }
+    spikes(b, -1.4, 1.4, 0, 8);
+    // the walker touches the rope at one point only, and stays upright because the heavy drooping pole puts the centre of mass below it
+    return { b, ea: 60000, strain: 0.002, iters: 10, kick: 1.2, view: [0.3, 0.18], thin: 0.65, people: [P], grips: [{ cs: footing(b, P, [r[k]]), pairs: [[r[k - 1], r[k + 1]]], max: 0.6 }],
+      info: 'A tightrope walker between two masts. Each mast is in compression and leans on two guy lines. The rope is in tension. The walker touches it at one point only, and stays upright because the long drooping pole puts the centre of their weight below the rope. Cut a guy line and a mast goes over, and the rope sinks toward the spikes. Cut the rope and there is nothing else.' };
   }
 
   const SHAPES = [
@@ -379,14 +543,23 @@ const TG = (() => {
     ['table', 'Tensegrity table', table, 'Tensegrities'],
     ['human', 'A simplified human', human, 'The body'],
     ['balloon', 'Hot air balloon', balloon, 'Everyday tension'],
-    ['tent', 'A tent', tent, 'Everyday tension'],
+    ['tent', 'A tent', tent, 'Tents and treehouses'],
+    ['mansion', 'A mansion of a tent', mansionTent, 'Tents and treehouses'],
+    ['treehouse', 'Treehouse neighbourhood', treehouses, 'Tents and treehouses'],
     ['wheel', 'Bicycle wheel', wheel, 'Everyday tension'],
+    ['piano', 'Under a hanging piano', piano, 'A life on the line'],
+    ['gorge', 'Crossing a rope bridge', gorge, 'A life on the line'],
+    ['highswing', 'Standing on a high swing', highSwing, 'A life on the line'],
+    ['cleaners', 'Window cleaners', cleaners, 'A life on the line'],
+    ['tightrope', 'The tightrope walker', tightrope, 'A life on the line'],
   ];
 
   function make(key) {
     const row = SHAPES.find(s => s[0] === key) || SHAPES[0];
     const sh = row[2](), { P, W, C, T } = sh.b, n = P.length;
-    const x = new Float64Array(3 * n), w = new Float64Array(W);
+    // spare room for one extra node per strut: a strut that is broken cracks in the middle and hinges there
+    const cap = n + C.filter(c => c.kind === 'strut').length;
+    const x = new Float64Array(3 * cap), w = new Float64Array(cap); w.set(W);
     P.forEach((p, i) => { x[3 * i] = p[0]; x[3 * i + 1] = p[1]; x[3 * i + 2] = p[2]; });
     C.forEach(c => {
       const L = dist(P[c.a], P[c.b]);
@@ -397,8 +570,9 @@ const TG = (() => {
       c.comp = tens ? c.L0 / ea : c.kind === 'bend' ? 1 / (sh.kb || 200) : 0;
       c.uni = tens; c.draw = c.kind !== 'brace' && c.kind !== 'bend'; c.alive = true; c.T = 0; c.Tema = 0;
     });
-    const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, x, p: new Float64Array(x), v: new Float64Array(3 * n), w, C, T, t: 0,
-      ay0: new Float64Array(sh.b.A), ay: new Float64Array(sh.b.A), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head };
+    const ay0 = new Float64Array(cap); ay0.set(sh.b.A);
+    const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, n0: n, cap, c0: C.length, cracks: [], x, p: new Float64Array(x), v: new Float64Array(3 * cap), w, C, T, t: 0,
+      ay0, ay: new Float64Array(ay0), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head, people: sh.people, grips: sh.grips, crush: sh.crush };
     // settle into equilibrium under gravity with strong damping, then freeze the result as time zero
     for (let k = 0; k < 150; k++) step(S, 1 / 60, 16, 14);
     S.v.fill(0);
@@ -456,12 +630,25 @@ const TG = (() => {
     }
   }
 
-  function reset(S) { S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); measure(S, 1); S.t = 0; }
+  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); if (S.grips) S.grips.forEach(g => { g.done = false; }); if (S.people) S.people.forEach(p => { p.hit = false; p.down = false; }); measure(S, 1); S.t = 0; }
+
+  // A broken strut does not vanish: it cracks in the middle. The two halves stay, joined by a free hinge, so the strut
+  // can no longer push its ends apart and the physics decides how the pieces fold.
+  function snap(S, c) {
+    c.alive = false;
+    if (c.half || S.n >= S.cap) return;
+    const i = S.n++, a = 3 * c.a, b = 3 * c.b, j = 3 * i, x = S.x;
+    for (let k = 0; k < 3; k++) { x[j + k] = (x[a + k] + x[b + k]) / 2; S.p[j + k] = x[j + k]; S.v[j + k] = (S.v[a + k] + S.v[b + k]) / 2; }
+    S.w[i] = Math.max(S.w[c.a], S.w[c.b]) || 1; S.ay[i] = 0; S.ay0[i] = 0;
+    const half = (p, q) => ({ a: p, b: q, kind: 'strut', L0: c.L0 / 2, comp: 0, uni: false, draw: true, alive: true, T: 0, Tema: 0, half: true, col: c.col, thin: c.thin });
+    S.C.push(half(c.a, i), half(i, c.b)); S.cracks.push(i);
+  }
 
   function kill(S, ci) {
     const c = S.C[ci]; if (!c || !c.alive) return 0;
     let k = 0;
-    if (c.kind === 'strut' && c.grp) S.C.forEach(o => { if (o.alive && (o.grp === c.grp || o.grp2 === c.grp)) { o.alive = false; k++; } });
+    if (c.kind === 'strut' && c.grp) S.C.slice().forEach(o => { if (o.alive && (o.grp === c.grp || o.grp2 === c.grp)) { if (o.kind === 'strut' && o.draw) snap(S, o); else o.alive = false; k++; } });
+    else if (c.kind === 'strut') { snap(S, c); k = 1; }
     else { c.alive = false; k = 1; }
     return k;
   }
@@ -474,9 +661,18 @@ const TG = (() => {
     S.v[3 * i] += dx / L * mag; S.v[3 * i + 1] += dy / L * mag; S.v[3 * i + 2] += dz / L * mag;
   }
 
+  function hazards(S) {
+    const x = S.x; let ev = null;
+    if (S.grips) S.grips.forEach(g => { if (g.done) return; for (const [a, c] of g.pairs) { const i = 3 * a, j = 3 * c, L = Math.hypot(x[j] - x[i], x[j + 1] - x[i + 1], x[j + 2] - x[i + 2]) || 1;
+      if (Math.abs(x[j + 1] - x[i + 1]) / L > g.max) { g.cs.forEach(ci => { S.C[ci].alive = false; }); g.done = true; ev = ev || 'slip'; break; } } });
+    if (S.crush && S.people) S.people.forEach(p => { if (p.hit) return; const h = 3 * p.head; for (const i of S.crush.by) { if (Math.hypot(x[3 * i] - x[h], x[3 * i + 1] - x[h + 1], x[3 * i + 2] - x[h + 2]) < S.crush.r) { p.hit = true; kill(S, p.strut); ev = { hit: [x[h], x[h + 1], x[h + 2]] }; break; } } });
+    if (S.people) S.people.forEach(p => { if (!p.down && x[3 * p.head + 1] < p.y0 * 0.4) { p.down = true; if (!p.hit) ev = ev || 'down'; } });
+    return ev;
+  }
+
   const ok = S => { for (let i = 0; i < S.x.length; i++) if (!isFinite(S.x[i]) || Math.abs(S.x[i]) > 50) return false; return true; };
 
-  return { SHAPES, make, step, measure, reset, kill, pluck, ok };
+  return { SHAPES, make, step, measure, reset, kill, pluck, ok, hazards };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 
@@ -492,6 +688,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 .stage.pick{cursor:crosshair}
 .tgc{max-width:560px;width:100%;margin:10px auto 0;display:grid;gap:8px;font-size:.9rem}
 .tgc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tgc-two{justify-content:space-between;gap:8px 14px}
+.tgc-grp{display:inline-flex;flex-wrap:wrap;gap:6px}
+.stage .tg-spin{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2;font-size:.98rem;padding:9px 18px 9px 11px;box-shadow:0 2px 10px rgba(11,37,69,.12)}
+.stage .tg-spin .sw{width:42px;height:22px}
+.stage .tg-spin .sw::after{width:18px;height:18px}
+.stage .tg-spin[aria-pressed="true"] .sw::after{transform:translateX(20px)}
 .tgc label.tgc-sel{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:600 .86rem/1.2 var(--font);color:var(--navy)}
 .tgc select{font:600 .88rem/1.2 var(--font);color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 30px 8px 10px;max-width:100%;cursor:pointer}
 .tgc select:hover{border-color:var(--sky)}
@@ -530,21 +732,18 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     box.innerHTML = `
 <div class="tgc-row"><label class="tgc-sel">Change the tensegrity <select>${[...new Set(TG.SHAPES.map(s => s[3]))].map(g => `<optgroup label="${g}">${TG.SHAPES.filter(s => s[3] === g).map(s => `<option value="${s[0]}"${s[0] === start ? ' selected' : ''}>${s[1]}</option>`).join('')}</optgroup>`).join('')}</select></label>
   <span class="tgc-seg tgc-bridge"><label class="tgc-chk"><input type="checkbox" data-o="water" checked> Water</label><label class="tgc-chk"><input type="checkbox" data-o="traffic" checked> Traffic</label></span></div>
-<div class="tgc-row" role="group" aria-label="Playback">
-  <button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button>
-  <span class="tgc-seg">Speed <button type="button" class="chipbtn on" data-s="1">1x</button><button type="button" class="chipbtn" data-s="0.25">0.25x</button><button type="button" class="chipbtn" data-s="0.1">0.1x</button></span>
-  <button type="button" class="spinsw" data-a="spin" aria-pressed="${spin}"><span class="sw" aria-hidden="true"></span><span class="st"></span></button>
-  <button type="button" class="chipbtn" data-a="reset">Reset</button>
-</div>
-<div class="tgc-row" role="group" aria-label="What a tap does">
-  <button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button>
-  <button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button>
-  <button type="button" class="chipbtn cut" data-m="strut">Collapse a strut</button>
+<div class="tgc-row tgc-two">
+  <span class="tgc-grp" role="group" aria-label="What a tap does"><button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button><button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button><button type="button" class="chipbtn cut" data-m="strut">Break a strut</button></span>
+  <span class="tgc-grp" role="group" aria-label="Playback"><button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button><button type="button" class="chipbtn" data-a="speed" aria-label="Speed, tap to change">Speed 1x</button><button type="button" class="chipbtn" data-a="reset">Reset</button></span>
 </div>
 <p class="tgc-info"><span class="tgc-text"></span>
 <span class="tgc-key"><span><i style="height:6px;background:var(--deep)"></i>strut: compression</span><span><i style="height:3px;background:var(--sky)"></i>cable: tension</span><span><i style="height:0;border-top:2px dashed #A9B8CC"></i>slack cable</span><span><i style="height:4px;background:#1D5FD1;box-shadow:0 0 6px #5B9BE6"></i>tension changing</span></span></p>
 <p class="tgc-status" aria-live="polite"></p>`;
     stage.insertAdjacentElement('afterend', box);
+    const spinBtn = document.createElement('button'); spinBtn.type = 'button'; spinBtn.className = 'spinsw tg-spin'; spinBtn.setAttribute('aria-pressed', spin); spinBtn.innerHTML = '<span class="sw" aria-hidden="true"></span><span class="st"></span>';
+    stage.appendChild(spinBtn);
+    ['pointerdown', 'pointerup', 'pointermove'].forEach(ev => spinBtn.addEventListener(ev, e => e.stopPropagation()));
+    spinBtn.addEventListener('click', e => { e.stopPropagation(); spin = !spin; spinBtn.setAttribute('aria-pressed', spin); });
     const $ = q => box.querySelector(q), sel = $('select'), status = $('.tgc-status');
     const setInfo = () => { $('.tgc-text').textContent = S.info; $('.tgc-bridge').style.display = S.deck ? '' : 'none'; };
     box.querySelectorAll('[data-o]').forEach(c => c.addEventListener('change', () => { if (c.dataset.o === 'water') water = c.checked; else { traffic = c.checked; if (!traffic) { cars = []; S.ay.set(S.ay0); } } }));
@@ -553,21 +752,21 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const say = () => {
       const parts = [];
       if (cuts) parts.push(`${cuts} cable${cuts > 1 ? 's' : ''} cut`);
-      if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} removed`);
-      let m = parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to remove it.' : 'Tap a node to send a pulse of tension; drag to turn.';
+      if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} broken`);
+      let m = parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : 'Tap a node to send a pulse of tension; drag to turn.';
       if (!running) m = 'Paused. ' + m + ' Press Play to run the physics.';
       status.textContent = m;
     };
     const chips = (attr, val) => box.querySelectorAll(`[data-${attr}]`).forEach(b => b.classList.toggle('on', b.dataset[attr] === String(val)));
     function load(key) { S = TG.make(key); S.deckSeg = null; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; fit(); setInfo(); say(); draw(); }
     sel.addEventListener('change', () => load(sel.value));
+    stage.tg = { state: () => S, cut: ci => { cuts += TG.kill(S, ci) ? 1 : 0; say(); }, load };
     box.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.s) { speed = +b.dataset.s; chips('s', b.dataset.s); }
       if (b.dataset.m) { mode = b.dataset.m; chips('m', mode); setCursor(); hover = -1; say(); }
       const a = b.dataset.a;
       if (a === 'play') { running = !running; b.textContent = running ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', !running); say(); }
-      if (a === 'spin') { spin = !spin; b.setAttribute('aria-pressed', spin); }
+      if (a === 'speed') { speed = speed === 1 ? 0.25 : speed === 0.25 ? 0.1 : 1; b.textContent = 'Speed ' + speed + 'x'; b.classList.toggle('on', speed !== 1); }
       if (a === 'reset') { TG.reset(S); cuts = removed = 0; cars = []; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; say(); }
     });
 
@@ -644,8 +843,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       // struts, far to near
       S.C.map((c, ci) => [c, ci]).filter(([c]) => c.alive && c.kind === 'strut').sort((p, q) => (P[q[0].a][2] + P[q[0].b][2]) - (P[p[0].a][2] + P[p[0].b][2])).forEach(([c, ci]) => {
         const a = P[c.a], b = P[c.b];
-        ctx.strokeStyle = ci === hover ? '#D33A45' : deep; ctx.lineCap = 'round';
-        ctx.lineWidth = S.thin * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * Math.min(1.3, Math.min(W, H) / 420)));
+        ctx.strokeStyle = ci === hover ? '#D33A45' : c.col || deep; ctx.lineCap = 'round';
+        ctx.lineWidth = S.thin * (c.thin || 1) * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * Math.min(1.3, Math.min(W, H) / 420)));
         ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       });
       // traffic on the deck
@@ -662,10 +861,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         let r = 0; S.head.forEach(i => { r = Math.max(r, Math.hypot(P[i][0] - cx, P[i][1] - cy)); });
         ctx.fillStyle = 'rgba(91,155,230,.14)'; ctx.strokeStyle = deep; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, cy, r * 0.95, r * 1.05, 0, 0, 7); ctx.fill(); ctx.stroke();
       }
+      if (S.people) S.people.forEach(p => { const h = P[p.head], nk = P[p.neck], r = Math.max(3, Math.hypot(h[0] - nk[0], h[1] - nk[1]) * 0.62);
+        ctx.fillStyle = p.hit ? '#F6D9CC' : '#FBE7D6'; ctx.strokeStyle = '#D9661F'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(h[0], h[1] - r * 0.25, r, 0, 7); ctx.fill(); ctx.stroke(); });
       // nodes
       for (let i = 0; i < S.n; i++) {
         const p = P[i];
         if (!S.w[i]) { ctx.fillStyle = '#7C8DA6'; ctx.fillRect(p[0] - 3, p[1] - 3, 6, 6); continue; }
+        if (i >= S.n0) { // the crack in a broken strut: a short red line across it
+          const h = S.C.find(c => c.half && c.alive && c.b === i) || S.C.find(c => c.half && c.alive && c.a === i); if (!h) continue;
+          const q = P[h.b === i ? h.a : h.b], dx = p[0] - q[0], dy = p[1] - q[1], d = Math.hypot(dx, dy) || 1, r = 7 * p[3] * Math.min(1.3, Math.min(W, H) / 420) + 3;
+          ctx.strokeStyle = '#D33A45'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(p[0] - dy / d * r, p[1] + dx / d * r); ctx.lineTo(p[0] + dy / d * r, p[1] - dx / d * r); ctx.stroke(); continue; }
         if (S.T.length && !S.C.some(c => c.alive && c.kind !== 'fabric' && c.draw && (c.a === i || c.b === i))) continue;
         ctx.fillStyle = blue; ctx.beginPath(); ctx.arc(p[0], p[1], 3.2 * p[3], 0, 7); ctx.fill();
       }
@@ -723,6 +928,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           if (S.balloon !== undefined && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.measure(S, 1 - Math.exp(-sdt / 0.5));
           if (!TG.ok(S)) { TG.reset(S); cuts = removed = 0; say(); }
+          const ev = TG.hazards(S);
+          if (ev) { if (ev.hit) { flashes.push({ x: ev.hit[0], y: ev.hit[1], z: ev.hit[2], t0: performance.now() }); status.textContent = 'It landed on them. Press Reset to try again.'; }
+            else if (ev === 'slip') status.textContent = 'What they stand on tilted past what feet can hold. They have lost their footing.';
+            else status.textContent = 'They fell. Press Reset to put them back.'; }
           if (spin && !dragging) yaw += 0.22 * dt;
         }
         if (!dragging) { yaw += vyaw; vyaw *= 0.92; }
@@ -796,4 +1005,75 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     if (auto) setTimeout(() => TG.pluck(S, 3, S.kick), 900);
     requestAnimationFrame(frame);
   }
+})();
+
+// The no-blank-space rule (owner request 2026-11-19). In a two-column block the shorter column must never leave an
+// empty stretch beside the longer one. The space is filled with something relevant to that section: a picture with a
+// link, or HMR's short answer on the topic with a link. Where no tile has been chosen yet, the shorter column travels
+// with the reader instead. New blocks should be given a tile here (or be built balanced by hand, as the kids page is).
+if (typeof document !== 'undefined') (() => {
+  const IMG = { // picture tiles: file, alt text, credit
+    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of coloured fascial lines.', 'Universe Model simulation'],
+    cells: ['hx-cytoskeleton-cells.jpg', 'Cells under fluorescence: blue nuclei inside a green web of cytoskeleton filaments.', 'Erin Rod, CC BY 4.0, Wikimedia Commons'],
+    hudf: ['rv-hudf.jpg', 'The Hubble Ultra Deep Field: thousands of galaxies in one small patch of sky.', 'NASA, ESA and others, public domain'],
+    webb: ['ew-deep-field.jpg', 'Webb\'s first deep field: a cluster of galaxies bending the light of those behind it.', 'NASA, ESA, CSA, STScI, public domain'],
+    vhp: ['vhp-male-thorax.jpg', 'A Visible Human Project cross-section through the chest.', 'Visible Human Project, U.S. National Library of Medicine'],
+    gallop: ['muybridge-gallop.jpg', 'Eadweard Muybridge\'s photographs of a galloping horse, 1878.', 'Eadweard Muybridge, 1878, public domain'],
+    straws: ['hx-tensegrity-icosahedron.jpg', 'A tensegrity made from drinking straws and elastic thread.', 'QuarterNotes, CC BY-SA 4.0, Wikimedia Commons'],
+    wood: ['hx-tensegrity-model.jpg', 'A tensegrity model: six wooden struts that never touch, held by thin cables.', 'Donald E. Ingber, CC BY 4.0'],
+    fascia: ['ew-fascia.jpg', 'A stained micrograph of loose connective tissue.', 'Berkshire Community College, CC0, Wikimedia Commons'],
+    beach: ['hx-yoga-beach.jpg', 'An outdoor yoga class holding a pose together on a beach.', 'DimiTalen, CC0, Wikimedia Commons'],
+    siddhas: ['ew-siddhas.jpg', 'An eighteenth century Tibetan painting of eight great adepts.', 'Palpung monastery, 18th century, public domain'],
+    tower: ['hx-tensegrity-needle-tower.jpg', 'Looking up through Kenneth Snelson\'s Needle Tower.', 'Ben Stephenson, CC BY 2.0, Wikimedia Commons']
+  };
+  // page -> start of the section heading -> tile. p = picture [key, title, text, link]; a = answer [question, answer, link]
+  const FILL = {
+    index: { 'Medicine has never': { p: ['sim', 'Meet the reference body', 'A skeleton of 45 separate bones held up by fascia alone. Cut a line or break a bone and the physics decides what happens.', 'simulation.html'] },
+      'The body as a tensegrity': { p: ['cells', 'The same design at the scale of a cell', 'Inside every cell, stiff filaments are held in a web of tensed ones.', 'health.html#ideal'] } },
+    hmr: { 'One theory, from': { a: ['What came before the Big Bang?', 'Universal Intelligence: awareness with unlimited potential and no order yet. Its first act was a distinction, me and not me, and that distinction was the first distance.', 'answers.html#before'] } },
+    health: { 'The problem: the wrong': { p: ['sim', 'The right reference, being built', 'A body with perfect tissue, measured exactly: the simulation starts there and works outward to every way a body can fall short.', 'simulation.html'] },
+      'How disease is assessed': { p: ['vhp', 'What medicine can already see', 'A whole body, slice by slice. The pictures exist. What is missing is the ideal to compare them with.', 'library.html'] },
+      'The body as a physical': { p: ['gallop', 'Motion is physics', 'The first photographs to freeze a moving body, 1878. Everything a body does is forces through tissue.', 'physics-health.html'] },
+      'The ideal comes from': { p: ['straws', 'Build one', 'Six straws and some elastic: the same principle the ideal body is worked out from.', 'simulation.html#why-tensegrity'] } },
+    reality: { 'Newton, Einstein': { p: ['hudf', 'One sky, three theories', 'Newton, Einstein and quantum theory each describe this exactly, each in its own range, and they do not agree with one another.', 'physics.html'] },
+      'A miss of': { a: ['Why does the calculation miss by 120 zeros?', 'HMR\'s reading: the calculation counts every possible tremble of empty space as if each one had weight. HMR has no formula for the measured amount yet, and says so.', 'answers.html#vacuum'] },
+      'We can identify': { a: ['What is dark matter?', 'HMR has no mechanism yet. Its hypothesis is that the extra gravity comes from the pattern of distance itself and not from an unseen particle, and it stays a hypothesis until the mathematics produces how a galaxy turns.', 'answers.html#darkmatter'] },
+      'No one knows what gravity': { a: ['What is gravity?', 'HMR\'s first hypothesis is a trend toward coherence. It is weighing others beside it: an inward flow of space, momentum through time, and a draw back to source.', 'physics.html#pull'] } },
+    ui: { 'A body built to upgrade': { a: ['What is a human being?', 'In effect, UI\'s artificial intelligence: a body built to upgrade itself, able to understand its own source.', 'answers.html#human'] },
+      'Create once': { a: ['What is life, and how did it begin?', 'Life is UI experiencing physical reality from the inside: matter created once, set free as an agent, and self-sustaining.', 'answers.html#life'] },
+      'Why the human path': { a: ['What is consciousness?', 'The ground of reality, not a product of matter. Each living being is an instance of UI experiencing physical reality.', 'answers.html#conscious'] } },
+    protocol: { 'Water, then moisture': { p: ['fascia', 'What the water is for', 'Loose connective tissue under the microscope. Its layers slide on a film of fluid, and the protocol works from the skin inward.', 'physics-health.html'] },
+      'Two directions, one web': { p: ['beach', 'Go slow and stay long', 'Minutes, not seconds, and every day. People have practiced long holds together for centuries.', 'east-west.html#body'] } },
+    'health-model': { 'Body, mind and meaning': { a: ['What is health?', 'Closeness to the perfect human body: an optimized tensegrity, bones floating in an evenly tensioned web of fascia.', 'answers.html#health'] } },
+    'mental-health': { 'Protocols for the body': { a: ['What is mental illness?', 'What follows when one of three supports is missing: a body at ease, beliefs that are true, and a community that understands you.', 'answers.html#mental'] } },
+    'physics-health': { 'Watch the body move': { p: ['gallop', 'It began with a horse', 'Muybridge froze motion in 1878 and motion science began. The same idea, with today\'s imaging, applied to the whole fascia web.', 'simulation.html'] } },
+    'east-west': { 'Practices that work': { p: ['beach', 'Long holds, done together', 'A yoga class holding one pose on a beach in France. The protocol uses the same long, slow loading.', 'protocol.html'] },
+      'The golden age': { p: ['siddhas', 'The traditions pictured it', 'Adepts who spent their lives on the body and mind, painted in eighteenth century Tibet.', 'ui.html'] } },
+    simulation: { 'A mechanic needs': { p: ['tower', 'The same principle at 18 metres', 'Tubes that never touch, held up only by cables in tension. Scroll up and try it on a body.', '#model'] } },
+    methods: { 'Compute': { p: ['sim', 'What the compute is for', 'Millions of simulated bodies, each with a different set of imperfections, solved as physics.', 'roadmap.html#campaign'] },
+      'Data sources': { p: ['vhp', 'The raw material', 'One of 9,808 cross-sections of a complete male body, from the Visible Human Project.', 'library.html'] },
+      'The full model': { p: ['cells', 'Down to the cell', 'The model is meant to reach from whole-body lines of fascia to the filaments inside each cell.', 'health.html#ideal'] } }
+  };
+  const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const tile = d => { const a = document.createElement('a'); if (d.p) { const [k, title, text, href] = d.p, im = IMG[k], pre = /\/preview\//.test(location.pathname) ? '../' : '';
+      a.className = 'nb-fill'; a.href = href; a.innerHTML = `<img src="${pre}img/${im[0]}" alt="${esc(im[1])}" loading="lazy"><span class="cap"><b>${esc(title)} →</b>${esc(text)}<small>${esc(im[2])}</small></span>`; }
+    else { const [q, ans, href] = d.a; a.className = 'nb-fill nb-ans'; a.href = href; a.innerHTML = `<span class="cap"><i>HMR's answer</i><b>${esc(q)}</b>${esc(ans)}<em>Read it in full →</em></span>`; }
+    return a; };
+  const page = (location.pathname.split('/').pop() || 'index.html').replace('.html', '') || 'index';
+  const fit = () => {
+    const wide = innerWidth > 1180;
+    document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
+      if (el.classList.contains('nb-keep') || el.classList.contains('kd-eq')) return; // balanced by hand
+      const kids = [...el.children].filter(c => c.offsetParent !== null);
+      kids.forEach(k => { k.classList.remove('nb-stick', 'nb-col'); [...k.children].forEach(c => { if (c.classList.contains('nb-fill') && c.dataset.auto) c.remove(); }); }); el.classList.remove('nb-eq');
+      if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.classList.contains('nb-keep') || el.closest('.simgrid')) return;
+      const tops = kids.map(k => k.getBoundingClientRect().top); if (Math.abs(tops[0] - tops[1]) > 30) return; // stacked, not side by side
+      const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1, gap = Math.abs(hs[0] - hs[1]); if (gap <= 120) return;
+      const sec = el.closest('section, .page-head'), h = sec && sec.querySelector('h1, h2'), head = h ? h.textContent.trim() : '', map = FILL[page] || {}, key = Object.keys(map).find(k => head.startsWith(k));
+      if (key && gap >= 150) { const t = tile(map[key]); t.dataset.auto = '1'; el.classList.add('nb-eq'); kids[short].classList.add('nb-col'); kids[short].appendChild(t); }
+      else if (hs[short] < innerHeight - 130) kids[short].classList.add('nb-stick');
+    });
+  };
+  let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 150); };
+  addEventListener('load', fit); addEventListener('resize', later); if (document.readyState !== 'loading') fit(); else addEventListener('DOMContentLoaded', fit);
 })();

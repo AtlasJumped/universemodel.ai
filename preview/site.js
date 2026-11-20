@@ -439,6 +439,101 @@ const TG = (() => {
       info: 'A simplified human tensegrity: the bones are struts, and the fascia is a web of cables in tension crossing every joint, front, back and sides. Nothing holds it upright but tension.' };
   }
 
+
+  /* ----- a life on the line: five scenes with someone in them. The people are rigid stick figures. Someone standing on
+     a deck is held to it by their footing, and the footing lets go when the deck tilts past about 37 degrees. ----- */
+  // turn = true puts the figure's left-right axis along z (so it faces along x). o.stance: half the gap between the feet. o.hands: [out, up, forward].
+  function person(b, x, y, z, s, grp, pin, turn, o) {
+    o = o || {}; const st = o.stance === undefined ? 0.09 : o.stance, hd = o.hands || [0.22, 0.52, 0.05], mk = o.m || 1;
+    const nd = (dl, dy, df, m, p) => turn ? b.node(x + df * s, y + dy * s, z + dl * s, m * mk, p) : b.node(x + dl * s, y + dy * s, z + df * s, m * mk, p);
+    const fL = nd(-st, 0, 0, 0.5, pin), fR = nd(st, 0, 0, 0.5, pin), hip = nd(0, 0.48, 0, 1.2), neck = nd(0, 0.8, 0, 0.8), head = nd(0, 0.93, 0, 0.5), hL = nd(-hd[0], hd[1], hd[2], 0.2), hR = nd(hd[0], hd[1], hd[2], 0.2);
+    const c0 = b.C.length, all = [fL, fR, hip, neck, head, hL, hR];
+    if (pin) all.push(nd(0, 0, 0.16, 0.5, true));
+    b.body(all, [[fL, hip], [fR, hip], [hip, neck], [neck, head], [neck, hL], [neck, hR]], grp);
+    for (let i = c0; i < b.C.length; i++) if (b.C[i].kind === 'strut') { b.C[i].col = '#D9661F'; b.C[i].thin = 0.62; }
+    return { fL, fR, hip, neck, head, hL, hR, grp, strut: c0, y0: y + 0.93 * s };
+  }
+  // footing: hidden rigid ties from both feet and the hips to what the person stands on. Returns the tie indexes.
+  function footing(b, P, deck) { const cs = []; [P.fL, P.fR, P.hip].forEach(i => deck.forEach(d => cs.push(b.add(i, d, 'brace')))); return cs; }
+  const spikes = (b, x0, x1, z, n) => { for (let k = 0; k < n; k++) { const x = x0 + (x1 - x0) * k / (n - 1), a = b.node(x - 0.07, 0, z, 1, true), c = b.node(x + 0.07, 0, z, 1, true), tip = b.node(x, 0.3, z, 1, true); const i = b.add(a, tip, 'strut'), j = b.add(c, tip, 'strut'); b.C[i].col = b.C[j].col = '#B4232F'; b.C[i].thin = b.C[j].thin = 0.45; } };
+  const sagRope = (b, p, q, n, sag, m) => { const P0 = b.P[p], P1 = b.P[q], ids = [p]; for (let k = 1; k < n; k++) { const u = k / n; ids.push(b.node(P0[0] + (P1[0] - P0[0]) * u, P0[1] + (P1[1] - P0[1]) * u - sag * 4 * u * (1 - u), P0[2] + (P1[2] - P0[2]) * u, m)); } ids.push(q);
+    for (let k = 0; k < n; k++) b.add(ids[k], ids[k + 1], 'cable', { strain: 0 }); return ids; };
+
+  function piano() {
+    const b = builder(), H = 3.4, X = 1.3;
+    const baseL = b.node(-X, 0, 0, 1, true), baseR = b.node(X, 0, 0, 1, true), topL = b.node(-X, H, 0, 0.6), topR = b.node(X, H, 0, 0.6), hkL = b.node(-0.45, H, 0, 0.3), hkR = b.node(0.45, H, 0, 0.3), apex = b.node(0, H + 0.55, 0, 0.3);
+    b.add(baseL, topL, 'strut'); b.add(baseR, topR, 'strut');
+    b.body([topL, topR, hkL, hkR, apex], [[topL, hkL], [hkL, hkR], [hkR, topR], [topL, apex], [apex, topR], [apex, hkL], [apex, hkR]]);
+    [[topL, -1], [topR, 1]].forEach(([tp, s]) => [[s * (X + 1.5), 0], [s * X, 1.8], [s * X, -1.8]].forEach(([ax, az]) => b.add(tp, b.node(ax, 0, az, 1, true), 'cable')));
+    // the piano: one rigid box
+    const bx = [], w = 0.45, d = 0.22, y0 = 2.25, y1 = 2.75;
+    [y0, y1].forEach(y => [-w, w].forEach(x => [-d, d].forEach(z => bx.push(b.node(x, y, z, 3)))));
+    const keel = b.node(0, y0, 0, 1), eyeL = b.node(-w, y1, 0, 0.5), eyeR = b.node(w, y1, 0, 0.5), E = (i, j) => [bx[i], bx[j]];
+    b.body([...bx, keel, eyeL, eyeR], [E(0, 1), E(2, 3), E(0, 2), E(1, 3), E(4, 5), E(6, 7), E(4, 6), E(5, 7), E(0, 4), E(1, 5), E(2, 6), E(3, 7)], 'piano');
+    b.add(hkL, eyeL, 'cable'); b.add(hkR, eyeR, 'cable');
+    const P = person(b, 0, 0, 0, 1.7, 'p0', true);
+    return { b, ea: 5000, strain: 0.002, iters: 4, kick: 1.2, view: [0.5, 0.16], thin: 0.7, people: [P], crush: { by: [keel, bx[0], bx[1], bx[2], bx[3]], r: 0.3 },
+      info: 'A piano hangs from a gantry by two ropes, and someone is standing under it. The posts are in compression and stand only because six guy lines hold them. Cut a rope, or a guy line, and the physics decides where the piano goes.' };
+  }
+
+  function gorge() {
+    const b = builder(), Hh = 2.4, half = 2.2, w = 0.3, n = 8, k = 4, s = 0.95;
+    const side = q => [-w, w].map(z => { const top = b.node(q * half, Hh, z, 1, true), rail = b.node(q * half, Hh + 0.5, z, 1, true), foot = b.node(q * (half + 0.3), 0, z, 1, true); b.add(foot, top, 'strut'); b.add(top, rail, 'strut'); return { top, rail }; });
+    const A = side(-1), B = side(1);
+    const d1 = sagRope(b, A[0].top, B[0].top, n, 0.32, 0.3), d2 = sagRope(b, A[1].top, B[1].top, n, 0.32, 0.3);
+    for (let i = 1; i < n; i++) b.add(d1[i], d2[i], 'strut');
+    const h1 = sagRope(b, A[0].rail, B[0].rail, n, 0.3, 0.1), h2 = sagRope(b, A[1].rail, B[1].rail, n, 0.3, 0.1);
+    // short hangers tie each handrail down to the deck. At the walker's plank the walker is the tie: feet on the plank, a hand on each rail.
+    for (let i = 1; i < n; i++) if (i !== k) { b.add(h1[i], d1[i], 'cable', { strain: 0 }); b.add(h2[i], d2[i], 'cable', { strain: 0 }); }
+    const p = b.P[d1[k]], up = (b.P[h1[k]][1] - p[1]) / s, P = person(b, p[0], p[1], 0, s, 'p0', false, true, { hands: [w / s, up, 0] });
+    const cs = footing(b, P, [d1[k], d2[k]]); [[P.hL, h1[k]], [P.hR, h2[k]], [P.hip, h1[k]], [P.hip, h2[k]]].forEach(([i, r]) => cs.push(b.add(i, r, 'brace')));
+    spikes(b, -1.2, 1.2, 0, 7);
+    return { b, ea: 2500, strain: 0.004, iters: 4, kick: 1.4, view: [0.42, 0.2], thin: 0.6, people: [P], grips: [{ cs, pairs: [[d1[k], d2[k]], [d1[k - 1], d1[k + 1]], [d2[k - 1], d2[k + 1]]], max: 0.6 }],
+      info: 'A rope bridge over a gorge, with someone halfway across, feet on a plank and a hand on each rail. Two ropes carry the planks and two more are the handrails, tied down to the deck by short hangers. Everything is in tension between the two cliffs. One cut rope can be survived, because the others take the load. Try two.' };
+  }
+
+  function highSwing() {
+    const b = builder(), H = 3.2, zf = 0.7;
+    const apex = [zf, -zf].map(z => { const a = b.node(0, H, z, 0.5); [-1.15, 1.15].forEach(x => b.add(b.node(x, 0, z, 1, true), a, 'strut')); b.add(a, b.node(0, 0, z + Math.sign(z) * 1.7, 1, true), 'cable'); return a; });
+    b.add(apex[0], apex[1], 'strut');
+    const sy = 1.65, sz = 0.36, sx = 0.13, c = [[-sx, sz], [sx, sz], [-sx, -sz], [sx, -sz]].map(([x, z]) => b.node(x, sy, z, 0.4)), eA = b.node(0, sy, sz, 0.2), eB = b.node(0, sy, -sz, 0.2);
+    b.body([...c, eA, eB], [[c[0], c[1]], [c[2], c[3]], [c[0], c[2]], [c[1], c[3]]], 'seat');
+    // a bridle of two ropes to each end of the seat, so the seat cannot roll over under the rider
+    b.add(apex[0], c[0], 'cable'); b.add(apex[0], c[1], 'cable'); b.add(apex[1], c[2], 'cable'); b.add(apex[1], c[3], 'cable');
+    const P = person(b, 0, sy, 0, 0.95, 'p0', false, true), grips = [{ cs: footing(b, P, c), pairs: [[eA, eB], [c[0], c[1]]], max: 0.6 }];
+    spikes(b, -0.9, 0.9, 0, 6);
+    return { b, ea: 3000, strain: 0.003, iters: 4, kick: 2.2, view: [0.9, 0.18], thin: 0.65, people: [P], grips,
+      info: 'Someone is standing on a swing, well above the ground. Two A-frames in compression carry a top bar, two guy lines keep the frames from folding flat, and four ropes hold the seat, two to each end. Pluck the seat to set it swinging. Cut a rope and the seat tips. Cut a guy line and the whole frame goes.' };
+  }
+
+  function cleaners() {
+    const b = builder(), H = 4.2, zf = 1.0, xa = 0.62, xb = 1.18, col = [[-0.2, zf], [-0.2, -zf], [-1.3, zf], [-1.3, -zf]];
+    const base = col.map(([x, z]) => b.node(x, 0, z, 1, true)), top = col.map(([x, z]) => b.node(x, H, z, 1)), o1 = [zf, -zf].map(z => b.node(xa, H, z, 0.4)), o2 = [zf, -zf].map(z => b.node(xb, H, z, 0.4));
+    b.body([...base, ...top, ...o1, ...o2], [[base[0], top[0]], [base[1], top[1]], [base[2], top[2]], [base[3], top[3]], [top[0], top[1]], [top[2], top[3]], [top[0], top[2]], [top[1], top[3]], [top[0], o1[0]], [o1[0], o2[0]], [top[1], o1[1]], [o1[1], o2[1]], [base[0], base[1]]], 'building');
+    const py = 2.5, c = [[xa, zf], [xb, zf], [xa, -zf], [xb, -zf]].map(([x, z]) => b.node(x, py, z, 0.6)), eA = b.node(0.9, py, zf, 0.2), eB = b.node(0.9, py, -zf, 0.2);
+    b.body([...c, eA, eB], [[c[0], c[1]], [c[2], c[3]], [c[0], c[2]], [c[1], c[3]]], 'platform');
+    b.add(o1[0], c[0], 'cable'); b.add(o2[0], c[1], 'cable'); b.add(o1[1], c[2], 'cable'); b.add(o2[1], c[3], 'cable');
+    const people = [0.45, -0.45].map((z, i) => person(b, 0.9, py, z, 0.95, 'p' + i, false, true));
+    const grips = people.map(P => ({ cs: footing(b, P, c), pairs: [[eA, eB], [c[0], c[1]]], max: 0.6 }));
+    // one of the two is clipped to a safety line, which hangs slack until it is needed
+    b.add(people[1].neck, o2[1], 'cable', { strain: -0.12 });
+    return { b, ea: 3500, strain: 0.003, iters: 4, kick: 1.6, view: [0.95, 0.2], thin: 0.65, people, grips,
+      info: 'Two window cleaners on a platform, four storeys up. The building and its roof beams are in compression. The platform hangs from the beams by four ropes, one at each corner. One cleaner is clipped to a safety line, the dashed one, which hangs slack until it is needed. The other is not. Cut ropes and see what a second line of support is worth.' };
+  }
+
+  function tightrope() {
+    const b = builder(), X = 2.3, H = 2.7, n = 10, k = 5, s = 0.95;
+    const top = [-1, 1].map(q => { const tp = b.node(q * X, H, 0, 0.6); b.add(b.node(q * X, 0, 0, 1, true), tp, 'strut'); [-1, 1].forEach(u => b.add(tp, b.node(q * (X + 1.6), 0, u * 1.0, 1, true), 'cable')); return tp; });
+    const r = sagRope(b, top[0], top[1], n, 0.12, 0.06), at = b.P[r[k]], x = at[0], y = at[1];
+    const P = person(b, x, y, 0, s, 'p0', false, true, { stance: 0.02, m: 0.5 }), poleL = b.node(x, y - 0.55, -1.35, 1.6), poleR = b.node(x, y - 0.55, 1.35, 1.6), c0 = b.C.length;
+    b.body([P.fL, P.fR, P.hip, P.neck, P.head, P.hL, P.hR, poleL, poleR], [[P.hL, poleL], [P.hR, poleR], [P.hL, P.hR]], 'p0');
+    for (let i = c0; i < b.C.length; i++) if (b.C[i].kind === 'strut') { b.C[i].col = '#8A5A0B'; b.C[i].thin = 0.4; }
+    spikes(b, -1.4, 1.4, 0, 8);
+    // the walker touches the rope at one point only, and stays upright because the heavy drooping pole puts the centre of mass below it
+    return { b, ea: 60000, strain: 0.002, iters: 10, kick: 1.2, view: [0.3, 0.18], thin: 0.65, people: [P], grips: [{ cs: footing(b, P, [r[k]]), pairs: [[r[k - 1], r[k + 1]]], max: 0.6 }],
+      info: 'A tightrope walker between two masts. Each mast is in compression and leans on two guy lines. The rope is in tension. The walker touches it at one point only, and stays upright because the long drooping pole puts the centre of their weight below the rope. Cut a guy line and a mast goes over, and the rope sinks toward the spikes. Cut the rope and there is nothing else.' };
+  }
+
   const SHAPES = [
     ['bridge', 'Suspension bridge', bridge, 'Bridges'],
     ['stayed', 'Cable-stayed bridge', cableStayed, 'Bridges'],
@@ -452,6 +547,11 @@ const TG = (() => {
     ['mansion', 'A mansion of a tent', mansionTent, 'Tents and treehouses'],
     ['treehouse', 'Treehouse neighbourhood', treehouses, 'Tents and treehouses'],
     ['wheel', 'Bicycle wheel', wheel, 'Everyday tension'],
+    ['piano', 'Under a hanging piano', piano, 'A life on the line'],
+    ['gorge', 'Crossing a rope bridge', gorge, 'A life on the line'],
+    ['highswing', 'Standing on a high swing', highSwing, 'A life on the line'],
+    ['cleaners', 'Window cleaners', cleaners, 'A life on the line'],
+    ['tightrope', 'The tightrope walker', tightrope, 'A life on the line'],
   ];
 
   function make(key) {
@@ -472,7 +572,7 @@ const TG = (() => {
     });
     const ay0 = new Float64Array(cap); ay0.set(sh.b.A);
     const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, n0: n, cap, c0: C.length, cracks: [], x, p: new Float64Array(x), v: new Float64Array(3 * cap), w, C, T, t: 0,
-      ay0, ay: new Float64Array(ay0), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head };
+      ay0, ay: new Float64Array(ay0), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head, people: sh.people, grips: sh.grips, crush: sh.crush };
     // settle into equilibrium under gravity with strong damping, then freeze the result as time zero
     for (let k = 0; k < 150; k++) step(S, 1 / 60, 16, 14);
     S.v.fill(0);
@@ -530,7 +630,7 @@ const TG = (() => {
     }
   }
 
-  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); measure(S, 1); S.t = 0; }
+  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); if (S.grips) S.grips.forEach(g => { g.done = false; }); if (S.people) S.people.forEach(p => { p.hit = false; p.down = false; }); measure(S, 1); S.t = 0; }
 
   // A broken strut does not vanish: it cracks in the middle. The two halves stay, joined by a free hinge, so the strut
   // can no longer push its ends apart and the physics decides how the pieces fold.
@@ -540,7 +640,7 @@ const TG = (() => {
     const i = S.n++, a = 3 * c.a, b = 3 * c.b, j = 3 * i, x = S.x;
     for (let k = 0; k < 3; k++) { x[j + k] = (x[a + k] + x[b + k]) / 2; S.p[j + k] = x[j + k]; S.v[j + k] = (S.v[a + k] + S.v[b + k]) / 2; }
     S.w[i] = Math.max(S.w[c.a], S.w[c.b]) || 1; S.ay[i] = 0; S.ay0[i] = 0;
-    const half = (p, q) => ({ a: p, b: q, kind: 'strut', L0: c.L0 / 2, comp: 0, uni: false, draw: true, alive: true, T: 0, Tema: 0, half: true });
+    const half = (p, q) => ({ a: p, b: q, kind: 'strut', L0: c.L0 / 2, comp: 0, uni: false, draw: true, alive: true, T: 0, Tema: 0, half: true, col: c.col, thin: c.thin });
     S.C.push(half(c.a, i), half(i, c.b)); S.cracks.push(i);
   }
 
@@ -561,9 +661,18 @@ const TG = (() => {
     S.v[3 * i] += dx / L * mag; S.v[3 * i + 1] += dy / L * mag; S.v[3 * i + 2] += dz / L * mag;
   }
 
+  function hazards(S) {
+    const x = S.x; let ev = null;
+    if (S.grips) S.grips.forEach(g => { if (g.done) return; for (const [a, c] of g.pairs) { const i = 3 * a, j = 3 * c, L = Math.hypot(x[j] - x[i], x[j + 1] - x[i + 1], x[j + 2] - x[i + 2]) || 1;
+      if (Math.abs(x[j + 1] - x[i + 1]) / L > g.max) { g.cs.forEach(ci => { S.C[ci].alive = false; }); g.done = true; ev = ev || 'slip'; break; } } });
+    if (S.crush && S.people) S.people.forEach(p => { if (p.hit) return; const h = 3 * p.head; for (const i of S.crush.by) { if (Math.hypot(x[3 * i] - x[h], x[3 * i + 1] - x[h + 1], x[3 * i + 2] - x[h + 2]) < S.crush.r) { p.hit = true; kill(S, p.strut); ev = { hit: [x[h], x[h + 1], x[h + 2]] }; break; } } });
+    if (S.people) S.people.forEach(p => { if (!p.down && x[3 * p.head + 1] < p.y0 * 0.4) { p.down = true; if (!p.hit) ev = ev || 'down'; } });
+    return ev;
+  }
+
   const ok = S => { for (let i = 0; i < S.x.length; i++) if (!isFinite(S.x[i]) || Math.abs(S.x[i]) > 50) return false; return true; };
 
-  return { SHAPES, make, step, measure, reset, kill, pluck, ok };
+  return { SHAPES, make, step, measure, reset, kill, pluck, ok, hazards };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 
@@ -651,6 +760,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const chips = (attr, val) => box.querySelectorAll(`[data-${attr}]`).forEach(b => b.classList.toggle('on', b.dataset[attr] === String(val)));
     function load(key) { S = TG.make(key); S.deckSeg = null; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; fit(); setInfo(); say(); draw(); }
     sel.addEventListener('change', () => load(sel.value));
+    stage.tg = { state: () => S, cut: ci => { cuts += TG.kill(S, ci) ? 1 : 0; say(); }, load };
     box.addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.m) { mode = b.dataset.m; chips('m', mode); setCursor(); hover = -1; say(); }
@@ -733,8 +843,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       // struts, far to near
       S.C.map((c, ci) => [c, ci]).filter(([c]) => c.alive && c.kind === 'strut').sort((p, q) => (P[q[0].a][2] + P[q[0].b][2]) - (P[p[0].a][2] + P[p[0].b][2])).forEach(([c, ci]) => {
         const a = P[c.a], b = P[c.b];
-        ctx.strokeStyle = ci === hover ? '#D33A45' : deep; ctx.lineCap = 'round';
-        ctx.lineWidth = S.thin * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * Math.min(1.3, Math.min(W, H) / 420)));
+        ctx.strokeStyle = ci === hover ? '#D33A45' : c.col || deep; ctx.lineCap = 'round';
+        ctx.lineWidth = S.thin * (c.thin || 1) * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * Math.min(1.3, Math.min(W, H) / 420)));
         ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       });
       // traffic on the deck
@@ -751,6 +861,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         let r = 0; S.head.forEach(i => { r = Math.max(r, Math.hypot(P[i][0] - cx, P[i][1] - cy)); });
         ctx.fillStyle = 'rgba(91,155,230,.14)'; ctx.strokeStyle = deep; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, cy, r * 0.95, r * 1.05, 0, 0, 7); ctx.fill(); ctx.stroke();
       }
+      if (S.people) S.people.forEach(p => { const h = P[p.head], nk = P[p.neck], r = Math.max(3, Math.hypot(h[0] - nk[0], h[1] - nk[1]) * 0.62);
+        ctx.fillStyle = p.hit ? '#F6D9CC' : '#FBE7D6'; ctx.strokeStyle = '#D9661F'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(h[0], h[1] - r * 0.25, r, 0, 7); ctx.fill(); ctx.stroke(); });
       // nodes
       for (let i = 0; i < S.n; i++) {
         const p = P[i];
@@ -816,6 +928,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           if (S.balloon !== undefined && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.measure(S, 1 - Math.exp(-sdt / 0.5));
           if (!TG.ok(S)) { TG.reset(S); cuts = removed = 0; say(); }
+          const ev = TG.hazards(S);
+          if (ev) { if (ev.hit) { flashes.push({ x: ev.hit[0], y: ev.hit[1], z: ev.hit[2], t0: performance.now() }); status.textContent = 'It landed on them. Press Reset to try again.'; }
+            else if (ev === 'slip') status.textContent = 'What they stand on tilted past what feet can hold. They have lost their footing.';
+            else status.textContent = 'They fell. Press Reset to put them back.'; }
           if (spin && !dragging) yaw += 0.22 * dt;
         }
         if (!dragging) { yaw += vyaw; vyaw *= 0.92; }

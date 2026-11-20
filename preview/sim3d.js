@@ -275,12 +275,18 @@
   // ---------- input: tap to place or select, drag to orbit, pinch or wheel to zoom ----------
   let dragging = false, lx = 0, ly = 0, moved = 0; const ptrs = new Map(); let pinch0 = 0, zoom0 = 1;
   function nearestEdge(c, cx, cy, strut) { const r = c.getBoundingClientRect(), mx = cx - r.left, my = cy - r.top, Q = sim.P.map(proj); let best = -1, bd = 12;
-    sim.E.forEach((e, k) => { if (e.cut || !!e.strut !== strut) return; if (strut ? (!e.show || e.cart || e.lig) : (sim.FIXED.has(e.a) && sim.FIXED.has(e.b))) return;
+    sim.E.forEach((e, k) => { if (e.cut || e.released || !!e.strut !== strut) return; if (strut ? (!e.show || e.cart || e.lig) : (sim.FIXED.has(e.a) && sim.FIXED.has(e.b))) return;
       const a = Q[e.a], b = Q[e.b], ux = b[0] - a[0], uy = b[1] - a[1], l2 = ux * ux + uy * uy || 1, t = Math.max(0, Math.min(1, ((mx - a[0]) * ux + (my - a[1]) * uy) / l2));
       const d = Math.hypot(a[0] + t * ux - mx, a[1] + t * uy - my) - (a[2] + b[2]) * 0.01; if (d < bd) { bd = d; best = k; } }); return best; }
   const isTool = () => mode === 'cut' || mode === 'break' || mode === 'pluck';
   function operate(c, e) {
     if (mode === 'pluck') { const i = nearest(c, e.clientX, e.clientY); if (i >= 0 && !sim.FIXED.has(i)) { sim.pluck(i, 6); changed(); status(`Plucked the ${pretty(i)}: watch the pulse travel through the web and settle.`); } return; }
+    if (mode === 'break') { // the skull has no shaft to tap: a tap on the head crushes it
+      const r = c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, hd = ['top', 'brow', 'chin', 'occ', 'earL', 'earR'].map(n => proj(sim.P[sim.IDX[n]]));
+      const cx = hd.reduce((s, q) => s + q[0], 0) / hd.length, cy = hd.reduce((s, q) => s + q[1], 0) / hd.length, rad = Math.max(...hd.map(q => Math.hypot(q[0] - cx, q[1] - cy)));
+      if (Math.hypot(mx - cx, my - cy) < rad) { const T = sim.IDX.top, Cn = sim.IDX.chin, ks = sim.E.findIndex(f => f.strut && !f.cut && f.bone === 'skull' && ((f.a === T && f.b === Cn) || (f.a === Cn && f.b === T)));
+        if (ks >= 0 && sim.breakBone(ks, 0.5)) { hoverE = -1; changed(); status('Skull crushed. Every fascial line that runs to the head, front, back and sides, has lost its top anchor and let go along its whole length (dotted). Nothing is left to hold the column up. Press Reset to healthy to heal.'); }
+        return; } }
     const k = nearestEdge(c, e.clientX, e.clientY, mode === 'break'); if (k < 0) return;
     const ed = sim.E[k];
     if (mode === 'break') {
@@ -293,7 +299,11 @@
       status(`${cap(B.name)} broken where you tapped. Its two ends are no longer one piece, and the muscle around it can no longer brace against it. ` + (B.def.seg ? 'The column of the spine is interrupted here: what is above now hangs on the fascia.' : /femur|tibia/.test(B.def.id) ? 'This bone carried the body to the ground. Watch whether the fascia and the other leg can hold the weight.' : 'Watch what it was holding.'));
       return; }
     sim.cut(k); hoverE = -1; changed();
-    status(`Cable cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (ed.lines.size ? 'A fascial line is one continuous band: the whole stretch between its anchors has gone slack (dotted). Gravity now loads whatever is left to hold that joint.' : 'This was one strand of the deep web. Its neighbours take up the load.'));
+    const L = sim.lastCut || {}, sd = s => s === 'L' ? 'left' : s === 'R' ? 'right' : '', n = (L.released || 0) + 1;
+    const REG = { leg1: 'left leg', 'leg-1': 'right leg', coreUpL: 'left side of the chest, the shoulder and the arm', coreUpR: 'right side of the chest, the shoulder and the arm', coreLowL: 'left side of the belly and lower back', coreLowR: 'right side of the belly and lower back', coreC: 'midline of the trunk' };
+    status(`Cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (L.kind === 'line' ? `That cord is part of the ${(L.names || [L.name]).map(s => s.toLowerCase()).join(' and the ')}${L.side === 'both' ? ', where both sides share it' : ' on the ' + sd(L.side) + ' side'}${(L.names || []).length > 1 ? ', which share fibres here, so both let go' : ''}. A fascial system is one continuous band, so a cut anywhere lets all of it go: ${n} stretches, from one end of the body to the other (dotted). Watch what it was holding, also far from the cut.`
+      : L.kind === 'deep' ? `That was one of the deep guys of the spine${L.side === 'C' ? ', on the midline' : ', ' + sd(L.side) + ' side'}. They work as one system from the skull to the pelvis, so all ${n} have let go (dotted), and the guys on the other side now pull the column their way.`
+      : `That was a strand of the general fascial web of the ${REG[L.region] || 'body'}. The web of a region is one sheet: all ${n} strands of it have let go (dotted). What it wrapped now hangs on the lines alone.`));
   }
   const setCursor = () => { for (const c of [cv, cv2].filter(Boolean)) { c.classList.remove('cur-point', 'cur-cut', 'cur-strut', 'cur-pluck'); c.classList.add(mode === 'cut' ? 'cur-cut' : mode === 'break' ? 'cur-strut' : mode === 'pluck' ? 'cur-pluck' : 'cur-point'); } };
   setCursor();

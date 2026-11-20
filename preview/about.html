@@ -11,7 +11,7 @@
 <link rel="icon" href="../img/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="../img/favicon.svg"><link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=aa1c74e1">
+<link rel="stylesheet" href="style.css?v=7173eb6d">
 </head>
 <body>
 <div style="background:#B4232F;color:#fff;font:600 13px/1.4 system-ui,sans-serif;text-align:center;padding:6px 10px">Preview: changes waiting for approval. Not the live site.</div>
@@ -40,6 +40,10 @@
 .ab-big p{max-width:none}
 .ab-hyp{display:inline-block;font:600 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#0B2545;background:#9CC3F5;border-radius:6px;padding:5px 7px;margin-bottom:10px}
 .ab-shuf{margin-top:22px;background:#fff}
+.ab-bind{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:center;margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.ab-bind img{width:100%;height:auto;border-radius:12px;display:block}
+.ab-bind figcaption{font-size:1rem;line-height:1.6;color:var(--ink);max-width:none}
+@media (max-width:760px){.ab-bind{grid-template-columns:1fr}}
 .ab-shuf-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
 .ab-shuf-h h3{font-size:1.45rem;margin:6px 0 0}
 .ab-shuf-b{display:flex;align-items:center;gap:12px}
@@ -114,6 +118,10 @@
         <div class="ab-no"><b>Wrong</b><p id="ab-a"></p></div>
         <div class="ab-yes"><b>Right, or simply normal</b><p id="ab-b"></p></div>
       </div>
+      <figure class="ab-bind">
+        <img src="../img/head-binding.svg" alt="Diagram of a Chinookan cradleboard seen from the side: an infant lies swaddled on a long board, and a second board hinged at the head end is bound down at an angle across the forehead." loading="lazy" width="560" height="300">
+        <figcaption><b>The first example, drawn.</b> Among the Chinookan peoples of the Columbia River, a baby lay on a cradleboard for its first year, with a second board bound across the forehead at an angle. The soft skull grew into a long, flat wedge. To them it was beautiful, and it marked a person of standing: slaves and outsiders did not have it. The custom lasted into the twentieth century. Parents did this out of care for their child, on the best model of reality they had. <span class="small muted">A diagram, not a portrait. Source: <a href="https://bodyarts.prm.ox.ac.uk/index.php/permanent-body-arts/reshaping-and-piercing/163-head-shaping-flattening.html">Pitt Rivers Museum, University of Oxford</a>.</span></figcaption>
+      </figure>
       <p class="small muted" style="margin:14px 0 0;max-width:none">None of these people is careless. Each is following a model of what is real, and the verdict comes from the model. That is why a value system is only as good as the model under it, and why a partial model can lead sincere people to opposite conclusions.</p>
     </div>
   </div>
@@ -312,7 +320,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=3a3c03c3" defer></script>
+<script src="site.js?v=b6bbed66" defer></script>
 <script src="fx-stars.js?v=4d933fcb" defer></script>
 </body>
 </html>

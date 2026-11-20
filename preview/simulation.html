@@ -11,7 +11,7 @@
 <link rel="icon" href="../img/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="../img/favicon.svg"><link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=aa1c74e1">
+<link rel="stylesheet" href="style.css?v=7173eb6d">
 </head>
 <body>
 <div style="background:#B4232F;color:#fff;font:600 13px/1.4 system-ui,sans-serif;text-align:center;padding:6px 10px">Preview: changes waiting for approval. Not the live site.</div>
@@ -28,11 +28,12 @@
 .simbar label.chipbtn input{margin:0;accent-color:var(--blue)}
 .simpair{display:grid;grid-template-columns:1fr 1fr}
 .simcell{position:relative;min-width:0}
-.simreset{position:absolute;right:14px;bottom:58px;display:inline-flex;align-items:center;gap:8px;font:650 .92rem/1 var(--font);color:#fff;background:var(--blue);border:0;border-radius:999px;padding:11px 18px 11px 14px;box-shadow:0 6px 18px rgba(13,59,122,.28);cursor:pointer;white-space:nowrap}
+.simresetrow{display:flex;justify-content:center;padding:10px 10px 2px}
+.simreset{display:inline-flex;align-items:center;gap:8px;font:650 .92rem/1 var(--font);color:#fff;background:var(--blue);border:0;border-radius:999px;padding:11px 18px 11px 14px;box-shadow:0 6px 18px rgba(13,59,122,.28);cursor:pointer;white-space:nowrap}
 .simreset svg{width:17px;height:17px}
 .simreset:hover{background:var(--navy)}
 .simreset:focus-visible{outline:3px solid #F0A940;outline-offset:2px}
-@media (max-width:640px){.simreset{right:8px;bottom:8px;font-size:.8rem;padding:8px 12px 8px 10px}}
+@media (max-width:640px){.simreset{font-size:.86rem;padding:10px 16px 10px 12px}}
 .simcell+.simcell{border-left:1px dashed var(--line)}
 .simlab{position:absolute;top:6px;left:0;right:0;text-align:center;font:600 .74rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);pointer-events:none}
 .simstage .simpair canvas{height:min(74vh,660px)}
@@ -87,9 +88,9 @@
           </div>
           <div class="simpair">
             <div class="simcell"><span class="simlab">Tensegrity: bones and fascia</span><canvas id="body3d" role="img" aria-label="A three-dimensional human skeleton built as a tensegrity: separate bones, jointed like a real skeleton, held up by a web of fascia cables, with the main fascial lines in color. Tapping it places an imperfection."></canvas></div>
-            <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas>
-              <button class="simreset" id="sim3d-reset" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M3.2 3.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset to healthy</button></div>
+            <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas></div>
           </div>
+          <div class="simresetrow"><button class="simreset" id="sim3d-reset" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M3.2 3.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset to healthy</button></div>
           <div class="simload"><span>Computed load on the structure</span><span class="bar"><i id="sim-load"></i></span><b id="sim-load-v">at rest</b></div>
           <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
         </div>
@@ -106,9 +107,9 @@
           </div>
           <div class="card" style="background:var(--ice)">
             <span class="tag">This is real math</span>
-            <p>Simple, but not a cartoon. The skeleton is 45 separate bones, jointed the way a real skeleton is: a ball at each hip and shoulder and between the vertebrae, a hinge at each knee, ankle and elbow. Nothing in it holds itself up. About 790 tension-only fascia cables do that, against real gravity, which pulls on every one of the 190 points all the time. Every tap truly redistributes force, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
-            <p>So cut enough fascia, or break a bone that carries weight, and the body really falls. Fascia slides along its lines toward even tension unless friction holds it.</p>
-            <p class="small muted" style="margin-bottom:0">What is simplified: the neck and chest vertebrae are grouped in pairs, the ribs are six pairs on a springy cartilage front, the pelvis is held as one ring by its ligaments, and the feet are planted. Nothing here contracts. The model stands on passive tension alone, which a living body cannot do: real standing also takes active muscle.</p>
+            <p>Simple, but not a cartoon. The skeleton is 45 separate bones, jointed the way a real skeleton is: a ball at each hip and shoulder and between the vertebrae, a hinge at each knee, ankle and elbow. Nothing in it holds itself up. About 700 tension-only fascia cables do that, against real gravity, which pulls on every one of the 190 points all the time. The cables are drawn taut: the lines rest 1.25 percent shorter than the distance they span and the deep guys of the spine 2 percent shorter, which is close to the most this model can carry before the healthy body folds forward at the chest. Every tap truly redistributes force, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
+            <p>The cables are grouped into a few separate systems: nine named lines on each side, the deep guys of the spine on the left, the right and the midline, and seven regions of general web. A cut anywhere releases the whole system, as a cut rope carries no tension anywhere along its length. So one cut shifts the posture, and cutting enough, or breaking a bone that carries weight, makes the body really fall. Fascia slides along its lines toward even tension unless friction holds it.</p>
+            <p class="small muted" style="margin-bottom:0">What is simplified: the neck and chest vertebrae are grouped in pairs, the ribs are six pairs on a springy cartilage front, the pelvis is held as one ring by its ligaments, the wrist does not bend, and the feet are planted. Treating a whole line as one band that lets go at once is the strongest version of that idea; real fascia is also tied down along its length. Nothing here contracts. The model stands on passive tension alone, which a living body cannot do: real standing also takes active muscle.</p>
           </div>
           <div class="card" style="grid-column:1/-1">
             <span class="tag">Where the model is going</span>
@@ -134,7 +135,7 @@
           <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button><button class="btn ghost" data-imode="torque" type="button">Twist</button></div>
           <h3 style="margin-top:16px">Or operate</h3>
           <div class="btns" role="group" aria-label="Surgical tools"><button class="btn ghost" data-imode="pluck" type="button">Pluck a node</button><button class="btn ghost" data-imode="cut" type="button">Cut a cable</button><button class="btn ghost" data-imode="break" type="button">Break a bone</button></div>
-          <p class="small muted" style="margin:8px 0 0">Cut a fascial line and the whole band between its anchors goes slack, because a line is one continuous sheet. Break a bone and it snaps where you tap. Some damage the web absorbs: one cut cord, a collarbone, the thin outer shin bone. Other damage brings the body down: a thigh bone, a shin bone, a vertebra in the lower back, or every line on one side. Press Reset to healthy, under the person, to heal.</p>
+          <p class="small muted" style="margin:8px 0 0">The fascia here is a few separate systems, each one continuous: every named line on each side of the body, the deep guys of the spine on each side, and the general web region by region. Cut one cord and the whole system it belongs to lets go, from end to end, so the body shifts far from the cut. Break a bone and it snaps where you tap. Tap the head with the bone tool and the skull is crushed. Some damage the rest absorbs with a shift in posture. Other damage brings the body down: a thigh bone, a shin bone, a vertebra in the lower back, the skull, or the front line on both sides. Press Reset to healthy, under the figures, to heal.</p>
           <label class="range">Strength <input type="range" id="sim-strength" min="1" max="6" value="3"></label>
           <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (imperfections creep along the lines)</label>
           <div class="edbox">
@@ -279,9 +280,9 @@
     </div>
   </div>
 </section>
-<script src="sim-core.js?v=7ee1aeb6" defer></script>
+<script src="sim-core.js?v=8336f575" defer></script>
 <script src="sim-figure.js?v=93c4c1bf" defer></script>
-<script src="sim3d.js?v=b908dedc" defer></script>
+<script src="sim3d.js?v=8adb43e6" defer></script>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><span class="lg" aria-hidden="true"><i></i></span><span>Universe Model</span></a>
@@ -291,7 +292,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=3a3c03c3" defer></script>
+<script src="site.js?v=b6bbed66" defer></script>
 <script src="fx-stars.js?v=4d933fcb" defer></script>
 </body>
 </html>

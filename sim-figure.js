@@ -32,7 +32,7 @@
     return out;
   }
 
-  const SKIN = [214, 168, 132], HAIR = [58, 40, 30];
+  const SKIN = [214, 168, 132], HAIR = [74, 52, 36], BEARD = [104, 80, 60];
   const SUIT = { male: [16, 48, 98], female: [15, 112, 128] };
 
   function draw(ctx, o) {
@@ -46,14 +46,14 @@
     const wF = female ? 1 : 0;
     const T = [];
     T.push(ringAxis(add(m2('hipL', 'hipR'), add(mul(Up, -k(female ? 5 : 6.5)), mul(Fp, -k(1)))), Up, Fp, k(female ? 5.5 : 7), k(female ? 5.5 : 7), k(5), k(6), sAvg('pubis', 'coccyx')));
-    T.push(ringFrom(g('trochL'), g('trochR'), g('pubis'), g('coccyx'), [k(1.2), k(1.2), k(2.5), k(5.5 + wF * 0.5)], sAvg('trochL', 'trochR', 'glutL' in I ? 'pubis' : 'pubis')));
-    T.push(ringFrom(g('crestL'), g('crestR'), m2('asisL', 'asisR'), g('tlf'), [k(1.4 - wF * 0.6), k(1.4 - wF * 0.6), k(3), k(1.2)], sAvg('crestL', 'crestR', 'tlf')));
-    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-2.6 - wF * 0.6), k(-2.6 - wF * 0.6), k(-3.1), k(1.4)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
-    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(2.3 - wF * 2), k(2.3 - wF * 2), k(0.4), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
+    T.push(ringFrom(g('trochL'), g('trochR'), g('pubis'), g('coccyx'), [k(0.6 + wF * 0.6), k(0.6 + wF * 0.6), k(2.5), k(5.5 + wF * 0.5)], sAvg('trochL', 'trochR', 'glutL' in I ? 'pubis' : 'pubis')));
+    T.push(ringFrom(g('crestL'), g('crestR'), m2('asisL', 'asisR'), g('tlf'), [k(0.1 + wF * 0.7), k(0.1 + wF * 0.7), k(2.4), k(1.2)], sAvg('crestL', 'crestR', 'tlf')));
+    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-3.1 - wF * 0.4), k(-3.1 - wF * 0.4), k(-4.0), k(1.2)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
+    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(0.4 - wF * 0.6), k(0.4 - wF * 0.6), k(0.2), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
     if (female) T.push(lerpRing(T[T.length - 1], ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(0.8), k(0.8), k(6.5), k(1.6)]), 0.55));
-    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(3.4 - wF * 1.8), k(3.4 - wF * 1.8), k(female ? 4.2 : 3.4), k(2.4)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
-    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-1.2 - wF * 0.6), k(-1.2 - wF * 0.6), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
-    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), g('c7'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
+    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(4.4 - wF * 2.8), k(4.4 - wF * 2.8), k(female ? 4.2 : 3.8), k(2.8)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
+    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), m2('napeL', 'napeR'), [k(-0.6 - wF * 1.2), k(-0.6 - wF * 1.2), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
+    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), m2('napeL', 'napeR'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
     // head frame: the skull's own axes, re-expressed so the healthy head is upright and faces straight ahead
     const hf = Q => { const e1 = norm(sub(Q[I.top], Q[I.chin])), e2 = ortho(sub(Q[I.brow], Q[I.occ]), e1); return [e1, e2, cross(e1, e2)]; };
     const fc0 = hf(o.ref || P), fc1 = hf(P), remap = v => { const c = fc0.map(e => dot(v, e)); return norm(add(add(mul(fc1[0], c[0]), mul(fc1[1], c[1])), mul(fc1[2], c[2]))); };
@@ -101,7 +101,7 @@
       mesh(F, 14, () => 'skin', true, true);
     }
     // ---------- arms ----------
-    const Ft = ortho(sub(g('stTop'), g('c7')), norm(sub(g('acromL'), g('acromR'))));
+    const Ft = ortho(sub(g('stTop'), m2('napeL', 'napeR')), norm(sub(g('acromL'), g('acromR'))));
     for (const s of ['L', 'R']) {
       const ac = g('acrom' + s), el = g('elbow' + s), wr = g('wrist' + s), ha = g('hand' + s), aw = female ? 0.86 : 1;
       const top = add(ac, mul(norm(sub(el, ac)), k(2.5)));
@@ -138,10 +138,13 @@
     const hairAt = (phi, th) => { const s = Math.sin(th), c = Math.cos(th);
       if (phi > 0.62) return true; if (s > 0.45) return phi > (female ? 0.5 : 0.56);
       if (s < -0.15) return phi > (female ? -0.95 : -0.25); return phi > (female ? -0.35 : 0.12) + 0.25 * Math.max(0, s) && !(Math.abs(c) > 0.8 && phi < 0.25 && !female); };
+    // the male figure wears a short full beard: jaw, chin and upper lip, joining the hair in front of the ears
+    const beardAt = (phi, th) => { if (female) return false; const s = Math.sin(th), c = Math.abs(Math.cos(th));
+      if (s < -0.05) return false; if (c > 0.82) return phi < 0.14 && phi > -1.05; if (c > 0.5) return phi < -0.16 && phi > -1.2; return phi < -0.3 && phi > -1.3; };
     for (let i = 0; i < mh; i++) for (let j = 0; j < nh; j++) {
       const j2 = (j + 1) % nh, phi = -Math.PI / 2 + Math.PI * (i + 0.5) / mh, th = (j + 0.5) / nh * Math.PI * 2;
       const qq = [HR[i][j], HR[i][j2], HR[i + 1][j2], HR[i + 1][j]];
-      pushQuad(qq, hairAt(phi, th) ? 'hair' : 'skin', sAvg('occ', 'c1') * 0.5, hC, norm(qq.reduce((a, q) => add(a, norm(sub(q, hC))), [0, 0, 0])));
+      pushQuad(qq, hairAt(phi, th) ? 'hair' : beardAt(phi, th) ? 'beard' : 'skin', sAvg('occ', 'c1') * 0.5, hC, norm(qq.reduce((a, q) => add(a, norm(sub(q, hC))), [0, 0, 0])));
     }
     if (female) { // a low bun
       const bc = add(hC, add(mul(Fh, -k(10.8)), mul(Uh, -k(1.5)))), BR = [];
@@ -168,7 +171,7 @@
     items.sort((a, b) => a[0] - b[0]);
     const load = Math.max(0, Math.min(1, o.load || 0));
     for (const [, v, n, q] of items) {
-      const base = q.kind === 'suit' ? SUIT[o.sex] : q.kind === 'hair' ? HAIR : SKIN;
+      const base = q.kind === 'suit' ? SUIT[o.sex] : q.kind === 'hair' ? HAIR : q.kind === 'beard' ? BEARD : SKIN;
       let col = base;
       if (q.kind === 'skin' && o.strainTint) { const t = Math.min(1, q.st * 16) * 0.3; col = [base[0] + (205 - base[0]) * t, base[1] + (92 - base[1]) * t, base[2] + (80 - base[2]) * t]; }
       const lam = Math.max(0, dot(n, L)), rim = Math.pow(1 - Math.abs(n[2]), 3) * 0.12;
@@ -192,8 +195,8 @@
         ctx.fillStyle = 'rgba(120,76,52,.16)'; ctx.beginPath(); ctx.ellipse(ec[0], ec[1] - w * 0.15, w * 1.35, w * 0.75, rot, 0, 7); ctx.fill();
         ctx.strokeStyle = 'rgba(70,44,30,.7)'; ctx.lineWidth = Math.max(0.9, w * 0.16); ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(e0[0], e0[1]); ctx.quadraticCurveTo(ec[0], ec[1] + w * (0.32 - 0.12 * load), e1[0], e1[1]); ctx.stroke();
-        const bIn = P2(0.21 - 0.05 * load, ph + sgn * 0.2, 0.2), bOut = P2(0.2, ph + sgn * 0.6, 0.05), bMid = P2(0.25 - 0.02 * load, ph + sgn * 0.4, 0.2);
-        ctx.strokeStyle = 'rgba(58,40,30,.55)'; ctx.lineWidth = Math.max(0.8, w * 0.2);
+        const bIn = P2((female ? 0.21 : 0.17) - 0.05 * load, ph + sgn * 0.2, 0.2), bOut = P2(0.2, ph + sgn * 0.6, 0.05), bMid = P2(0.25 - 0.02 * load, ph + sgn * 0.4, 0.2);
+        ctx.strokeStyle = female ? 'rgba(58,40,30,.55)' : 'rgba(64,44,30,.8)'; ctx.lineWidth = Math.max(0.8, w * (female ? 0.2 : 0.34));
         ctx.beginPath(); ctx.moveTo(bIn[0], bIn[1]); ctx.quadraticCurveTo(bMid[0], bMid[1], bOut[0], bOut[1]); ctx.stroke();
       }
       const nTop = P2(0.04, ph + 0.06, 0.4), nTip = P2(-0.15, ph + 0.05, 1.2), nL = P2(-0.2, ph - 0.1, 0.5), nR = P2(-0.2, ph + 0.1, 0.5);
