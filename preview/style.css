@@ -39,11 +39,11 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
    gradient, fixed to the window and three windows wide, so a single band of colour crosses logo, name and menu. */
 .site-head .brand span,.site-head .brand .lg i,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{
   --hb:transparent;
-  background-image:linear-gradient(100deg,currentColor 0%,currentColor 47.4%,#1D5FD1 48.7%,#6D4AFF 50%,#F2A93B 51.3%,currentColor 52.6%,currentColor 100%),linear-gradient(var(--hb),var(--hb));
-  background-size:300% 100%,auto;background-attachment:fixed,scroll;background-position:100% 0,0 0;background-repeat:no-repeat;
-  -webkit-background-clip:text,padding-box;background-clip:text,padding-box;-webkit-text-fill-color:transparent;
+  background-image:linear-gradient(100deg,currentColor 0%,currentColor 47.4%,#1D5FD1 48.7%,#6D4AFF 50%,#F2A93B 51.3%,currentColor 52.6%,currentColor 100%),linear-gradient(var(--hb),var(--hb)) !important;
+  background-size:300% 100%,auto !important;background-attachment:fixed,scroll !important;background-position:100% 0,0 0;background-repeat:no-repeat !important;
+  -webkit-background-clip:text,padding-box !important;background-clip:text,padding-box !important;-webkit-text-fill-color:transparent;
   animation:headsheen 7s linear infinite}
-.site-head .brand .lg i{-webkit-background-clip:border-box,border-box;background-clip:border-box,border-box}
+.site-head .brand .lg i{-webkit-background-clip:border-box,border-box !important;background-clip:border-box,border-box !important}
 .site-head .nav a:not(.cta):hover,.site-head .nav .grpbtn:hover{--hb:var(--mist)}
 .site-head .nav a[aria-current="page"]{--hb:var(--ice)}
 .site-head .nav .grp.on>.grpbtn{--hb:var(--ice)}
