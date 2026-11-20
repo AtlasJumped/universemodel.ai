@@ -225,11 +225,13 @@ ul.plain b{font-variant-numeric:tabular-nums;color:var(--navy)}
 .nav .drop{display:none;position:absolute;top:100%;left:0;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:50;flex-direction:column}
 .nav .drop a{display:block;padding:10px 12px}
 .nav .grp:hover .drop,.nav .grp:focus-within .drop{display:flex}
+/* small screens: the menu is one scrolling panel, every page listed under its group heading; the same on every page */
 @media (max-width:1180px){
-  .nav .grpbtn{width:100%;justify-content:space-between;padding:12px;font-size:.98rem}
-  .nav .grp:hover .drop,.nav .grp:focus-within .drop{display:none}
-  .nav .drop{position:static;border:0;box-shadow:none;padding:0 0 4px 12px;min-width:0}
-  .nav .grp.open .drop{display:flex}
+  .nav{max-height:calc(100vh - 66px);max-height:calc(100dvh - 66px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 18px 30px rgba(11,37,69,.12)}
+  .nav .grpbtn{width:100%;padding:14px 12px 2px;font-size:.8rem;font-weight:600;letter-spacing:.02em;cursor:default;pointer-events:none}
+  .nav .grpbtn span{display:none}
+  .site-head .nav .grp.on>.grpbtn{--hb:transparent}
+  .nav .drop,.nav .grp:hover .drop,.nav .grp:focus-within .drop,.nav .grp.open .drop{display:flex;position:static;border:0;box-shadow:none;padding:0 0 4px 10px;min-width:0}
 }
 
 /* the arrow everywhere outside the simulations: no text I-beam over words (links keep the hand) */
@@ -281,8 +283,8 @@ summary,label{cursor:pointer}
 
 /* 2026-11-19: the mechanics sections on the Math and Physics pages */
 .lvl{display:inline-block;font:600 .72rem/1 var(--font);padding:4px 8px;border-radius:999px;vertical-align:2px;white-space:nowrap}
-.lvl.est{background:#DFF3E7;color:#1D6B3F}.lvl.exa{background:#DCEBFF;color:#1B4F9C}.lvl.rea{background:#FCEFD9;color:#8A5A0B}.lvl.con{background:#ECE4FB;color:#5A34A8}.lvl.open{background:#FBE2E2;color:#8E1B1B}.lvl.obs{background:#E9EDF3;color:#44536A}
-@media (min-width:900px){.road.mm-two{grid-template-columns:1fr 1fr}}
+.lvl.est{background:#DFF3E7;color:#1D6B3F}.lvl.exa{background:#DCEBFF;color:#1B4F9C}.lvl.rea{background:#FCEFD9;color:#8A5A0B}.lvl.con{background:#ECE4FB;color:#5A34A8}.lvl.open{background:#FBE2E2;color:#8E1B1B}.lvl.wip{background:#E3F1F4;color:#0E5E6F}.lvl.obs{background:#E9EDF3;color:#44536A}
+@media (min-width:900px){.road.mm-two{grid-template-columns:1fr 1fr}.mm-three{grid-template-columns:repeat(3,1fr)}@media(max-width:900px){.mm-three{grid-template-columns:1fr}}}
 .mm-h{font-size:1.28rem;margin:38px 0 12px;padding-top:18px;border-top:1px solid var(--line)}
 .mm-ops .card b.big{display:block;font:750 1.9rem/1 var(--font);color:var(--blue);margin-bottom:8px}
 .mm-ops .card p{font-size:.95rem}

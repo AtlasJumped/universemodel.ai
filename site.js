@@ -7,9 +7,14 @@
 (() => {
   if (typeof document === 'undefined') return;
   const btn = document.querySelector('.menu'), nav = document.querySelector('.nav');
-  const setMenu = o => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', o); };
+  // the small-screen menu: one scrolling panel with every page in it; the page behind does not scroll while it is open
+  const setMenu = o => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', o); document.documentElement.classList.toggle('menu-open', o); if (o) nav.scrollTop = 0; };
   if (btn && nav) {
-    btn.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+    btn.addEventListener('click', e => { e.stopPropagation(); setMenu(!nav.classList.contains('open')); });
+    nav.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+    document.addEventListener('click', e => { if (nav.classList.contains('open') && !e.target.closest('.nav')) setMenu(false); });
+    addEventListener('resize', () => { if (innerWidth > 1180 && nav.classList.contains('open')) setMenu(false); });
+    addEventListener('pageshow', () => setMenu(false));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) { setMenu(false); btn.focus(); } });
   }
   const grps = [...document.querySelectorAll('.nav .grp')];
@@ -17,7 +22,7 @@
   grps.forEach(g => {
     const b = g.querySelector('.grpbtn'); if (!b) return;
     b.setAttribute('aria-expanded', 'false');
-    b.addEventListener('click', () => { const o = !g.classList.contains('open'); closeAll(g); g.classList.toggle('open', o); b.setAttribute('aria-expanded', o); });
+    b.addEventListener('click', () => { if (innerWidth <= 1180) return; const o = !g.classList.contains('open'); closeAll(g); g.classList.toggle('open', o); b.setAttribute('aria-expanded', o); });
   });
   document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('.nav .grp')) closeAll(null); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(null); });
@@ -706,13 +711,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 .tgc-key i{display:inline-block;width:20px;vertical-align:middle;margin-right:5px;border-radius:3px}
 .tgc-status{margin:0;max-width:none;font-size:.84rem;color:var(--soft);min-height:1.3em}
 .tgc-chk{display:inline-flex;align-items:center;gap:5px;margin-left:8px;font:600 .84rem/1 var(--font);color:var(--navy);cursor:pointer}.tgc-chk input{accent-color:var(--blue)}
-.nav .grp.open .drop{display:flex}
-@media (max-width:1400px){
-  .nav .grpbtn{padding:12px 12px 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;cursor:default}
-  .nav .grpbtn span{display:none}
-  .nav .grp.on>.grpbtn{background:none}
-  .nav .drop{display:flex;position:static;border:0;box-shadow:none;padding:0 0 0 8px;min-width:0}
-}`;
+`;
   document.head.appendChild(st);
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
