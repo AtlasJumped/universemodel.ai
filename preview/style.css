@@ -302,3 +302,4 @@ summary,label{cursor:pointer}
 @media (max-width:860px){.mm-grow-g{grid-template-columns:1fr}.mm-grow canvas{min-height:280px;height:280px}}
 .bb-rows{gap:14px;align-items:stretch}
 .bb-rows>.card{margin:0}
+.mm-t3 .r{grid-template-columns:minmax(0,.55fr) minmax(0,1.6fr)}
