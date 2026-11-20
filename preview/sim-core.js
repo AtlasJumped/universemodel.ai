@@ -16,8 +16,8 @@
     ['c1','c',[0,158,-3]],['c7','c',[0,147,-6]],['t6','c',[0,129,-10]],['t12','c',[0,110,-8]],['l3','c',[0,101,-5]],
     ['s1','c',[0,93,-8]],['coccyx','c',[0,85,-9]],['stTop','c',[0,145,6]],['xiph','c',[0,122,11]],['pubis','c',[0,86,9]],
     ['navel','c',[0,104,13],1],['throat','c',[0,151,5],1],['diaphragm','c',[0,118,1],1],['tlf','c',[0,101,-13],1],
-    ['scm','b',[4,152,3],1],['neckSide','b',[6,154,-2],1],['acrom','b',[18,146,-1]],['scapInf','b',[10,126,-11]],
-    ['ribUp','b',[14,132,2]],['ribLow','b',[13,116,3]],['elbow','b',[21,113,-3]],['wrist','b',[23,88,1]],['hand','b',[23,70,3]],
+    ['scm','b',[4,152,3],1],['neckSide','b',[6,154,-2],1],['acrom','b',[19,146,-1]],['scapInf','b',[10,126,-11]],
+    ['ribUp','b',[14,132,2]],['ribLow','b',[13,116,3]],['elbow','b',[26,114,-3]],['wrist','b',[31,90,1]],['hand','b',[34,73,3]],
     ['pec','b',[9,136,9],1],['lat','b',[12,118,-7],1],['abd','b',[11,104,9],1],['trunk','b',[15,110,0],1],
     ['erector','b',[4,115,-12],1],['erectorLow','b',[4,98,-10],1],['psoas','b',[4,97,1],1],['tlfRaphe','b',[9,104,-9],1],
     ['asis','b',[12,96,7]],['crest','b',[14,101,-3]],['hip','b',[9,89,0]],['troch','b',[16,88,-1]],['isch','b',[6,84,-6]],
@@ -407,6 +407,10 @@
       make: (S, I) => [{ type: 'point', node: I.abdR, radius: 7, density: 2.8, friction: 8 }] },
     belly: { label: 'Belly load', text: 'Belly load: the abdomen carries four times its mass and 80% more volume, with no change in density. Gravity and the spacer do the rest.',
       make: (S, I) => [{ type: 'point', node: I.navel, radius: 13, density: 1, mass: 4, volume: 1.8 }] },
+    knee: { label: 'Knee injury', text: 'Knee injury, right: after an injury the tissue around the joint heals denser and stickier (density 3.2, friction 6), so the layers no longer slide. Watch the hip above it and the foot below.',
+      make: (S, I) => [{ type: 'point', node: I.kneeR, radius: 9, density: 3.2, friction: 6 }] },
+    elbow: { label: 'Tennis elbow', text: 'Tennis elbow, right: the tissue on the outside of the elbow, where the muscles that lift the wrist attach, densified (density 3.4). Watch the hand, the shoulder and the neck.',
+      make: (S, I) => [{ type: 'point', node: I.elbowR, radius: 8, density: 3.4, friction: 3 }] },
     hams: { label: 'Tight hamstrings', text: 'Tight hamstrings: the back line between the sitting bones and the knees densified on both sides (density 3).',
       make: (S, I, y) => [{ type: 'set', node: I.ischL, edges: S.lineEdges('sbl', (e, k) => y(k, p => p[1] > 45 && p[1] < 90)), density: 3, radius: 0 }] }
   };

@@ -386,7 +386,9 @@ const TG = (() => {
   function make(key) {
     const row = SHAPES.find(s => s[0] === key) || SHAPES[0];
     const sh = row[2](), { P, W, C, T } = sh.b, n = P.length;
-    const x = new Float64Array(3 * n), w = new Float64Array(W);
+    // spare room for one extra node per strut: a strut that is broken cracks in the middle and hinges there
+    const cap = n + C.filter(c => c.kind === 'strut').length;
+    const x = new Float64Array(3 * cap), w = new Float64Array(cap); w.set(W);
     P.forEach((p, i) => { x[3 * i] = p[0]; x[3 * i + 1] = p[1]; x[3 * i + 2] = p[2]; });
     C.forEach(c => {
       const L = dist(P[c.a], P[c.b]);
@@ -397,8 +399,9 @@ const TG = (() => {
       c.comp = tens ? c.L0 / ea : c.kind === 'bend' ? 1 / (sh.kb || 200) : 0;
       c.uni = tens; c.draw = c.kind !== 'brace' && c.kind !== 'bend'; c.alive = true; c.T = 0; c.Tema = 0;
     });
-    const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, x, p: new Float64Array(x), v: new Float64Array(3 * n), w, C, T, t: 0,
-      ay0: new Float64Array(sh.b.A), ay: new Float64Array(sh.b.A), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head };
+    const ay0 = new Float64Array(cap); ay0.set(sh.b.A);
+    const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, n0: n, cap, c0: C.length, cracks: [], x, p: new Float64Array(x), v: new Float64Array(3 * cap), w, C, T, t: 0,
+      ay0, ay: new Float64Array(ay0), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head };
     // settle into equilibrium under gravity with strong damping, then freeze the result as time zero
     for (let k = 0; k < 150; k++) step(S, 1 / 60, 16, 14);
     S.v.fill(0);
@@ -456,12 +459,25 @@ const TG = (() => {
     }
   }
 
-  function reset(S) { S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); measure(S, 1); S.t = 0; }
+  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); measure(S, 1); S.t = 0; }
+
+  // A broken strut does not vanish: it cracks in the middle. The two halves stay, joined by a free hinge, so the strut
+  // can no longer push its ends apart and the physics decides how the pieces fold.
+  function snap(S, c) {
+    c.alive = false;
+    if (c.half || S.n >= S.cap) return;
+    const i = S.n++, a = 3 * c.a, b = 3 * c.b, j = 3 * i, x = S.x;
+    for (let k = 0; k < 3; k++) { x[j + k] = (x[a + k] + x[b + k]) / 2; S.p[j + k] = x[j + k]; S.v[j + k] = (S.v[a + k] + S.v[b + k]) / 2; }
+    S.w[i] = Math.max(S.w[c.a], S.w[c.b]) || 1; S.ay[i] = 0; S.ay0[i] = 0;
+    const half = (p, q) => ({ a: p, b: q, kind: 'strut', L0: c.L0 / 2, comp: 0, uni: false, draw: true, alive: true, T: 0, Tema: 0, half: true });
+    S.C.push(half(c.a, i), half(i, c.b)); S.cracks.push(i);
+  }
 
   function kill(S, ci) {
     const c = S.C[ci]; if (!c || !c.alive) return 0;
     let k = 0;
-    if (c.kind === 'strut' && c.grp) S.C.forEach(o => { if (o.alive && (o.grp === c.grp || o.grp2 === c.grp)) { o.alive = false; k++; } });
+    if (c.kind === 'strut' && c.grp) S.C.slice().forEach(o => { if (o.alive && (o.grp === c.grp || o.grp2 === c.grp)) { if (o.kind === 'strut' && o.draw) snap(S, o); else o.alive = false; k++; } });
+    else if (c.kind === 'strut') { snap(S, c); k = 1; }
     else { c.alive = false; k = 1; }
     return k;
   }
@@ -539,7 +555,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 <div class="tgc-row" role="group" aria-label="What a tap does">
   <button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button>
   <button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button>
-  <button type="button" class="chipbtn cut" data-m="strut">Collapse a strut</button>
+  <button type="button" class="chipbtn cut" data-m="strut">Break a strut</button>
 </div>
 <p class="tgc-info"><span class="tgc-text"></span>
 <span class="tgc-key"><span><i style="height:6px;background:var(--deep)"></i>strut: compression</span><span><i style="height:3px;background:var(--sky)"></i>cable: tension</span><span><i style="height:0;border-top:2px dashed #A9B8CC"></i>slack cable</span><span><i style="height:4px;background:#1D5FD1;box-shadow:0 0 6px #5B9BE6"></i>tension changing</span></span></p>
@@ -553,8 +569,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const say = () => {
       const parts = [];
       if (cuts) parts.push(`${cuts} cable${cuts > 1 ? 's' : ''} cut`);
-      if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} removed`);
-      let m = parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to remove it.' : 'Tap a node to send a pulse of tension; drag to turn.';
+      if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} broken`);
+      let m = parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : 'Tap a node to send a pulse of tension; drag to turn.';
       if (!running) m = 'Paused. ' + m + ' Press Play to run the physics.';
       status.textContent = m;
     };
@@ -666,6 +682,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       for (let i = 0; i < S.n; i++) {
         const p = P[i];
         if (!S.w[i]) { ctx.fillStyle = '#7C8DA6'; ctx.fillRect(p[0] - 3, p[1] - 3, 6, 6); continue; }
+        if (i >= S.n0) { // the crack in a broken strut: a short red line across it
+          const h = S.C.find(c => c.half && c.alive && c.b === i) || S.C.find(c => c.half && c.alive && c.a === i); if (!h) continue;
+          const q = P[h.b === i ? h.a : h.b], dx = p[0] - q[0], dy = p[1] - q[1], d = Math.hypot(dx, dy) || 1, r = 7 * p[3] * Math.min(1.3, Math.min(W, H) / 420) + 3;
+          ctx.strokeStyle = '#D33A45'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(p[0] - dy / d * r, p[1] + dx / d * r); ctx.lineTo(p[0] + dy / d * r, p[1] - dx / d * r); ctx.stroke(); continue; }
         if (S.T.length && !S.C.some(c => c.alive && c.kind !== 'fabric' && c.draw && (c.a === i || c.b === i))) continue;
         ctx.fillStyle = blue; ctx.beginPath(); ctx.arc(p[0], p[1], 3.2 * p[3], 0, 7); ctx.fill();
       }

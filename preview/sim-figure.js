@@ -46,13 +46,13 @@
     const wF = female ? 1 : 0;
     const T = [];
     T.push(ringAxis(add(m2('hipL', 'hipR'), add(mul(Up, -k(female ? 5 : 6.5)), mul(Fp, -k(1)))), Up, Fp, k(female ? 5.5 : 7), k(female ? 5.5 : 7), k(5), k(6), sAvg('pubis', 'coccyx')));
-    T.push(ringFrom(g('trochL'), g('trochR'), g('pubis'), g('coccyx'), [k(1.2), k(1.2), k(2.5), k(5.5 + wF * 0.5)], sAvg('trochL', 'trochR', 'glutL' in I ? 'pubis' : 'pubis')));
-    T.push(ringFrom(g('crestL'), g('crestR'), m2('asisL', 'asisR'), g('tlf'), [k(1.4 - wF * 0.6), k(1.4 - wF * 0.6), k(3), k(1.2)], sAvg('crestL', 'crestR', 'tlf')));
-    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-2.6 - wF * 0.6), k(-2.6 - wF * 0.6), k(-3.1), k(1.4)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
-    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(2.3 - wF * 2), k(2.3 - wF * 2), k(0.4), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
+    T.push(ringFrom(g('trochL'), g('trochR'), g('pubis'), g('coccyx'), [k(0.6 + wF * 0.6), k(0.6 + wF * 0.6), k(2.5), k(5.5 + wF * 0.5)], sAvg('trochL', 'trochR', 'glutL' in I ? 'pubis' : 'pubis')));
+    T.push(ringFrom(g('crestL'), g('crestR'), m2('asisL', 'asisR'), g('tlf'), [k(0.1 + wF * 0.7), k(0.1 + wF * 0.7), k(2.4), k(1.2)], sAvg('crestL', 'crestR', 'tlf')));
+    T.push(ringFrom(g('trunkL'), g('trunkR'), g('navel'), mix(m2('erectorL', 'erectorR'), m2('erectorLowL', 'erectorLowR'), 0.5), [k(-3.9 - wF * 0.1), k(-3.9 - wF * 0.1), k(-4.3), k(1.2)], sAvg('trunkL', 'trunkR', 'navel', 'tlf')));
+    T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(1.5 - wF * 1.6), k(1.5 - wF * 1.6), k(0.2), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
     if (female) T.push(lerpRing(T[T.length - 1], ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(0.8), k(0.8), k(6.5), k(1.6)]), 0.55));
-    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(3.4 - wF * 1.8), k(3.4 - wF * 1.8), k(female ? 4.2 : 3.4), k(2.4)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
-    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-1.2 - wF * 0.6), k(-1.2 - wF * 0.6), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
+    T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(5.4 - wF * 3.8), k(5.4 - wF * 3.8), k(female ? 4.2 : 3.8), k(2.8)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
+    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-0.6 - wF * 1.2), k(-0.6 - wF * 1.2), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
     T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), g('c7'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
     // head frame: the skull's own axes, re-expressed so the healthy head is upright and faces straight ahead
     const hf = Q => { const e1 = norm(sub(Q[I.top], Q[I.chin])), e2 = ortho(sub(Q[I.brow], Q[I.occ]), e1); return [e1, e2, cross(e1, e2)]; };

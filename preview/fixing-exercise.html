@@ -73,7 +73,7 @@
       <p>A tensegrity is more like a great system of pulleys. Every strut and cable passes force on to others, the way a rope passes force around a run of pulleys, and the whole system only works when every pulley is in its proper place. Move one pulley a little and every line pulls slightly wrong; the structure still lifts, but it squeezes inward to make up for it. Move several, and it starts to collapse in on itself. That is why loading an imperfect tensegrity is a different thing from loading a column: the load goes wherever the misaligned pulleys send it.</p>
     </div>
     <div class="fx-sim">
-      <canvas id="fxcol" class="cur-cut" role="img" aria-label="A two-dimensional tensegrity column of four stacked modules. Struts are dark bars; cables are colored by tension from blue (low) to red (high). Tap a cable to cut it, or switch to breaking a strut."></canvas>
+      <canvas id="fxcol" class="cur-cut" role="img" aria-label="A two-dimensional tensegrity column of four stacked modules. Struts are dark bars; cables are colored by tension from blue (low) to red (high). A weight hangs on a string above it. Tap a cable or the string to cut it, or switch to breaking a strut."></canvas>
       <div class="btns">
         <button class="chipbtn on" type="button" data-fxm="cut" aria-pressed="true">Cut a cable</button>
         <button class="chipbtn" type="button" data-fxm="strut" aria-pressed="false">Break a strut</button>
@@ -88,11 +88,138 @@
         <div><dt>Top displaced vs optimized</dt><dd id="fx-sway">0% of height</dd></div>
       </dl>
       <div class="fx-key"><span><i style="background:#5B9BE6"></i>low tension</span><span><i style="background:#C62828"></i>high tension</span><span><i style="background:repeating-linear-gradient(90deg,#9AA9BC 0 5px,transparent 5px 9px)"></i>slack</span><span><i style="background:#0E3A75;height:7px"></i>strut (bone)</span></div>
-      <p class="small muted" style="margin:10px 0 0">Tap a cable to cut it, or choose Break a strut and tap a strut. The load presses straight down on the top. A simple spring model of a four-module tensegrity column, solved live in your browser. Peak tension is shown as a percentage of the optimized column under the same load. For a full body, see the <a href="simulation.html#model">3D simulation</a>.</p>
+      <p class="small muted" style="margin:10px 0 0">Tap a cable to cut it, or choose Break a strut and tap a strut: it cracks in the middle and folds. The weight hangs on a string above the column; cut the string, or press Load it, and it drops onto the top. A simple spring model of a four-module tensegrity column, solved live in your browser. Peak tension is shown as a percentage of the optimized column under the same load. For a full body, see the <a href="simulation.html#model">3D simulation</a>.</p>
       <blockquote style="margin:14px 0 0;padding:12px 14px;background:var(--ice);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;font-size:.95rem">&ldquo;There are no shears, bending moments or levers, just simple tension and compression, in a self organizing, hierarchical, load distributing, low energy consuming structure.&rdquo;<span style="display:block;color:var(--soft);font-size:.84rem;margin-top:4px">Stephen Levin on biotensegrity, <a href="https://www.biotensegrity.com/">biotensegrity.com</a> (researcher's own site)</span></blockquote>
     </div>
   </div>
 </section>
+
+<section id="pulleys">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">See it work</span>
+      <h2>The body as a system of pulleys.</h2>
+      <p>Here is a body standing like Leonardo's Vitruvian Man. One rope comes in at the left hand, runs over pulleys at the shoulders and hips, crossing the trunk the way the long lines of fascia do, and leaves at the right hand, where it holds a weight.</p>
+      <p><b>Pull the rope.</b> In the optimized body every pulley is where it belongs. The frame stays firm, and the weight rises exactly as far as you pull, for exactly its own weight in effort.</p>
+      <p><b>Now add imperfections,</b> one pulley at a time. A pulley that is out of place binds the rope, and the web around it no longer holds it properly. Pull again. At first the weight still goes up, but you have to pull harder and the body squeezes inward to make up the difference. Add more, and the body folds in on itself while the weight hardly moves.</p>
+      <p>That is the case for the order the HMR proposes. Lifting through an optimized tensegrity lifts the weight. Lifting through an imperfect one loads the body instead.</p>
+    </div>
+    <div class="fx-sim">
+      <canvas id="fxpul" style="height:min(50vh,400px);cursor:ew-resize;touch-action:pan-y" role="img" aria-label="A figure with arms out and legs apart, drawn as bones, web lines and pulleys. A rope enters at the left hand, runs over pulleys at the shoulders and hips, and holds a weight below the right hand. Pulling the rope raises the weight; adding imperfections makes the body squeeze inward." data-x="1"></canvas>
+      <label class="range" style="display:block;margin-top:12px">Pull the rope <input type="range" id="fp-pull" min="0" max="100" value="0" style="width:100%"></label>
+      <div class="btns">
+        <button class="chipbtn" type="button" id="fp-imp">Add an imperfection</button>
+        <button class="btn primary" type="button" id="fp-reset">Reset to optimized</button>
+      </div>
+      <dl class="fx-meter" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+        <div><dt>Rope pulled</dt><dd id="fp-in">0 cm</dd></div>
+        <div><dt>Weight raised</dt><dd id="fp-out">0 cm</dd></div>
+        <div><dt>Pull needed</dt><dd id="fp-force">1.0 &times; the weight</dd></div>
+        <div><dt>Body squeezed</dt><dd id="fp-sq">0%</dd></div>
+      </dl>
+      <div class="fx-key"><span><i style="background:#C9A227"></i>rope</span><span><i style="background:#0E3A75;height:7px"></i>bone</span><span><i style="background:#9CC3F5"></i>web</span><span><i style="background:#D33A45"></i>pulley out of place</span></div>
+      <p class="small muted" style="margin:10px 0 0">Drag the slider, or drag left on the picture. A simple model solved live in your browser: bones and web are springs, the rope keeps its length, and a pulley that is out of place adds rope friction (the capstan effect) and loses support from the web around it. The faint outline is the optimized shape. It illustrates the idea; it is not a measurement of a real body.</p>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  var cv=document.getElementById('fxpul');if(!cv)return;var ctx=cv.getContext('2d');
+// Vitruvian pulley model: a body-shaped frame of bones and web, with one rope run over pulleys at the hands, shoulders and hips.
+function build(){
+  var names=['footL','footR','kneeL','kneeR','hipL','hipR','lum','chest','neck','head','shL','shR','elL','elR','haL','haR'];
+  var xy=[[-0.33,0,1],[0.33,0,1],[-0.24,0.5],[0.24,0.5],[-0.15,0.96],[0.15,0.96],[0,1.12],[0,1.38],[0,1.52],[0,1.7],[-0.22,1.46],[0.22,1.46],[-0.52,1.46],[0.52,1.46],[-0.82,1.46],[0.82,1.46]];
+  var I={},N=[],E=[];
+  names.forEach(function(n,i){I[n]=i;N.push({x:xy[i][0],y:xy[i][1],px:xy[i][0],py:xy[i][1],x0:xy[i][0],y0:xy[i][1],fx:0,fy:0,fix:!!xy[i][2],mu:0,bad:false});});
+  function el(a,b,t){var A=N[I[a]],B=N[I[b]];E.push({a:I[a],b:I[b],t:t,L0:Math.hypot(B.x-A.x,B.y-A.y),k:t==='s'?300:60,weak:1});}
+  [['footL','kneeL'],['kneeL','hipL'],['footR','kneeR'],['kneeR','hipR'],['hipL','hipR'],['hipL','lum'],['hipR','lum'],['lum','chest'],['chest','neck'],['neck','head'],['chest','shL'],['chest','shR'],['shL','elL'],['elL','haL'],['shR','elR'],['elR','haR']].forEach(function(p){el(p[0],p[1],'s');});
+  [['kneeL','kneeR'],['kneeL','hipR'],['kneeR','hipL'],['footL','kneeR'],['footR','kneeL'],['footL','hipL'],['footR','hipR'],
+   ['shL','neck'],['shR','neck'],['shL','lum'],['shR','lum'],['shL','hipL'],['shR','hipR'],['shL','head'],['shR','head'],
+   ['elL','head'],['elR','head'],['haL','head'],['haR','head'],['elL','hipL'],['elR','hipR'],['haL','hipL'],['haR','hipR'],['elL','chest'],['elR','chest'],
+   ['hipL','chest'],['hipR','chest'],['kneeL','lum'],['kneeR','lum'],['shL','shR']].forEach(function(p){el(p[0],p[1],'c');});
+  var rope=['haL','shL','hipR','hipL','shR','haR'].map(function(n){return I[n];});   // handle -> ... -> weight
+  var m={N:N,E:E,I:I,rope:rope,pull:0,W:0.9,PMAX:0.45,HOFF:0.34};
+  m.Ltot=pathLen(m)+N[I.haR].y/2;      // the weight starts halfway between the hand and the ground
+  return m;
+}
+function handle(m){var h=m.N[m.I.haL];return [h.x0-m.HOFF-m.pull*m.PMAX,h.y0];}
+function pathLen(m){var H=handle(m),px=H[0],py=H[1],L=0;m.rope.forEach(function(i){var n=m.N[i];L+=Math.hypot(n.x-px,n.y-py);px=n.x;py=n.y;});return L;}
+function weightY(m){var r=m.N[m.I.haR];return Math.max(0,r.y-(m.Ltot-pathLen(m)));}
+function tensions(m){ // tension in each rope segment, from the weight end back to the handle (capstan: T grows by exp(mu*theta) past a binding pulley while pulling)
+  var R=m.rope,n=R.length,H=handle(m),T=new Array(n+1),hang=weightY(m)>0?m.W:0; T[n]=hang;
+  for(var k=n-1;k>=0;k--){var P=m.N[R[k]],prev=k===0?{x:H[0],y:H[1]}:m.N[R[k-1]],next=k===n-1?{x:P.x,y:P.y-1}:m.N[R[k+1]];
+    var ax=prev.x-P.x,ay=prev.y-P.y,bx=next.x-P.x,by=next.y-P.y,la=Math.hypot(ax,ay)||1e-9,lb=Math.hypot(bx,by)||1e-9;
+    var cos=(ax*bx+ay*by)/(la*lb),th=Math.PI-Math.acos(Math.max(-1,Math.min(1,cos)));
+    T[k]=T[k+1]*Math.exp((m.pull>0?P.mu:0)*th);}
+  return T; // T[k] = tension in the segment on the handle side of pulley k; T[n] = weight side
+}
+function step(m,iters){
+  var N=m.N,E=m.E,R=m.rope,n=R.length;
+  for(var it=0;it<iters;it++){
+    for(var i=0;i<N.length;i++){N[i].fx=0;N[i].fy=0;}
+    for(var j=0;j<E.length;j++){var e=E[j],A=N[e.a],B=N[e.b],dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1e-9,f=e.k*e.weak*(L-e.L0),ux=dx/L,uy=dy/L;A.fx+=f*ux;A.fy+=f*uy;B.fx-=f*ux;B.fy-=f*uy;}
+    var T=tensions(m),H=handle(m);
+    for(var k=0;k<n;k++){var P=N[R[k]],prev=k===0?{x:H[0],y:H[1]}:N[R[k-1]],next=k===n-1?{x:P.x,y:P.y-1}:N[R[k+1]];
+      var ax=prev.x-P.x,ay=prev.y-P.y,la=Math.hypot(ax,ay)||1e-9,bx=next.x-P.x,by=next.y-P.y,lb=Math.hypot(bx,by)||1e-9;
+      P.fx+=T[k]*ax/la+T[k+1]*bx/lb;P.fy+=T[k]*ay/la+T[k+1]*by/lb;}
+    for(var q=0;q<N.length;q++){var nd=N[q];if(nd.fix)continue;var vx=(nd.x-nd.px)*0.86,vy=(nd.y-nd.py)*0.86;nd.px=nd.x;nd.py=nd.y;nd.x+=vx+nd.fx*0.0008;nd.y+=vy+nd.fy*0.0008;if(nd.y<0.02)nd.y=0.02;}
+  }
+  return tensions(m);
+}
+var ORDER=['hipR','shL','hipL','shR','haR'];
+function imperfect(m,k){ // a pulley out of place: it binds, it sits a little off line, and the web around it no longer supports it properly
+  var name=ORDER[k%ORDER.length],i=m.I[name],n=m.N[i];n.bad=true;n.mu+=0.3;
+  m.E.forEach(function(e){if(e.t==='c'&&(e.a===i||e.b===i)){e.weak*=0.25;e.L0*=0.95;}});
+}
+
+  var m,imp=0,frames=0,w0=0,sq0=1,W,H,S,ox,oy;
+  function init(){m=build();step(m,6000);m.Ltot=pathLen(m)+m.N[m.I.haR].y/2;m.N.forEach(function(n){n.rx=n.x;n.ry=n.y;});w0=weightY(m);imp=0;frames=0;document.getElementById('fp-pull').value=0;}
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);S=Math.min(W/2.95,H/2.12);ox=W/2+S*0.43;oy=H-S*0.14;}
+  function P(x,y){return [ox+x*S,oy-y*S];}
+  function line(a,b){ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+  function draw(){
+    ctx.clearRect(0,0,W,H);var N=m.N,I=m.I;
+    // Leonardo's circle and square, faintly
+    ctx.strokeStyle='#E3EAF3';ctx.lineWidth=1.2;var c=P(0,1.06);ctx.beginPath();ctx.arc(c[0],c[1],1.06*S,0,7);ctx.stroke();var q=P(-0.88,1.76);ctx.strokeRect(q[0],q[1],1.76*S,1.76*S);
+    ctx.strokeStyle='#D6E1EE';ctx.lineWidth=2;line(P(-2.2,0),P(1.4,0));
+    // the optimized shape, as a ghost
+    ctx.strokeStyle='rgba(14,58,117,.13)';ctx.lineWidth=6;ctx.lineCap='round';m.E.forEach(function(e){if(e.t==='s')line(P(N[e.a].rx,N[e.a].ry),P(N[e.b].rx,N[e.b].ry));});
+    // web
+    m.E.forEach(function(e){if(e.t!=='c')return;ctx.strokeStyle=e.weak<1?'rgba(211,58,69,.55)':'rgba(91,155,230,.5)';ctx.lineWidth=1.1;ctx.setLineDash(e.weak<1?[4,4]:[]);line(P(N[e.a].x,N[e.a].y),P(N[e.b].x,N[e.b].y));});ctx.setLineDash([]);
+    // bones and head
+    ctx.strokeStyle='#0E3A75';ctx.lineWidth=7;m.E.forEach(function(e){if(e.t==='s')line(P(N[e.a].x,N[e.a].y),P(N[e.b].x,N[e.b].y));});
+    var hd=P(N[I.head].x,N[I.head].y+0.06);ctx.fillStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(hd[0],hd[1],0.115*S,0,7);ctx.fill();ctx.stroke();
+    // rope
+    var Hh=handle(m),hp=P(Hh[0],Hh[1]),wy=weightY(m),hr=N[I.haR];
+    ctx.strokeStyle='#C9A227';ctx.lineWidth=2.6;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(hp[0],hp[1]);m.rope.forEach(function(i){var a=P(N[i].x,N[i].y);ctx.lineTo(a[0],a[1]);});var wp=P(hr.x,wy);ctx.lineTo(wp[0],wp[1]-0.2*S);ctx.stroke();
+    // pulleys
+    m.rope.forEach(function(i){var a=P(N[i].x,N[i].y),bad=N[i].bad;ctx.fillStyle='#fff';ctx.strokeStyle=bad?'#D33A45':'#0E3A75';ctx.lineWidth=bad?3:2.2;ctx.beginPath();ctx.arc(a[0],a[1],8,0,7);ctx.fill();ctx.stroke();ctx.fillStyle=bad?'#D33A45':'#0E3A75';ctx.beginPath();ctx.arc(a[0],a[1],2.3,0,7);ctx.fill();});
+    // weight
+    var bw=0.34*S,bh=0.2*S;ctx.fillStyle='#0B2545';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(wp[0]-bw/2,wp[1]-bh,bw,bh,5);else ctx.rect(wp[0]-bw/2,wp[1]-bh,bw,bh);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='600 '+Math.max(9,Math.round(S*0.075))+'px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('weight',wp[0],wp[1]-bh/2);
+    // handle
+    ctx.strokeStyle='#C9A227';ctx.lineWidth=3;ctx.beginPath();ctx.arc(hp[0]-9,hp[1],9,0,7);ctx.stroke();
+    ctx.fillStyle='#53657E';ctx.font='600 '+Math.max(10,Math.round(S*0.07))+'px Inter,sans-serif';ctx.textBaseline='alphabetic';ctx.fillText('\u2190 pull',hp[0]-9,hp[1]-18);ctx.textAlign='start';
+    // meters (1 model unit = 100 cm)
+    var T=tensions(m),sq=0;N.forEach(function(n){sq=Math.max(sq,Math.hypot(n.x-n.rx,n.y-n.ry));});
+    document.getElementById('fp-in').textContent=Math.round(m.pull*m.PMAX*100)+' cm';
+    document.getElementById('fp-out').textContent=Math.round((wy-w0)*100)+' cm';
+    document.getElementById('fp-force').innerHTML=(m.pull>0?(T[0]/m.W):1).toFixed(1)+' &times; the weight';
+    document.getElementById('fp-sq').textContent=Math.round(sq/1.7*100)+'%';
+  }
+  function loop(){if(frames<240){step(m,160);frames++;}draw();requestAnimationFrame(loop);}
+  function setPull(v){m.pull=Math.max(0,Math.min(1,v));document.getElementById('fp-pull').value=Math.round(m.pull*100);frames=0;}
+  document.getElementById('fp-pull').addEventListener('input',function(){m.pull=this.value/100;frames=0;});
+  document.getElementById('fp-imp').addEventListener('click',function(){if(imp<ORDER.length){imperfect(m,imp);imp++;frames=0;}this.textContent=imp<ORDER.length?'Add another imperfection':'No more to add';});
+  document.getElementById('fp-reset').addEventListener('click',function(){init();document.getElementById('fp-imp').textContent='Add an imperfection';});
+  var drag=null;
+  cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,p:m.pull};cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){if(drag)setPull(drag.p+(drag.x-e.clientX)/(m.PMAX*S));});
+  cv.addEventListener('pointerup',function(){drag=null;});cv.addEventListener('pointercancel',function(){drag=null;});
+  window.addEventListener('resize',size);
+  init();size();loop();
+})();
+</script>
 
 <section id="numbers">
   <div class="wrap">
@@ -334,9 +461,15 @@
   step(ref0,LOAD,20000);var refLd=peak(ref0),topLd=topOf(ref0);
   var height=topUn[1];
   var m,loaded=false,denseIdx=[4,10,23,16],dn=0,frames=0;
-  function reset(){m=TG(MODS);step(m,0,20000);loaded=false;dn=0;frames=0;document.getElementById('fx-load').setAttribute('aria-pressed','false');document.getElementById('fx-load').textContent='Load it';}
+  // the weight hangs on a string above the column; cut the string (or press Load it) and it drops onto the top
+  var HANG=height+0.62,wy=HANG,wv=0,falling=false,thud=0;
+  function hang(){loaded=false;falling=false;wy=HANG;wv=0;thud=0;var b=document.getElementById('fx-load');b.setAttribute('aria-pressed','false');b.textContent='Load it';}
+  function drop(){if(loaded||falling)return;falling=true;wv=0;var b=document.getElementById('fx-load');b.setAttribute('aria-pressed','true');b.textContent='Remove load';}
+  function topY(){var t=m.M[MODS-1];return (m.N[t[2]].y+m.N[t[3]].y)/2;}
+  function topX(){var t=m.M[MODS-1];return (m.N[t[2]].x+m.N[t[3]].x)/2;}
+  function reset(){m=TG(MODS);step(m,0,20000);dn=0;frames=0;hang();}
   var W,H,S,ox,oy;
-  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);S=Math.min(W/2.4,H/3.35);ox=W/2-S*0.03;oy=H-S*0.2;}
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);S=Math.min(W/2.7,H/4.75);ox=W/2-S*0.03;oy=H-S*0.25;}
   var yaw=0,spin=false,fxm='cut';function P(n){return [ox+n.x*S*Math.cos(yaw),oy-n.y*S];}
   function col(t){var r=t/refLd;r=Math.max(0,Math.min(1,(r-0.2)/1.1));var a=[91,155,230],b=[198,40,40];return 'rgb('+Math.round(a[0]+(b[0]-a[0])*r)+','+Math.round(a[1]+(b[1]-a[1])*r)+','+Math.round(a[2]+(b[2]-a[2])*r)+')';}
   function draw(){
@@ -347,23 +480,38 @@
       ctx.stroke();ctx.setLineDash([]);
       if(e.dense){ctx.fillStyle='#C62828';ctx.beginPath();ctx.arc((a[0]+b[0])/2,(a[1]+b[1])/2,5,0,7);ctx.fill();}});
     m.E.forEach(function(e){if(e.t!=='s'||e.cut)return;var a=P(m.N[e.a]),b=P(m.N[e.b]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='#0E3A75';ctx.lineWidth=7*sh;ctx.lineCap='round';ctx.stroke();});
-    m.N.forEach(function(n){var p=P(n);ctx.fillStyle=n.fix?'#53657E':'#fff';ctx.strokeStyle='#0E3A75';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0],p[1],4,0,7);ctx.fill();ctx.stroke();});
-    if(loaded){var t=m.M[MODS-1],a=P(m.N[t[2]]),b=P(m.N[t[3]]),cx=(a[0]+b[0])/2,cy=(a[1]+b[1])/2-10;ctx.strokeStyle='#1D5FD1';ctx.fillStyle='#1D5FD1';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(cx,cy-44);ctx.lineTo(cx,cy-8);ctx.stroke();ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx-7,cy-12);ctx.lineTo(cx+7,cy-12);ctx.fill();}
+    m.N.forEach(function(n){if(n.crack)return;var p=P(n);ctx.fillStyle=n.fix?'#53657E':'#fff';ctx.strokeStyle='#0E3A75';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p[0],p[1],4,0,7);ctx.fill();ctx.stroke();});
+    // cracks: a broken strut stays, snapped in the middle
+    m.N.forEach(function(n){if(!n.crack)return;var p=P(n),q=P(m.N[n.crack-1]),dx=p[0]-q[0],dy=p[1]-q[1],d=Math.hypot(dx,dy)||1,r=9;ctx.strokeStyle='#D33A45';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(p[0]-dy/d*r,p[1]+dx/d*r);ctx.lineTo(p[0]+dy/d*r,p[1]-dx/d*r);ctx.stroke();});
+    // the weight and its string
+    var wx=ox+(loaded?topX():0)*S*Math.cos(yaw),wb=oy-wy*S-(loaded?6:0),bw=S*0.62,bh=S*0.30;
+    if(!loaded&&!falling){ctx.strokeStyle='#53657E';ctx.lineWidth=1.6;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(wx,0);ctx.lineTo(wx,wb-bh);ctx.stroke();}
+    ctx.fillStyle='#0B2545';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(wx-bw/2,wb-bh,bw,bh,5);else ctx.rect(wx-bw/2,wb-bh,bw,bh);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='600 '+Math.max(10,Math.round(S*0.13))+'px Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('weight',wx,wb-bh/2);ctx.textAlign='start';ctx.textBaseline='alphabetic';
     var pk=peak(m),ref=loaded?refLd:refUn,sl=0;m.E.forEach(function(e){if(e.t==='c'&&!e.cut&&e.T<=0.0001)sl++;});
     document.getElementById('fx-peak').textContent=Math.round(pk/ref*100)+'%';
     document.getElementById('fx-slack').textContent=sl;
     var tp=topOf(m),rt=loaded?topLd:topUn;document.getElementById('fx-sway').textContent=(Math.hypot(tp[0]-rt[0],tp[1]-rt[1])/height*100).toFixed(1)+'% of height';
   }
-  function loop(){if(frames<400){step(m,loaded?LOAD:0,120);frames++;}if(spin)yaw+=0.012;draw();requestAnimationFrame(loop);}
+  function loop(){
+    if(falling){wv-=0.012;wy+=wv;if(wy<=topY()){wy=topY();falling=false;loaded=true;thud=14;frames=0;}}
+    if(frames<400){step(m,loaded?LOAD*(thud>0?1.9:1):0,120);frames++;if(thud>0)thud--;}
+    if(loaded)wy=topY();
+    if(spin)yaw+=0.012;draw();requestAnimationFrame(loop);}
   function kick(){frames=0;}
-  document.getElementById('fx-load').addEventListener('click',function(){loaded=!loaded;this.setAttribute('aria-pressed',loaded);this.textContent=loaded?'Remove load':'Load it';kick();});
+  document.getElementById('fx-load').addEventListener('click',function(){if(loaded||falling){hang();kick();}else drop();});
   document.getElementById('fx-dense').addEventListener('click',function(){if(dn<denseIdx.length){m.E[denseIdx[dn]].dense=true;dn++;}kick();});
   document.getElementById('fx-reset').addEventListener('click',function(){reset();});
   document.querySelectorAll('[data-fxm]').forEach(function(b){b.addEventListener('click',function(){fxm=b.dataset.fxm;document.querySelectorAll('[data-fxm]').forEach(function(o){var on=o===b;o.classList.toggle('on',on);o.setAttribute('aria-pressed',on);});cv.classList.toggle('cur-cut',fxm==='cut');cv.classList.toggle('cur-plus',fxm==='strut');});});
   document.getElementById('fx-spin').addEventListener('click',function(){spin=!spin;this.setAttribute('aria-pressed',spin);if(!spin)yaw=0;});
   cv.addEventListener('click',function(ev){var r=cv.getBoundingClientRect(),x=ev.clientX-r.left,y=ev.clientY-r.top,best=null,bd=14,want=fxm==='cut'?'c':'s';
     m.E.forEach(function(e){if(e.t!==want||e.cut)return;var a=P(m.N[e.a]),b=P(m.N[e.b]),dx=b[0]-a[0],dy=b[1]-a[1],t=((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));var d=Math.hypot(a[0]+t*dx-x,a[1]+t*dy-y);if(d<bd){bd=d;best=e;}});
-    if(best){best.cut=true;kick();}});
+    // the string holding the weight can be cut like any cable
+    if(fxm==='cut'&&!loaded&&!falling){var sx=ox,sb=oy-wy*S-S*0.30;if(Math.abs(x-sx)<12&&y<sb&&(!best||Math.abs(x-sx)<bd)){drop();return;}}
+    if(best){if(best.t==='s'){ // a strut cracks in the middle: two halves on a free hinge
+        var A=m.N[best.a],B=m.N[best.b];m.N.push({x:(A.x+B.x)/2,y:(A.y+B.y)/2,px:(A.x+B.x)/2,py:(A.y+B.y)/2,fx:0,fy:0,fix:false,crack:best.a+1});var h=m.N.length-1;
+        m.E.push({a:best.a,b:h,t:'s',L0:best.L0/2,cut:false,dense:false,T:0,half:true},{a:h,b:best.b,t:'s',L0:best.L0/2,cut:false,dense:false,T:0,half:true});best.cut=true;}
+      else best.cut=true;kick();}});
   window.addEventListener('resize',size);
   reset();size();loop();
 })();
@@ -377,7 +525,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=bdf83568" defer></script>
+<script src="site.js?v=0978e9a1" defer></script>
 <script src="fx-stars.js?v=4e8b7ad1" defer></script>
 </body>
 </html>
