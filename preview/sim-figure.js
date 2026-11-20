@@ -52,8 +52,8 @@
     T.push(ringFrom(g('ribLowL'), g('ribLowR'), g('xiph'), m2('erectorL', 'erectorR'), [k(0.4 - wF * 0.6), k(0.4 - wF * 0.6), k(0.2), k(1.4)], sAvg('ribLowL', 'ribLowR', 'xiph')));
     if (female) T.push(lerpRing(T[T.length - 1], ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(0.8), k(0.8), k(6.5), k(1.6)]), 0.55));
     T.push(ringFrom(g('ribUpL'), g('ribUpR'), m2('pecL', 'pecR'), m2('scapInfL', 'scapInfR'), [k(4.4 - wF * 2.8), k(4.4 - wF * 2.8), k(female ? 4.2 : 3.8), k(2.8)], sAvg('ribUpL', 'ribUpR', 'pecL', 'pecR')));
-    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), g('c7'), [k(-0.6 - wF * 1.2), k(-0.6 - wF * 1.2), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
-    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), g('c7'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
+    T.push(ringFrom(g('acromL'), g('acromR'), g('stTop'), m2('napeL', 'napeR'), [k(-0.6 - wF * 1.2), k(-0.6 - wF * 1.2), k(2.2), k(3.6 - wF)], sAvg('acromL', 'acromR', 'c7')));
+    T.push(ringFrom(g('neckSideL'), g('neckSideR'), g('throat'), m2('napeL', 'napeR'), [k(-0.7 - wF * 0.7), k(-0.7 - wF * 0.7), k(-0.4), k(1.4)], sAvg('neckSideL', 'neckSideR', 'throat')));
     // head frame: the skull's own axes, re-expressed so the healthy head is upright and faces straight ahead
     const hf = Q => { const e1 = norm(sub(Q[I.top], Q[I.chin])), e2 = ortho(sub(Q[I.brow], Q[I.occ]), e1); return [e1, e2, cross(e1, e2)]; };
     const fc0 = hf(o.ref || P), fc1 = hf(P), remap = v => { const c = fc0.map(e => dot(v, e)); return norm(add(add(mul(fc1[0], c[0]), mul(fc1[1], c[1])), mul(fc1[2], c[2]))); };
@@ -101,7 +101,7 @@
       mesh(F, 14, () => 'skin', true, true);
     }
     // ---------- arms ----------
-    const Ft = ortho(sub(g('stTop'), g('c7')), norm(sub(g('acromL'), g('acromR'))));
+    const Ft = ortho(sub(g('stTop'), m2('napeL', 'napeR')), norm(sub(g('acromL'), g('acromR'))));
     for (const s of ['L', 'R']) {
       const ac = g('acrom' + s), el = g('elbow' + s), wr = g('wrist' + s), ha = g('hand' + s), aw = female ? 0.86 : 1;
       const top = add(ac, mul(norm(sub(el, ac)), k(2.5)));

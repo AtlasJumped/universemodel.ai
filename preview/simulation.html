@@ -28,6 +28,11 @@
 .simbar label.chipbtn input{margin:0;accent-color:var(--blue)}
 .simpair{display:grid;grid-template-columns:1fr 1fr}
 .simcell{position:relative;min-width:0}
+.simreset{position:absolute;right:14px;bottom:58px;display:inline-flex;align-items:center;gap:8px;font:650 .92rem/1 var(--font);color:#fff;background:var(--blue);border:0;border-radius:999px;padding:11px 18px 11px 14px;box-shadow:0 6px 18px rgba(13,59,122,.28);cursor:pointer;white-space:nowrap}
+.simreset svg{width:17px;height:17px}
+.simreset:hover{background:var(--navy)}
+.simreset:focus-visible{outline:3px solid #F0A940;outline-offset:2px}
+@media (max-width:640px){.simreset{right:8px;bottom:8px;font-size:.8rem;padding:8px 12px 8px 10px}}
 .simcell+.simcell{border-left:1px dashed var(--line)}
 .simlab{position:absolute;top:6px;left:0;right:0;text-align:center;font:600 .74rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);pointer-events:none}
 .simstage .simpair canvas{height:min(74vh,660px)}
@@ -81,8 +86,9 @@
             <label class="spinsw"><input type="checkbox" id="sim-spin"><span class="sw" aria-hidden="true"></span><span class="st"></span></label>
           </div>
           <div class="simpair">
-            <div class="simcell"><span class="simlab">Tensegrity: bones and fascia</span><canvas id="body3d" role="img" aria-label="A three-dimensional human figure built as a tensegrity: dark bone struts held by a web of fascia cables, with the main fascial lines in color. Tapping it places an imperfection."></canvas></div>
-            <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas></div>
+            <div class="simcell"><span class="simlab">Tensegrity: bones and fascia</span><canvas id="body3d" role="img" aria-label="A three-dimensional human skeleton built as a tensegrity: separate bones, jointed like a real skeleton, held up by a web of fascia cables, with the main fascial lines in color. Tapping it places an imperfection."></canvas></div>
+            <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas>
+              <button class="simreset" id="sim3d-reset" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M3.2 3.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset to healthy</button></div>
           </div>
           <div class="simload"><span>Computed load on the structure</span><span class="bar"><i id="sim-load"></i></span><b id="sim-load-v">at rest</b></div>
           <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
@@ -100,8 +106,9 @@
           </div>
           <div class="card" style="background:var(--ice)">
             <span class="tag">This is real math</span>
-            <p>Simple, but not a cartoon. One hundred points, about a hundred bone struts and some 340 tension-only fascia cables are solved as a constraint system many times a second. Every tap truly redistributes force along these lines, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
-            <p style="margin-bottom:0">A weak pull toward the healthy shape stands in for muscle tone and balance; fascia slides along its lines toward even tension unless friction holds it.</p>
+            <p>Simple, but not a cartoon. The skeleton is 45 separate bones, jointed the way a real skeleton is: a ball at each hip and shoulder and between the vertebrae, a hinge at each knee, ankle and elbow. Nothing in it holds itself up. About 790 tension-only fascia cables do that, against real gravity, which pulls on every one of the 190 points all the time. Every tap truly redistributes force, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
+            <p>So cut enough fascia, or break a bone that carries weight, and the body really falls. Fascia slides along its lines toward even tension unless friction holds it.</p>
+            <p class="small muted" style="margin-bottom:0">What is simplified: the neck and chest vertebrae are grouped in pairs, the ribs are six pairs on a springy cartilage front, the pelvis is held as one ring by its ligaments, and the feet are planted. Nothing here contracts. The model stands on passive tension alone, which a living body cannot do: real standing also takes active muscle.</p>
           </div>
           <div class="card" style="grid-column:1/-1">
             <span class="tag">Where the model is going</span>
@@ -127,7 +134,7 @@
           <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button><button class="btn ghost" data-imode="torque" type="button">Twist</button></div>
           <h3 style="margin-top:16px">Or operate</h3>
           <div class="btns" role="group" aria-label="Surgical tools"><button class="btn ghost" data-imode="pluck" type="button">Pluck a node</button><button class="btn ghost" data-imode="cut" type="button">Cut a cable</button><button class="btn ghost" data-imode="break" type="button">Break a bone</button></div>
-          <p class="small muted" style="margin:8px 0 0">Cut a fascial line and the whole band between its anchors goes slack, because a line is one continuous sheet. Break a bone and it snaps where you tap: if the column that carries the body to the ground is gone, the body collapses. Press Reset to heal.</p>
+          <p class="small muted" style="margin:8px 0 0">Cut a fascial line and the whole band between its anchors goes slack, because a line is one continuous sheet. Break a bone and it snaps where you tap. Some damage the web absorbs: one cut cord, a collarbone, the thin outer shin bone. Other damage brings the body down: a thigh bone, a shin bone, a vertebra in the lower back, or every line on one side. Press Reset to healthy, under the person, to heal.</p>
           <label class="range">Strength <input type="range" id="sim-strength" min="1" max="6" value="3"></label>
           <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (imperfections creep along the lines)</label>
           <div class="edbox">
@@ -143,7 +150,6 @@
         <div class="pgroup">
           <h3>Try a scenario</h3>
           <div class="btns" id="sim-scenarios"></div>
-          <button class="btn primary" id="sim3d-reset" type="button" style="margin-top:10px">Reset to healthy</button>
         </div>
         <div class="pgroup">
           <h3>What changed</h3>
@@ -273,9 +279,9 @@
     </div>
   </div>
 </section>
-<script src="sim-core.js?v=fd8d05dd" defer></script>
-<script src="sim-figure.js?v=f1c1b3d3" defer></script>
-<script src="sim3d.js?v=90500abf" defer></script>
+<script src="sim-core.js?v=7ee1aeb6" defer></script>
+<script src="sim-figure.js?v=93c4c1bf" defer></script>
+<script src="sim3d.js?v=b908dedc" defer></script>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15.5" fill="#0B2545"/><g stroke="#9CC3F5" stroke-width=".5" stroke-opacity=".75" fill="none"><path d="M5 9.5 L9.5 7.5 L13 10 L17.5 8 L21 11.5 L26.5 9.5 M17.5 8 L19 5.5 M21 11.5 L22.5 16 L19.5 21.5 L23 25.5 M22.5 16 L27 19"/></g><g fill="#DCEBFF"><circle cx="5" cy="9.5" r=".8"/><circle cx="9.5" cy="7.5" r=".7"/><circle cx="13" cy="10" r=".9"/><circle cx="17.5" cy="8" r="1"/><circle cx="19" cy="5.5" r=".6"/><circle cx="21" cy="11.5" r=".8"/><circle cx="26.5" cy="9.5" r=".6"/><circle cx="22.5" cy="16" r=".7"/><circle cx="27" cy="19" r=".6"/><circle cx="19.5" cy="21.5" r=".7"/><circle cx="23" cy="25.5" r=".8"/></g><text x="16" y="21.3" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="12.5" font-weight="800" fill="#fff" letter-spacing="-.4">UM</text></svg><span>Universe Model</span></a>
