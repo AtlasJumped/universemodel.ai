@@ -321,7 +321,6 @@
         <p><b>What the other three conditions allow.</b> Fix any rule of the family, with all its numbers positive, as a reference. Then the rules that keep conditions 1, 2 and 4 are exactly</p>
         <p class="mx-eq">chance = reference chance<br>&nbsp;&nbsp;× w(next state) / w(present state)</p>
         <p>where w gives every pattern a number that is never negative, w of the void is 1, and w of a pattern is the reference-weighted average of w over the patterns that can follow it. Here w is simply the chance of a pattern under the rule divided by its chance under the reference. It is a change of description, not a restriction, and it changes if the reference is changed. These rules are the order-invariant measures studied by <a href="https://doi.org/10.1214/10-AAP736">Brightwell and Luczak (2011)</a>. <span class="lvl est">established</span></p>
-        <p style="margin-bottom:0"><b>Reading w as liking.</b> If w is how much UI likes a pattern, then “do more of what feels good” has a general form: reference chance times w(next) / w(now). The simplest rule is one case of it: with strength p it is the rule with strength ½, reweighted by w = (2p)<sup>links</sup> × (2(1 − p))<sup>pairs apart</sup>. HMR does not yet say what UI's own w is. <span class="lvl rea">HMR reading</span> Whether any such rule grows space is a published open problem, and those who posed it expect the answer to lie outside ordinary probability. <span class="lvl open">open</span></p>
       </div>
       <div>
         <div class="card">
@@ -331,10 +330,20 @@
           <p>That is an exact meaning for “a closed system” (<a href="https://doi.org/10.1103/PhysRevD.63.084026">Martin, O'Connor, Rideout and Sorkin, 2001</a>). <span class="lvl est">established</span></p>
           <p style="margin-bottom:0">Reading HMR's completion as a post: <span class="lvl rea">HMR reading</span> In the rule a post happens by chance; reading it as a model becoming complete adds a meaning the mathematics does not carry. The Big Bang as a post: <span class="lvl con">HMR conjecture</span> “Understands itself”: <span class="lvl open">open</span></p>
         </div>
-        <div class="card" style="margin-top:14px">
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="card">
+          <span class="tag">Reading w as liking</span>
+          <p style="margin-bottom:0">If w is how much UI likes a pattern, then “do more of what feels good” has a general form: reference chance times w(next) / w(now). The simplest rule is one case of it: with strength p it is the rule with strength ½, reweighted by w = (2p)<sup>links</sup> × (2(1 − p))<sup>pairs apart</sup>. HMR does not yet say what UI's own w is. <span class="lvl rea">HMR reading</span> Whether any such rule grows space is a published open problem, and those who posed it expect the answer to lie outside ordinary probability. <span class="lvl open">open</span></p>
+      </div>
+      <div class="card">
           <span class="tag">How often a post happens</span>
           <p style="margin-bottom:0">In the simplest case it depends steeply on p: about one thought in 12 is a post at p = ½, one in 10<sup>12</sup> at p = 0.1, and one in 10<sup>139</sup> at p = 0.01. With weights 1/k!, the expected number of posts in a whole history is about 0.3, and most of that is the very first thought, which has no past. So whether closure recurs depends entirely on the free numbers. <span class="lvl est">established</span> the last figure by simulation</p>
-        </div>
+      </div>
+      <div class="card" style="border-top:4px solid var(--blue)">
+          <span class="tag">Return</span>
+          <p style="margin-bottom:0">Each closed moment starts the pattern again, under a rule of the same family with its numbers renewed by the formula above. The simplest rule is the only kind that comes back unchanged, and a wide range of other rules are drawn toward it, closure after closure (same paper, which conjectures that all are). So the free numbers do not stay free. <span class="lvl est">established</span> Reading each closed moment as a return to ground and a new beginning: <span class="lvl rea">HMR reading</span></p>
       </div>
     </div>
   </div>
@@ -619,7 +628,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=8d6b348d" defer></script>
+<script src="site.js?v=40b42a21" defer></script>
 <script src="fx-stars.js?v=3e21f9c2" defer></script>
 </body>
 </html>

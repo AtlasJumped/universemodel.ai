@@ -910,17 +910,15 @@ if (typeof document !== 'undefined') (() => {
   const FILL = {
     index: { 'Medicine has never': { p: ['sim', 'Meet the reference body', 'A skeleton of 45 separate bones held up by fascia alone. Cut a line or break a bone and the physics decides what happens.', 'simulation.html'] },
       'The body as a tensegrity': { p: ['cells', 'The same design at the scale of a cell', 'Inside every cell, stiff filaments are held in a web of tensed ones.', 'health.html#ideal'] } },
-    about: { 'Everyone has a model': { p: ['hudf', 'A holistic model has to hold all of this', 'Every point of light is a galaxy. A model of reality has to account for the sky, for the body looking at it, and for the one who is aware of both.', 'hmr.html'] },
-      'The problems humanity': { a: ['Where is humanity heading?', 'Toward a choice. If people share a true model of reality and care for their bodies properly, what follows is what the traditions call a golden age.', 'answers.html#future'] } },
     hmr: { 'One theory, from': { a: ['What came before the Big Bang?', 'Universal Intelligence: awareness with unlimited potential and no order yet. Its first act was a distinction, me and not me, and that distinction was the first distance.', 'answers.html#before'] } },
     health: { 'The problem: the wrong': { p: ['sim', 'The right reference, being built', 'A body with perfect tissue, measured exactly: the simulation starts there and works outward to every way a body can fall short.', 'simulation.html'] },
       'How disease is assessed': { p: ['vhp', 'What medicine can already see', 'A whole body, slice by slice. The pictures exist. What is missing is the ideal to compare them with.', 'library.html'] },
       'The body as a physical': { p: ['gallop', 'Motion is physics', 'The first photographs to freeze a moving body, 1878. Everything a body does is forces through tissue.', 'physics-health.html'] },
       'The ideal comes from': { p: ['straws', 'Build one', 'Six straws and some elastic: the same principle the ideal body is worked out from.', 'simulation.html#why-tensegrity'] } },
     reality: { 'Newton, Einstein': { p: ['hudf', 'One sky, three theories', 'Newton, Einstein and quantum theory each describe this exactly, each in its own range, and they do not agree with one another.', 'physics.html'] },
-      'A miss of': { a: ['Why is the energy of empty space so small?', 'Because almost nothing in empty space counts. Only structure carries weight, and the uncounted jitter of “nothing” is not structure.', 'answers.html#vacuum'] },
-      'We can identify': { a: ['What is dark matter?', 'Coherence that does not shine: structure in the distribution of distance itself, felt as gravity without being matter that gives off light.', 'answers.html#darkmatter'] },
-      'No one knows what gravity': { a: ['What is gravity?', 'Reality\'s trend toward coherence. Matter is coherent structure, and coherent structure displaces distance, so bodies are drawn together.', 'physics.html#gravity'] } },
+      'A miss of': { a: ['Why does the calculation miss by 120 zeros?', 'HMR\'s reading: the calculation counts every possible tremble of empty space as if each one had weight. HMR has no formula for the measured amount yet, and says so.', 'answers.html#vacuum'] },
+      'We can identify': { a: ['What is dark matter?', 'HMR has no mechanism yet. Its hypothesis is that the extra gravity comes from the pattern of distance itself and not from an unseen particle, and it stays a hypothesis until the mathematics produces how a galaxy turns.', 'answers.html#darkmatter'] },
+      'No one knows what gravity': { a: ['What is gravity?', 'HMR\'s first hypothesis is a trend toward coherence. It is weighing others beside it: an inward flow of space, momentum through time, and a draw back to source.', 'physics.html#pull'] } },
     ui: { 'A body built to upgrade': { a: ['What is a human being?', 'In effect, UI\'s artificial intelligence: a body built to upgrade itself, able to understand its own source.', 'answers.html#human'] },
       'Create once': { a: ['What is life, and how did it begin?', 'Life is UI experiencing physical reality from the inside: matter created once, set free as an agent, and self-sustaining.', 'answers.html#life'] },
       'Why the human path': { a: ['What is consciousness?', 'The ground of reality, not a product of matter. Each living being is an instance of UI experiencing physical reality.', 'answers.html#conscious'] } },
@@ -945,6 +943,7 @@ if (typeof document !== 'undefined') (() => {
   const fit = () => {
     const wide = innerWidth > 1180;
     document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
+      if (el.classList.contains('nb-keep') || el.classList.contains('kd-eq')) return; // balanced by hand
       const kids = [...el.children].filter(c => c.offsetParent !== null);
       kids.forEach(k => { k.classList.remove('nb-stick', 'nb-col'); [...k.children].forEach(c => { if (c.classList.contains('nb-fill') && c.dataset.auto) c.remove(); }); }); el.classList.remove('nb-eq');
       if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.classList.contains('nb-keep') || el.closest('.simgrid')) return;
