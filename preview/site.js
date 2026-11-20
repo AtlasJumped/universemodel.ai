@@ -947,7 +947,7 @@ if (typeof document !== 'undefined') (() => {
     document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
       const kids = [...el.children].filter(c => c.offsetParent !== null);
       kids.forEach(k => { k.classList.remove('nb-stick', 'nb-col'); [...k.children].forEach(c => { if (c.classList.contains('nb-fill') && c.dataset.auto) c.remove(); }); }); el.classList.remove('nb-eq');
-      if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.closest('.simgrid')) return;
+      if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.classList.contains('nb-keep') || el.closest('.simgrid')) return;
       const tops = kids.map(k => k.getBoundingClientRect().top); if (Math.abs(tops[0] - tops[1]) > 30) return; // stacked, not side by side
       const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1, gap = Math.abs(hs[0] - hs[1]); if (gap <= 120) return;
       const sec = el.closest('section, .page-head'), h = sec && sec.querySelector('h1, h2'), head = h ? h.textContent.trim() : '', map = FILL[page] || {}, key = Object.keys(map).find(k => head.startsWith(k));

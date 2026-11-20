@@ -11,7 +11,7 @@
 <link rel="icon" href="../img/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="../img/favicon.svg"><link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=e9743405">
+<link rel="stylesheet" href="style.css?v=37f0917b">
 </head>
 <body>
 <div style="background:#B4232F;color:#fff;font:600 13px/1.4 system-ui,sans-serif;text-align:center;padding:6px 10px">Preview: changes waiting for approval. Not the live site.</div>
@@ -24,7 +24,6 @@
 <style>
 .mx-mp .st{font-size:.88rem;color:var(--soft);border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
 .mx-mp .st b{color:var(--navy)}
-.mx-eq{font:600 1rem/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--ice);color:var(--deep);border-radius:8px;padding:10px 14px;margin:10px 0;overflow-x:auto;white-space:nowrap}
 .mx-proof{border-left:4px solid var(--blue);padding:4px 0 4px 18px;margin:14px 0}
 .mx-proof ol{padding-left:1.2em}.mx-proof li{margin-bottom:8px}
 .mx-mp{display:grid;gap:14px;margin-top:22px}
@@ -71,34 +70,330 @@
   </div>
 </section>
 
-<section class="tint" id="sphere">
-  <div class="wrap split">
-    <div>
-      <span class="eyebrow">A proof from the Science Bridge</span>
-      <h2>Why the first boundary must be a sphere.</h2>
-      <p>The Science Bridge says that once "me" has a reach, the unit distance, testing its edge in every direction traces a sphere, and with it π. Here is the argument written as a proof, with its one assumption named.</p>
-      <div class="mx-proof">
-        <p><b>Given:</b> a reference point O (me) and a unit distance d₀ (the first distance). Nothing else exists.</p>
-        <p><b>Assumption (no hidden structure):</b> the directions away from O carry no labels, marks or preferences. Any two directions are interchangeable.</p>
-        <ol>
-          <li>The edge of "me" is the set B of points where not-me begins: the points that the one available limit, d₀, picks out.</li>
-          <li>Any rule for choosing B can only use what exists: O and d₀. A rule that treated one direction differently from another would need information that distinguishes them, and by the assumption there is none.</li>
-          <li>So B must be unchanged by every rearrangement of directions that keeps O and d₀ fixed. In mathematical terms, B is invariant under all rotations about O.</li>
-          <li>The rotations about a point can carry any direction to any other. So if B contains one point at distance d₀, it contains every point at distance d₀.</li>
-          <li>Therefore B is the set of all points at distance d₀ from O: a circle in two independent directions, a sphere in three.</li>
-          <li>For any such circle, the ratio of its length to its diameter is the same number, whatever the size: π. The boundary forces π. ∎</li>
-        </ol>
+<section id="mechanics">
+  <div class="wrap">
+    <span class="eyebrow">The mechanics of thought</span>
+    <h2>One kind of thing, one kind of act.</h2>
+    <div class="split nb-keep" style="margin-top:6px">
+      <div>
+        <p class="lede" style="max-width:none">HMR says reality is Universal Intelligence (UI) thinking. If that is so, there should be a mathematics whose only object is a thought and whose only operation is thinking one. This section builds it from HMR's premises, and marks every line with how firm it is.</p>
+        <p>It is not finished. It reaches as far as an exact family of rules for how one thought follows another, and an exact account of what those rules cannot do. Nothing here was invented to fill a gap: where the mathematics runs out, the page says open.</p>
       </div>
-      <p><b>Why the assumption is earned, not added.</b> A world in which directions were marked, a grid say, would need something to place the marks, and with only O and d₀ in existence there is nothing to do it. The same reasoning is used throughout physics, where it is called Curie's principle: a symmetry present in the causes appears in the effects. The one thing the proof still takes as given is that directions form a continuum rather than a finite set; a finite set would again need something to choose which directions count.</p>
+      <div class="card" style="background:var(--ice);border:0">
+        <span class="tag">How to read the labels</span>
+        <p style="margin:0 0 6px"><span class="lvl est">established</span> Proven mathematics, with a source or a check we ran ourselves.</p>
+        <p style="margin:0 0 6px"><span class="lvl exa">exact in HMR</span> An HMR premise restated in this mathematics, with nothing added.</p>
+        <p style="margin:0 0 6px"><span class="lvl rea">HMR reading</span> Established mathematics read in HMR's terms. It fits; nothing forces it.</p>
+        <p style="margin:0 0 6px"><span class="lvl con">HMR conjecture</span> A claim that could turn out false.</p>
+        <p style="margin:0"><span class="lvl open">open</span> No mathematics yet.</p>
+      </div>
+    </div>
+    <p class="small muted" style="margin:16px 0 0">How it was built: two AI researchers, one working as a mathematician and one as a physicist, started from the premises on this site, exchanged drafts and corrected each other. A third, which had seen none of the work, refereed it and recomputed the main results. It found no error of arithmetic, and corrected the labels or wording of 18 of 29 core statements. Those corrections are in what you read here.</p>
+
+    <h3 class="mm-h">The operands and the one operator</h3>
+    <div class="grid g4 mm-ops">
+      <div class="card"><b class="big">•</b><h3>A thought</h3><p>One element. It is the only kind of thing there is. Calling an element a thought is a definition, offered for HMR to accept.</p><span class="lvl exa">exact in HMR</span></div>
+      <div class="card"><b class="big">≺</b><h3>A state</h3><p>A finite set of thoughts with one relation, “came before”. The relation never runs in a circle.</p><span class="lvl exa">exact in HMR</span></div>
+      <div class="card"><b class="big">∅</b><h3>The void</h3><p>The state with no thoughts in it. Growth starts here. It is nothing inside the model. Whether that is what HMR means by the placeholder for what the model is not is open.</p><span class="lvl est">established</span> <span class="lvl rea">as the placeholder: a reading</span></div>
+      <div class="card" style="border-top:4px solid var(--blue)"><b class="big">+1</b><h3>Birth</h3><p>Attend to any set S of existing thoughts. A new thought is born after everything in S and after everything S rests on.</p><span class="lvl est">established</span> <span class="lvl rea">“attention” is a reading</span></div>
+    </div>
+    <div class="split nb-keep" style="margin-top:18px">
+      <div>
+        <p><b>The laws of birth.</b> Each follows directly from the definition.</p>
+        <ol class="mm-laws">
+          <li><b>Nothing is born into the past.</b> A new thought comes after what it attends to, never before.</li>
+          <li><b>Attention completes itself.</b> Attending to a thought includes everything that thought rests on.</li>
+          <li><b>Unrelated births commute.</b> If neither of two new thoughts attends to the other, the order they are born in makes no difference to the result.</li>
+          <li><b>Related births do not.</b> If the second attends to the first, the order is part of the result.</li>
+          <li><b>Nothing is removed.</b> Thoughts and relations only accumulate.</li>
+          <li><b>Each birth adds one.</b> That is counting.</li>
+        </ol>
+        <figure class="fig" style="margin-top:14px">
+          <svg viewBox="0 0 440 150" role="img" aria-label="The five patterns three thoughts can form, drawn as dots joined by lines, with time running upward: three in a chain; one before two; two before one; one pair with a third unrelated; and three unrelated." style="display:block;width:100%;height:auto;background:#F7FAFF">
+            <g stroke="#5B9BE6" stroke-width="2.4" stroke-linecap="round" fill="none">
+              <path d="M44 118 L44 76 L44 34"/><path d="M132 118 L110 46 M132 118 L154 46"/><path d="M198 118 L220 46 M242 118 L220 46"/><path d="M292 118 L292 46"/>
+            </g>
+            <g fill="#0B2545">
+              <circle cx="44" cy="118" r="7"/><circle cx="44" cy="76" r="7"/><circle cx="44" cy="34" r="7"/>
+              <circle cx="132" cy="118" r="7"/><circle cx="110" cy="46" r="7"/><circle cx="154" cy="46" r="7"/>
+              <circle cx="198" cy="118" r="7"/><circle cx="242" cy="118" r="7"/><circle cx="220" cy="46" r="7"/>
+              <circle cx="292" cy="118" r="7"/><circle cx="292" cy="46" r="7"/><circle cx="324" cy="82" r="7"/>
+              <circle cx="372" cy="82" r="7"/><circle cx="396" cy="82" r="7"/><circle cx="420" cy="82" r="7"/>
+            </g>
+            <g font-family="Inter,Arial,sans-serif" font-size="11" fill="#5B6B82" text-anchor="middle"><text x="44" y="144">a chain</text><text x="132" y="144">one, then two</text><text x="220" y="144">two, then one</text><text x="306" y="144">a pair and one</text><text x="396" y="144">unrelated</text></g>
+          </svg>
+          <figcaption>The five patterns three thoughts can form. A line means “came before”, with time running upward. Four thoughts form 16 patterns, five form 63.</figcaption>
+        </figure>
+      </div>
+      <div>
+        <div class="card">
+          <span class="tag">Everything can be grown</span>
+          <p>Every finite pattern of thoughts can be reached from the void by births. Growing all of them by computer gives 1, 1, 2, 5, 16, 63 and 318 distinct patterns with zero to six thoughts, which are the known counts.</p>
+          <p style="margin-bottom:0"><span class="lvl est">established</span></p>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">Three tenses</span>
+          <p>Two thoughts are before, after, or unrelated. For unrelated thoughts the order of birth has no meaning. So time is the order of UI's thought, not one single line of thoughts. <span class="lvl exa">exact in HMR</span></p>
+          <p style="margin-bottom:0">This amends one line of HMR, “time is the sequence of UI's thought”, and is offered for acceptance. We then define the time from an earlier thought to a later one as the number of links in the longest chain between them. <span class="lvl rea">a definition</span></p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mm-h" id="skills">UI's skill set, one skill at a time</h3>
+    <p style="max-width:78ch">HMR describes UI by what it can do. Each ability is listed here with the piece of mathematics that carries it, or with a plain statement that none has been found.</p>
+    <div class="mm-t">
+      <div class="r h"><div>Skill</div><div>In this mathematics</div><div>How firm</div></div>
+      <div class="r"><div>Think a thought</div><div>Add one new thought to the state.</div><div><span class="lvl exa">exact in HMR</span></div></div>
+      <div class="r"><div>Attention</div><div>The set S of existing thoughts chosen at a birth.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Focus</div><div>The size of S, and how much weight each size is given. No focus at all means every thought is unrelated to every other.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Notice its own experience</div><div>Every thought carries its past with it: the record of what it rests on.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Repeat</div><div>Apply the same operation again. The counting numbers are what one operation, repeated, generates.</div><div><span class="lvl exa">exact in HMR</span></div></div>
+      <div class="r"><div>Relate</div><div>An ordered pair in “came before”.</div><div><span class="lvl exa">exact in HMR</span></div></div>
+      <div class="r"><div>Distinguish</div><div>Sorting thoughts into two kinds. Two is the smallest number of things that can differ.</div><div><span class="lvl exa">exact in HMR</span></div></div>
+      <div class="r"><div>Hold fixed</div><div>A quantity that does not change from one birth to the next.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Like, and do more of</div><div>A weight w for each pattern, read as how much UI likes it. The chance of a birth becomes a reference chance times w(next) / w(now). The form has no content until w and the reference are chosen. <a href="#liking">How this arises ↓</a></div><div><span class="lvl rea">HMR reading</span> Which w is UI's: <span class="lvl open">open</span></div></div>
+      <div class="r"><div>Sure or unsure</div><div>Two candidates: a probability for what comes next, or a third value, “undecided”, beside yes and no.</div><div><span class="lvl rea">HMR reading</span> Which one: <span class="lvl open">open</span></div></div>
+      <div class="r"><div>Accepted, or still processing</div><div>Accepted: a complete pattern that is now part of the state, and stays true. Processing: not yet born.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Change its mind</div><div>Nothing born is ever removed, so a change of mind can only be a later thought that supersedes an earlier one.</div><div><span class="lvl rea">HMR reading</span> The mechanism: <span class="lvl open">open</span></div></div>
+      <div class="r"><div>Make a mistake</div><div>No counterpart found. Every step the rule allows is legitimate.</div><div><span class="lvl open">open</span></div></div>
+      <div class="r"><div>Perspective</div><div>What is visible from a thought. Of everything in its past, only the latest thoughts are seen directly; the rest stand behind them.</div><div><span class="lvl rea">HMR reading</span></div></div>
+      <div class="r"><div>Thought, and idea</div><div>A thought is one act. An idea is a pattern of thoughts, which can occur many times.</div><div><span class="lvl rea">HMR reading</span> offered as a definition</div></div>
+      <div class="r"><div>Complete thought</div><div>A set of thoughts that contains everything it rests on.</div><div><span class="lvl rea">HMR reading</span> offered as a definition</div></div>
+      <div class="r"><div>Choose what to think next</div><div>The model describes which thought comes next by a probability. HMR does not say thoughts are random. This is <span class="lvl obs">an assumption</span> of the model, and HMR calls UI's first limit intentional.</div><div>an assumption</div></div>
+    </div>
+    <p class="note" style="margin-top:14px">The honest summary: the rows still open, what UI likes, changing its mind and making a mistake, are the ones that make UI an agent and not a rule. The mathematics does not contain them yet.</p>
+
+    <h3 class="mm-h" id="operators">Operators: how patterns combine</h3>
+    <div class="split nb-keep">
+      <div>
+        <div class="mm-t mm-t4">
+          <div class="r h"><div>Operator</div><div>Meaning</div><div>Thoughts</div><div>Relations</div></div>
+          <div class="r"><div>C beside D</div><div>Side by side, unrelated</div><div>add</div><div>add</div></div>
+          <div class="r"><div>C then D</div><div>All of C before all of D</div><div>add</div><div>add, plus n(C) × n(D)</div></div>
+          <div class="r"><div>D inside C</div><div>Every thought of C replaced by a copy of D</div><div>multiply</div><div>R(C) n(D)² + n(C) R(D)</div></div>
+          <div class="r"><div>C paired with D</div><div>All pairs, ordered in both places</div><div>multiply</div><div></div></div>
+        </div>
+        <p class="small muted" style="margin-top:8px">n is the number of thoughts in a pattern and R the number of its relations. These are the arithmetic of ordered sets worked out by Garrett Birkhoff in the 1930s and 1940s; the laws were checked here by computation. <span class="lvl est">established</span></p>
+        <figure class="fig" style="margin-top:14px">
+          <svg viewBox="0 0 440 96" role="img" aria-label="A pattern C of two thoughts placed before a pattern D of three thoughts. Six new lines join every thought of C to every thought of D." style="display:block;width:100%;height:auto;background:#F7FAFF">
+            <g stroke="#5B9BE6" stroke-width="2" stroke-linecap="round"><path d="M64 74 L40 24 M64 74 L92 24 M64 74 L144 24 M120 74 L40 24 M120 74 L92 24 M120 74 L144 24"/></g>
+            <g fill="#0B2545"><circle cx="64" cy="74" r="7"/><circle cx="120" cy="74" r="7"/><circle cx="40" cy="24" r="7"/><circle cx="92" cy="24" r="7"/><circle cx="144" cy="24" r="7"/></g>
+            <g font-family="Inter,Arial,sans-serif" fill="#5B6B82" font-size="11"><text x="162" y="28">D, three thoughts</text><text x="138" y="78">C, two thoughts</text></g>
+            <g font-family="Inter,Arial,sans-serif" fill="#0B2545"><text x="270" y="42" font-size="13" font-weight="700">C then D</text><text x="270" y="60" font-size="11.5" fill="#5B6B82">2 × 3 = 6 new relations,</text><text x="270" y="75" font-size="11.5" fill="#5B6B82">one for every crossing pair</text></g>
+          </svg>
+        </figure>
+      </div>
+      <div>
+        <p><b>Number is order, forgotten.</b> Keep only “how many” and both ways of adding become plain addition, both ways of multiplying become plain multiplication. Ordinary arithmetic is what is left of this algebra when everything but the count is thrown away. <span class="lvl est">established</span></p>
+        <p><b>More than the sum of its parts, in one exact sense.</b> Put one pattern after another and count relations:</p>
+        <p class="mx-eq">R(C then D) − R(C) − R(D) = n(C) × n(D)</p>
+        <p>Joining the two creates one new relation for every pair that crosses between them. Side by side, there is no surplus. In the same way, a + b things have a × b more pairs among them than a things and b things counted apart. <span class="lvl est">established</span> <span class="lvl rea">as “more than the parts”: a reading</span></p>
+        <p style="margin-bottom:0">A caution from the physics: this surplus is a count of relations, not weight. A bound whole weighs slightly less than its parts. <a href="physics.html#two-numbers">The physics →</a></p>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card"><h3>Two multiplications</h3><p>Twins in each of two generations is not the same pattern as two parent and child pairs. Both hold four thoughts. So “inside” does not commute, and neither multiplication of patterns is the multiplication of numbers. The doubt about multiplication is right in an exact sense.</p><span class="lvl est">established</span></div>
+      <div class="card"><h3>Procreation</h3><p>A birth that attends to two thoughts has two parents. Exponential growth appears in one case only: when every part produces its own offspring, in parallel. Counting relations does not give it. Pairs among n parts number n(n − 1)/2, which grows as the square.</p><span class="lvl est">established</span></div>
+      <div class="card"><h3>Division, and prime thoughts</h3><p>Dividing a pattern means finding smaller patterns it is built from. Usually there are none: of the 16 patterns on four thoughts, only 5 are a product of two smaller ones. The rest are prime, as a prime number is.</p><span class="lvl est">established</span></div>
+    </div>
+    <p style="max-width:78ch;margin-top:14px"><b>Grammar.</b> A morpheme is an operator with a type: a prefix or suffix takes one argument, an infix takes two. Brackets change meaning. “Un-lock-able” is either un-(lock-able), not able to be locked, or (un-lock)-able, able to be unlocked. A complete thought is an expression with no slot left unfilled. <span class="lvl rea">HMR reading</span> What the types are in HMR: <span class="lvl open">open</span></p>
+
+    <h3 class="mm-h" id="rule">The rule for what is thought next</h3>
+    <div class="split nb-keep">
+      <div>
+        <p>Ask four things of any rule that gives the chance of each possible next thought:</p>
+        <ol class="mm-laws">
+          <li>Nothing is born into the past.</li>
+          <li>The chance of reaching a state does not depend on the order in which its unrelated thoughts were born.</li>
+          <li>The odds between two possible births depend only on the two pasts involved, not on thoughts outside them.</li>
+          <li>Something is always thought next: the chances add to one.</li>
+        </ol>
+        <p>If, in addition, no possible birth has chance zero, the rule has one form. There are numbers t<sub>0</sub> = 1, t<sub>1</sub>, t<sub>2</sub> and so on, none negative. In a state of n thoughts, a birth whose past holds w thoughts, m of them seen directly, has chance</p>
+        <p class="mx-eq">chance = λ(w, m) / λ(n, 0)<br>λ(w, m) = Σ<sub>k=m…w</sub> C(w − m, k − m) t<sub>k</sub></p>
+        <p>for each distinct past. C(a, b) counts the ways to choose b things from a. This is the classical sequential growth law of <a href="https://doi.org/10.1103/PhysRevD.61.024002">Rideout and Sorkin (1999)</a>, found in the search for a theory of quantum gravity. <span class="lvl est">established</span></p>
+      </div>
+      <div>
+        <div class="card" style="background:var(--ice);border:0">
+          <span class="tag">The simplest case</span>
+          <p>Let each existing thought be attended to with the same chance p, independently of the others. Then the formula becomes</p>
+          <p class="mx-eq" style="background:#fff">p<sup>m</sup> (1 − p)<sup>n − w</sup></p>
+          <p style="margin-bottom:0">Start with one thought and p = ½. The second thought comes after the first with chance ½, and beside it with chance ½. That is the whole rule, at its smallest.</p>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">The same rule, said as attention</span>
+          <p style="margin-bottom:0">Pick a set S of existing thoughts, a set of k thoughts having weight t<sub>k</sub>. The new thought is born after S and all that S rests on. Checked by exact computation, on every pattern of up to five thoughts, by the mathematician and again by the referee: it gives the formula on the left. <span class="lvl est">established</span> Reading t<sub>k</sub> as UI's weighting of a focus of size k: <span class="lvl rea">HMR reading</span></p>
+        </div>
+      </div>
+    </div>
+
+
+    <p style="max-width:80ch;margin-top:16px"><b>It is a family, not one law.</b> The numbers t<sub>k</sub> are free, infinitely many of them, and nothing in the four conditions fixes them.</p>
+
+    <div class="card mm-grow" id="grow-toy">
+      <div class="mm-grow-g">
+        <canvas id="mm-gc" role="img" aria-label="A pattern of thoughts grown by the simplest rule. Dots are thoughts, lines join each thought to the ones directly before it, and time runs upward."></canvas>
+        <div class="mm-grow-s">
+          <h3>Grow a pattern yourself</h3>
+          <p>This runs the simplest case. Each new thought attends to each existing thought with chance p, and comes after everything those rest on. A line joins a thought to the ones directly beneath it, and time runs upward.</p>
+          <label class="mm-grow-l" for="mm-gp">Chance p <input type="range" id="mm-gp" min="5" max="95" step="5" value="50"> <b id="mm-gpv">0.50</b></label>
+          <div class="mm-grow-b"><button type="button" class="btn primary" id="mm-g1">Think one thought</button><button type="button" class="btn ghost" id="mm-g20">Think 20</button><button type="button" class="btn ghost" id="mm-g0">Start over</button></div>
+          <p class="mm-grow-r" id="mm-gr" aria-live="polite"></p>
+          <p class="small muted" style="margin:0">Gold marks a post: a thought that every other thought comes before or after. Low p grows wide, high p grows a single line. This is the simplest rule of the family, shown to make it concrete. It is not offered as UI's law.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mm-h" id="liking">What that family cannot do, and the door it leaves open</h3>
+    <div class="grid g3">
+      <div class="card" style="border-top:4px solid #C9382E"><h3>It is blind to shape</h3><p>The chance of a birth depends on the new thought's past through two numbers only: its size w, and how many of its thoughts are seen directly, m. The rule can favour a wide or a narrow focus. It cannot favour one shape of past over another with the same two numbers.</p><span class="lvl est">established</span></div>
+      <div class="card" style="border-top:4px solid #C9382E"><h3>It cannot be the whole law</h3><p>An ordinary probability rule that obeys a condition like the third cannot produce the linked outcomes seen in entangled particles, if what is measured can be chosen freely. Experiments do produce them. HMR's “what was one never stops being one” needs more than this family.</p><span class="lvl est">established</span> as Bell's theorem, applied here</div>
+      <div class="card" style="border-top:4px solid #C9382E"><h3>No space in the large</h3><p>For every choice of the numbers, a large pattern grown this way is close to one that has an order in time and no structure in space. No rule of the family has a large-scale limit that resembles flat spacetime in two or more dimensions (<a href="https://doi.org/10.1002/rsa.20278">Brightwell and Georgiou, 2010</a>).</p><span class="lvl est">established</span></div>
+    </div>
+    <div class="split nb-keep" style="margin-top:16px">
+      <div>
+        <p><b>So the four-condition rule is a template, not UI's law.</b> Our judgment is that, within ordinary probability, the condition to give up is the third. HMR asks for that three times: for preferring some patterns, for entanglement, and for space. The other way out is a quantum rule, in which all four conditions take a new form. <span class="lvl con">HMR conjecture</span></p>
+        <p><b>What the other three conditions allow.</b> Fix any rule of the family, with all its numbers positive, as a reference. Then the rules that keep conditions 1, 2 and 4 are exactly</p>
+        <p class="mx-eq">chance = reference chance<br>&nbsp;&nbsp;× w(next state) / w(present state)</p>
+        <p>where w gives every pattern a number that is never negative, w of the void is 1, and w of a pattern is the reference-weighted average of w over the patterns that can follow it. Here w is simply the chance of a pattern under the rule divided by its chance under the reference. It is a change of description, not a restriction, and it changes if the reference is changed. These rules are the order-invariant measures studied by <a href="https://doi.org/10.1214/10-AAP736">Brightwell and Luczak (2011)</a>. <span class="lvl est">established</span></p>
+        <p style="margin-bottom:0"><b>Reading w as liking.</b> If w is how much UI likes a pattern, then “do more of what feels good” has a form for the first time: reference chance times w(next) / w(now). The form has no content until w and the reference are chosen, and HMR does not yet say how to choose them. <span class="lvl rea">HMR reading</span> Whether any such rule grows space is a published open problem, and those who posed it expect the answer to lie outside ordinary probability. <span class="lvl open">open</span></p>
+      </div>
+      <div>
+        <div class="card">
+          <span class="tag">Closed</span>
+          <p>A <b>post</b> is a thought that every earlier thought comes before and every later thought comes after. In the four-condition rule, after a post with r thoughts before it, everything earlier acts on what follows only through the number r:</p>
+          <p class="mx-eq">t′<sub>n</sub> = Σ<sub>k=0…r</sub> C(r, k) t<sub>n+k</sub></p>
+          <p>That is an exact meaning for “a closed system” (<a href="https://doi.org/10.1103/PhysRevD.63.084026">Martin, O'Connor, Rideout and Sorkin, 2001</a>). <span class="lvl est">established</span></p>
+          <p style="margin-bottom:0">Reading HMR's completion as a post: <span class="lvl rea">HMR reading</span> In the rule a post happens by chance; reading it as a model becoming complete adds a meaning the mathematics does not carry. The Big Bang as a post: <span class="lvl con">HMR conjecture</span> “Understands itself”: <span class="lvl open">open</span></p>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <span class="tag">How often a post happens</span>
+          <p style="margin-bottom:0">In the simplest case it depends steeply on p: about one thought in 12 is a post at p = ½, one in 10<sup>12</sup> at p = 0.1, and one in 10<sup>139</sup> at p = 0.01. With weights 1/k!, the expected number of posts in a whole history is about 0.3, and most of that is the very first thought, which has no past. So whether closure recurs depends entirely on the free numbers. <span class="lvl est">established</span> the last figure by simulation</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  var cv = document.getElementById('mm-gc'); if (!cv) return;
+  var ctx = cv.getContext('2d'), N = [], MAX = 150, timer = 0;
+  var pIn = document.getElementById('mm-gp'), pOut = document.getElementById('mm-gpv'), out = document.getElementById('mm-gr');
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function p() { return (+pIn.value) / 100; }
+  // One birth: attend to each existing thought with chance p, then take everything those rest on.
+  function birth() {
+    if (N.length >= MAX) return false;
+    var past = new Set(), pr = p(), i;
+    for (i = 0; i < N.length; i++) if (Math.random() < pr) { past.add(i); N[i].past.forEach(function (j) { past.add(j); }); }
+    var below = new Set(); past.forEach(function (i) { N[i].past.forEach(function (j) { below.add(j); }); });
+    var links = [], h = 0;
+    past.forEach(function (i) { if (!below.has(i)) { links.push(i); if (N[i].h + 1 > h) h = N[i].h + 1; } });
+    N.push({ past: past, links: links, h: h });
+    return true;
+  }
+  function posts() {
+    var fut = N.map(function () { return 0; }), k = [];
+    N.forEach(function (x) { x.past.forEach(function (j) { fut[j]++; }); });
+    N.forEach(function (x, i) { if (N.length > 1 && x.past.size + fut[i] === N.length - 1) k.push(i); });
+    return k;
+  }
+  function draw() {
+    var r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2), W = Math.max(200, r.width), H = Math.max(200, r.height);
+    if (cv.width !== Math.round(W * d) || cv.height !== Math.round(H * d)) { cv.width = Math.round(W * d); cv.height = Math.round(H * d); }
+    ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, W, H);
+    var top = 0, lev = [], i;
+    for (i = 0; i < N.length; i++) { top = Math.max(top, N[i].h); (lev[N[i].h] = lev[N[i].h] || []).push(i); }
+    var pad = 22, gap = (H - 2 * pad) / Math.max(top, 5), rad = Math.max(2.2, Math.min(6.5, gap * 0.36)), X = [], Y = [];
+    lev.forEach(function (row, h) { row.forEach(function (i, c) { X[i] = W * (c + 1) / (row.length + 1); Y[i] = H - pad - h * gap; }); });
+    rad = Math.min(rad, Math.max(2.2, W / (2.6 * Math.max.apply(null, lev.map(function (q) { return q.length; }).concat([1])))));
+    ctx.strokeStyle = 'rgba(91,155,230,.75)'; ctx.lineWidth = Math.max(0.8, rad * 0.3); ctx.beginPath();
+    N.forEach(function (x, i) { x.links.forEach(function (j) { ctx.moveTo(X[i], Y[i]); ctx.lineTo(X[j], Y[j]); }); }); ctx.stroke();
+    var po = posts(), isPost = {}; po.forEach(function (i) { isPost[i] = 1; });
+    N.forEach(function (x, i) {
+      ctx.beginPath(); ctx.arc(X[i], Y[i], isPost[i] ? rad + 1.5 : rad, 0, 6.2832);
+      ctx.fillStyle = isPost[i] ? '#E8A33D' : '#0B2545'; ctx.fill();
+      if (isPost[i]) { ctx.lineWidth = 1.5; ctx.strokeStyle = '#8A5A0B'; ctx.stroke(); }
+    });
+    if (!N.length) { ctx.fillStyle = '#5B6B82'; ctx.font = '14px Inter, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('No thoughts yet. This is the void.', W / 2, H / 2); }
+    pOut.textContent = p().toFixed(2);
+    var n = N.length, t = n === 1 ? '1 thought' : n + ' thoughts';
+    out.textContent = n ? t + '. Longest chain: ' + (top + 1) + '. Posts right now: ' + po.length + '.' + (n >= MAX ? ' That is as many as fit here. Start over to grow another.' : '') : 'Nothing has been thought.';
+  }
+  function grow(k) {
+    clearTimeout(timer);
+    if (still) { while (k-- > 0 && birth()); draw(); return; }
+    (function step() { if (k-- > 0 && birth()) { draw(); timer = setTimeout(step, 45); } else draw(); })();
+  }
+  document.getElementById('mm-g1').addEventListener('click', function () { grow(1); });
+  document.getElementById('mm-g20').addEventListener('click', function () { grow(20); });
+  document.getElementById('mm-g0').addEventListener('click', function () { clearTimeout(timer); N = []; draw(); });
+  pIn.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  for (var i = 0; i < 24; i++) birth();
+  draw();
+})();
+</script>
+
+<section class="tint" id="sphere">
+  <div class="wrap split nb-keep">
+    <div>
+      <span class="eyebrow">Geometry from the first distinction</span>
+      <h2>The first boundary as a sphere: what is proved, and what is assumed.</h2>
+      <p>The Science Bridge says that once “me” has a reach, testing its edge in every direction traces a sphere, and with it π. An earlier version of this page called that a proof with one assumption that was “earned, not added”. Checked carefully, it needs three assumptions, and none of them follows from me, not me and the unit alone. Here it is stated correctly.</p>
+      <div class="mx-proof">
+        <p><b>Given:</b> a flat space of at least two dimensions, with distances that can take any real value; a point O (me); the unit d₀ (the first distance).</p>
+        <p><b>Assumption (no hidden structure):</b> the distance-preserving maps that keep O fixed can carry any point at distance d₀ to any other.</p>
+        <p><b>Claim:</b> any set of points at distance d₀ from O that is picked out by a rule using only O and d₀ is the whole sphere. In two dimensions its length is 2π d₀.</p>
+        <p style="margin-bottom:0"><b>Proof:</b> a distance-preserving map that keeps O fixed keeps every statement written with O and distance true, so it carries the chosen set onto itself. The chosen set is then made of whole orbits of those maps, and by the assumption the sphere is a single orbit. ∎ <span class="lvl est">established</span></p>
+      </div>
+      <p><b>What is assumed.</b> The flat space, its number of dimensions, and that no direction is special. These cannot be derived from the three givens, because there are spaces that contain a me, a not-me and one unit and give other answers:</p>
+      <div class="mm-t mm-t5">
+        <div class="r h"><div>Space</div><div>The unit “circle” is</div><div>Edge ÷ width</div></div>
+        <div class="r"><div>City-block distance</div><div>a square on its corner</div><div class="num">4</div></div>
+        <div class="r"><div>Hexagonal distance</div><div>a hexagon</div><div class="num">3</div></div>
+        <div class="r"><div>Flat plane</div><div>a round circle</div><div class="num">3.14159…</div></div>
+        <div class="r"><div>On a ball one unit in radius</div><div>round</div><div class="num">2.6436</div></div>
+        <div class="r"><div>Saddle-shaped plane, same scale</div><div>round</div><div class="num">3.6920</div></div>
+      </div>
+      <p class="small muted" style="margin-top:8px">Computed. <span class="lvl est">established</span></p>
+      <figure class="fig" style="margin-top:14px">
+        <svg viewBox="0 0 440 142" role="img" aria-label="Three shapes that are each the set of points one unit from a centre: a square standing on its corner under city-block distance, a hexagon under hexagonal distance, and a round circle in the flat plane." style="display:block;width:100%;height:auto;background:#fff">
+          <g fill="#EAF2FD" stroke="#1D5FD1" stroke-width="2.2" stroke-linejoin="round">
+            <polygon points="75,16 119,60 75,104 31,60"/>
+            <polygon points="264,60 242,21.9 198,21.9 176,60 198,98.1 242,98.1"/>
+            <circle cx="365" cy="60" r="44"/>
+          </g>
+          <g stroke="#0B2545" stroke-width="1.6" stroke-dasharray="4 3"><line x1="75" y1="60" x2="119" y2="60"/><line x1="220" y1="60" x2="264" y2="60"/><line x1="365" y1="60" x2="409" y2="60"/></g>
+          <g fill="#0B2545"><circle cx="75" cy="60" r="3.6"/><circle cx="220" cy="60" r="3.6"/><circle cx="365" cy="60" r="3.6"/></g>
+          <g font-family="Inter,Arial,sans-serif" font-size="12" fill="#0B2545" text-anchor="middle" font-weight="700"><text x="75" y="130">city-block: 4</text><text x="220" y="130">hexagonal: 3</text><text x="365" y="130">flat plane: 3.14159…</text></g>
+        </svg>
+        <figcaption>Three shapes that are all “every point one unit from me”. Which one you get depends on the space, and the space is what the proof assumes.</figcaption>
+      </figure>
     </div>
     <div>
       <div class="card" style="background:#fff">
-        <span class="tag">Repeat, and learn</span>
-        <p>With nothing else in existence, once the limit is in place, all UI can do is repeat it and see what happens. Each repetition produces new data, and from that data the whole of reality can extrapolate the next step. The sphere is the first result of that process. Dimensions, then space and time, are the next.</p>
+        <span class="tag">In favour of roundness, 1</span>
+        <h3>π from counting alone</h3>
+        <p class="mx-eq">n × ( C(2n, n) / 4ⁿ )² → 1/π</p>
+        <p>Make 2n two-way choices. The chance they split exactly evenly is close to 1/√(πn). No direction, circle or continuum is used. The inverse of the left side, computed for n = 10, 100, 1000 and 10000, is 3.2211, 3.1495, 3.1424 and 3.1417.</p>
+        <p style="margin-bottom:0">So the number π does come out of a two-way distinction, repeated and counted. The sphere does not. <span class="lvl est">established</span> <span class="lvl rea">as repeated distinction: a reading</span></p>
       </div>
       <div class="card" style="margin-top:14px">
-        <span class="tag">The same result, later in history</span>
-        <p>In 2003 Grigori Perelman proved the Poincaré conjecture, one of the Millennium Prize problems: any closed three-dimensional space without holes or edges is, in shape, a sphere. In HMR's reading it is the same truth seen from far downstream: a closed boundary, with nothing to break its symmetry, is a sphere. <a href="#millennium">The Millennium problems →</a></p>
+        <span class="tag">In favour of roundness, 2</span>
+        <h3>Repetition rounds things off</h3>
+        <p style="margin-bottom:0">Add up many independent steps taken by one rule, even on a square grid, and the spread of the total depends on position only through the Pythagorean distance. On a grid, two points equally far apart by Pythagoras but not by grid steps differ in likelihood by 4.9% after 20 steps and by 0.005% after 200. It needs a space in which steps add, and independence, and it is never exact at a finite stage. <span class="lvl est">established</span></p>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <span class="tag">In favour of roundness, 3</span>
+        <h3>A scatter with no plan has no direction</h3>
+        <p style="margin-bottom:0">If thoughts are scattered in a flat space independently and with no preferred place, the scatter is the Poisson scatter, and its law has no preferred direction and no preferred state of motion. The assumption that no direction is special is replaced by two others, independence and no preferred place. The flat space, its dimension and its volume are still assumed. <span class="lvl est">established</span></p>
+      </div>
+      <div class="card" style="margin-top:14px;border-top:4px solid #C9382E">
+        <span class="tag">The fork</span>
+        <h3>Sphere or simplex</h3>
+        <p>If the only distance that exists is the unit, and no pair of boundary points is special, then every boundary point is one unit from every other. That is not a sphere. It is a simplex: a triangle, then a pyramid, one new dimension for each new point, with no edge to measure and no π. A round sphere needs distances that repeating the unit cannot supply, such as √2. So HMR has a choice to make at this step, sphere or simplex, and should say that it is choosing. <span class="lvl open">open</span></p>
+        <p style="margin-bottom:0"><b>And under HMR's own physics</b> the first distance is a single link between two thoughts, with nothing between its ends. A sphere and π can then exist only as limits over very many thoughts. <span class="lvl rea">HMR reading</span></p>
       </div>
     </div>
   </div>
@@ -110,7 +405,7 @@
       <span class="eyebrow">The meaning of π</span>
       <h2>π: the unlimited, inside the first limit.</h2>
       <p>π is the ratio of a circle's edge to its width. Three facts about it matter to HMR.</p>
-      <p><b>It is forced.</b> No one chooses π. Any edge drawn evenly around a point produces it, at every size. In HMR it is the signature of the first boundary, the edge of "me".</p>
+      <p><b>It is forced.</b> No one chooses π. In flat space, any edge drawn evenly around a point produces it, at every size. It also appears with no geometry at all, from counting two-way choices (<a href="#sphere">above</a>). In HMR it is the signature of the first boundary, the edge of "me".</p>
       <p><b>It never ends.</b> π is transcendental: its digits never stop and never repeat (<a href="https://doi.org/10.1007/BF01446522">Lindemann, 1882</a>, proved it is not the root of any polynomial with whole-number coefficients). The first and simplest limit, a single unit distance tested in every direction, contains a number that cannot be written down completely. In HMR's reading, that is the trace of phase 1: the unlimited is still present inside the first limited thing.</p>
       <p><b>It is everywhere.</b> π appears wherever something spreads evenly from a point: in every wave and vibration, in the law of gravity and the law of electric force (the 4π of a sphere's surface), in Einstein's equations (8π), in quantum mechanics (ħ = h/2π), and in the bell curve of chance. HMR reads every appearance as a trace of the original boundary, carried into everything built on it.</p>
     </div>
@@ -129,25 +424,53 @@
 </section>
 
 <section class="navyband" id="bigbang">
-  <div class="wrap split">
-    <div>
-      <span class="eyebrow" style="color:#9CC3F5">The catalytic moment</span>
-      <h2>The mathematics of the Big Bang.</h2>
-      <p>The Science Bridge says the Big Bang was the moment UI's first model of itself became complete. Here is how that can be said in mathematics. These are HMR's proposals, built from standard ideas.</p>
-      <p><b>1. A self-model reaches a fixed point.</b> Let S be what UI is, and F the act of modeling it: F(S) is UI's picture of itself. The model is complete when the picture and the thing agree:</p>
-      <p class="mx-eq" style="background:rgba(255,255,255,.08);color:#fff">S* = F(S*)</p>
-      <p>Mathematics knows such fixed points well. Self-reference always produces them, and Lawvere's fixed-point theorem shows why (<a href="https://doi.org/10.1007/BFb0080769" style="color:#9CC3F5">Lawvere, 1969</a>). In HMR, the fixed point is reached when a point, a not-point, the distance between them, the boundary tested in every direction and the rules relating everything inside it all describe one another completely.</p>
-      <p><b>2. A closed system grows explosively.</b> Once the system is closed, every new thought is a new relation among parts it already has. With n parts there are n(n−1)/2 pairs and 2<sup>n</sup> possible groupings, so relations multiply far faster than parts. Growth by doubling is exponential, and the earliest universe, in the standard theory of inflation, also grew exponentially, its size scaling as a(t) ∝ e<sup>Ht</sup>. HMR proposes they are the same event described twice.</p>
-      <p><b>3. Life is the same pattern, turned inward.</b> After the explosion, the universe models itself again. HMR proposes a second catalytic event, an inversion: subsystems that contain a working model of themselves, and so can repair and copy themselves. That is a recognized definition of life in theoretical biology, as self-producing (autopoietic) systems, and John von Neumann showed the logic of a machine that holds its own description and builds itself from it.</p>
-    </div>
-    <div>
-      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
-        <span class="tag" style="background:rgba(156,195,245,.18);color:#CFE2FA">In the story</span>
-        <p style="color:#DCE7F5">UI asked what it is. To answer, it imagined what it is not, measured the gap, tested its own edges in every direction, and worked out how anything inside could relate to anything else. The moment that picture was complete, it could not stay still: a complete picture of oneself is a thought that keeps producing new thoughts. That was the Big Bang. Much later, parts of the universe began to picture themselves from within. That was life.</p>
+  <div class="wrap">
+    <div class="split nb-keep">
+      <div>
+        <span class="eyebrow" style="color:#9CC3F5">The catalytic moment</span>
+        <h2>The mathematics of the Big Bang.</h2>
+        <p style="margin-bottom:0">The Science Bridge says the Big Bang was the moment UI's first model of itself became complete. An earlier version of this section said more than the mathematics supports. Below is what holds, point by point, and what would have to be shown for the rest.</p>
       </div>
-      <div class="card" style="margin-top:14px;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
-        <span class="tag" style="background:rgba(242,169,59,.2);color:#F7D49A">Open work</span>
-        <p style="color:#DCE7F5">To turn these proposals into a theory: define F precisely; show that its fixed point is unique; derive the rate of growth after closure and compare it with the measured properties of inflation. That is a program, and we name it as one.</p>
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+        <span class="tag" style="display:inline-block;background:rgba(156,195,245,.18);color:#CFE2FA;padding:5px 9px;border-radius:6px">In the story</span>
+        <p style="color:#DCE7F5;margin-bottom:0">UI asked what it is. To answer, it imagined what it is not, measured the gap, tested its own edges in every direction, and worked out how anything inside could relate to anything else. The moment that picture was complete, it could not stay still: a complete picture of oneself is a thought that keeps producing new thoughts. That was the Big Bang. Much later, parts of the universe began to picture themselves from within. That was life.</p>
+      </div>
+    </div>
+    <div class="split nb-keep bb-rows" style="margin-top:22px">
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+        <h3>1. A complete self-model</h3>
+        <p>Let S be what UI is, and F the act of modeling it. The model is complete when the picture and the thing agree:</p>
+        <p class="mx-eq" style="background:rgba(255,255,255,.08);color:#fff">S* = F(S*)</p>
+        <p>For the natural choices of F (one more; a pair; any finite grouping; one birth) a smallest solution exists, and in every case it is not finite: n = n + 1, n = 1 + n² and n = 2ⁿ have no solutions. So if closure is this equation, closure is not a finite event. <span class="lvl est">established</span></p>
+        <p style="margin-bottom:0">Lawvere's fixed-point theorem (<a href="https://doi.org/10.1007/BFb0080769" style="color:#9CC3F5">Lawvere, 1969</a>) does not say that self-reference always produces fixed points, as this page once did. It says: if a system could represent every way of sorting its own thoughts, then every operation on the values would have a fixed point. For two values, me and not me, swapping them has none. So no complete two-valued self-model exists. That leaves three ways out: the self-model is never total, which agrees with HMR's “UI is not all-knowing”; or there is a third value, undecided, a formal home for “unsure”; or the fixed point is an alternation in time. <span class="lvl est">established</span> That closure forces one of the three: <span class="lvl con">HMR conjecture</span></p>
+      </div>
+      <div>
+        <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+          <h3>2. What does exist: a post</h3>
+          <p style="margin-bottom:0">The growth rule above has an exact notion of a closed system, a thought that everything earlier comes before and everything later comes after. Reading the Big Bang as such a moment is an <span class="lvl con">HMR conjecture</span>. It would be confirmed by a growth rule, outside the classical family, whose post is followed by a hot, expanding universe of three space dimensions. No such rule is known. <a href="#liking" style="color:#9CC3F5">Closed, exactly ↑</a></p>
+        </div>
+        <div class="card" style="margin-top:14px;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+          <h3>3. After closure</h3>
+          <p style="margin-bottom:0">This page once said that relations multiply exponentially once a system is closed, and that this is inflation. The count does not support it. Among n parts there are n(n − 1)/2 pairs, which grows as the square. The 2ⁿ groupings are possibilities, not relations forming in time. Exponential growth in time needs every part to produce its own offspring in parallel, and no known rule supplies that. In the one rule we simulated, the width of the pattern rises in a burst after an origin and then stays constant, and the volume of a thought's past grows at a steady rate for only five to seven e-folds (growth by the factor e) before turning linear. That is not inflation. “Inflation is growth after closure” stands as an <span class="lvl con">HMR conjecture</span> with no support at present.</p>
+        </div>
+      </div>
+    </div>
+    <div class="split nb-keep bb-rows" style="margin-top:14px">
+      <div>
+        <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+          <h3>4. Life as the same pattern, turned inward</h3>
+          <p style="margin-bottom:0">HMR proposes a second catalytic event, an inversion: parts of the universe that carry a working model of themselves, and so can repair and copy themselves. We examined five exact meanings for “inversion”. None yet predicts anything about life. <span class="lvl open">open</span></p>
+        </div>
+        <div class="card" style="margin-top:14px;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+          <span class="tag" style="display:inline-block;background:rgba(156,195,245,.18);color:#CFE2FA;padding:5px 9px;border-radius:6px">Why say all this</span>
+          <p style="color:#DCE7F5;margin-bottom:0">Because a model that claims to be about truth has to mark its own unfinished parts. The story is HMR's. The mathematics on this page is as far as the story has been made exact, and no further.</p>
+        </div>
+      </div>
+      <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.18)">
+        <span class="tag" style="display:inline-block;background:rgba(242,169,59,.2);color:#F7D49A;padding:5px 9px;border-radius:6px">What would turn the story into mathematics</span>
+        <p style="color:#DCE7F5;margin-bottom:8px">1. A rule for the next thought whose typical result is a space of three dimensions plus time.</p>
+        <p style="color:#DCE7F5;margin-bottom:8px">2. In that rule, a closed moment followed by growth at a steady rate for sixty or more e-folds (growth by the factor e, sixty times over), with the ripples astronomers measure.</p>
+        <p style="color:#DCE7F5;margin-bottom:0">3. A definition of a part that carries a model of itself. <a href="physics.html#verdict" style="color:#9CC3F5">The full list →</a></p>
       </div>
     </div>
   </div>
@@ -216,7 +539,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=254226fc" defer></script>
+<script src="site.js?v=8d6b348d" defer></script>
 <script src="fx-stars.js?v=3e21f9c2" defer></script>
 </body>
 </html>
