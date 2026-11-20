@@ -284,7 +284,7 @@ summary,label{cursor:pointer}
 /* 2026-11-19: the mechanics sections on the Math and Physics pages */
 .lvl{display:inline-block;font:600 .72rem/1 var(--font);padding:4px 8px;border-radius:999px;vertical-align:2px;white-space:nowrap}
 .lvl.est{background:#DFF3E7;color:#1D6B3F}.lvl.exa{background:#DCEBFF;color:#1B4F9C}.lvl.rea{background:#FCEFD9;color:#8A5A0B}.lvl.con{background:#ECE4FB;color:#5A34A8}.lvl.open{background:#FBE2E2;color:#8E1B1B}.lvl.wip{background:#E3F1F4;color:#0E5E6F}.lvl.obs{background:#E9EDF3;color:#44536A}
-@media (min-width:900px){.road.mm-two{grid-template-columns:1fr 1fr}}
+@media (min-width:900px){.road.mm-two{grid-template-columns:1fr 1fr}.mm-three{grid-template-columns:repeat(3,1fr)}@media(max-width:900px){.mm-three{grid-template-columns:1fr}}}
 .mm-h{font-size:1.28rem;margin:38px 0 12px;padding-top:18px;border-top:1px solid var(--line)}
 .mm-ops .card b.big{display:block;font:750 1.9rem/1 var(--font);color:var(--blue);margin-bottom:8px}
 .mm-ops .card p{font-size:.95rem}
