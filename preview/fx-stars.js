@@ -60,7 +60,7 @@
     parts.push({ x: Math.random() * w * 0.94, y: 4 + Math.random() * (h - 8), vx: Math.cos(a) * s + (stirred ? dx * 0.35 : 0), vy: Math.sin(a) * s * 0.6 + (stirred ? dy * 0.2 : 0),
       r: 0.7 + Math.random() * 2.3, age: 0, life: stirred ? 90 + Math.random() * 90 : 190 + Math.random() * 220, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.35 }); }
   function draw() { c.clearRect(0, 0, w, h);
-    for (const p of parts) { const u = Math.min(1, p.age / p.life), env = Math.min(1, u * 6, (1 - u) * 6), a = env * (0.62 + 0.3 * Math.sin(p.tw)), [r, g, b] = p.col, R = p.r;
+    for (const p of parts) { const u = Math.min(1, p.age / p.life), env = Math.min(1, u * 14, (1 - u) * 14), a = env * (0.8 + 0.14 * Math.sin(p.tw)), [r, g, b] = p.col, R = p.r;
       const gr = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, R * 4);
       gr.addColorStop(0, `rgba(${r},${g},${b},${0.8 * a})`); gr.addColorStop(0.35, `rgba(${r},${g},${b},${0.32 * a})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
       c.fillStyle = gr; c.beginPath(); c.arc(p.x, p.y, R * 4, 0, 6.283); c.fill();
