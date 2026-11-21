@@ -57,9 +57,9 @@
     function size() { const r = brand.getBoundingClientRect(), hr = host.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
       w = whole ? hr.width : Math.max(120, Math.min(hr.width, r.right - hr.left + 110)); h = hr.height;
       bx = r.left - hr.left - 40; by = r.top - hr.top - 26; bw = r.width + 150; bh = r.height + 52;
-      want = whole ? Math.max(46, Math.min(120, Math.round(w * h / 7000))) : 36;
+      want = whole ? Math.max(50, Math.min(150, Math.round(w * h / 5600))) : 36;
       cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = w * d; cv.height = h * d; c.setTransform(d, 0, 0, d, 0, 0); if (still) draw(); }
-    function spawn(stirred) { const a = Math.random() * 6.283, s = 0.06 + Math.random() * 0.2, near = whole && Math.random() < 0.4;
+    function spawn(stirred) { const a = Math.random() * 6.283, s = 0.06 + Math.random() * 0.2, near = false; // the footer's cloud is even across its whole width (owner, 2026-11-20)
       const x = whole ? (near ? bx + Math.random() * bw : Math.random() * w) : Math.random() * w * 0.94, y = near ? by + Math.random() * bh : 4 + Math.random() * (h - 8);
       parts.push({ x, y, vx: Math.cos(a) * s + (stirred ? dx * 0.35 : 0), vy: Math.sin(a) * s * 0.6 + (stirred ? dy * 0.2 : 0),
         r: 0.7 + Math.random() * 2.3, age: 0, life: stirred ? 90 + Math.random() * 90 : 190 + Math.random() * 220, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.35 }); }
