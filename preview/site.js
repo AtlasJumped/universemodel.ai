@@ -830,7 +830,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     // nearby words: line boxes of the text close to the label, read once
     const skip = new Set([lab, fireBtn, spinBtn]), cand = [], lc = { x: labRect.left + labRect.width / 2, y: labRect.top + labRect.height / 2 };
     const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => {
-      const p = n.parentElement; if (!p || !/\S/.test(n.nodeValue) || stage.contains(p) || lab.contains(p) || fireBtn.contains(p) || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION|SELECT)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+      const p = n.parentElement; if (!p || !/\S/.test(n.nodeValue) || stage.contains(p) || lab.contains(p) || p.closest('header,nav,[role=navigation]') || fireBtn.contains(p) || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION|SELECT)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT; } });
     const rg = document.createRange(); let node, seen = 0;
     while ((node = tw.nextNode()) && seen++ < 3000) {
@@ -912,7 +912,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       for (const o of T) { const X = o.x - ox, Y = o.y - oy; if (Y > H + 40 || Y + o.h < -60) continue; let act = 0;
         for (const s of o.sl) { const u0 = t - s.ts; if (u0 < 0 || u0 > s.L) continue;
           const u = clamp(u0 / 0.3, 0, 1) * (u0 > s.L * 0.6 ? clamp((s.L - u0) / (s.L * 0.4), 0, 1) : 1) * fl; if (u <= 0.02) continue; act += u;
-          const f = 0.7 + 0.3 * Math.sin(t * 13 + s.ph) * Math.sin(t * 7.3 + s.ph * 2), h = (o.h * 0.85 + 7) * (0.8 + 0.6 * I) * s.hh * u * f, w = Math.max(5, s.w * (1.2 + 0.5 * Math.abs(Math.sin(s.ph)))) * (0.8 + 0.3 * I);
+          const f = 0.7 + 0.3 * Math.sin(t * 13 + s.ph) * Math.sin(t * 7.3 + s.ph * 2), h = Math.min(o.h * 0.85 + 7, 30) * (0.8 + 0.6 * I) * s.hh * u * f, w = Math.max(5, s.w * (1.2 + 0.5 * Math.abs(Math.sin(s.ph)))) * (0.8 + 0.3 * I);
           tongue(X + s.x + s.w / 2 + Math.sin(t * 5 + s.ph) * 2, Y + o.h * 0.88, w, h, Math.sin(t * 6 + s.ph) * w * 0.55, Math.min(1, u * 1.3));
           if (rise.length < (coarse ? 14 : 34) && Math.random() < dt * 5) rise.push({ x: o.x + s.x, y: o.y + o.h * 0.3, vx: rnd(-10, 10), vy: rnd(-40, -90), l: 1, r: rnd(0.8, 1.6) }); }
         if (act > 0.5 && !coarse) { const g = c.createRadialGradient(X + o.w / 2, Y + o.h * 0.6, 0, X + o.w / 2, Y + o.h * 0.6, o.w * 0.6 + 14); const q = Math.min(0.3, act / o.sl.length * 0.3);
