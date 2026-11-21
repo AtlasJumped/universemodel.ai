@@ -152,9 +152,9 @@
     // The skin: a tension-only envelope over the outer points, like the rubber of a balloon. It never pushes and never holds
     // the body up. It only pulls back when a patch of the surface strays outward.
     SKIN: 1,                  // 1 = the skin is on, 0 = off (for comparison tests)
-    SKIN_GIVE: 0.3,            // how far a whole patch of surface may stand off its bone axis, beyond its healthy distance, before the skin pulls it back (30%)
-    SKIN_LOCAL: 0.2,          // how much more one point may bulge than the average of its neighbours before it is pulled back (20%): no single bump on the envelope
-    SKIN_SLACK: 0.2,          // how much a patch of skin may stretch before it resists (20%): the healthy body feels no skin force at all
+    SKIN_GIVE: 0.4,            // how far a whole patch of surface may stand off its bone axis, beyond its healthy distance, before the skin pulls it back (30%)
+    SKIN_LOCAL: 0.3,          // how much more one point may bulge than the average of its neighbours before it is pulled back (30%): no single bump on the envelope
+    SKIN_SLACK: 0.3,          // how much a patch of skin may stretch before it resists (30%): the healthy body feels no skin force at all
     K_SKIN_R: 0.03, K_SKIN: 0.03, // how firmly it pulls back toward the axis, and how firmly neighbours pull on each other (share of the excess undone per sub-step)
     SKIN_NB: 3, SKIN_R: 16, SKIN_BAND: 5, // each surface point is tied to its 3 nearest neighbours at about the same height (within 5 cm) on the same limb or trunk: the skin is a hoop, it resists swelling round a section and carries no load along the body
     SKIN_RMIN: 2.5, SKIN_CONE: 0.8, SKIN_SHADOW: 1.15 // a point counts as surface unless another point farther out lies in the same direction (cone of 37 degrees) and band
@@ -263,7 +263,7 @@
         outer.forEach(c => { const cs = outer.filter(o => o !== c && o.g === c.g).map(o => [o, v3.dist(N[c.i].p0, N[o.i].p0)]).filter(([o, d]) => d < C.SKIN_R * sc && Math.abs(N[o.i].p0[1] - N[c.i].p0[1]) < C.SKIN_BAND * sc).sort((x, y) => x[1] - y[1]).slice(0, C.SKIN_NB);
           for (const [o, d] of cs) { const k = Math.min(c.i, o.i) + '-' + Math.max(c.i, o.i); if (!seen.has(k)) { seen.add(k); links.push([pos.get(c.i), pos.get(o.i), d]); } } });
         const nbr = outer.map(() => []); links.forEach(([a, b]) => { nbr[a].push(b); nbr[b].push(a); });
-        SK = { n: outer.length, node: Int32Array.from(outer.map(c => c.i)), axA: Int32Array.from(outer.map(c => c.a)), axB: Int32Array.from(outer.map(c => c.b)), axT: Float64Array.from(outer.map(c => c.t)), axU: outer.map(c => c.u), on: new Uint8Array(outer.length).fill(1), r0: Float64Array.from(outer.map(c => c.r)),
+        SK = { n: outer.length, node: Int32Array.from(outer.map(c => c.i)), axA: Int32Array.from(outer.map(c => c.a)), axB: Int32Array.from(outer.map(c => c.b)), axT: Float64Array.from(outer.map(c => c.t)), axU: outer.map(c => c.u), grp: outer.map(c => c.g), on: new Uint8Array(outer.length).fill(1), r0: Float64Array.from(outer.map(c => c.r)),
           la: Int32Array.from(links.map(l => l[0])), lb: Int32Array.from(links.map(l => l[1])), l0: Float64Array.from(links.map(l => l[2])), nbr, pos, dx: new Float64Array(3 * N.length), cnt: new Uint8Array(N.length), ratio: new Float64Array(outer.length) };
         S.skin = { nodes: Array.from(SK.node), links: links.length }; }
       S.N = N; S.IDX = IDX; S.E = E; S.adj = adj; S.FIXED = FIXED; S.O = O; S.bones = bones; S.chains = chains; S.bands = bands;
@@ -322,7 +322,9 @@
       // a crushed skull gives the fascia nothing to hold on to: every band and guy attached to the head lets go
       if (n && B.uid === 'skull') { const hd = new Set(B.ids); for (const b of bands) if (b.some(j => hd.has(E[j].a) || hd.has(E[j].b))) for (const j of b) if (!E[j].cut) E[j].released = true;
         E.forEach(f => { if (!f.strut && !f.cut && (hd.has(f.a) || hd.has(f.b))) f.released = true; }); }
-      if (n && SK) SK.axU.forEach((u, q) => { if (u === B.uid) SK.on[q] = 0; }); // the skin lets go of a bone that has snapped
+      // the skin lets go of a bone that has snapped: of the whole limb it belongs to, or of the stretch of trunk around that bone, so it cannot splint the break
+      if (n && SK) { const hit = new Set(); SK.axU.forEach((u, q) => { if (u === B.uid) hit.add(q); });
+        hit.forEach(q => { if (SK.grp[q] !== 'core') SK.grp.forEach((g, r) => { if (g === SK.grp[q]) SK.on[r] = 0; }); else { SK.on[q] = 0; SK.nbr[q].forEach(r => { SK.on[r] = 0; }); } }); }
       if (n) { S.damaged = true; S.moving = 1; }
       return n;
     };
@@ -489,7 +491,7 @@
         dx[i3] -= vx * c * wp; dx[i3 + 1] -= vy * c * wp; dx[i3 + 2] -= vz * c * wp; cnt[i]++;
         const fa = c * (1 - t) * W[a], fb = c * t * W[b];
         dx[a3] += vx * fa; dx[a3 + 1] += vy * fa; dx[a3 + 2] += vz * fa; cnt[a]++; dx[b3] += vx * fb; dx[b3 + 1] += vy * fb; dx[b3 + 2] += vz * fb; cnt[b]++; }
-      for (let l = 0; l < k.la.length; l++) { const a = k.node[k.la[l]], b = k.node[k.lb[l]], a3 = 3 * a, b3 = 3 * b, vx = X[b3] - X[a3], vy = X[b3 + 1] - X[a3 + 1], vz = X[b3 + 2] - X[a3 + 2];
+      for (let l = 0; l < k.la.length; l++) { if (!k.on[k.la[l]] || !k.on[k.lb[l]]) continue; const a = k.node[k.la[l]], b = k.node[k.lb[l]], a3 = 3 * a, b3 = 3 * b, vx = X[b3] - X[a3], vy = X[b3 + 1] - X[a3 + 1], vz = X[b3 + 2] - X[a3 + 2];
         const d = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9, rest = k.l0[l] * SL; if (d <= rest) continue; const wa = W[a], wb = W[b], w = wa + wb; if (!w) continue;
         const c = (d - rest) / d * C.K_SKIN / w;
         dx[a3] += vx * c * wa; dx[a3 + 1] += vy * c * wa; dx[a3 + 2] += vz * c * wa; dx[b3] -= vx * c * wb; dx[b3 + 1] -= vy * c * wb; dx[b3 + 2] -= vz * c * wb; cnt[a]++; cnt[b]++; }
@@ -600,7 +602,7 @@
       const acc = new Float64Array(SK.n), cn = new Uint8Array(SK.n);
       for (let l = 0; l < SK.la.length; l++) { const a = SK.la[l], b = SK.lb[l], st = Math.max(0, v3.dist(P[SK.node[a]], P[SK.node[b]]) / SK.l0[l] - 1); acc[a] += st; acc[b] += st; cn[a]++; cn[b]++; }
       for (let q = 0; q < SK.n; q++) { const A = P[SK.axA[q]], B = P[SK.axB[q]], t = SK.axT[q], c = [A[0] + t * (B[0] - A[0]), A[1] + t * (B[1] - A[1]), A[2] + t * (B[2] - A[2])];
-        out[SK.node[q]] = Math.max(Math.max(0, v3.dist(P[SK.node[q]], c) / SK.r0[q] - 1), cn[q] ? acc[q] / cn[q] : 0); }
+        out[SK.node[q]] = Math.max(SK.on[q] ? Math.max(0, v3.dist(P[SK.node[q]], c) / SK.r0[q] - 1) : 0, cn[q] ? acc[q] / cn[q] : 0); }
       for (let i = 0; i < n; i++) if (!SK.pos.has(i) && !FIXED.has(i)) { let best = 1e9, v = 0; for (let q = 0; q < SK.n; q++) { const d = v3.dist(O[i], O[SK.node[q]]); if (d < best) { best = d; v = out[SK.node[q]]; } } out[i] = v; }
       return Array.from(out);
     };

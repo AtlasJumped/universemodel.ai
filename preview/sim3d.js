@@ -179,7 +179,7 @@
     if (active) { sim.step(); dirty = true; } // one step is 1/60 of a second of real time
     { let tx = 0, tz = 0; if (sim.damaged) { const P = sim.P; for (const p of P) { tx += p[0]; tz += p[2]; } tx /= P.length; tz /= P.length; }
       const dx = tx - cam[0], dz = tz - cam[1]; if (Math.abs(dx) + Math.abs(dz) > 0.02) { cam[0] += dx * 0.06; cam[1] += dz * 0.06; dirty = true; } }
-    if (now - lastM > 250 && (active || !metrics)) { lastM = now; metrics = sim.metrics(origin); nodeStrain = sim.nodeStrain(); readout(); }
+    if (now - lastM > 250 && (active || !metrics)) { lastM = now; metrics = sim.metrics(origin); nodeStrain = sim.skinStrain ? sim.skinStrain() : sim.nodeStrain(); readout(); }
     if (dirty) { drawTensegrity(); drawPerson(); dirty = false; frames++; }
     requestAnimationFrame(frame);
   }
