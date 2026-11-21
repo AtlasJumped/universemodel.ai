@@ -131,3 +131,12 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
   again();
 })();
+
+// In-text markers (the small star beside an aside or a source note) are frozen instances of the header's sparkles:
+// same soft dot, same colours, some with the fine cross. Static: nothing here moves. (owner, 2026-11-21)
+(function () {
+  const COLS = ['#1D5FD1', '#5B9BE6', '#6D4AFF', '#F2A93B', '#D678D2', '#F2A93B'];
+  const svg = (col, plus) => 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><defs><radialGradient id="g"><stop offset="0" stop-color="' + col + '" stop-opacity=".95"/><stop offset=".35" stop-color="' + col + '" stop-opacity=".4"/><stop offset="1" stop-color="' + col + '" stop-opacity="0"/></radialGradient></defs><circle cx="12" cy="12" r="10" fill="url(#g)"/>' + (plus ? '<path d="M3 12H21M12 3V21" stroke="' + col + '" stroke-width="1.3" stroke-linecap="round"/>' : '') + '</svg>') + '")';
+  const go = () => document.querySelectorAll('.pull, .note').forEach((el, i) => { const k = (i * 7 + 3) % 12; el.style.setProperty('--spk', svg(COLS[k % 6], k % 3 !== 1)); });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
