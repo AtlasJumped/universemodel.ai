@@ -152,10 +152,10 @@
     // The skin: a tension-only envelope over the outer points, like the rubber of a balloon. It never pushes and never holds
     // the body up. It only pulls back when a patch of the surface strays outward.
     SKIN: 1,                  // 1 = the skin is on, 0 = off (for comparison tests)
-    SKIN_GIVE: 0.1,           // how far a whole patch of surface may stand off its bone axis, beyond its healthy distance, before the skin pulls it back (10%)
-    SKIN_LOCAL: 0.03,         // how much more one point may bulge than the average of its neighbours before it is pulled back (3%): no single bump on the envelope
-    SKIN_SLACK: 0.03,         // how much a patch of skin may stretch before it resists (3%): the healthy body feels no skin force at all
-    K_SKIN_R: 0.3, K_SKIN: 0.25, // how firmly it pulls back toward the axis, and how firmly neighbours pull on each other (share of the excess undone per sub-step)
+    SKIN_GIVE: 0.3,            // how far a whole patch of surface may stand off its bone axis, beyond its healthy distance, before the skin pulls it back (30%)
+    SKIN_LOCAL: 0.2,          // how much more one point may bulge than the average of its neighbours before it is pulled back (20%): no single bump on the envelope
+    SKIN_SLACK: 0.2,          // how much a patch of skin may stretch before it resists (20%): the healthy body feels no skin force at all
+    K_SKIN_R: 0.03, K_SKIN: 0.03, // how firmly it pulls back toward the axis, and how firmly neighbours pull on each other (share of the excess undone per sub-step)
     SKIN_NB: 3, SKIN_R: 16, SKIN_BAND: 5, // each surface point is tied to its 3 nearest neighbours at about the same height (within 5 cm) on the same limb or trunk: the skin is a hoop, it resists swelling round a section and carries no load along the body
     SKIN_RMIN: 2.5, SKIN_CONE: 0.8, SKIN_SHADOW: 1.15 // a point counts as surface unless another point farther out lies in the same direction (cone of 37 degrees) and band
   };
