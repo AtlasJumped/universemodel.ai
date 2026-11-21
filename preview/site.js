@@ -819,11 +819,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const sr = stage.getBoundingClientRect(), top = Math.max(0, sr.top), bot = Math.min(vh, sr.bottom);
     if (bot - top < 40 || sr.width < 40) return;
     const sx = scrollX, sy = scrollY, cx0 = sr.left + sr.width / 2 + sx, cy0 = (top + bot) / 2 + sy;
-    const R = Math.min(Math.min(sr.width, bot - top) * (0.2 + 0.32 * I), Math.min(vw, vh) * 0.42);   // hole radius
+    const R = Math.min(Math.min(sr.width, bot - top) * (0.2 + 0.32 * I), Math.min(vw, vh) * (coarse ? 0.3 : 0.4), sr.width * 0.36);   // hole radius
     const ph = [0, 1, 2, 3, 4].map(() => Math.random() * 6.283), N = 36;
     const rad = a => 1 + 0.16 * Math.sin(3 * a + ph[0]) + 0.1 * Math.sin(5 * a + ph[1]) + 0.07 * Math.sin(9 * a + ph[2]);
     // the text near the hole: line boxes in page coordinates, read once
-    const reach = R * 1.9 + 50, rects = [], tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => {
+    const reach = R * 1.5 + 40, rects = [], tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => {
       const p = n.parentElement; if (!p || !/\S/.test(n.nodeValue) || stage.contains(p) || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT; } });
     const rg = document.createRange(); let node, seen = 0;
@@ -832,7 +832,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       for (const r of rg.getClientRects()) {
         if (r.width < 6 || r.height < 6 || r.bottom < 0 || r.top > vh) continue;
         const dx = Math.max(r.left - (cx0 - sx), 0, (cx0 - sx) - r.right), dy = Math.max(r.top - (cy0 - sy), 0, (cy0 - sy) - r.bottom), dist = Math.hypot(dx, dy);
-        if (dist < reach) rects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height, k: 1 - dist / reach });
+        if (dist < reach) rects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height, k: 1 - dist / reach, u: 0.2 + Math.random() * 0.6 });
       }
     }
     rects.sort((a, b) => b.k - a.k); rects.length = Math.min(rects.length, Math.round(14 + 40 * I));
@@ -866,13 +866,15 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       const sc = grow * (1 - heal), heat = (1 - heal) * clamp(t / 0.8, 0, 1);
       // scorch on the text
       if (sc > 0.02) { for (const r of rects) { const k = r.k * sc * (0.5 + 0.5 * I); if (k < 0.04) continue;
-          const g = c.createLinearGradient(0, r.y - oy, 0, r.y - oy + r.h); g.addColorStop(0, `rgba(40,24,14,${0.55 * k})`); g.addColorStop(1, `rgba(70,40,18,${0.12 * k})`);
-          c.fillStyle = g; c.fillRect(r.x - sx - ox - 2, r.y - sy - oy - 1, r.w + 4, r.h + 2); } }
+          const gx = r.x - sx - ox + r.w * r.u, gy = r.y - sy - oy + r.h * 0.55, rx = Math.max(r.w * 0.55, 18);
+          c.save(); c.translate(gx, gy); c.scale(1, r.h / rx * 0.9); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+          g.addColorStop(0, `rgba(70,36,12,${0.42 * k})`); g.addColorStop(0.6, `rgba(120,60,20,${0.16 * k})`); g.addColorStop(1, 'rgba(120,60,20,0)');
+          c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 6.283); c.fill(); c.restore(); } }
       // the burn hole: dark, ragged, with a glowing edge
       if (sc > 0.02) {
         const pts = []; for (let i = 0; i < N; i++) { const a = i / N * 6.283, rr = R * sc * rad(a); pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.86]); }
         const path = () => { c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); };
-        const gr = c.createRadialGradient(cx, cy, 0, cx, cy, R * sc * 1.2 + 1); gr.addColorStop(0, 'rgba(14,10,18,.94)'); gr.addColorStop(0.75, 'rgba(26,16,14,.9)'); gr.addColorStop(1, 'rgba(60,30,14,.8)');
+        const gr = c.createRadialGradient(cx, cy, 0, cx, cy, R * sc * 1.2 + 1); gr.addColorStop(0, 'rgba(14,10,18,.9)'); gr.addColorStop(0.75, 'rgba(26,16,14,.84)'); gr.addColorStop(1, 'rgba(60,30,14,.72)');
         path(); c.fillStyle = gr; c.fill();
         c.lineJoin = 'round'; path(); c.strokeStyle = `rgba(50,26,12,${0.7 * sc})`; c.lineWidth = 12 * sc + 2; c.stroke();
         for (let i = 0; i < N; i++) { const a = pts[i], b = pts[(i + 1) % N], fl = 0.55 + 0.45 * Math.sin(t * 9 + i * 1.7 + ph[3]) * Math.sin(t * 5.3 + i), h = heat * fl;

@@ -25,7 +25,8 @@
 .fx-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:22px}
 @media (max-width:860px){.fx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .fx-stats .card{padding:18px 20px}
-.fx-stats b{display:block;font:750 clamp(1.5rem,2.6vw,2.1rem)/1.05 var(--font);color:var(--navy);margin-bottom:6px;letter-spacing:-.02em}
+.fx-stats b{display:block;font:750 clamp(1.7rem,3.2vw,2.6rem)/1.05 var(--font);color:var(--navy);margin-bottom:8px;letter-spacing:-.02em;overflow-wrap:anywhere}
+.fx-stats .card.hit{border-top:4px solid #C62828}
 .fx-stats span{font-size:.92rem;color:var(--soft);line-height:1.45;display:block}
 .fx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:24px}
 @media (max-width:860px){.fx-grid{grid-template-columns:1fr}}
@@ -45,6 +46,7 @@
 .fx-sim canvas{width:100%;height:min(62vh,520px);display:block;touch-action:manipulation;cursor:crosshair;background:linear-gradient(#F5F8FC,#fff)}
 .fx-sim .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .fx-meter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+#fx-load{min-width:7.6em}
 .fx-meter div{background:var(--mist);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
 .fx-meter dt{font-size:.78rem;color:var(--soft)}.fx-meter dd{margin:0;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
 .fx-key{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--soft);margin-top:10px}
@@ -53,15 +55,20 @@
 .fx-order li{counter-increment:o;position:relative;padding:0 0 14px 46px}
 .fx-order li::before{content:counter(o);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
 .pl-pull{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
-.pl-pull input[type=range]{flex:1 1 140px;min-width:120px}
-.pl-pull .range{margin:0}
 .pl-sev{display:inline-flex;align-items:center;gap:8px;font-size:.92rem}
 .pl-sev input{width:120px}
 #pl-cv{display:block;width:100%;aspect-ratio:6/5;touch-action:pan-y;background:#fff;border-radius:10px}
+.fx-sim.pulling #pl-cv{touch-action:none}
+html.pl-lock{overscroll-behavior:none}
+#pl-hold{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;min-height:54px;padding-left:34px;padding-right:34px;justify-content:center;text-align:center}
+#pl-hold:active{transform:none}
+@media (max-width:700px){#pl-hold{flex:1 1 100%}}
 .chipbtn.jk{background:#FDECEC;border-color:#D33A45;color:#9B1C1C}
 .pl-meter{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-.pl-meter small{display:block;font-weight:400;color:var(--soft);font-size:.78rem}
-.pl-live{min-height:3.2em;margin:10px 0 0}
+.pl-meter small{display:block;font-weight:400;color:var(--soft);font-size:.78rem;min-height:1.3em}
+.pl-meter #pl-strain small{min-height:2.6em}
+.pl-live{height:5.2em;overflow:auto;margin:10px 0 0}
+@media (max-width:700px){.pl-live{height:8.2em}}
 .fx-strength{margin-top:22px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:center;border-left:4px solid var(--blue)}
 .fx-pic{margin-top:14px}
 .fx-strength .fx-pic{margin-top:0}
@@ -79,6 +86,8 @@
       <h2>An immature tensegrity transmits force the wrong way</h2>
       <p>The human body behaves as a tensegrity: rigid bones held in place by a continuous, pre-tensioned web of fascia (the evidence is on <a href="health.html#ideal">The Perfect Body</a>). In a well-tuned tensegrity, a load applied anywhere is shared across the whole web. Every cable takes a little, none takes too much, and the structure springs back.</p>
       <p>An immature, non-optimized tensegrity is different. Where fascia has become denser, shorter or stuck, those lines carry far more than their share, and the lines around them go slack. Force no longer spreads; it funnels. From a physics standpoint, that is the common problem behind every protocol on this page: the energy of each step, lift or sprint flows through a broken, uneven web, and the same regions are overloaded again and again.</p>
+      <p><b>HMR's view of the skin.</b> The skin is an outer layer that pulls inward evenly on what it holds, like the rubber of a balloon. It behaves a little differently from the web beneath it, and experiments on skin can show that. Because it is joined to that web, it is still part of the whole: a more complex biological tensegrity.</p>
+      <p><b>HMR's view of a step.</b> The energy of each step travels up from the ground as a wave. The tissue absorbs it, twisting and whipping along its lines to the core, which spreads it through the whole body. In a perfect tensegrity less is lost on the way. During growth the tissue untwists as it lengthens, most of all near the joints. Where that does not happen, a surprising amount of length stays locked up.</p>
       <p><b>By logic from the model:</b> this uneven flow is why so much exercise produces injury, why gains fade when training stops, and why the body redistributes mass in ways people do not want. The cure is not to stop moving. It is to change the order.</p>
       <h3 style="margin-top:22px">A column is not a tensegrity</h3>
       <p>A column holds weight by stacking: each block presses straight down on the one below. Load it up and, as long as every block is strong enough, it holds. For a column, simply loading it up more or less makes sense.</p>
@@ -97,7 +106,7 @@
       <dl class="fx-meter">
         <div><dt>Peak cable tension</dt><dd id="fx-peak">100%</dd></div>
         <div><dt>Slack cables</dt><dd id="fx-slack">0</dd></div>
-        <div><dt>Top displaced vs optimized</dt><dd id="fx-sway">0% of height</dd></div>
+        <div><dt>Top displaced (% of height)</dt><dd id="fx-sway">0.0%</dd></div>
       </dl>
       <div class="fx-key"><span><i style="background:#5B9BE6"></i>low tension</span><span><i style="background:#C62828"></i>high tension</span><span><i style="background:repeating-linear-gradient(90deg,#9AA9BC 0 5px,transparent 5px 9px)"></i>slack</span><span><i style="background:#0E3A75;height:7px"></i>strut (bone)</span></div>
       <p class="small muted" style="margin:10px 0 0">Tap a cable to cut it, or choose Break a strut and tap a strut: it cracks in the middle and folds. The weight hangs on a string above the column; cut the string, or press Load it, and it drops onto the top. A simple spring model of a four-module tensegrity column, solved live in your browser. Peak tension is shown as a percentage of the optimized column under the same load. For a full body, see the <a href="simulation.html#model">3D simulation</a>.</p>
@@ -111,19 +120,17 @@
     <div>
       <span class="eyebrow">See it work</span>
       <h2>The body as a system of pulleys</h2>
-      <p>Here is a body standing with its arms out. One rope comes in at the left hand, runs over pulleys at the elbow and shoulder, down the left side and the left leg, under the feet, back up the right leg and side, and out along the right arm. There it runs five times between two blocks of wheels, a block and tackle, and holds a weight. The rope turns at an angle at every joint: hand, elbow, shoulder, hip, knee and ankle. Eleven joint pulleys and a tackle of five wheels, one line of pull, the way a long line of fascia runs through the whole body.</p>
-      <p><b>Pull the rope, then let go.</b> In the optimized body every pulley is where it belongs. The frame stays firm, the weight rises one fifth as far as you pull, for close to one fifth of its weight in effort, and it falls back when you release.</p>
-      <p><b>Now add imperfections,</b> one at a time. The pulley that is out of place binds the rope, and the web around it no longer holds it properly. The joint it sits on goes janky with it: it shifts off its axis, tilts, and lags behind the pull. No fault stays local: the pulleys next to it on the rope lose some of their seating too, and shift as you pull. At first the weight still goes up, but you have to pull harder and the body squeezes inward to make up the difference. Add more, and the body folds in on itself while the weight hardly moves.</p>
+      <p>Here is a body standing with its arms out. One rope comes in at the left hand, runs over the left shoulder and over the top of the head, down through the neck and the spine, and up over the right shoulder. There it runs three times between two blocks of wheels, a block and tackle, and holds a weight. Seven pulleys on the body and three in the tackle, one line of pull, the way a long line of fascia runs through the whole body. Even this many pulleys is far simpler than a human body, which is almost beyond comparison in complexity. That is why this site puts humanity's most powerful tools to work on mapping exactly how it works.</p>
+      <p><b>Hold the button to pull, then let go.</b> In the optimized body every pulley is where it belongs. The body stays upright and firm, the weight rises one third as far as you pull, for close to one third of its weight in effort, and it falls back when you let go.</p>
+      <p><b>Now add imperfections,</b> one at a time. A pulley that is out of place binds the rope, and the web around it no longer holds it properly. No fault stays local: the pulleys next to it on the rope lose some of their seating too. Press the button and the body goes janky first. It sags and wobbles while it takes up slack, then it tightens and the weight starts to move, later and less than it should. The more janky pulleys, the longer the wait and the bigger the wobble. A janky neck or spine hurts most, because the rope runs through the middle of the body. Make every pulley janky and it still lifts, but terribly.</p>
       <p>That is the case for the order HMR proposes. Lifting through an optimized tensegrity lifts the weight. Lifting through an imperfect one loads the body instead.</p>
       <p class="small"><b>Why pulleys?</b> It is more than a figure of speech. Anatomists call the bands that hold the finger tendons against the bone pulleys (<a href="https://doi.org/10.1016/S0363-5023(88)80082-0">Doyle, 1988</a>). The kneecap redirects the pull of the thigh muscles, and tendons turn round the ankle bones under straps of fascia. Fascia itself comes as broad sheets and as cords, and as the body moves its layers slide over one another on a film of fluid (<a href="https://doi.org/10.1007/s00276-011-0876-9">Stecco et al., 2011</a>), passing force from muscle to muscle (<a href="https://doi.org/10.1016/j.jbiomech.2008.09.027">Huijing, 2009</a>). In people with long-term low back pain that sliding is reduced (<a href="https://doi.org/10.1186/1471-2474-12-203">Langevin et al., 2011</a>). So a line of pull in the body does not run round a neat wheel. It runs over and around a great many surfaces, and each has to be in place and free to slide.</p>
     </div>
     <div class="fx-sim" id="pl-box">
-      <canvas id="pl-cv" role="img" aria-label="A body standing with its arms out, drawn as bones with pulleys at the hands, elbows, shoulders, hips, knees and ankles. One rope enters at the left hand grip, turns round a pulley at each joint down the left side and leg, runs under the feet, and climbs the right leg and arm to a block and tackle at the right hand: a fixed block of three wheels above and a moving block of two wheels below, joined by five strands of rope, with the weight hanging from the moving block. Pulling the grip raises the weight one fifth as far. Pulleys you mark as janky turn red, their joints shift and tilt, and a dashed outline shows the optimized body."></canvas>
+      <canvas id="pl-cv" role="img" aria-label="A body standing with its arms out, drawn as bones with pulleys at the left hand, the left shoulder, the top of the head, the neck, the upper and lower spine, and the right shoulder. One rope enters at the left hand grip, runs over the left shoulder and the top of the head, down through the neck and the spine, and up over the right shoulder to a block and tackle at the right hand: a fixed block of two wheels above and a moving block of one wheel below, joined by three strands of rope, with the weight hanging from the moving block. Holding the button pulls the grip, and the weight rises one third as far. Pulleys you mark as janky turn red, the body sags and wobbles before the weight moves, and a dashed outline shows the optimized body."></canvas>
       <div class="pl-pull">
-        <label class="range" for="pl-range">Pull the rope</label>
-        <input type="range" id="pl-range" min="0" max="100" value="0">
-        <button class="btn primary" type="button" id="pl-hold">Hold to pull</button>
-        <button class="chipbtn" type="button" id="pl-let">Let go</button>
+        <button class="btn primary" type="button" id="pl-hold" aria-describedby="pl-hint">Hold to pull</button>
+        <span class="small muted" id="pl-hint">Hold the button to pull. Let go and the weight goes back.</span>
       </div>
       <p class="small" style="margin:12px 0 6px"><b>Which pulleys go bad?</b> Tap a pulley on the figure, or choose here.</p>
       <div class="btns" id="pl-chips" role="group" aria-label="Pulleys that can go janky"></div>
@@ -141,7 +148,7 @@
       </dl>
       <p id="pl-live" class="small pl-live" role="status" aria-live="polite"></p>
       <div class="fx-key"><span><i style="background:#C9A227"></i>rope</span><span><i style="background:#0E3A75;height:7px"></i>bone</span><span><i style="background:#D33A45"></i>janky pulley</span><span><i style="background:rgba(100,130,220,.4);height:9px"></i>glow: strain</span></div>
-      <p class="small muted" style="margin:10px 0 0">A simple model solved live in your browser. The rope has a fixed length and runs over each wheel along real tangent lines. The weight rises where the geometry lets it rise. At each wheel the pull grows with friction and with how far the rope turns (the capstan effect), and a janky pulley adds a great deal of friction. The tackle balances five strands against the weight. The force the rope puts on each joint pushes the pulley off its axis and tilts the joint, which changes the rope path, and the rope and web stretch a little under load. The dashed outline is the optimized body.</p>
+      <p class="small muted" style="margin:10px 0 0">A simple model solved live in your browser. The rope has a fixed length and runs over each wheel along real tangent lines. The weight rises where the geometry lets it rise. At each wheel the pull grows with friction and with how far the rope turns (the capstan effect), and a janky pulley adds a great deal of friction. The tackle balances three strands against the weight. The force the rope puts on each joint tilts it and shifts the pulley, which changes the rope path, and the rope and web stretch a little under load. Janky pulleys make the body sag and sway while it takes up slack, and the time this takes grows with how janky they are. The dashed outline is the optimized body.</p>
     </div>
   </div>
 </section>
@@ -149,27 +156,30 @@
 
 <section id="numbers">
   <div class="wrap">
-    <div class="sec-head"><div><h2>What the injury research shows</h2></div><div><p class="lede">These figures come from peer-reviewed studies of people training the way most programs teach. Each is linked in the protocol cards below.</p></div></div>
+    <div class="sec-head"><div><h2>What the injury research shows</h2></div><div><p class="lede">Shares of people, not counts. These are the people who trained the way most programs teach, and got hurt.</p></div></div>
     <div class="fx-stats">
-      <div class="card"><b>17.8</b><span>injuries per 1,000 hours of running in novice runners (7.7 in recreational runners)</span></div>
-      <div class="card"><b>970,801</b><span>estimated weight-training injuries in US emergency departments, 1990 to 2007</span></div>
-      <div class="card"><b>144%</b><span>rise in US injuries from HIIT-style exercise, 2012 to 2016 versus 2007 to 2011</span></div>
-      <div class="card"><b>91.3%</b><span>of adolescent competitive swimmers report shoulder pain</span></div>
+      <div class="card hit"><b>91.3%</b><span>of adolescent competitive swimmers report shoulder pain. Nearly every one. <a href="https://doi.org/10.4085/1062-6050-439-18">Feijen et al., 2020</a></span></div>
+      <div class="card hit"><b>73.5%</b><span>of CrossFit participants surveyed had been injured while training, most often in the shoulder and the spine. <a href="https://doi.org/10.1519/JSC.0000000000000318">Hak et al., 2013</a></span></div>
+      <div class="card"><b>19.4% to 79.3%</b><span>of long-distance runners suffer a lower-limb injury. The knee is the most common site. <a href="https://doi.org/10.1136/bjsm.2006.033548">van Gent et al., 2007</a></span></div>
+      <div class="card"><b>619 million</b><span>people lived with low back pain in 2020, the leading cause of disability worldwide. <a href="https://doi.org/10.1016/S2665-9913(23)00098-X">GBD 2021, Lancet Rheumatology, 2023</a></span></div>
     </div>
+    <p class="small muted" style="margin:14px 0 0">The protocol cards below carry more studies, with their quotations.</p>
+    <p style="margin:18px 0 0"><b>If this resonates with you, <a href="collaborators.html">engage with us here</a>.</b></p>
   </div>
 </section>
 
 <section class="tint" id="protocols">
   <div class="wrap">
     <div class="sec-head"><div><span class="eyebrow">Current protocols, one by one</span><h2>What each gets right, and what follows from the model</h2></div><div><p class="lede">Red: by the logic of the model, harmful for an imperfect tensegrity. Amber: real value, with clear risks. Green: HMR aligned. Quotes come from the published abstracts.</p></div></div>
+    <div class="card" style="background:var(--ice);margin-top:18px"><span class="tag">What all exercise gets right, in HMR</span><p>One of the main benefits of exercise is not calories. Movement pumps the body's fluids, makes tissue move, and frees what has stagnated. It refreshes circulation, lymph, and the body's sense of itself, and it builds the mind's map of the body. Every card below gets this right.</p></div>
     <div class="fx-grid">
       <article class="fx-card bad">
         <span class="fx-v">Harmful before optimization</span>
         <h3>Weightlifting and hypertrophy training</h3>
         <dl>
-          <dt>What people believe</dt><dd>Lifting breaks muscle down so it rebuilds bigger and stronger, and that this is what a healthy body looks like.</dd>
-          <dt>What it gets right</dt><dd>Strength matters, and resistance training is one of the few exercise interventions shown to reduce sports injuries in trials.</dd>
-          <dt>What follows from the model</dt><dd>The picture misses the web. Heavy load travels through fascia that is not optimized, and the force reaches a region that is not ready to hold it: that is where people get hurt. Muscle is built on top of the imperfections and locks them in. When lifting stops, the unoptimized tensegrity redistributes that mass in ways people do not want, and they feel weak and soft again.</dd>
+          <dt>What people believe</dt><dd>Lifting stresses and breaks muscle down, and it rebuilds bigger and stronger. That is the usual account, and HMR does not dispute it.</dd>
+          <dt>What it gets right</dt><dd>It clearly builds muscle. Strength matters, and resistance training is one of the few exercise interventions shown to reduce sports injuries in trials.</dd>
+          <dt>What follows from the model</dt><dd>In HMR the load is stress on the tensegrity, and the tensegrity adapts. In a perfect tensegrity the whole body would take the load and grow evenly, and the gains would be better and last longer. Today the web is not optimized: heavy load travels through fascia that is not ready, and the force reaches a region that cannot hold it. That is where people get hurt. Muscle is built on top of the imperfections and locks them in, and when lifting stops, the tensegrity redistributes that mass in ways people do not want. It does not work the same for everyone, because every tensegrity is in a different state. An open hypothesis in HMR is that an optimized tensegrity, under less stress, may find room to grow again.</dd>
         </dl>
         <blockquote>&ldquo;From 1990 to 2007, 25 335 weight training injuries were seen in US emergency departments, correlating to an estimated 970 801 injuries nationwide.&rdquo; &ldquo;The most common diagnosis was sprain/strain (46.1%).&rdquo;<cite><a href="https://doi.org/10.1177/0363546509351560">Kerr, Collins and Comstock, Am J Sports Med, 2010</a> (research)</cite></blockquote>
         <blockquote>&ldquo;There was a significant decrease in muscle size following 31-52 weeks of training cessation&rdquo;<cite><a href="https://doi.org/10.3390/ijerph192114048">Grgic, Int J Environ Res Public Health, 2022</a>, meta-analysis in older adults (research)</cite></blockquote>
@@ -180,7 +190,7 @@
         <h3>Running and jogging</h3>
         <dl>
           <dt>What it gets right</dt><dd>Cardiovascular fitness, time outdoors, and a simple habit almost anyone can start.</dd>
-          <dt>What follows from the model</dt><dd>Every stride sends an impact up the body. With an uneven web, that impact is not spread: it is funneled into the same knees, shins, heels and hips, thousands of times an hour. Joints take what the fascia should have shared. Many people dislike running for a reason; the body is reporting the strain.</dd>
+          <dt>What follows from the model</dt><dd>Every stride sends an impact up the body. With an uneven web, that impact is not spread: it is funneled into the same knees, shins, heels, and hips, thousands of times an hour. Joints take what the fascia should have shared. Many people dislike running for a reason; the body is reporting the strain.</dd>
         </dl>
         <blockquote>&ldquo;The incidence of lower extremity running injuries ranged from 19.4% to 79.3%. The predominant site of these injuries was the knee.&rdquo;<cite><a href="https://doi.org/10.1136/bjsm.2006.033548">van Gent et al., Br J Sports Med, 2007</a>, systematic review (research)</cite></blockquote>
         <blockquote>&ldquo;The meta-analyses revealed a weighted injury incidence of 17.8 (95% confidence interval [CI] 16.7-19.1) in novice runners and 7.7 (95% CI 6.9-8.7) in recreational runners.&rdquo; (per 1,000 hours)<cite><a href="https://doi.org/10.1007/s40279-015-0333-8">Videb&aelig;k et al., Sports Med, 2015</a> (research)</cite></blockquote>
@@ -191,20 +201,9 @@
         <h3>High-intensity interval training (HIIT)</h3>
         <dl>
           <dt>What it gets right</dt><dd>Short, efficient sessions with real gains in fitness.</dd>
-          <dt>What follows from the model</dt><dd>HIIT combines high speed, high load and fatigue, the exact conditions in which an imperfect web fails. Fast, explosive force gives the tissue no time to share load; it hits the weakest line first.</dd>
+          <dt>What follows from the model</dt><dd>HIIT combines high speed, high load, and fatigue, the exact conditions in which an imperfect web fails. Fast, explosive force gives the tissue no time to share load; it hits the weakest line first.</dd>
         </dl>
         <blockquote>&ldquo;From 2012-2016 versus 2007-2011, there was a 144% increase in all injuries&rdquo; &ldquo;These increases in injury incidence correlated with a 274% increase in HIIT interest.&rdquo;<cite><a href="https://doi.org/10.23736/S0022-4707.19.09407-6">Rynecki et al., J Sports Med Phys Fitness, 2019</a> (research)</cite></blockquote>
-      </article>
-
-      <article class="fx-card bad">
-        <span class="fx-v">Harmful before optimization</span>
-        <h3>CrossFit and high-intensity functional training</h3>
-        <dl>
-          <dt>What it gets right</dt><dd>Community, variety and whole-body movement.</dd>
-          <dt>What follows from the model</dt><dd>Heavy Olympic lifts, gymnastics and speed in one session: the hardest loads, done tired, through a web that has never been tuned. For someone with an excellent tensegrity, CrossFit could be excellent training. It is simply too much for an imperfect one.</dd>
-        </dl>
-        <blockquote>&ldquo;A total of 132 responses were collected with 97 (73.5%) having sustained an injury during CrossFit training.&rdquo; &ldquo;An injury rate of 3.1 per 1000 hours trained was calculated.&rdquo;<cite><a href="https://doi.org/10.1519/JSC.0000000000000318">Hak, Hodzovic and Hickey, J Strength Cond Res, 2013</a> (research)</cite></blockquote>
-        <blockquote>&ldquo;Current evidence suggests that the injury risk from CrossFit training is comparable to Olympic weightlifting, distance running, track and field, rugby, football, ice hockey, soccer, or gymnastics.&rdquo;<cite><a href="https://doi.org/10.1123/jsr.2016-0040">Klimek et al., J Sport Rehabil, 2018</a> (research)</cite></blockquote>
       </article>
 
       <article class="fx-card bad">
@@ -219,14 +218,26 @@
       </article>
 
       <article class="fx-card mixed">
-        <span class="fx-v">Valuable, with risks</span>
+        <span class="fx-v">Value with risks</span>
         <h3>Weight-loss programs</h3>
         <dl>
-          <dt>What it gets right</dt><dd>Excess weight does strain the body.</dd>
-          <dt>What follows from the model</dt><dd>Diets and calorie-burning exercise treat fat as the cause. In HMR, where fat is stored is shaped by where the web is tight and where it is slack (see the <a href="health.html#hypothesis">densification section</a>). Losing weight is valuable and not nearly as harmful as beating up an imperfect tensegrity; its main problem is that it does not last. Lose the weight without fixing the web, and the body tends to rebuild the same shape.</dd>
+          <dt>What it gets right</dt><dd>Excess weight does strain the body. Losing it also changes the physics and the shape of the system. Like a balloon, a body that has been deflated can be drawn out longer than a full one, which can open the way for other work.</dd>
+          <dt>What follows from the model</dt><dd>Diets and calorie-burning exercise treat fat as the cause. In HMR, the body stores it for a reason: where fat sits is shaped by where the web is tight and where it is slack (see the <a href="health.html#hypothesis">densification section</a>). Without changing the tensegrity, the loss does not last, and the body tends to rebuild the same shape.</dd>
+          <dt>HMR's hypothesis</dt><dd>Decrease and increase the volume of the body, deliberately and for short periods, each with its own protocol. Bodybuilders already do this, bulking and cutting. HMR holds that it belongs in a holistic protocol, not theirs alone.</dd>
         </dl>
         <blockquote>&ldquo;After 6 years, 41.0 &plusmn; 31.3 kg of the lost weight was regained&rdquo;<cite><a href="https://doi.org/10.1002/oby.21538">Fothergill et al. (NIH), Obesity, 2016</a>, follow-up of contestants who had lost 58.3 kg on average (research)</cite></blockquote>
         <blockquote>&ldquo;Current perception is that participants of a structured weight-loss program regain all of their weight loss within 5 y.&rdquo; In that meta-analysis, people kept off on average 17% to 29% of the weight they lost.<cite><a href="https://doi.org/10.1093/ajcn/74.5.579">Anderson et al., Am J Clin Nutr, 2001</a> (research)</cite></blockquote>
+      </article>
+
+      <article class="fx-card mixed">
+        <span class="fx-v">Value with risks</span>
+        <h3>CrossFit and high-intensity functional training</h3>
+        <dl>
+          <dt>What it gets right</dt><dd>Whole-body movement that works the fascia web directly, and strong bursts of circulation. Community and variety too.</dd>
+          <dt>What follows from the model</dt><dd>CrossFit athletes can be very strong when their tensegrity happens to be tuned well. In HMR, they train without a perfect one, and they would do far better with it. Heavy Olympic lifts, gymnastics, and speed in one session, done tired, put the hardest loads through a web that has never been tuned. That is where the injuries come from.</dd>
+        </dl>
+        <blockquote>&ldquo;A total of 132 responses were collected with 97 (73.5%) having sustained an injury during CrossFit training.&rdquo; &ldquo;An injury rate of 3.1 per 1000 hours trained was calculated.&rdquo;<cite><a href="https://doi.org/10.1519/JSC.0000000000000318">Hak, Hodzovic and Hickey, J Strength Cond Res, 2013</a> (research)</cite></blockquote>
+        <blockquote>&ldquo;Current evidence suggests that the injury risk from CrossFit training is comparable to Olympic weightlifting, distance running, track and field, rugby, football, ice hockey, soccer, or gymnastics.&rdquo;<cite><a href="https://doi.org/10.1123/jsr.2016-0040">Klimek et al., J Sport Rehabil, 2018</a> (research)</cite></blockquote>
       </article>
 
       <article class="fx-card mixed">
@@ -253,7 +264,7 @@
         <span class="fx-v">High value, with risks</span>
         <h3>Team sports</h3>
         <dl>
-          <dt>What it gets right</dt><dd>Play, teamwork, joy and skill. Play matters a great deal in HMR: it is one of the main ways people learn, bond and enjoy physical reality.</dd>
+          <dt>What it gets right</dt><dd>Play, teamwork, joy, and skill. Play matters a great deal in HMR: it is one of the main ways people learn, bond and enjoy physical reality.</dd>
           <dt>What follows from the model</dt><dd>Sudden cuts, tackles and sprints put peak force through the body with no warning, and an imperfect web cannot share it in time. The value is high and so is the risk, until the tensegrity is optimized.</dd>
         </dl>
         <blockquote>&ldquo;Match injury incidence (36 injuries/1000 hours of exposure) was almost 10 times higher than training injury incidence rate (3.7 injuries/1000 hours of exposure).&rdquo;<cite><a href="https://doi.org/10.1136/bjsports-2018-099577">L&oacute;pez-Valenciano et al., Br J Sports Med, 2020</a>, professional football (research)</cite></blockquote>
@@ -263,7 +274,7 @@
         <span class="fx-v">HMR aligned</span>
         <h3>Pilates</h3>
         <dl>
-          <dt>What it gets right</dt><dd>A lot. Slow, controlled movement, long holds, stretching under control and whole-body attention. It is pretty good exercise too.</dd>
+          <dt>What it gets right</dt><dd>A lot. Slow, controlled movement, long holds, stretching under control, and whole-body attention. It is pretty good exercise too.</dd>
           <dt>What follows from the model</dt><dd>Pilates comes closest to working with the web instead of against it. Its limit is that it still treats the body as it is, rather than first defining what the optimized tensegrity should be.</dd>
         </dl>
         <blockquote>&ldquo;Two trials assessed adverse events in this review, one did not find any adverse events, and another reported minor events.&rdquo;<cite><a href="https://doi.org/10.1002/14651858.CD010265.pub2">Yamato et al., Cochrane review of Pilates for low back pain, 2015</a> (research)</cite></blockquote>
@@ -273,7 +284,7 @@
         <span class="fx-v">HMR aligned</span>
         <h3>Yoga, especially long holds</h3>
         <dl>
-          <dt>What it gets right</dt><dd>Long-held poses, breath and attention: the traditions refined exactly the slow, sustained loading fascia responds to. Long hip-opening and yin-style sessions are HMR aligned, close to the protocol.</dd>
+          <dt>What it gets right</dt><dd>Long-held poses, breath, and attention: the traditions refined exactly the slow, sustained loading fascia responds to. Long hip-opening and yin-style sessions are HMR aligned, close to the protocol.</dd>
           <dt>The risk</dt><dd>Forcing range. Pushing into a pose the web is not ready for strains the same slack regions that every other program strains.</dd>
         </dl>
         <blockquote>&ldquo;There were 29,590 yoga-related injuries seen in hospital emergency departments from 2001 to 2014. The trunk (46.6%) was the most frequent region injured, and sprain/strain (45.0%) accounted for the majority of diagnoses.&rdquo;<cite><a href="https://doi.org/10.1177/2325967116671703">Swain and McGwin, Orthop J Sports Med, 2016</a> (research)</cite></blockquote>
@@ -289,7 +300,7 @@
           <dt>What follows from the model</dt><dd>Excellent for balance and attention. On its own it rarely applies the long, deep holds that change dense fascia.</dd>
         </dl>
         <blockquote>&ldquo;TC is unlikely to result in serious AEs, but it may be associated with minor musculoskeletal aches and pains.&rdquo;<cite><a href="https://doi.org/10.1016/j.apmr.2014.05.005">Wayne et al., Arch Phys Med Rehabil, 2014</a>, review of 153 trials (research; TC is tai chi, AEs adverse events)</cite></blockquote>
-        <figure class="fig fx-pic"><img src="../img/ew-taichi.jpg" alt="A group of people practicing tai chi together outdoors in a city park in the morning." loading="lazy" width="1400" height="837"><figcaption>Morning tai chi in Bryant Park, New York. Carl from New York, CC BY-SA 2.0, via <a href="https://commons.wikimedia.org/wiki/File:Morning_Tai_Chi_in_Bryant_Park.jpg">Wikimedia Commons</a>. More on <a href="east-west.html">tai chi and qigong in East and West</a>.</figcaption></figure>
+        <figure class="fig fx-pic"><img src="../img/ew-taichi.jpg" alt="A group of people practicing tai chi together outdoors in a city park in the morning." width="1400" height="837" decoding="async"><figcaption>Morning tai chi in Bryant Park, New York. Carl from New York, CC BY-SA 2.0, via <a href="https://commons.wikimedia.org/wiki/File:Morning_Tai_Chi_in_Bryant_Park.jpg">Wikimedia Commons</a>. More on <a href="east-west.html">tai chi and qigong in East and West</a>.</figcaption></figure>
       </article>
 </div>
 
@@ -297,10 +308,17 @@
       <div class="fx-sc-text">
         <h3 style="margin-top:0">What strength training does to an imperfect tensegrity</h3>
         <p>The evidence is clear that it helps. Weight-training sports have lower injury rates than many team sports: &ldquo;the weight-training sports appear to have relatively low rates of injury compared with common team sports&rdquo; (<a href="https://doi.org/10.1007/s40279-016-0575-0">Keogh and Winwood, Sports Med, 2017</a>). In trials, &ldquo;Strength training reduced sports injuries to less than 1/3 and overuse injuries could be almost halved&rdquo; (<a href="https://doi.org/10.1136/bjsports-2013-092538">Lauersen et al., Br J Sports Med, 2014</a>).</p>
+        <p><b>In HMR, the web adapts.</b> From infancy to adulthood the bones push outward through growth, and the fascia web adapts to that push. It lays down adhesions and clears them again, and fibroblasts and other cells remodel it all the time. It behaves like a living thing in its own right, and training loads that living web.</p>
         <p>It follows by logic from the model that this fits. There are many ways to make an imperfect tensegrity more capable, and strength training is one of them. It strengthens the web in the shape it already has, including its adhesions, and it accustoms the fascia to the very movements the sport demands, so injuries fall. The body gets stronger in its imperfect shape.</p>
         <p style="margin:0">It follows by logic from the model that the cost is long term: imperfections that have been strengthened are harder to undo, and may show up later as chronic problems. HMR's claim is about order. Optimizing the tensegrity first, as the <a href="protocol.html">protocol</a> does, is the slower way and by the logic of the model the safest and most lasting one. The same training on an optimized tensegrity then does far more good and far less harm.</p>
       </div>
-      <figure class="fig fx-pic"><img src="../img/hx-thoracolumbar-fascia.jpg" alt="A dissection of the human back showing the broad white sheet of the thoracolumbar fascia across the spine." loading="lazy" width="960" height="720"><figcaption>The thoracolumbar fascia links the shoulders, spine, pelvis and legs in one sheet, so strength built in one place is carried across all of them. Photo: Anatomist90, CC BY-SA 3.0, via <a href="https://commons.wikimedia.org/wiki/File:Thoracolumbar_fascia.JPG">Wikimedia Commons</a>. See it on <a href="health.html#ideal">The Perfect Body</a>.</figcaption></figure>
+      <figure class="fig fx-pic"><img src="../img/hx-thoracolumbar-fascia.jpg" alt="A dissection of the human back showing the broad white sheet of the thoracolumbar fascia across the spine." loading="lazy" width="960" height="720"><figcaption>The thoracolumbar fascia links the shoulders, spine, pelvis, and legs in one sheet, so strength built in one place is carried across all of them. Photo: Anatomist90, CC BY-SA 3.0, via <a href="https://commons.wikimedia.org/wiki/File:Thoracolumbar_fascia.JPG">Wikimedia Commons</a>. See it on <a href="health.html#ideal">The Perfect Body</a>.</figcaption></figure>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <span class="tag">Physical therapy</span>
+      <h3 style="margin-top:0">Where the tensegrity work belongs</h3>
+      <p style="margin-bottom:0">Physical therapists are the people best placed to work on the tensegrity. They already work hands-on with movement, load, and recovery. Today they are not trained on a tensegrity model of the body. HMR sees that as one of the largest gaps in physical health care, and therapists are the ones who can close it.</p>
     </div>
   </div>
 </section>
@@ -312,8 +330,8 @@
       <h2>Tensegrity first. Strength second</h2>
       <ol class="fx-order">
         <li><b>Define the optimized tensegrity.</b> A physics model of the ideal human body, built from measurements, shows what each line of fascia should be. <a href="health.html">The Perfect Body →</a></li>
-        <li><b>Mature the web toward it.</b> Hydration, long holds, hands-on work and the inside-out practices that make fascia receptive to change (the <a href="protocol.html">HMR Fascia Health Protocol</a>).</li>
-        <li><b>Then train.</b> Once force is shared evenly, strength, speed and endurance build on a sound structure instead of on its faults.</li>
+        <li><b>Mature the web toward it.</b> Hydration, long holds, hands-on work, and the inside-out practices that make fascia receptive to change (the <a href="protocol.html">HMR Fascia Health Protocol</a>).</li>
+        <li><b>Then train.</b> Once force is shared evenly, strength, speed, and endurance build on a sound structure instead of on its faults.</li>
       </ol>
       <p>Done the other way around, exercise mostly reinforces the imperfections: the dense lines get denser and the slack ones weaker, and each year of training makes the faults harder to undo.</p>
     </div>
@@ -324,7 +342,7 @@
         <li style="margin-bottom:8px"><b>No pain.</b> Load spreads through the whole web, so no single joint or tendon takes the hit.</li>
         <li style="margin-bottom:8px"><b>Much stronger.</b> Every line contributes, so the whole body lifts, not a few overloaded muscles.</li>
         <li style="margin-bottom:8px"><b>Lighter.</b> A well-tensioned structure holds itself up; less effort goes into bracing against its own faults.</li>
-        <li><b>More capable.</b> Range, balance and speed come from the structure itself, and gains stay when training pauses.</li>
+        <li><b>More capable.</b> Range, balance, and speed come from the structure itself, and gains stay when training pauses.</li>
       </ul>
     </div>
   </div>
@@ -339,6 +357,7 @@
     </div>
     <div>
       <h2>What the model says about puberty</h2>
+      <p>Science describes puberty as a cascade of hormones, and the hormones are real. What sets it off is not settled (<a href="https://doi.org/10.3389/fendo.2019.00828" style="color:#9CC3F5">Livadas and Chrousos, 2019</a>). In HMR, the hormones come on because of how a growing tensegrity behaves when it comes under strain.</p>
       <p>In HMR, puberty is a signal that the growing tensegrity is reaching its bounds, and that the inner struts need to be aligned properly. If they are not, some parts grow faster than others, tension becomes uneven, and the tensegrity develops imperfections. So far in human history, adults have carried those imperfections for life. Now there is a protocol to work them out again. <a href="protocol.html" style="color:#9CC3F5">The protocol →</a></p>
       <p>Even so, the most valuable fascia care anyone ever receives is the care given to them as a child. <a href="kids.html" style="color:#9CC3F5">Do you have kids? →</a></p>
     </div>
@@ -410,7 +429,7 @@
     var pk=peak(m),ref=loaded?refLd:refUn,sl=0;m.E.forEach(function(e){if(e.t==='c'&&!e.cut&&e.T<=0.0001)sl++;});
     document.getElementById('fx-peak').textContent=Math.round(pk/ref*100)+'%';
     document.getElementById('fx-slack').textContent=sl;
-    var tp=topOf(m),rt=loaded?topLd:topUn;document.getElementById('fx-sway').textContent=(Math.hypot(tp[0]-rt[0],tp[1]-rt[1])/height*100).toFixed(1)+'% of height';
+    var tp=topOf(m),rt=loaded?topLd:topUn;document.getElementById('fx-sway').textContent=(Math.hypot(tp[0]-rt[0],tp[1]-rt[1])/height*100).toFixed(1)+'%';
   }
   function loop(){
     if(falling){wv-=0.012;wy+=wv;if(wy<=topY()){wy=topY();falling=false;loaded=true;thud=14;frames=0;}}
@@ -432,6 +451,16 @@
         m.E.push({a:best.a,b:h,t:'s',L0:best.L0/2,cut:false,dense:false,T:0,half:true},{a:h,b:best.b,t:'s',L0:best.L0/2,cut:false,dense:false,T:0,half:true});best.cut=true;}
       else best.cut=true;kick();}});
   window.addEventListener('resize',size);
+  // if the visitor has cut or broken something but scrolls on without pressing Load it, load it once as the toy leaves the screen
+  var autoLoaded=false,pressed=false;
+  document.getElementById('fx-load').addEventListener('click',function(){pressed=true;});
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){var e=es[0];
+      if(autoLoaded||pressed||loaded||falling||e.intersectionRatio>=0.4||e.boundingClientRect.top>=0||e.boundingClientRect.bottom<=0)return;
+      if(!m.E.some(function(x){return x.cut||x.dense;}))return;
+      autoLoaded=true;drop();
+    },{threshold:[0.4]}).observe(cv);
+  }
   reset();size();loop();
 })();
 </script>
@@ -448,7 +477,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="collaborators.html">Collaborators</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=28d5a90c" defer></script>
+<script src="site.js?v=bf75eb42" defer></script>
 <script src="fx-stars.js?v=5a13ce3b" defer></script>
 </body>
 </html>
