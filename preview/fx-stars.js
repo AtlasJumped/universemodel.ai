@@ -108,7 +108,8 @@
     ox = r.left - left; oy = r.top - hr.top; return r; }
   let passes = 0;
   function wink() { cta.classList.remove('wink'); void cta.offsetWidth; cta.classList.add('wink'); setTimeout(() => cta.classList.remove('wink'), 2000); }
-  function burst() { if (document.hidden || !inBar()) return; if (passes++ % 10 === 0) setTimeout(wink, 240); const r = fit();
+  // the sparkles and the wink come together, on the first pass of the band and then on every tenth (owner, 2026-11-20)
+  function burst() { if (document.hidden || !inBar()) return; if (passes++ % 10 !== 0) return; setTimeout(wink, 240); const r = fit();
     for (let i = 0; i < 38; i++) { const u = Math.random(), side = Math.random() < 0.5, x = ox + u * r.width, y = oy + (side ? 0 : r.height), a = (side ? -1 : 1) * (0.25 + Math.random() * 2.64), s = 0.5 + Math.random() * 1.9;
       parts.push({ x, y, vx: Math.cos(a) * s * (u < 0.5 ? -1 : 1) * (Math.random() < 0.5 ? 1 : 0.4), vy: Math.sin(a) * s * 0.7, r: 0.8 + Math.random() * 2.4, age: 0, life: 34 + Math.random() * 38, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.5 }); }
     if (!running) { running = true; requestAnimationFrame(frame); } }
