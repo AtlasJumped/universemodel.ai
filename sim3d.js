@@ -22,7 +22,7 @@
     c3:'upper neck', c5:'lower neck', t2:'upper back (spine)', t4:'upper back (spine)', t8:'mid back (spine)', t10:'mid back (spine)', l1:'lower back (spine)', l2:'lower back (spine)', l4:'lower back (spine)',
     ribA:'first ribs', ribB:'upper ribs', ribC:'middle ribs', ribF:'floating ribs', stMid:'breastbone', sacA:'front of the sacrum', sacMid:'back of the sacrum', si:'sacroiliac joint',
     psis:'back of the pelvis', femMid:'thigh bone', condB:'back of the knee', fibHead:'head of the fibula', malMed:'inner ankle', malLat:'outer ankle', subF:'ankle bone', subB:'ankle bone',
-    ballLat:'outer ball of the foot', ballMed:'inner ball of the foot', gh:'shoulder joint', scapMed:'top of the shoulder blade', delt:'upper arm', elbowMed:'inner elbow', elbowLat:'outer elbow',
+    ballLat:'outer ball of the foot', ballMed:'inner ball of the foot', gh:'shoulder joint', scapMed:'top of the shoulder blade', delt:'upper arm', deltUp:'top of the upper arm', elbowMed:'inner elbow', elbowLat:'outer elbow',
     olec:'point of the elbow', wristU:'wrist (little finger side)', wristR:'wrist (thumb side)' };
   const segName = b => { const m = b.match(/^(ce|th|lu)\d([pa])$/); return m ? `${{ ce: 'neck', th: 'upper back', lu: 'lower back' }[m[1]]} ${m[2] === 'p' ? '(beside the spine)' : '(front of the spine)'}` : null; };
   const pretty = i => { const n = sim.N[i]; return (NAMES[n.base] || segName(n.base) || n.base) + (n.side ? (n.side > 0 ? ' (left)' : ' (right)') : ''); };

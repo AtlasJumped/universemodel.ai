@@ -21,8 +21,67 @@
 <nav class="nav" id="nav" aria-label="Main"><a href="about.html">About (start here)</a><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Problems<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Science Today</a><a href="fixing-exercise.html">Exercise Today</a><a href="mental-health.html">Mental Health Today</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Solutions<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="hmr.html">The HMR</a><a href="ui.html">Universal Intelligence</a><a href="health-model.html">HMR Holistic Health Model</a><a href="physics-health.html">HMR Physical Health Model</a><a href="health.html">The Perfect Body</a><a href="protocol.html">HMR Fascia Health Protocol</a><a href="mental-model.html">HMR Mental Health Model</a><a href="math.html">HMR Math Paradigm</a><a href="physics.html">HMR Physics Paradigm</a><a href="values.html">HMR Values</a><a href="answers.html">The Answers</a></div></div><a href="east-west.html">East and West</a><a href="kids.html">Do you have kids?</a><a href="simulation.html">Simulation</a><a href="fun.html" aria-current="page">For fun</a><a href="roadmap.html">Road Ahead</a><a href="collaborators.html">Collaborators</a><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">More<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="methods.html">Methods</a><a href="library.html">Library</a></div></div><a class="cta" href="about.html#contact"><span class="cta-t">Get in touch</span><span class="cta-w" aria-hidden="true"><svg viewBox="0 0 64 24" width="64" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle class="e1" cx="20" cy="8" r="2.4" fill="currentColor" stroke="none"/><g class="e2"><circle cx="44" cy="8" r="2.4" fill="currentColor" stroke="none"/></g><path class="e2w" d="M39.5 8.6q4.5 -3.4 9 0"/><path d="M21 16.5q11 7 22 0"/></svg></span></a></nav>
 </div></header>
 <main>
-<div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">For fun</span><h1>A room full of tensegrities to wreck and rebuild</h1></div><div><p class="lede">Being built.</p></div></div>
+<div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">For fun</span><h1>A room for wrecking tensegrities</h1></div><div><p class="lede">Part of HMR is having fun. Every structure here stands the way the body does: struts held apart by tension. Cut them, burn them, shake the ground under them, then put them right again.</p></div></div>
 </div></div>
+
+<style>
+.fun-sec{padding:clamp(18px,2.4vw,30px) 0 clamp(26px,3vw,44px)}
+.fun-app{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:stretch}
+.fun-stage{position:relative;min-height:max(580px,78vh);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;background:linear-gradient(#EAF1FA,#F8FBFF 60%,#fff)}
+.fun-stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;outline-offset:-3px}
+.fun-read{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none;max-width:calc(100% - 20px)}
+.fun-read span{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font:600 .8rem/1 var(--font);color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fun-read b{font-weight:750}
+.fun-msg{position:absolute;left:10px;bottom:10px;right:10px;margin:0;pointer-events:none;font:600 .86rem/1.3 var(--font);color:var(--navy)}
+.fun-msg span{display:inline-block;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.fun-msg span:empty{display:none}
+.fun-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px}
+.fun-grp{border:0;margin:0;padding:0;min-width:0}
+.fun-h{display:block;font:700 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 7px}
+.fun-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.fun-row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.fun-panel .chipbtn{min-height:40px;padding:8px 8px;text-align:center;white-space:normal;line-height:1.15}
+.fun-panel .chipbtn[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.fun-panel .chipbtn.hot{border-color:#E7B08A;color:#8A3B0B;background:#FFF6EE}
+.fun-panel .chipbtn.hot:hover{border-color:#D9822B}
+.fun-panel .chipbtn.wide{grid-column:1/-1}
+.fun-panel .btn{width:100%;justify-content:center;text-align:center}
+.fun-note{margin:14px 0 0}
+@media (max-width:900px){
+  .fun-app{grid-template-columns:minmax(0,1fr)}
+  .fun-stage{min-height:max(430px,66vh)}
+  .fun-row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){.fun-stage canvas{scroll-behavior:auto}}
+</style>
+
+<section class="fun-sec">
+  <div class="wrap">
+    <div class="fun-app" id="fun">
+      <div class="fun-stage" id="fun-stage">
+        <canvas id="fun-cv" tabindex="0" role="img" aria-label="A 3D tensegrity smash room. A structure made of struts in compression and cables in tension stands on the ground. Choose a scene and a tool, then pluck, cut, break, slice, burn, shake or smash it. Drag empty space to rotate, scroll or pinch to zoom."></canvas>
+        <div class="fun-read" id="fun-read" aria-hidden="true"></div>
+        <p class="fun-msg" id="fun-msg" role="status" aria-live="polite"><span></span></p>
+      </div>
+      <div class="fun-panel">
+        <div class="fun-row">
+          <button class="btn primary" type="button" id="fun-reset">Reset to healthy</button>
+          <button class="chipbtn" type="button" id="fun-surprise">Surprise me</button>
+        </div>
+        <div class="fun-row r3">
+          <button class="chipbtn" type="button" id="fun-pause" aria-pressed="false">Pause</button>
+          <button class="chipbtn" type="button" id="fun-slow">Slow 1x</button>
+          <button class="chipbtn" type="button" id="fun-moon" aria-pressed="false">Low gravity</button>
+        </div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h1"><span class="fun-h" id="fun-h1">Scene</span><div class="fun-row" id="fun-scenes"></div></div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h2"><span class="fun-h" id="fun-h2">Tool</span><div class="fun-row" id="fun-tools"></div></div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h3"><span class="fun-h" id="fun-h3">Disasters</span><div class="fun-row" id="fun-acts"></div></div>
+      </div>
+    </div>
+    <p class="fun-note">What to notice: cut one cable and watch the load move through the whole structure. Slack cables pull tight, and each line changes colour as it takes more strain. The working human model is on the <a href="simulation.html">simulation page</a>.</p>
+  </div>
+</section>
+<script src="fun.js" defer></script>
 <section class="nextup" aria-label="Summary and next page"><div class="wrap">
 <div class="nx-sum"><span class="eyebrow">In short</span><p>Part of HMR is having fun. This page is a room full of tensegrities to play with: structures held up by tension and struts together. Cut them, break them, burn them, shake the ground under them, send a storm through them, and then set them right again. Every structure here stands the way the body does, so playing with them is a quick way to feel how tension and compression share a load.</p></div>
 <a class="nx-go" href="roadmap.html"><span class="nx-k">Next</span><b>Road Ahead</b><span class="nx-why">Back to the work. A sketch shows the idea, and the full model has to be built from real bodies, bone by bone and tissue by tissue. The next page is the road ahead: what has been done, what is being built now, and what comes after.</span></a>
