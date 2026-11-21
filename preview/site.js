@@ -806,99 +806,144 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
   document.head.appendChild(st);
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  /* ----- page fire (owner request 2026-11-21): the first time a visitor burns a structure down, the fire seems to catch the page itself.
-     A burn hole with glowing edges opens where the toy is, and scorch and small flames touch the nearby text, for about five seconds.
-     Then the site's sparkles sweep in and repair it. Everything is drawn on one fixed overlay canvas that ignores the pointer, so no
-     layout moves and no text changes; the overlay is removed completely when it ends. Once per page load. Never with reduced motion. ----- */
-  let pageFireDone = false;
-  function pageFire(stage) {
-    if (pageFireDone || reduce) return; pageFireDone = true;
+  /* ----- page fire (owner requests 2026-11-21): every time a structure is burned down, the fire seems to catch the page. The "Spin" control
+     lights first, the fire hops to the "Change the tensegrity" label (a few embers arc across), spreads to nearby words and lines, some of which char and
+     crumble, and last the Fire button burns and a small burn hole with glowing edges opens right there. About seven seconds of burning, then the site's
+     sparkles sweep in and repair it. Everything is drawn on one fixed overlay canvas that ignores the pointer, so no layout moves and no text changes;
+     word positions are read from the real elements and text ranges once and tracked through scrolling. The overlay is removed when it ends, on
+     pagehide, and by a hard timeout. One sequence at a time: a new burn restarts it. Never with reduced motion. ----- */
+  let pf = null;
+  function pageFire(stage, box, spinBtn) {
+    if (reduce) return; if (pf) pf.end(); pf = null;
+    const fireBtn = box.querySelector('[data-m="fire"]'), lab = box.querySelector('.tgc-sel');
+    if (!fireBtn || !lab || !spinBtn || !spinBtn.isConnected) return;
     const COLS = [[29, 95, 209], [91, 155, 230], [109, 74, 255], [242, 169, 59], [14, 58, 117], [214, 120, 210]];
     const coarse = matchMedia('(pointer: coarse)').matches, I = Math.random();          // I: how big a fire this time (0 small, 1 big)
-    const vw = innerWidth, vh = innerHeight, d = Math.min(coarse ? 1.25 : 1.5, devicePixelRatio || 1);
-    const sr = stage.getBoundingClientRect(), top = Math.max(0, sr.top), bot = Math.min(vh, sr.bottom);
-    if (bot - top < 40 || sr.width < 40) return;
-    const sx = scrollX, sy = scrollY, cx0 = sr.left + sr.width / 2 + sx, cy0 = (top + bot) / 2 + sy;
-    const R = Math.min(Math.min(sr.width, bot - top) * (0.2 + 0.32 * I), Math.min(vw, vh) * (coarse ? 0.3 : 0.4), sr.width * 0.36);   // hole radius
-    const ph = [0, 1, 2, 3, 4].map(() => Math.random() * 6.283), N = 36;
-    const rad = a => 1 + 0.16 * Math.sin(3 * a + ph[0]) + 0.1 * Math.sin(5 * a + ph[1]) + 0.07 * Math.sin(9 * a + ph[2]);
-    // the text near the hole: line boxes in page coordinates, read once
-    const reach = R * 1.5 + 40, rects = [], tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => {
-      const p = n.parentElement; if (!p || !/\S/.test(n.nodeValue) || stage.contains(p) || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+    const vw = innerWidth, vh = innerHeight, d = Math.min(coarse ? 1.25 : 1.5, devicePixelRatio || 1), sx = scrollX, sy = scrollY;
+    const rnd = (a, b) => a + Math.random() * (b - a), clamp = (x, a, b) => Math.max(a, Math.min(b, x)), ease = x => 1 - Math.pow(1 - x, 3);
+    const pg = r => ({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height });
+    const sr = spinBtn.getBoundingClientRect(), fr = fireBtn.getBoundingClientRect();
+    if (sr.width < 10 || fr.width < 10) return;
+    // the text of the label: its own text node, so the flames sit on the letters and not on the drop-down
+    let labRect = null; { const w = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT); const n = w.nextNode(); if (n) { const g = document.createRange(); g.selectNodeContents(n); const r = g.getBoundingClientRect(); if (r.width > 10) labRect = r; } }
+    if (!labRect) labRect = lab.getBoundingClientRect();
+    // nearby words: line boxes of the text close to the label, read once
+    const skip = new Set([lab, fireBtn, spinBtn]), cand = [], lc = { x: labRect.left + labRect.width / 2, y: labRect.top + labRect.height / 2 };
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: n => {
+      const p = n.parentElement; if (!p || !/\S/.test(n.nodeValue) || stage.contains(p) || lab.contains(p) || fireBtn.contains(p) || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION|SELECT)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT; } });
     const rg = document.createRange(); let node, seen = 0;
-    while ((node = tw.nextNode()) && seen++ < 4000) {
+    while ((node = tw.nextNode()) && seen++ < 3000) {
       rg.selectNodeContents(node);
       for (const r of rg.getClientRects()) {
-        if (r.width < 6 || r.height < 6 || r.bottom < 0 || r.top > vh) continue;
-        const dx = Math.max(r.left - (cx0 - sx), 0, (cx0 - sx) - r.right), dy = Math.max(r.top - (cy0 - sy), 0, (cy0 - sy) - r.bottom), dist = Math.hypot(dx, dy);
-        if (dist < reach) rects.push({ x: r.left + sx, y: r.top + sy, w: r.width, h: r.height, k: 1 - dist / reach, u: 0.2 + Math.random() * 0.6 });
+        if (r.width < 24 || r.height < 8 || r.height > 60 || r.bottom < 8 || r.top > vh - 8 || r.right < 0 || r.left > vw) continue;
+        const dist = Math.hypot(r.left + r.width / 2 - lc.x, (r.top + r.height / 2 - lc.y) * 1.3);
+        if (dist < (coarse ? 380 : 560)) cand.push({ r, dist });
       }
     }
-    rects.sort((a, b) => b.k - a.k); rects.length = Math.min(rects.length, Math.round(14 + 40 * I));
-    const flames = []; const nf = Math.round(5 + 50 * I) * (coarse ? 0.7 : 1);
-    for (let i = 0; i < nf && rects.length; i++) { const r = rects[Math.floor(Math.pow(Math.random(), 1.6) * rects.length)];
-      flames.push({ x: r.x + Math.random() * r.w, y: r.y + r.h * (0.15 + Math.random() * 0.2), w: 4 + Math.random() * 5 + 5 * I, h: 9 + Math.random() * 12 + 14 * I * r.k, ph: Math.random() * 6.283, t0: 1.1 + Math.random() * 2.4, k: r.k }); }
-    const ember = [];
+    cand.sort((a, b) => a.dist - b.dist);
+    const nOther = Math.min(cand.length, Math.round((4 + 9 * I) * (coarse ? 0.7 : 1))), pool = cand.slice(0, Math.min(cand.length, nOther * 2 + 3));
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const picks = pool.slice(0, nOther).sort((a, b) => a.dist - b.dist);
+    // targets, in the order the fire reaches them: spin, label, nearby words, the Fire button
+    const T_FIRE = 7, spd = 60 + 60 * I;
+    const T = [];
+    const add = (r, arr, crumble, win) => {
+      let x = r.left + sx, w = r.width; if (win && w > 150) { const ww = rnd(70, 150); x += rnd(0, w - ww); w = ww; }
+      const o = { x, y: r.top + sy, w, h: r.height, arr, crumble, org: rnd(0.2, 0.8) * w, sl: [], lit: false };
+      const ns = Math.max(3, Math.ceil(w / 6)), sw = w / ns;
+      for (let j = 0; j < ns; j++) { const cx = (j + 0.5) * sw, ts = arr + Math.abs(cx - o.org) / spd + Math.random() * 0.15, L = crumble ? rnd(1.5, 2.9) : rnd(0.8, 1.6);
+        o.sl.push({ x: j * sw, w: sw, ts, L, ph: Math.random() * 6.283, hh: rnd(0.75, 1.3), cr: false }); }
+      T.push(o); return o;
+    };
+    add(sr, 0.3, true, false);
+    add(labRect, 2.1, true, false);
+    const t1 = 2.9, t2 = 5.0;
+    picks.forEach((p, i) => add(p.r, t1 + (picks.length > 1 ? i / (picks.length - 1) : 0) * (t2 - t1) + rnd(-0.12, 0.12), Math.random() < 0.55, true));
+    const lastArr = T[T.length - 1].arr, fArr = Math.max(5.3, lastArr + 0.7);
+    const FB = add(fr, fArr, true, false);
+    const hc = { x: fr.left + fr.width / 2 + sx, y: fr.top + fr.height / 2 + sy }, HR = clamp(Math.max(fr.height * 0.85, 20) * (1 + 0.45 * I), 20, coarse ? 30 : 40);
+    const T_HOLE = fArr + 0.6, ph = [0, 1, 2, 3, 4].map(() => Math.random() * 6.283), N = 28;
+    const rad = a => 1 + 0.18 * Math.sin(3 * a + ph[0]) + 0.1 * Math.sin(5 * a + ph[1]) + 0.07 * Math.sin(9 * a + ph[2]);
+    // embers that arc from one burning place to the next
+    const hops = [];
+    const pt = (o, top) => ({ x: o.x + rnd(0.1, 0.9) * o.w, y: o.y + o.h * (top ? 0.3 : 0.6) });
+    for (let i = 1; i < T.length; i++) {
+      const dst = T[i], src = T[Math.max(0, i - 1 - (Math.random() < 0.3 ? 1 : 0))], cnt = (i === 1 ? 4 : i === T.length - 1 ? 3 : 2) + (I > 0.6 && i > 1 ? 1 : 0);
+      for (let k = 0; k < cnt; k++) { const a = pt(src, true), b = k === 0 ? { x: dst.x + dst.org, y: dst.y + dst.h * 0.5 } : pt(dst, false), du = rnd(0.5, 0.7) + (i === 1 ? 0.15 : 0);
+        hops.push({ ax: a.x, ay: a.y, bx: b.x, by: b.y, t: dst.arr - du + (k ? rnd(-0.25, 0.1) : 0), du, up: rnd(35, 75) * (i === 1 ? 1.3 : 1) * (Math.random() < 0.5 ? 1 : 0.8) }); }
+    }
+    const crumbs = [], rise = [];
     const cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); cv.dataset.pageFire = '1';
     cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70';
     const c = cv.getContext('2d'); let W = 0, H = 0;
     const size = () => { W = innerWidth; H = innerHeight; cv.width = Math.round(W * d); cv.height = Math.round(H * d); c.setTransform(d, 0, 0, d, 0, 0); };
     size(); document.body.appendChild(cv); addEventListener('resize', size);
     // the sparkles that repair it: the same look as the pointer trail (soft glow, sometimes a four-pointed glint), same colours
-    const nsp = Math.round((24 + 150 * I) * (coarse ? 0.55 : 1)), T_FIRE = 5, T_REP = 2.2 + 1.6 * I, T_END = T_FIRE + T_REP + 0.7, spark = [];
-    for (let i = 0; i < nsp; i++) { const a = Math.random() * 6.283, e = Math.random() < 0.6, tr = Math.random() < 0.7 || !rects.length ? null : rects[Math.floor(Math.random() * rects.length)];
+    const nsp = Math.round((28 + 150 * I) * (coarse ? 0.55 : 1)), T_REP = 2.2 + 1.6 * I, T_END = T_FIRE + T_REP + 0.7, spark = [];
+    for (let i = 0; i < nsp; i++) { const a = Math.random() * 6.283, e = Math.random() < 0.6, tr = Math.random() < 0.3 ? null : T[Math.floor(Math.random() * T.length)];
       spark.push({ sx: W / 2 + Math.cos(a) * W * 0.7, sy: H / 2 + Math.sin(a) * H * 0.7, a: Math.random() * 6.283, rr: Math.sqrt(Math.random()), tr, tx: Math.random(), ty: Math.random(),
         r: 1.2 + Math.random() * 2.8 + (e ? 0.8 : 0), d0: Math.random() * (T_REP - 1.1), dur: 0.7 + Math.random() * 0.5, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.4 }); }
-    const ease = x => 1 - Math.pow(1 - x, 3), clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-    const t0 = performance.now(); let raf = 0, over = false, last = 0;
+    const t0 = performance.now(); let raf = 0, over = false, last = 0, prev = 0;
     function glow(x, y, R, a, col) { const gr = c.createRadialGradient(x, y, 0, x, y, R * 4);
       gr.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${0.85 * a})`); gr.addColorStop(0.35, `rgba(${col[0]},${col[1]},${col[2]},${0.35 * a})`); gr.addColorStop(1, `rgba(${col[0]},${col[1]},${col[2]},0)`);
       c.fillStyle = gr; c.beginPath(); c.arc(x, y, R * 4, 0, 6.283); c.fill(); }
-    function end() { if (over) return; over = true; cancelAnimationFrame(raf); removeEventListener('resize', size); cv.remove(); }
+    function tongue(x, y, w, h, lean, a) {
+      c.fillStyle = `rgba(255,86,22,${0.82 * a})`; c.beginPath(); c.moveTo(x - w / 2, y); c.quadraticCurveTo(x - w * 0.6, y - h * 0.55, x + lean, y - h); c.quadraticCurveTo(x + w * 0.6, y - h * 0.5, x + w / 2, y); c.closePath(); c.fill();
+      c.fillStyle = `rgba(255,170,44,${0.92 * a})`; c.beginPath(); c.moveTo(x - w * 0.32, y); c.quadraticCurveTo(x - w * 0.36, y - h * 0.4, x + lean * 0.7, y - h * 0.72); c.quadraticCurveTo(x + w * 0.36, y - h * 0.35, x + w * 0.32, y); c.closePath(); c.fill();
+      c.fillStyle = `rgba(255,238,160,${0.95 * a})`; c.beginPath(); c.moveTo(x - w * 0.15, y); c.quadraticCurveTo(x - w * 0.16, y - h * 0.2, x + lean * 0.4, y - h * 0.38); c.quadraticCurveTo(x + w * 0.16, y - h * 0.18, x + w * 0.15, y); c.closePath(); c.fill(); }
+    function end() { if (over) return; over = true; cancelAnimationFrame(raf); clearTimeout(hard); removeEventListener('resize', size); removeEventListener('pagehide', end); cv.remove(); if (pf && pf.end === end) pf = null; }
     function frame(now) {
       if (over) return; raf = requestAnimationFrame(frame);
       if (coarse && now - last < 32) return; last = now;
-      const t = (now - t0) / 1000; if (t > T_END) { end(); return; }
+      const t = (now - t0) / 1000, dt = Math.min(0.1, t - prev); prev = t; if (t > T_END) { end(); return; }
       c.clearRect(0, 0, W, H);
-      const ox = scrollX - sx, oy = scrollY - sy, cx = cx0 - sx - ox, cy = cy0 - sy - oy;
-      const rep = clamp((t - T_FIRE) / T_REP, 0, 1), grow = ease(clamp(t / 1.3, 0, 1)), heal = ease(clamp((rep - 0.12) / 0.8, 0, 1));
-      const sc = grow * (1 - heal), heat = (1 - heal) * clamp(t / 0.8, 0, 1);
-      // scorch on the text
-      if (sc > 0.02) { for (const r of rects) { const k = r.k * sc * (0.5 + 0.5 * I); if (k < 0.04) continue;
-          const gx = r.x - sx - ox + r.w * r.u, gy = r.y - sy - oy + r.h * 0.55, rx = Math.max(r.w * 0.55, 18);
-          c.save(); c.translate(gx, gy); c.scale(1, r.h / rx * 0.9); const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
-          g.addColorStop(0, `rgba(70,36,12,${0.42 * k})`); g.addColorStop(0.6, `rgba(120,60,20,${0.16 * k})`); g.addColorStop(1, 'rgba(120,60,20,0)');
-          c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, 6.283); c.fill(); c.restore(); } }
-      // the burn hole: dark, ragged, with a glowing edge
-      if (sc > 0.02) {
-        const pts = []; for (let i = 0; i < N; i++) { const a = i / N * 6.283, rr = R * sc * rad(a); pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.86]); }
+      const ox = scrollX, oy = scrollY;
+      const rep = clamp((t - T_FIRE) / T_REP, 0, 1), heal = ease(clamp((rep - 0.12) / 0.8, 0, 1)), fl = 1 - clamp(rep / 0.3, 0, 1), keep = 1 - heal;
+      // char on the letters: a dark overlay that creeps along from where the fire caught, ragged at the top, with bits crumbling off
+      for (const o of T) { const X = o.x - ox, Y = o.y - oy; if (Y > H + 40 || Y + o.h < -40) continue;
+        for (const s of o.sl) { const a = clamp((t - s.ts - 0.2) / 0.7, 0, 1); if (a <= 0) continue;
+          const k = (o.crumble ? 0.86 : 0.3) * a * keep, jag = o.crumble ? (0.12 + 0.2 * Math.abs(Math.sin(s.ph * 3))) * o.h : 0.1 * o.h;
+          c.fillStyle = o.crumble ? `rgba(24,16,14,${k})` : `rgba(80,44,20,${k})`; c.fillRect(X + s.x, Y + jag * (1 - a * 0.5), s.w + 0.6, o.h - jag * (1 - a * 0.5) + 1);
+          if (o.crumble && !s.cr && t > s.ts + s.L * 0.8 && crumbs.length < (coarse ? 36 : 80)) { s.cr = true; for (let q = 0; q < 2; q++) crumbs.push({ x: o.x + s.x + Math.random() * s.w, y: o.y + o.h * rnd(0.4, 0.9), vx: rnd(-8, 8), vy: rnd(-10, 6), z: rnd(1.4, 3), l: 1 }); } } }
+      for (let i = crumbs.length - 1; i >= 0; i--) { const b = crumbs[i]; b.vy += 120 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.l -= dt * 0.9; if (b.l <= 0) { crumbs.splice(i, 1); continue; }
+        c.fillStyle = `rgba(30,20,16,${0.85 * b.l * keep})`; c.fillRect(b.x - ox, b.y - oy, b.z, b.z); }
+      // flames dancing along the letters
+      for (const o of T) { const X = o.x - ox, Y = o.y - oy; if (Y > H + 40 || Y + o.h < -60) continue; let act = 0;
+        for (const s of o.sl) { const u0 = t - s.ts; if (u0 < 0 || u0 > s.L) continue;
+          const u = clamp(u0 / 0.3, 0, 1) * (u0 > s.L * 0.6 ? clamp((s.L - u0) / (s.L * 0.4), 0, 1) : 1) * fl; if (u <= 0.02) continue; act += u;
+          const f = 0.7 + 0.3 * Math.sin(t * 13 + s.ph) * Math.sin(t * 7.3 + s.ph * 2), h = (o.h * 0.85 + 7) * (0.8 + 0.6 * I) * s.hh * u * f, w = Math.max(6, s.w * 1.7) * (0.8 + 0.3 * I);
+          tongue(X + s.x + s.w / 2 + Math.sin(t * 5 + s.ph) * 2, Y + o.h * 0.88, w, h, Math.sin(t * 6 + s.ph) * w * 0.55, Math.min(1, u * 1.3));
+          if (rise.length < (coarse ? 14 : 34) && Math.random() < dt * 5) rise.push({ x: o.x + s.x, y: o.y + o.h * 0.3, vx: rnd(-10, 10), vy: rnd(-40, -90), l: 1, r: rnd(0.8, 1.6) }); }
+        if (act > 0.5 && !coarse) { const g = c.createRadialGradient(X + o.w / 2, Y + o.h * 0.6, 0, X + o.w / 2, Y + o.h * 0.6, o.w * 0.6 + 14); const q = Math.min(0.3, act / o.sl.length * 0.3);
+          g.addColorStop(0, `rgba(255,130,40,${q})`); g.addColorStop(1, 'rgba(255,130,40,0)'); c.fillStyle = g; c.fillRect(X - 14, Y - o.h * 1.2, o.w + 28, o.h * 2.6); } }
+      // the burn hole where the Fire button was: dark, ragged, with a glowing edge
+      const hs = ease(clamp((t - T_HOLE) / 1.0, 0, 1)) * keep, heat = clamp((t - T_HOLE) / 0.6, 0, 1) * keep;
+      if (hs > 0.02) { const cx = hc.x - ox, cy = hc.y - oy, pts = [];
+        for (let i = 0; i < N; i++) { const a = i / N * 6.283, rr = HR * hs * rad(a); pts.push([cx + Math.cos(a) * rr * 1.5, cy + Math.sin(a) * rr]); }
         const path = () => { c.beginPath(); pts.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); };
-        const gr = c.createRadialGradient(cx, cy, 0, cx, cy, R * sc * 1.2 + 1); gr.addColorStop(0, 'rgba(14,10,18,.9)'); gr.addColorStop(0.75, 'rgba(26,16,14,.84)'); gr.addColorStop(1, 'rgba(60,30,14,.72)');
-        path(); c.fillStyle = gr; c.fill();
-        c.lineJoin = 'round'; path(); c.strokeStyle = `rgba(50,26,12,${0.7 * sc})`; c.lineWidth = 12 * sc + 2; c.stroke();
-        for (let i = 0; i < N; i++) { const a = pts[i], b = pts[(i + 1) % N], fl = 0.55 + 0.45 * Math.sin(t * 9 + i * 1.7 + ph[3]) * Math.sin(t * 5.3 + i), h = heat * fl;
-          c.lineCap = 'round'; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]);
-          c.strokeStyle = `rgba(255,96,24,${0.75 * h})`; c.lineWidth = 7; c.stroke(); c.strokeStyle = `rgba(255,170,50,${0.85 * h})`; c.lineWidth = 4; c.stroke(); c.strokeStyle = `rgba(255,236,150,${0.9 * h})`; c.lineWidth = 1.6; c.stroke(); }
-        // embers rising off the edge
-        if (heat > 0.2 && ember.length < (coarse ? 24 : 50) && Math.random() < 0.6 + 0.3 * I) { const a = Math.random() * 6.283; ember.push({ x: cx + Math.cos(a) * R * sc * rad(a), y: cy + Math.sin(a) * R * sc * 0.86 * rad(a), vx: (Math.random() - 0.5) * 0.5, vy: -0.6 - Math.random() * 0.9, l: 1, r: 0.9 + Math.random() * 1.6 }); }
-      }
-      for (let i = ember.length - 1; i >= 0; i--) { const e = ember[i]; e.x += e.vx; e.y += e.vy + (oy ? 0 : 0); e.l -= 0.022; if (e.l <= 0) { ember.splice(i, 1); continue; } glow(e.x, e.y, e.r * e.l + 0.4, e.l * heat, [255, 150, 40]); }
-      // small flames on the text
-      for (const f of flames) { const u = clamp((t - f.t0) / 0.5, 0, 1) * (1 - clamp((rep - 0.05) / 0.5, 0, 1)); if (u <= 0.02) continue;
-        const fl = 0.75 + 0.25 * Math.sin(t * 13 + f.ph), h = f.h * u * fl, w = f.w * u, x = f.x - sx - ox, y = f.y - sy - oy, lean = Math.sin(t * 6 + f.ph) * w * 0.5;
-        c.fillStyle = 'rgba(255,100,26,.85)'; c.beginPath(); c.moveTo(x - w / 2, y); c.quadraticCurveTo(x - w / 2, y - h * 0.5, x + lean, y - h); c.quadraticCurveTo(x + w / 2, y - h * 0.5, x + w / 2, y); c.closePath(); c.fill();
-        c.fillStyle = 'rgba(255,214,100,.95)'; c.beginPath(); c.moveTo(x - w / 4, y); c.quadraticCurveTo(x - w / 4, y - h * 0.3, x + lean * 0.5, y - h * 0.6); c.quadraticCurveTo(x + w / 4, y - h * 0.3, x + w / 4, y); c.closePath(); c.fill(); }
+        const gr = c.createRadialGradient(cx, cy, 0, cx, cy, HR * 1.5 * hs + 1); gr.addColorStop(0, 'rgba(14,10,18,.95)'); gr.addColorStop(0.75, 'rgba(26,16,14,.9)'); gr.addColorStop(1, 'rgba(60,30,14,.8)');
+        path(); c.fillStyle = gr; c.fill(); c.lineJoin = 'round'; path(); c.strokeStyle = `rgba(50,26,12,${0.7 * hs})`; c.lineWidth = 8 * hs + 2; c.stroke(); c.lineCap = 'round';
+        for (let i = 0; i < N; i++) { const a = pts[i], b = pts[(i + 1) % N], h = heat * (0.55 + 0.45 * Math.sin(t * 9 + i * 1.7 + ph[3]) * Math.sin(t * 5.3 + i));
+          c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]);
+          c.strokeStyle = `rgba(255,96,24,${0.75 * h})`; c.lineWidth = 6; c.stroke(); c.strokeStyle = `rgba(255,170,50,${0.85 * h})`; c.lineWidth = 3.4; c.stroke(); c.strokeStyle = `rgba(255,236,150,${0.9 * h})`; c.lineWidth = 1.4; c.stroke(); }
+        if (rise.length < (coarse ? 14 : 34) && Math.random() < dt * 20 * heat) { const a = Math.random() * 6.283; rise.push({ x: hc.x + Math.cos(a) * HR * hs * 1.5, y: hc.y + Math.sin(a) * HR * hs, vx: rnd(-10, 10), vy: rnd(-50, -100), l: 1, r: rnd(0.9, 1.8) }); } }
+      for (let i = rise.length - 1; i >= 0; i--) { const e = rise[i]; e.x += e.vx * dt; e.y += e.vy * dt; e.l -= dt * 1.1; if (e.l <= 0) { rise.splice(i, 1); continue; } glow(e.x - ox, e.y - oy, e.r * e.l + 0.4, e.l * Math.max(fl, 0.2) * 0.9, [255, 150, 40]); }
+      // embers hopping from place to place
+      for (const h of hops) { const u = (t - h.t) / h.du; if (u < 0 || u > 1.15 || fl <= 0) continue;
+        const pos = v => ({ x: h.ax + (h.bx - h.ax) * v - ox, y: h.ay + (h.by - h.ay) * v - 4 * h.up * v * (1 - v) - oy });
+        for (let k = 5; k >= 0; k--) { const v = clamp(u - k * 0.04, 0, 1), p = pos(v), a = (1 - k / 6) * (u > 1 ? 1 - (u - 1) / 0.15 : 1); glow(p.x, p.y, (k ? 1.1 : 2) * (1 - k * 0.1), a * 0.9, k ? [255, 120, 30] : [255, 214, 110]); } }
       // the sparkles come in and mend it
-      if (rep > 0 || t > T_FIRE - 0.2) for (const s of spark) {
+      if (t > T_FIRE - 0.2) for (const s of spark) {
         const u = (t - T_FIRE - s.d0) / s.dur; if (u < 0 || u > 1.7) continue;
-        let tx, ty; if (s.tr) { tx = s.tr.x - sx - ox + s.tx * s.tr.w; ty = s.tr.y - sy - oy + s.ty * s.tr.h; } else { const rr = R * (1 - heal * 0.6) * 0.95 * s.rr; tx = cx + Math.cos(s.a) * rr; ty = cy + Math.sin(s.a) * rr * 0.86; }
+        let tx, ty; if (s.tr) { tx = s.tr.x - ox + s.tx * s.tr.w; ty = s.tr.y - oy + s.ty * s.tr.h; } else { tx = hc.x - ox + Math.cos(s.a) * HR * 1.4 * s.rr; ty = hc.y - oy + Math.sin(s.a) * HR * s.rr; }
         const m = ease(clamp(u, 0, 1)), x = s.sx + (tx - s.sx) * m, y = s.sy + (ty - s.sy) * m, a = (u < 1 ? 0.35 + 0.65 * m : Math.max(0, 1 - (u - 1) / 0.7)) * (0.7 + 0.3 * Math.sin(t * 14 + s.tw)), [r, g, b] = s.col, Rr = s.r;
         glow(x, y, Rr, a, s.col);
         if (s.star) { c.strokeStyle = `rgba(${r},${g},${b},${a})`; c.lineWidth = 1.1; c.beginPath(); c.moveTo(x - Rr * 3.2, y); c.lineTo(x + Rr * 3.2, y); c.moveTo(x, y - Rr * 3.2); c.lineTo(x, y + Rr * 3.2); c.stroke(); }
       }
     }
-    try { raf = requestAnimationFrame(frame); setTimeout(end, (T_END + 2) * 1000); addEventListener('pagehide', end, { once: true }); } catch (_) { end(); }
+    let hard = 0;
+    try { raf = requestAnimationFrame(frame); hard = setTimeout(end, (T_END + 2) * 1000); addEventListener('pagehide', end, { once: true }); pf = { end }; } catch (_) { end(); }
   }
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   stages.forEach(init);
@@ -1163,7 +1208,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           TG.step(S, sdt, speed < 1 ? 12 : 20, 0.7);
           if (S.balloon !== undefined && !S.fire && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.fireStep(S, sdt, reduce ? 0.5 : 0);
-          if (!pageFireDone && !reduce && S.fire && !S.fire.over && S.fire.F > S.fire.last + 2) pageFire(stage);
+          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > S.fire.last + 2)) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
           if (!S.fire) burningList = [];
           if (S.fire && !reduce && burningList.length) {
             smoke = smoke.filter(m => now - m.t0 < 1700); smoke.forEach(m => { m.y += cam.R * 0.22 * sdt; m.x += m.vx * sdt; });
