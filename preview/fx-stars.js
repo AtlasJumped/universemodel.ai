@@ -87,7 +87,8 @@
   const COLS = [[242, 169, 59], [91, 155, 230], [109, 74, 255], [242, 169, 59], [214, 120, 210], [255, 255, 255]];
   const inBar = () => { const r = cta.getBoundingClientRect(), h = head.getBoundingClientRect(); return r.width > 0 && r.top >= h.top - 1 && r.bottom <= h.bottom + 1; };
   const pos = x => (75 - 50 * x / innerWidth).toFixed(2) + '%';
-  function place() { const a = lg.getBoundingClientRect(); head.style.setProperty('--hp0', pos(a.left + a.width / 2));
+  function place() { if (!(innerWidth > 0)) return; // a hidden window has no width yet; the CSS defaults stand until it is shown
+    const a = lg.getBoundingClientRect(); head.style.setProperty('--hp0', pos(a.left + a.width / 2));
     const b = cta.getBoundingClientRect(); head.style.setProperty('--hp1', pos(inBar() ? b.left + b.width * 0.3 : innerWidth * 0.94)); }
   function sync() { if (!document.getAnimations) return;
     for (const an of document.getAnimations()) { const t = an.effect && an.effect.target; if (t && head.contains(t) && NAMES.test(an.animationName || '')) { try { an.startTime = 0; } catch (e) {} } } }
