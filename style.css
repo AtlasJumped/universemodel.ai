@@ -58,21 +58,21 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .nav .cta{position:relative}
 .cta-t{display:inline-block}
 .cta-w{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}
-.cta-w svg{display:block;height:74%;width:auto;overflow:visible}
-.cta-w .eo{transform-box:fill-box;transform-origin:50% 62%}
-.cta-w .ec{opacity:0}
-.site-head .nav .cta{animation:ctaglow var(--cyc) linear infinite}
-.site-head .nav .cta::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.6) 50%,rgba(255,255,255,0) 62%) no-repeat;background-size:260% 100%;animation:ctasheen var(--cyc) linear infinite}
+.cta-w svg{display:block;height:62%;width:auto}
+.cta-w .e2w{opacity:0}
+.site-head .nav .cta.lit{animation:ctaglow 1.6s ease-out both}
+.site-head .nav .cta::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.6) 50%,rgba(255,255,255,0) 62%) no-repeat;background-size:260% 100%;}
+.site-head .nav .cta.lit::before{animation:ctasheen 1.1s linear both}
 .cta.wink .cta-t{animation:ctatext 1.9s ease both}
 .cta.wink .cta-w{animation:ctaface 1.9s ease both}
-.cta.wink .cta-w .eo{animation:ctaopen 1.9s ease both}
-.cta.wink .cta-w .ec{animation:ctashut 1.9s ease both}
-@keyframes ctaglow{0%,48.5%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}51%{box-shadow:0 0 0 3px rgba(242,169,59,.6),0 0 24px 5px rgba(109,74,255,.5);filter:brightness(1.2)}60%{box-shadow:0 0 0 2px rgba(242,169,59,.28),0 0 14px 2px rgba(109,74,255,.25);filter:brightness(1.08)}67%,100%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}}
-@keyframes ctasheen{0%,47.5%{opacity:0;background-position:130% 0}48.5%{opacity:1;background-position:130% 0}54.5%{opacity:1;background-position:-30% 0}55.5%,100%{opacity:0;background-position:-30% 0}}
+.cta.wink .cta-w .e2{animation:ctaeye 1.9s linear both}
+.cta.wink .cta-w .e2w{animation:ctalid 1.9s linear both}
+@keyframes ctaglow{0%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}16%{box-shadow:0 0 0 3px rgba(242,169,59,.6),0 0 24px 5px rgba(109,74,255,.5);filter:brightness(1.2)}60%{box-shadow:0 0 0 2px rgba(242,169,59,.28),0 0 14px 2px rgba(109,74,255,.25);filter:brightness(1.08)}100%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}}
+@keyframes ctasheen{0%{opacity:0;background-position:130% 0}12%{opacity:1;background-position:130% 0}88%{opacity:1;background-position:-30% 0}100%{opacity:0;background-position:-30% 0}}
 @keyframes ctatext{0%{opacity:1}10%,88%{opacity:0}100%{opacity:1}}
 @keyframes ctaface{0%,4%{opacity:0}14%,84%{opacity:1}94%,100%{opacity:0}}
-@keyframes ctaopen{0%,34%{opacity:1;transform:scaleY(1)}44%{opacity:0;transform:scaleY(.08)}62%{opacity:0;transform:scaleY(.08)}72%,100%{opacity:1;transform:scaleY(1)}}
-@keyframes ctashut{0%,38%{opacity:0}44%,62%{opacity:1}68%,100%{opacity:0}}
+@keyframes ctaeye{0%,40%{opacity:1}43%,60%{opacity:0}63%,100%{opacity:1}}
+@keyframes ctalid{0%,40%{opacity:0}43%,60%{opacity:1}63%,100%{opacity:0}}
 .cta-burst{position:absolute;top:0;pointer-events:none;z-index:2}
 @media (prefers-reduced-motion:reduce){.site-head .brand span,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{animation:none;background-position:100% 0,0 0}
   .site-head .brand .lg i,.site-head .nav .cta,.site-head .nav .cta::before{animation:none}}

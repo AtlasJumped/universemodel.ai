@@ -57,9 +57,9 @@
     function size() { const r = brand.getBoundingClientRect(), hr = host.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
       w = whole ? hr.width : Math.max(120, Math.min(hr.width, r.right - hr.left + 110)); h = hr.height;
       bx = r.left - hr.left - 40; by = r.top - hr.top - 26; bw = r.width + 150; bh = r.height + 52;
-      want = whole ? Math.max(46, Math.min(120, Math.round(w * h / 7000))) : 36;
+      want = whole ? Math.max(50, Math.min(150, Math.round(w * h / 5600))) : 36;
       cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = w * d; cv.height = h * d; c.setTransform(d, 0, 0, d, 0, 0); if (still) draw(); }
-    function spawn(stirred) { const a = Math.random() * 6.283, s = 0.06 + Math.random() * 0.2, near = whole && Math.random() < 0.4;
+    function spawn(stirred) { const a = Math.random() * 6.283, s = 0.06 + Math.random() * 0.2, near = false; // the footer's cloud is even across its whole width (owner, 2026-11-20)
       const x = whole ? (near ? bx + Math.random() * bw : Math.random() * w) : Math.random() * w * 0.94, y = near ? by + Math.random() * bh : 4 + Math.random() * (h - 8);
       parts.push({ x, y, vx: Math.cos(a) * s + (stirred ? dx * 0.35 : 0), vy: Math.sin(a) * s * 0.6 + (stirred ? dy * 0.2 : 0),
         r: 0.7 + Math.random() * 2.3, age: 0, life: stirred ? 90 + Math.random() * 90 : 190 + Math.random() * 220, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.35 }); }
@@ -91,15 +91,17 @@
 (() => {
   const head = document.querySelector('.site-head'); if (!head || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const lg = head.querySelector('.brand .lg'), cta = head.querySelector('.nav .cta'); if (!lg || !cta) return;
-  const CYC = 8000, NAMES = /^(headsheen|umspin|umgold|cta)/;
+  const CYC = 8000, NAMES = /^(headsheen|umspin|umgold)/;
   const COLS = [[242, 169, 59], [91, 155, 230], [109, 74, 255], [242, 169, 59], [214, 120, 210], [255, 255, 255]];
   const inBar = () => { const r = cta.getBoundingClientRect(), h = head.getBoundingClientRect(); return r.width > 0 && r.top >= h.top - 1 && r.bottom <= h.bottom + 1; };
   const pos = x => (75 - 50 * x / innerWidth).toFixed(2) + '%';
+  // the cycle starts when the page arrives: UM facing front and gold, the band just leaving it (owner, 2026-11-20)
+  const clock = () => document.timeline ? document.timeline.currentTime : performance.now(), t0 = clock();
   function place() { if (!(innerWidth > 0)) return; // a hidden window has no width yet; the CSS defaults stand until it is shown
     const a = lg.getBoundingClientRect(); head.style.setProperty('--hp0', pos(a.left + a.width / 2));
     const b = cta.getBoundingClientRect(); head.style.setProperty('--hp1', pos(inBar() ? b.left + b.width * 0.3 : innerWidth * 0.94)); }
   function sync() { if (!document.getAnimations) return;
-    for (const an of document.getAnimations()) { const t = an.effect && an.effect.target; if (t && head.contains(t) && NAMES.test(an.animationName || '')) { try { an.startTime = 0; } catch (e) {} } } }
+    for (const an of document.getAnimations()) { const t = an.effect && an.effect.target; if (t && head.contains(t) && NAMES.test(an.animationName || '')) { try { an.startTime = t0; } catch (e) {} } } }
   const cv = document.createElement('canvas'); cv.className = 'cta-burst'; cv.setAttribute('aria-hidden', 'true'); head.appendChild(cv);
   const c = cv.getContext('2d'), parts = []; let w = 0, h = 0, ox = 0, oy = 0, running = false;
   function fit() { const r = cta.getBoundingClientRect(), hr = head.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1), m = 90;
@@ -108,7 +110,8 @@
     ox = r.left - left; oy = r.top - hr.top; return r; }
   let passes = 0;
   function wink() { cta.classList.remove('wink'); void cta.offsetWidth; cta.classList.add('wink'); setTimeout(() => cta.classList.remove('wink'), 2000); }
-  function burst() { if (document.hidden || !inBar()) return; if (passes++ % 10 === 0) setTimeout(wink, 240); const r = fit();
+  // the sparkles and the wink come together, on the first pass of the band and then on every tenth (owner, 2026-11-20)
+  function burst() { if (document.hidden || !inBar()) return; if (passes++ % 10 !== 0) return; cta.classList.remove('lit'); void cta.offsetWidth; cta.classList.add('lit'); setTimeout(() => cta.classList.remove('lit'), 1800); setTimeout(wink, 240); const r = fit();
     for (let i = 0; i < 38; i++) { const u = Math.random(), side = Math.random() < 0.5, x = ox + u * r.width, y = oy + (side ? 0 : r.height), a = (side ? -1 : 1) * (0.25 + Math.random() * 2.64), s = 0.5 + Math.random() * 1.9;
       parts.push({ x, y, vx: Math.cos(a) * s * (u < 0.5 ? -1 : 1) * (Math.random() < 0.5 ? 1 : 0.4), vy: Math.sin(a) * s * 0.7, r: 0.8 + Math.random() * 2.4, age: 0, life: 34 + Math.random() * 38, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.5 }); }
     if (!running) { running = true; requestAnimationFrame(frame); } }
@@ -120,7 +123,7 @@
       if (p.star) { c.strokeStyle = `rgba(${r},${g},${b},${a})`; c.lineWidth = 1.1; c.beginPath(); c.moveTo(p.x - R * 3.4, p.y); c.lineTo(p.x + R * 3.4, p.y); c.moveTo(p.x, p.y - R * 3.4); c.lineTo(p.x, p.y + R * 3.4); c.stroke(); } }
     if (parts.length) requestAnimationFrame(frame); else { running = false; c.clearRect(0, 0, w, h); } }
   let timer = 0;
-  function arm() { clearTimeout(timer); const now = document.timeline ? document.timeline.currentTime : performance.now(), wait = ((0.5 * CYC - (now % CYC)) + CYC) % CYC;
+  function arm() { clearTimeout(timer); const now = clock() - t0, wait = ((0.5 * CYC - (now % CYC)) + CYC) % CYC;
     timer = setTimeout(() => { burst(); setTimeout(arm, 400); }, Math.max(30, wait)); }
   const again = () => { place(); sync(); arm(); };
   addEventListener('resize', again); addEventListener('load', again); document.addEventListener('visibilitychange', () => { if (!document.hidden) again(); });
