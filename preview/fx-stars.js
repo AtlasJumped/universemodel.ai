@@ -75,3 +75,45 @@
   for (let i = 0; i < 36; i++) { spawn(false); parts[i].age = parts[i].life * Math.random() * 0.8; }
   requestAnimationFrame(frame);
 })();
+
+// Universe Model: one clock for the top bar (owner request 2026-11-20e). The letters UM turn once per cycle. Facing front, they
+// flash gold and a band of colour leaves them; it reaches "Get in touch" as the letters face away, and the button lights up,
+// throws a short burst of the same sparkles and winks. The CSS holds the animations; this lines their clocks up, tells the CSS
+// where the monogram and the button are, and draws the burst.
+(() => {
+  const head = document.querySelector('.site-head'); if (!head || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const lg = head.querySelector('.brand .lg'), cta = head.querySelector('.nav .cta'); if (!lg || !cta) return;
+  const CYC = 8000, NAMES = /^(headsheen|umspin|umgold|cta)/;
+  const COLS = [[242, 169, 59], [91, 155, 230], [109, 74, 255], [242, 169, 59], [214, 120, 210], [255, 255, 255]];
+  const inBar = () => { const r = cta.getBoundingClientRect(), h = head.getBoundingClientRect(); return r.width > 0 && r.top >= h.top - 1 && r.bottom <= h.bottom + 1; };
+  const pos = x => (75 - 50 * x / innerWidth).toFixed(2) + '%';
+  function place() { const a = lg.getBoundingClientRect(); head.style.setProperty('--hp0', pos(a.left + a.width / 2));
+    const b = cta.getBoundingClientRect(); head.style.setProperty('--hp1', pos(inBar() ? b.left + b.width * 0.3 : innerWidth * 0.94)); }
+  function sync() { if (!document.getAnimations) return;
+    for (const an of document.getAnimations()) { const t = an.effect && an.effect.target; if (t && head.contains(t) && NAMES.test(an.animationName || '')) { try { an.startTime = 0; } catch (e) {} } } }
+  const cv = document.createElement('canvas'); cv.className = 'cta-burst'; cv.setAttribute('aria-hidden', 'true'); head.appendChild(cv);
+  const c = cv.getContext('2d'), parts = []; let w = 0, h = 0, ox = 0, oy = 0, running = false;
+  function fit() { const r = cta.getBoundingClientRect(), hr = head.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1), m = 90;
+    const left = Math.max(0, r.left - m), right = Math.min(innerWidth, r.right + m); w = right - left; h = hr.height + 64;
+    cv.style.left = (left - hr.left) + 'px'; cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.width = w * d; cv.height = h * d; c.setTransform(d, 0, 0, d, 0, 0);
+    ox = r.left - left; oy = r.top - hr.top; return r; }
+  function burst() { if (document.hidden || !inBar()) return; const r = fit();
+    for (let i = 0; i < 38; i++) { const u = Math.random(), side = Math.random() < 0.5, x = ox + u * r.width, y = oy + (side ? 0 : r.height), a = (side ? -1 : 1) * (0.25 + Math.random() * 2.64), s = 0.5 + Math.random() * 1.9;
+      parts.push({ x, y, vx: Math.cos(a) * s * (u < 0.5 ? -1 : 1) * (Math.random() < 0.5 ? 1 : 0.4), vy: Math.sin(a) * s * 0.7, r: 0.8 + Math.random() * 2.4, age: 0, life: 34 + Math.random() * 38, tw: Math.random() * 6.283, col: COLS[Math.floor(Math.random() * COLS.length)], star: Math.random() < 0.5 }); }
+    if (!running) { running = true; requestAnimationFrame(frame); } }
+  function frame() { c.clearRect(0, 0, w, h);
+    for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.x += p.vx; p.y += p.vy; p.vx *= 0.965; p.vy = p.vy * 0.965 + 0.012; p.age++; p.tw += 0.3; if (p.age >= p.life) { parts.splice(i, 1); continue; }
+      const u = p.age / p.life, a = Math.min(1, u * 8, (1 - u) * 2.2) * (0.8 + 0.2 * Math.sin(p.tw)), [r, g, b] = p.col, R = p.r;
+      const gr = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, R * 4); gr.addColorStop(0, `rgba(${r},${g},${b},${0.9 * a})`); gr.addColorStop(0.35, `rgba(${r},${g},${b},${0.36 * a})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      c.fillStyle = gr; c.beginPath(); c.arc(p.x, p.y, R * 4, 0, 6.283); c.fill();
+      if (p.star) { c.strokeStyle = `rgba(${r},${g},${b},${a})`; c.lineWidth = 1.1; c.beginPath(); c.moveTo(p.x - R * 3.4, p.y); c.lineTo(p.x + R * 3.4, p.y); c.moveTo(p.x, p.y - R * 3.4); c.lineTo(p.x, p.y + R * 3.4); c.stroke(); } }
+    if (parts.length) requestAnimationFrame(frame); else { running = false; c.clearRect(0, 0, w, h); } }
+  let timer = 0;
+  function arm() { clearTimeout(timer); const now = document.timeline ? document.timeline.currentTime : performance.now(), wait = ((0.5 * CYC - (now % CYC)) + CYC) % CYC;
+    timer = setTimeout(() => { burst(); setTimeout(arm, 400); }, Math.max(30, wait)); }
+  const again = () => { place(); sync(); arm(); };
+  addEventListener('resize', again); addEventListener('load', again); document.addEventListener('visibilitychange', () => { if (!document.hidden) again(); });
+  const menu = head.querySelector('.menu'); if (menu) menu.addEventListener('click', () => setTimeout(again, 60));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+  again();
+})();

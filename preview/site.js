@@ -691,9 +691,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
   st.textContent = `
 .stage{touch-action:pan-y;cursor:grab}
 .stage.pick{cursor:crosshair}
-.tgc{max-width:560px;width:100%;margin:10px auto 0;display:grid;gap:8px;font-size:.9rem}
+.tgc{width:100%;margin:10px auto 0;display:grid;gap:8px;font-size:.9rem}
 .tgc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.tgc-two{justify-content:space-between;gap:8px 14px}
+.tgc-two{gap:6px}
+.tgc-two .tgc-grp{flex-wrap:nowrap}
+.tgc-two .tgc-grp+.tgc-grp{margin-left:auto;padding-left:10px;border-left:1px solid var(--line)}
+.tgc-two .chipbtn{white-space:nowrap}
+@media (max-width:560px){.tgc-two .tgc-grp+.tgc-grp{margin-left:0;padding-left:0;border-left:0}}
 .tgc-grp{display:inline-flex;flex-wrap:wrap;gap:6px}
 .stage .tg-spin{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2;font-size:.98rem;padding:9px 18px 9px 11px;box-shadow:0 2px 10px rgba(11,37,69,.12)}
 .stage .tg-spin .sw{width:42px;height:22px}
@@ -702,7 +706,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 .tgc label.tgc-sel{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:600 .86rem/1.2 var(--font);color:var(--navy)}
 .tgc select{font:600 .88rem/1.2 var(--font);color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 30px 8px 10px;max-width:100%;cursor:pointer}
 .tgc select:hover{border-color:var(--sky)}
-.tgc .chipbtn{padding:8px 11px}
+.tgc .chipbtn{padding:8px 10px}
 .tgc .chipbtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .tgc .chipbtn.cut.on{background:#B4232F;border-color:#B4232F}
 .tgc-seg{display:inline-flex;align-items:center;gap:4px;color:var(--soft);font-size:.82rem;font-weight:600}
@@ -1059,10 +1063,34 @@ if (typeof document !== 'undefined') (() => {
     else { const [q, ans, href] = d.a; a.className = 'nb-fill nb-ans'; a.href = href; a.innerHTML = `<span class="cap"><i>HMR's answer</i><b>${esc(q)}</b>${esc(ans)}<em>Read it in full →</em></span>`; }
     return a; };
   const page = (location.pathname.split('/').pop() || 'index.html').replace('.html', '') || 'index';
+  // Two columns side by side should end together. Where a picture tile exists for the section it fills the short column.
+  // Otherwise text flows between the columns in reading order: the end of a long left column moves to the top of the right
+  // one, or the start of a long right column moves to the foot of the left one (owner, recordings 2026-11-19 and 2026-11-20e).
+  const TITLE = /^(H1|H2)$/, isTitle = n => TITLE.test(n.tagName) || n.classList.contains('eyebrow');
+  const undo = el => { el.classList.remove('nb-prose'); [...el.querySelectorAll('img[data-nb-fit]')].forEach(i => { i.removeAttribute('data-nb-fit'); i.style.maxHeight = i.style.width = i.style.marginInline = ''; }); [...el.querySelectorAll('[data-nb-moved]')].forEach(n => n.removeAttribute('data-nb-moved'));
+    if (el._nbHome) { el._nbHome.forEach((list, i) => list.forEach(n => el._nbCols[i].appendChild(n))); } };
+  const flow = (el, kids) => {
+    // two columns of plain paragraphs: let the browser balance them as one running text
+    if (kids.every(k => k.children.length && [...k.children].every(c => c.tagName === 'P'))) { el.classList.add('nb-prose'); return; }
+    if (!el._nbHome) { el._nbCols = kids; el._nbHome = kids.map(k => [...k.children]); }
+    const H = () => kids.map(k => k.getBoundingClientRect().height);
+    for (let guard = 0; guard < 12; guard++) {
+      const hs = H(), gap = Math.abs(hs[0] - hs[1]); if (gap <= 90) break;
+      const fromLeft = hs[0] > hs[1], src = kids[fromLeft ? 0 : 1], dst = kids[fromLeft ? 1 : 0], list = [...src.children]; if (list.length < 2) break;
+      let take;
+      if (fromLeft) { take = [list[list.length - 1]]; const prev = list[list.length - 2]; if (prev && /^H[3-6]$/.test(prev.tagName)) take.unshift(prev); }
+      else { take = [list[0]]; if (/^H[3-6]$/.test(list[0].tagName) && list[1]) take.push(list[1]); }
+      if (take.some(isTitle) || take.length >= list.length) break;
+      const mark = fromLeft ? dst.firstChild : null; take.forEach(n => { n.dataset.nbMoved = '1'; dst.insertBefore(n, mark); });
+      const h2 = H(), gap2 = Math.abs(h2[0] - h2[1]);
+      if (gap2 >= gap - 8) { const back = fromLeft ? null : src.firstChild; take.forEach(n => { n.removeAttribute('data-nb-moved'); src.insertBefore(n, back); }); break; }
+    }
+  };
   const fit = () => {
     const wide = innerWidth > 1180;
     document.querySelectorAll('main .split, main .ew-row, main .ui-hum').forEach(el => {
       if (el.classList.contains('nb-keep') || el.classList.contains('kd-eq')) return; // balanced by hand
+      undo(el);
       const kids = [...el.children].filter(c => c.offsetParent !== null);
       kids.forEach(k => { k.classList.remove('nb-stick', 'nb-col'); [...k.children].forEach(c => { if (c.classList.contains('nb-fill') && c.dataset.auto) c.remove(); }); }); el.classList.remove('nb-eq');
       if (!wide || kids.length !== 2 || el.classList.contains('kd-eq') || el.classList.contains('nb-keep') || el.closest('.simgrid')) return;
@@ -1070,7 +1098,12 @@ if (typeof document !== 'undefined') (() => {
       const hs = kids.map(k => k.getBoundingClientRect().height), short = hs[0] < hs[1] ? 0 : 1, gap = Math.abs(hs[0] - hs[1]); if (gap <= 120) return;
       const sec = el.closest('section, .page-head'), h = sec && sec.querySelector('h1, h2'), head = h ? h.textContent.trim() : '', map = FILL[page] || {}, key = Object.keys(map).find(k => head.startsWith(k));
       if (key && gap >= 150) { const t = tile(map[key]); t.dataset.auto = '1'; el.classList.add('nb-eq'); kids[short].classList.add('nb-col'); kids[short].appendChild(t); }
-      else if (hs[short] < innerHeight - 130) kids[short].classList.add('nb-stick');
+      else if (!el.closest('.page-head, .hero') && el.matches('.split')) flow(el, kids);
+      // still uneven because one column is mostly a picture: show the picture smaller, so the two columns end together
+      const h2 = kids.map(k => k.getBoundingClientRect().height), g2 = Math.abs(h2[0] - h2[1]);
+      if (g2 > 120 && !el.classList.contains('nb-eq') && !el.classList.contains('nb-prose') && !el.closest('.page-head, .hero')) {
+        const tall = kids[h2[0] > h2[1] ? 0 : 1], img = [...tall.querySelectorAll('img')].filter(i => !i.closest('.nb-fill')).sort((a, b) => b.getBoundingClientRect().height - a.getBoundingClientRect().height)[0];
+        if (img) { const ih = img.getBoundingClientRect().height; if (ih > 300) { img.dataset.nbFit = '1'; img.style.maxHeight = Math.max(260, Math.round(ih - g2)) + 'px'; img.style.width = 'auto'; img.style.marginInline = 'auto'; } } }
     });
   };
   let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 150); };

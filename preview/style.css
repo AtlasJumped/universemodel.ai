@@ -23,7 +23,7 @@ img,svg,canvas{max-width:100%}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:.18em}
 a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid rgba(29,95,209,.35);outline-offset:3px;border-radius:6px}
-.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(16px,4vw,40px)}
+.wrap{max-width:1440px;margin:0 auto;padding:0 clamp(16px,4vw,56px)}
 
 /* header */
 .site-head{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
@@ -35,20 +35,67 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 /* the name in the top bar: a slow cloud of sparkles behind it */
 .brand-aura{position:absolute;left:0;top:0;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 62%,transparent 100%)}
 .site-head .wrap{position:relative;z-index:1}
-/* One sheen through the whole top bar, in sync. Every piece of header text, and the monogram, shows the same
-   gradient, fixed to the window and three windows wide, so a single band of colour crosses logo, name and menu. */
-.site-head .brand span,.site-head .brand .lg i,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{
+/* The top bar runs on one clock (--cyc). A band of colour, fixed to the window and three windows wide, crosses the name and
+   the menu. It is at the monogram when the letters UM face front (0%) and at "Get in touch" when they face away (50%).
+   --hp0 and --hp1 are where the band must sit at those two moments; fx-stars.js measures them and lines the clocks up. */
+.site-head{--cyc:8s;--hp0:72%;--hp1:29%}
+.site-head .brand span,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{
   --hb:transparent;
   background-image:linear-gradient(100deg,currentColor 0%,currentColor 47.4%,#1D5FD1 48.7%,#6D4AFF 50%,#F2A93B 51.3%,currentColor 52.6%,currentColor 100%),linear-gradient(var(--hb),var(--hb)) !important;
   background-size:300% 100%,auto !important;background-attachment:fixed,scroll !important;background-position:100% 0,0 0;background-repeat:no-repeat !important;
   -webkit-background-clip:text,padding-box !important;background-clip:text,padding-box !important;-webkit-text-fill-color:transparent;
-  animation:headsheen 7s linear infinite}
-.site-head .brand .lg i{-webkit-background-clip:border-box,border-box !important;background-clip:border-box,border-box !important}
+  animation:headsheen var(--cyc) linear infinite}
 .site-head .nav a:not(.cta):hover,.site-head .nav .grpbtn:hover{--hb:var(--mist)}
 .site-head .nav a[aria-current="page"]{--hb:var(--ice)}
 .site-head .nav .grp.on>.grpbtn{--hb:var(--ice)}
-@keyframes headsheen{from{background-position:100% 0,0 0}to{background-position:0% 0,0 0}}
-@media (prefers-reduced-motion:reduce){.site-head .brand span,.site-head .brand .lg i,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{animation:none;background-position:100% 0,0 0}}
+@keyframes headsheen{0%{background-position:var(--hp0) 0,0 0}50%{background-position:var(--hp1) 0,0 0}60%{background-position:0% 0,0 0}60.01%{background-position:100% 0,0 0}100%{background-position:var(--hp0) 0,0 0}}
+/* the letters UM turn on a vertical axis, one turn per cycle, and flash gold as they come round to face front */
+.site-head .brand .lg{perspective:140px}
+.site-head .brand .lg i{animation:umspin var(--cyc) linear infinite,umgold var(--cyc) linear infinite;will-change:transform}
+@keyframes umspin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+@keyframes umgold{0%,100%{background-color:#F6C453}5%,95%{background-color:#fff}}
+/* "Get in touch": when the band arrives it lights up, a sheen crosses it, and the words give way to a wink */
+.nav .cta{position:relative}
+.cta-t{display:inline-block}
+.cta-w{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}
+.cta-w svg{display:block;height:62%;width:auto}
+.cta-w .e2w{opacity:0}
+.site-head .nav .cta{animation:ctaglow var(--cyc) linear infinite}
+.site-head .nav .cta::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.6) 50%,rgba(255,255,255,0) 62%) no-repeat;background-size:260% 100%;animation:ctasheen var(--cyc) linear infinite}
+.site-head .cta-t{animation:ctatext var(--cyc) linear infinite}
+.site-head .cta-w{animation:ctaface var(--cyc) linear infinite}
+.site-head .cta-w .e2{animation:ctaeye var(--cyc) linear infinite}
+.site-head .cta-w .e2w{animation:ctalid var(--cyc) linear infinite}
+@keyframes ctaglow{0%,48.5%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}51%{box-shadow:0 0 0 3px rgba(242,169,59,.6),0 0 24px 5px rgba(109,74,255,.5);filter:brightness(1.2)}60%{box-shadow:0 0 0 2px rgba(242,169,59,.28),0 0 14px 2px rgba(109,74,255,.25);filter:brightness(1.08)}67%,100%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}}
+@keyframes ctasheen{0%,47.5%{opacity:0;background-position:130% 0}48.5%{opacity:1;background-position:130% 0}54.5%{opacity:1;background-position:-30% 0}55.5%,100%{opacity:0;background-position:-30% 0}}
+@keyframes ctatext{0%,51%{opacity:1}53%,64%{opacity:0}66%,100%{opacity:1}}
+@keyframes ctaface{0%,51.5%{opacity:0}53.5%,63.5%{opacity:1}65.5%,100%{opacity:0}}
+@keyframes ctaeye{0%,56%{opacity:1}56.4%,60.6%{opacity:0}61%,100%{opacity:1}}
+@keyframes ctalid{0%,56%{opacity:0}56.4%,60.6%{opacity:1}61%,100%{opacity:0}}
+.cta-burst{position:absolute;top:0;pointer-events:none;z-index:2}
+@media (prefers-reduced-motion:reduce){.site-head .brand span,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{animation:none;background-position:100% 0,0 0}
+  .site-head .brand .lg i,.site-head .nav .cta,.site-head .nav .cta::before,.site-head .cta-t,.site-head .cta-w,.site-head .cta-w .e2,.site-head .cta-w .e2w{animation:none}}
+/* a column of plain paragraphs that flows into two balanced columns on wide screens */
+.prose2{columns:2;column-gap:clamp(24px,5vw,64px)}
+.prose2>p{break-inside:avoid;max-width:none}
+@media (max-width:820px){.prose2{columns:1}}
+/* page heads: the title on the left, its opening text on the right */
+.page-head .split.ph-auto{align-items:center;gap:clamp(20px,5vw,72px)}
+.page-head .split.ph-auto h1{margin-bottom:0}
+.page-head .split.ph-auto>div:last-child>:last-child{margin-bottom:0}
+@media (max-width:900px){.page-head .split.ph-auto h1{margin-bottom:16px}}
+/* the end of every page: what it said, and the next page in the reading order */
+.nextup{padding:clamp(28px,4vw,46px) 0;background:var(--mist);border-top:1px solid var(--line)}
+.nextup .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(18px,4vw,56px);align-items:center}
+.nx-sum p{font-size:1.06rem;line-height:1.6;color:var(--ink);margin:8px 0 0;max-width:66ch}
+.nx-go{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;align-items:center;padding:22px 26px;border-radius:var(--radius);background:linear-gradient(135deg,#0B2545 0%,#123A6B 100%);color:#fff;box-shadow:var(--shadow)}
+.nx-go:hover{text-decoration:none}
+.nx-k{grid-column:1;font:600 .76rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#9CC3F5}
+.nx-go b{grid-column:1;font:700 clamp(1.25rem,2vw,1.6rem)/1.2 var(--font);letter-spacing:-.015em;margin:8px 0 6px}
+.nx-why{grid-column:1;color:#C9DAF0;font-size:.98rem;line-height:1.5}
+.nx-go::after{content:"";grid-column:2;grid-row:1/4;width:46px;height:46px;border-radius:50%;background:var(--blue) url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%222.4%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M5 12h14M13 6l6 6-6 6%22/%3E%3C/svg%3E") center/22px no-repeat;transition:transform .18s ease}
+.nx-go:hover::after{transform:translateX(5px)}
+@media (max-width:820px){.nextup .wrap{grid-template-columns:1fr}}
 .nav{display:flex;gap:4px;align-items:center}
 .nav a{font:500 .94rem/1 var(--font);color:var(--soft);padding:10px 12px;border-radius:8px;white-space:nowrap}
 .nav a:hover{color:var(--navy);background:var(--mist);text-decoration:none}
@@ -76,7 +123,7 @@ p{margin:0 0 16px;max-width:68ch}
 .small{font-size:.9rem}
 
 /* sections */
-section{padding:clamp(56px,8vw,104px) 0}
+section{padding:clamp(44px,5.4vw,78px) 0}
 section.tint{background:var(--mist);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 section.navyband{background:linear-gradient(135deg,#0B2545 0%,#123A6B 100%);color:#DCE8F7}
 section.navyband h2,section.navyband h3{color:#fff}
@@ -101,7 +148,7 @@ button.btn{cursor:pointer;font-family:var(--font)}
 @media (max-width:1180px){.hero{grid-template-columns:1fr}.stage{max-width:400px}}
 
 /* page header (inner pages) */
-.page-head{padding:clamp(44px,7vw,84px) 0 clamp(28px,4vw,44px);background:linear-gradient(180deg,var(--mist),#fff);border-bottom:1px solid var(--line)}
+.page-head{padding:clamp(36px,5vw,64px) 0 clamp(26px,3.6vw,44px);background:linear-gradient(180deg,var(--mist),#fff);border-bottom:1px solid var(--line)}
 .page-head h1{font-size:clamp(2rem,4.4vw,3.2rem);margin-bottom:16px;max-width:22ch}
 
 /* grids and cards */
@@ -325,3 +372,32 @@ body, body *{hyphens:manual !important;-webkit-hyphens:manual !important}
 h3.subhead{font-size:clamp(1.3rem,2vw,1.5rem);font-weight:700;line-height:1.2;margin:34px 0 12px}
 .stage-cap{font-size:.9rem}
 .tag{letter-spacing:.1em}
+
+/* section heads: the heading on the left, its opening lines on the right */
+.sec-head{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(20px,5vw,72px);align-items:end;margin-bottom:4px}
+.sec-head h2,.sec-head h3{margin-bottom:0}
+.sec-head>div:last-child>p{max-width:72ch !important}
+.sec-head>div:last-child>:last-child{margin-bottom:0}
+@media (max-width:980px){.sec-head{grid-template-columns:1fr;gap:12px}}
+/* a grid of three or four across never leaves a hole at the end of its last row */
+@media (min-width:981px){
+  .grid.g3:not([style*="template"]){grid-template-columns:repeat(6,minmax(0,1fr))}
+  .grid.g3:not([style*="template"])>*{grid-column:span 2}
+  .grid.g3:not([style*="template"])>:last-child:nth-child(3n+1){grid-column:span 6}
+  .grid.g3:not([style*="template"])>:nth-last-child(2):nth-child(3n+1),.grid.g3:not([style*="template"])>:last-child:nth-child(3n+2){grid-column:span 3}
+  .grid.g4:not([style*="template"]){grid-template-columns:repeat(12,minmax(0,1fr))}
+  .grid.g4:not([style*="template"])>*{grid-column:span 3}
+  .grid.g4:not([style*="template"])>:last-child:nth-child(4n+1){grid-column:span 12}
+  .grid.g4:not([style*="template"])>:nth-last-child(2):nth-child(4n+1),.grid.g4:not([style*="template"])>:last-child:nth-child(4n+2){grid-column:span 6}
+  .grid.g4:not([style*="template"])>:nth-last-child(3):nth-child(4n+1),.grid.g4:not([style*="template"])>:nth-last-child(2):nth-child(4n+2),.grid.g4:not([style*="template"])>:last-child:nth-child(4n+3){grid-column:span 4}
+  .grid.g3>.card:last-child:nth-child(3n+1),.grid.g4>.card:last-child:nth-child(4n+1){columns:2;column-gap:36px}
+  .grid.g3>.card:last-child:nth-child(3n+1)>*,.grid.g4>.card:last-child:nth-child(4n+1)>*{break-inside:avoid}
+}
+/* five steps in a row */
+@media (min-width:1180px){.road.mm-five{grid-template-columns:repeat(5,minmax(0,1fr))}.road.mm-five li{padding:64px 18px 18px}.road.mm-five li::before{left:18px;top:16px}}
+/* two columns of plain paragraphs, balanced as one running text (set by site.js when the columns end unevenly) */
+.split.nb-prose{display:block;columns:2;column-gap:clamp(24px,5vw,64px)}
+.split.nb-prose>div{display:contents}
+.split.nb-prose p{max-width:none}
+.split.nb-prose .pull{break-inside:avoid}
+.split.nb-prose p{orphans:3;widows:3}

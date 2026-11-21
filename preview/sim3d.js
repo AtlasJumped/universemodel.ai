@@ -262,7 +262,7 @@
     const im = sel, fields = im.type === 'torque' ? ['angle'] : im.type === 'set' ? ['density', 'friction', 'mass', 'volume'] : ['density', 'friction', 'mass', 'volume', 'radius'];
     $('sim-ed-title').textContent = label(im);
     $('sim-ed-fields').innerHTML = FIELDS.filter(f => fields.includes(f[0])).map(([key, name, lo, hi, st, fmt, help]) =>
-      `<label class="edf"><span class="edn">${name} <b id="edv-${key}">${fmt(+im[key])}</b></span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${im[key]}" data-ed="${key}" aria-label="${name}"><small>${help}</small></label>`).join('');
+      `<label class="edf" title="${help}"><span class="edn">${name} <b id="edv-${key}">${fmt(+im[key])}</b></span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${im[key]}" data-ed="${key}" aria-label="${name}"><small>${help}</small></label>`).join('');
     $('sim-ed-fields').querySelectorAll('[data-ed]').forEach(inp => inp.addEventListener('input', () => {
       const key = inp.dataset.ed, f = FIELDS.find(x => x[0] === key); sim.update(im, { [key]: +inp.value }); $('edv-' + key).textContent = f[5](+inp.value);
       if (key === 'angle') $('edv-angle').textContent += +inp.value ? ' ' + (+inp.value > 0 ? UMSim.JOINTS[im.joint].pos : UMSim.JOINTS[im.joint].neg) : '';

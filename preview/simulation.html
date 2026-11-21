@@ -11,72 +11,173 @@
 <link rel="icon" href="../img/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="../img/favicon.svg"><link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=c29f54fb">
+<link rel="stylesheet" href="style.css?v=ec9007ff">
 </head>
 <body>
 <div style="background:#B4232F;color:#fff;font:600 13px/1.4 system-ui,sans-serif;text-align:center;padding:6px 10px">Preview: changes waiting for approval. Not the live site.</div>
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html"><span class="lg" aria-hidden="true"><i></i></span><span>Universe Model</span></a>
 <button class="menu" aria-expanded="false" aria-controls="nav">Menu</button>
-<nav class="nav" id="nav" aria-label="Main"><a href="about.html">About (start here)</a><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Problems<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Science Today</a><a href="fixing-exercise.html">Exercise Today</a><a href="mental-health.html">Mental Health Today</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Solutions<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="hmr.html">The HMR</a><a href="ui.html">Universal Intelligence</a><a href="health-model.html">HMR Holistic Health Model</a><a href="physics-health.html">HMR Physical Health Model</a><a href="mental-model.html">HMR Mental Health Model</a><a href="health.html">The Perfect Body</a><a href="protocol.html">HMR Fascia Health Protocol</a><a href="science-bridge.html">Science Bridge</a><a href="math.html">HMR Math Paradigm</a><a href="physics.html">HMR Physics Paradigm</a><a href="values.html">HMR Values</a><a href="answers.html">The Answers</a></div></div><a href="east-west.html">East and West</a><a href="kids.html">Do you have kids?</a><a href="simulation.html" aria-current="page">Simulation</a><a href="roadmap.html">Road Ahead</a><a href="methods.html">Methods</a><a href="library.html">Library</a><a class="cta" href="about.html#contact">Get in touch</a></nav>
+<nav class="nav" id="nav" aria-label="Main"><a href="about.html">About (start here)</a><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Problems<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="reality.html">Science Today</a><a href="fixing-exercise.html">Exercise Today</a><a href="mental-health.html">Mental Health Today</a></div></div><div class="grp"><button type="button" class="grpbtn" aria-haspopup="true">Solutions<span aria-hidden="true">&#9662;</span></button><div class="drop"><a href="hmr.html">The HMR</a><a href="ui.html">Universal Intelligence</a><a href="health-model.html">HMR Holistic Health Model</a><a href="physics-health.html">HMR Physical Health Model</a><a href="health.html">The Perfect Body</a><a href="protocol.html">HMR Fascia Health Protocol</a><a href="mental-model.html">HMR Mental Health Model</a><a href="science-bridge.html">Science Bridge</a><a href="math.html">HMR Math Paradigm</a><a href="physics.html">HMR Physics Paradigm</a><a href="values.html">HMR Values</a><a href="answers.html">The Answers</a></div></div><a href="east-west.html">East and West</a><a href="kids.html">Do you have kids?</a><a href="simulation.html" aria-current="page">Simulation</a><a href="roadmap.html">Road Ahead</a><a href="methods.html">Methods</a><a href="library.html">Library</a><a class="cta" href="about.html#contact"><span class="cta-t">Get in touch</span><span class="cta-w" aria-hidden="true"><svg viewBox="0 0 64 24" width="64" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle class="e1" cx="20" cy="8" r="2.4" fill="currentColor" stroke="none"/><g class="e2"><circle cx="44" cy="8" r="2.4" fill="currentColor" stroke="none"/></g><path class="e2w" d="M39.5 8.6q4.5 -3.4 9 0"/><path d="M21 16.5q11 7 22 0"/></svg></span></a></nav>
 </div></header>
 <main>
 <style>
-.simbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 10px 0}
+/* page head: compact, three columns */
+.page-head.simhead{padding:22px 0 18px}
+.page-head.simhead .wrap{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:12px clamp(20px,3vw,44px);align-items:start}
+.page-head.simhead h1{font-size:clamp(1.55rem,2.5vw,2.15rem);line-height:1.15;margin:6px 0 0;max-width:none}
+.page-head.simhead p{font-size:.95rem;line-height:1.6;margin:0 0 8px;max-width:68ch}
+.page-head.simhead .lede{font-size:.98rem;margin-bottom:8px}
+.simtest{display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:5px 11px;font:600 .74rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+@media (max-width:1100px){.page-head.simhead .wrap{grid-template-columns:1fr 1fr}.page-head.simhead .wrap>div:first-child{grid-column:1/-1}}
+@media (max-width:700px){.page-head.simhead .wrap{grid-template-columns:1fr}}
+
+/* the simulation block: display | controls | results */
+#model{padding:12px 0 28px}
+#model h2{font-size:1.2rem;line-height:1.25;margin:0 0 10px}
+.simgrid{grid-template-columns:minmax(0,1fr) 330px 292px;gap:14px;align-items:stretch}
+.simleft{display:flex;flex-direction:column;min-width:0}
+.simstage{display:flex;flex-direction:column;flex:1}
+.simbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px 0}
 .simbar .sp{flex:1}
-.simbar label.chipbtn{display:inline-flex;gap:7px;align-items:center}
-.simbar label.chipbtn input{margin:0;accent-color:var(--blue)}
-.simpair{display:grid;grid-template-columns:1fr 1fr}
+.simpair{display:grid;grid-template-columns:1fr 1fr;flex:1}
 .simcell{position:relative;min-width:0}
-.simresetrow{display:flex;justify-content:center;padding:10px 10px 2px}
-.simreset{display:inline-flex;align-items:center;gap:8px;font:650 .92rem/1 var(--font);color:#fff;background:var(--blue);border:0;border-radius:999px;padding:11px 18px 11px 14px;box-shadow:0 6px 18px rgba(13,59,122,.28);cursor:pointer;white-space:nowrap}
-.simreset svg{width:17px;height:17px}
-.simreset:hover{background:var(--navy)}
-.simreset:focus-visible{outline:3px solid #F0A940;outline-offset:2px}
-@media (max-width:640px){.simreset{font-size:.86rem;padding:10px 16px 10px 12px}}
 .simcell+.simcell{border-left:1px dashed var(--line)}
-.simlab{position:absolute;top:6px;left:0;right:0;text-align:center;font:600 .74rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);pointer-events:none}
-.simstage .simpair canvas{height:min(74vh,660px)}
-.simstage .simstatus{position:static;margin:0 10px 10px}
-.simload{display:flex;align-items:center;gap:10px;margin:2px 12px 10px;font-size:.84rem;color:var(--soft)}
-.simload .bar{flex:1;height:8px;border-radius:99px;background:var(--mist);overflow:hidden}
+.simlab{position:absolute;top:6px;left:0;right:0;text-align:center;font:600 .7rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);pointer-events:none}
+.simpair{min-height:330px}
+.simstage .simpair canvas{position:absolute;left:0;top:0;width:100%;height:100%}
+.simgrid{min-height:clamp(560px,calc(100vh - 130px),780px)}
+.simstage .simstatus{position:static;margin:0 10px 10px;font-size:.88rem;line-height:1.4;padding:7px 11px;min-height:2.9em}
+.simload{display:flex;align-items:center;gap:10px;margin:2px 12px 8px;font-size:.82rem;color:var(--soft)}
+.simload .bar{flex:1;height:7px;border-radius:99px;background:var(--mist);overflow:hidden}
 .simload .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5B9BE6,#F0A940,#D93B3B);transition:width .3s}
 .simload b{color:var(--navy);min-width:72px;text-align:right}
 .chipbtn.on{background:var(--ice);border-color:var(--blue);color:var(--blue)}
-.implist{display:flex;flex-wrap:wrap;gap:6px}
-.edbox{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.edbox h4{margin:0 0 4px;font-size:.95rem;color:var(--navy)}
-.edf{display:grid;gap:3px;margin-top:10px}
-.edn{display:flex;justify-content:space-between;font-size:.9rem}
+.simbar label.chipbtn{display:inline-flex;gap:7px;align-items:center}
+
+/* control panel and results are cards */
+.simcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;min-width:0}
+.simctl{display:grid;gap:0;align-content:start}
+.simctl .pgroup,.simres .pgroup{background:none;border:0;border-radius:0;padding:0}
+.simctl .pgroup+.pgroup,.simctl .pg-ctl>.pgroup:first-child{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+.simctl .pg-ctl>.pgroup:first-child{margin-top:9px}
+.simpanel h3,.simres h3{font-size:.72rem;line-height:1.2;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);margin:0 0 7px}
+.simpanel h3.sub{margin:7px 0 4px;color:var(--soft);letter-spacing:.06em}
+.pgroup.inl{display:grid;grid-template-columns:44px 1fr;align-items:center}
+.pgroup.inl h3{margin:0}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.hrow h3{margin:0}
+.simctl .btns,.simres .btns{gap:6px}
+.simctl .btn{padding:6px 10px;font-size:.78rem;line-height:1.1;border-radius:999px;justify-content:center;text-align:center}
+.seg{display:grid;gap:6px}
+.seg.c2{grid-template-columns:1fr 1fr}.seg.c3{grid-template-columns:repeat(3,1fr)}.seg.c4{grid-template-columns:repeat(4,1fr)}
+.seg .btn{padding:7px 4px;border-radius:10px}
+.simctl .range{margin-top:7px;font-size:.84rem;gap:8px}
+.simctl .tog{font-size:.82rem;line-height:1.3;margin-top:6px;gap:7px}
+.simctl .tog input{margin-top:2px}
+.togs{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.togs .tog{margin-top:6px}
+.simreset{display:inline-flex;align-items:center;gap:6px;font:650 .78rem/1 var(--font);color:#fff;background:var(--blue);border:0;border-radius:999px;padding:7px 12px 7px 9px;cursor:pointer;white-space:nowrap}
+.simreset svg{width:14px;height:14px}
+.simreset:hover{background:var(--navy)}
+.simreset:focus-visible{outline:3px solid #F0A940;outline-offset:2px}
+/* results */
+.simres{display:block;height:0;min-height:100%;overflow-y:auto;overscroll-behavior:contain}
+.simres .metrics{display:block}
+.simres .metrics div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:none;border-radius:0;border-bottom:1px solid var(--mist);padding:5px 0}
+.simres .metrics div:last-child{border-bottom:0}
+.simres .metrics dt{font-size:.8rem;line-height:1.25}
+.simres .metrics dd{margin:0;font-size:.88rem;text-align:right}
+.simres .pgroup+.pgroup{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.implist{display:flex;flex-wrap:wrap;gap:5px}
+.implist .chipbtn{font-size:.76rem;padding:6px 9px}
+.edbox h4{margin:0 0 4px;font-size:.88rem;color:var(--navy)}
+.edf{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:2px 8px;align-items:center;margin-top:6px}
+.edn{display:contents;font-size:.8rem}
+.edn b{grid-column:3;grid-row:1;text-align:right;font-size:.8rem}
+.edf input{grid-column:2;grid-row:1}
+.edf small{grid-column:1/-1;grid-row:2}
 .edn b{color:var(--navy);font-variant-numeric:tabular-nums}
-.edf input{accent-color:#D93B3B}
-.edf small{color:var(--soft);font-size:.78rem;line-height:1.4}
-.simhow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-.simhow .card{padding:18px 20px}
-.simhow ul{margin:6px 0 0;padding-left:18px}.simhow li{margin-bottom:6px;font-size:.94rem}
-.symkey{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px}
+.edf input{accent-color:#D93B3B;margin:0;height:18px}
+.edf small{display:none;color:var(--soft);font-size:.74rem;line-height:1.35}
+.edf:focus-within small{display:block}
+#sim-ed-fields{margin-top:0}
+.edbox .btns{margin-top:9px !important}
+
+/* under the display */
+.simbelow{display:grid;grid-template-columns:1.15fr 1.1fr 1fr;gap:14px clamp(20px,3vw,44px);margin-top:18px;align-items:start}
+.simbelow p{margin:0;font-size:.92rem;line-height:1.6;max-width:68ch}
+.simbelow h3{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);margin:0 0 7px}
+.lines{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start;margin:0;padding:0;border:0}
+.lineopt{font-size:.84rem;line-height:1.25;align-items:flex-start}.lineopt i{margin-top:6px;flex:none}
+
+/* How to use it / This is real math: two full-width bands */
+.simband{margin-top:18px;padding:18px 22px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.simband.blue{background:var(--ice)}
+.simband .tag{display:block;font:600 .74rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
+.simhow ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:14px 22px}
+.simhow li{font-size:.9rem;line-height:1.55;margin:0;padding-left:12px;border-left:3px solid var(--ice)}
+.simmath .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px clamp(20px,3vw,44px)}
+.simmath p{margin:0;font-size:.9rem;line-height:1.6}
+.symkey{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:8px 22px}
 .symkey span{display:inline-flex;align-items:center;gap:7px;font-size:.86rem}
 .symkey svg{width:34px;height:20px;border:1px solid var(--line);border-radius:5px;background:#fff}
-.page-head.simhead{padding:30px 0 22px}
-.page-head.simhead .wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:12px 36px;align-items:center}
-.page-head.simhead h1{margin-bottom:0}.page-head.simhead .lede{font-size:1.08rem;margin-bottom:10px}
-@media (max-width:900px){.page-head.simhead .wrap{grid-template-columns:1fr}}
-@media (max-width:760px){.simhow{grid-template-columns:1fr}}
-@media (max-width:960px){.simgrid>.simleft{display:contents}.simgrid .simstage{order:1}.simgrid .simpanel{order:2}.simgrid .simhow{order:3;margin-top:0}}
-@media (max-width:640px){.simload>span:first-child{font-size:.76rem;max-width:90px;line-height:1.2}}
-@media (max-width:640px){.simstage .simpair canvas{height:min(60vh,500px)}.simlab{font-size:.66rem}.simbar .chipbtn{padding:7px 9px;font-size:.78rem}}
+.simgoing{display:grid;grid-template-columns:1.4fr 1fr;gap:14px clamp(20px,3vw,44px);align-items:center}
+.simgoing p{margin:0;font-size:.92rem;line-height:1.6}
+
+@media (max-width:1280px){.simgrid{grid-template-columns:minmax(0,1fr) 310px 268px;gap:12px}.simhow ul{grid-template-columns:repeat(3,1fr)}}
+@media (max-height:780px) and (min-width:1101px){.simctl .btns{gap:5px}.simctl .btn{padding:5px 9px}.seg .btn{padding:6px 4px}.simctl .tog{margin-top:5px}.simcard{padding:10px 12px}.simctl .pgroup+.pgroup,.simres .pgroup+.pgroup{margin-top:7px;padding-top:7px}.simres .metrics div{padding:3px 0}}
+@media (max-width:1100px){
+  .simres{height:auto;min-height:0;overflow:visible}
+  .simgrid{grid-template-columns:minmax(0,1fr) 300px}
+  .simleft{grid-column:1/-1}
+  .simbelow{grid-template-columns:1fr 1fr}
+  .simgoing{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .simgrid{display:flex;flex-direction:column;gap:12px}
+  .simleft{display:contents}
+  .simpanel{display:contents}
+  .pg-scen,.pg-ctl{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px}
+  .simstage{order:1}.pg-scen{order:2}.simres{order:3}.pg-ctl{order:4}
+  .simgrid{min-height:0}.simpair{min-height:0;height:min(56vh,460px);flex:none}
+  .simlab{font-size:.62rem}
+  .simbar .chipbtn{padding:7px 9px;font-size:.78rem}
+  .simbelow,.simmath .cols,.simhow ul{grid-template-columns:1fr}
+  .symkey{grid-template-columns:1fr 1fr}
+  .simload>span:first-child{font-size:.76rem;max-width:90px;line-height:1.2}
+}
+
+/* the rest of the page: tighter, wider, three columns where the text allows */
+section:not(#model){padding:clamp(36px,4.5vw,60px) 0}
+@media (min-width:1101px){
+  #why-tensegrity .split{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:clamp(24px,3vw,48px)}
+  #why-tensegrity .split>div:first-child{columns:2;column-gap:clamp(24px,3vw,48px)}
+  #why-tensegrity .split>div:first-child p{margin-top:0;margin-bottom:12px}
+  #why-tensegrity .grid.g2{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #why-tensegrity .grid.g2 .pull{font-size:1.05rem;line-height:1.45}
+  #why-tensegrity .grid.g2 p{font-size:.92rem;line-height:1.6}
+  #what-for.split{grid-template-columns:minmax(0,1fr);gap:20px}
+  #what-for .fourp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px clamp(20px,2.5vw,36px)}
+  #what-for .card{columns:2;column-gap:clamp(24px,3vw,48px);padding:20px 24px}
+  #what-for .card .tag{column-span:all}
+  #what-for .card p{break-inside:avoid;font-size:.95rem;line-height:1.6;margin-bottom:10px}
+  #what-for .fourp p{margin:0 0 8px;font-size:.96rem;line-height:1.6}
+  #tension .stage{max-width:440px}
+}
+#why-tensegrity .note{max-width:none}
 </style>
 <div class="page-head simhead"><div class="wrap">
   <div><span class="eyebrow">Simulating reality</span>
-  <h1>A working model of physical reality, with a perfect human inside it.</h1></div>
-  <div><p class="lede">One goal of this work is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that simulation and watch what follows, from health to disease and back again. We are reverse engineering disease: from the optimal state and from every non-optimal state, we walk back how each non-optimal state came to exist.</p>
-  <p>This is possible now. Technology is advancing very fast, and humanity's innovations have given us extraordinary computing power, AI and data. It may not be easy, but no one should doubt that it can be done: with today's tools, all it takes is the idea and the will to execute it. That is what we are doing.</p>
-  <p><span class="tag" style="display:inline-block;background:#FFF4E0;color:#9A5B00;border:1px solid #F0C67A;border-radius:999px;padding:6px 12px;font:600 .8rem/1 var(--font);letter-spacing:.06em;text-transform:uppercase">Test phase</span> <span class="muted small">The 3D model below is a very simplified version of that work. The full model is in a development environment.</span></p></div>
+  <h1>A working model of physical reality, with a perfect human inside it</h1></div>
+  <div><p class="lede">One goal of this work is to model physical reality with a perfect human tensegrity inside it, then change the conditions of that simulation and watch what follows, from health to disease and back again. We are reverse engineering disease: from the optimal state and from every non-optimal state, we walk back how each non-optimal state came to exist.</p></div>
+  <div><p>This is possible now. Technology is advancing very fast, and humanity's innovations have given us extraordinary computing power, AI and data. It may not be easy, but no one should doubt that it can be done: with today's tools, all it takes is the idea and the will to execute it. That is what we are doing.</p>
+  <p><span class="simtest">Test phase</span><span class="muted small">The 3D model below is a very simplified version of that work. The full model is in a development environment.</span></p></div>
 </div></div>
 
-<section class="tint" id="model" style="padding-top:28px">
+<section class="tint" id="model">
   <div class="wrap">
-    <h2 style="margin-bottom:14px">Try it: a human tensegrity, and the person it holds up.</h2>
+    <h2>Try it: a human tensegrity, and the person it holds up</h2>
     <div class="simgrid">
       <div class="simleft">
         <div class="simstage">
@@ -90,68 +191,42 @@
             <div class="simcell"><span class="simlab">Tensegrity: bones and fascia</span><canvas id="body3d" role="img" aria-label="A three-dimensional human skeleton built as a tensegrity: separate bones, jointed like a real skeleton, held up by a web of fascia cables, with the main fascial lines in color. Tapping it places an imperfection."></canvas></div>
             <div class="simcell"><span class="simlab">The person it holds up</span><canvas id="body3d-skin" role="img" aria-label="A person in a swimsuit drawn over the same computed skeleton. As imperfections are added, their posture and symmetry change with the physics."></canvas></div>
           </div>
-          <div class="simresetrow"><button class="simreset" id="sim3d-reset" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M3.2 3.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset to healthy</button></div>
           <div class="simload"><span>Computed load on the structure</span><span class="bar"><i id="sim-load"></i></span><b id="sim-load-v">at rest</b></div>
           <p id="sim3d-status" class="simstatus" aria-live="polite">Healthy: a perfect tensegrity at time zero.</p>
         </div>
-        <div class="simhow">
-          <div class="card">
-            <span class="tag">How to use it</span>
-            <ul>
-              <li><b>Tap</b> either figure to place an imperfection. Choose <b>Point</b>, <b>Line</b>, <b>Plane</b> or <b>Twist</b> first.</li>
-              <li><b>Drag</b> to turn the body all the way around; pinch or scroll to zoom. A tap without a drag still picks a point. It stays still unless you switch on <b>Spin</b>.</li>
-              <li>Each imperfection opens an <b>editor</b>: density, friction, mass, volume and the boundary of its zone. They persist, and stack.</li>
-              <li><b>Let time pass</b> and the change creeps outward along the fascial lines that leave the zone.</li>
-              <li>The person on the right is drawn on the same computed skeleton. Their posture, symmetry, load and expression come only from the physics.</li>
-            </ul>
-          </div>
-          <div class="card" style="background:var(--ice)">
-            <span class="tag">This is real math</span>
-            <p>Simple, but not a cartoon. The skeleton is 45 separate bones, jointed the way a real skeleton is: a ball at each hip and shoulder and between the vertebrae, a hinge at each knee, ankle and elbow. Nothing in it holds itself up. About 700 tension-only fascia cables do that, against real gravity, which pulls on every one of the 190 points all the time. The cables are drawn taut: the lines rest 1.25 percent shorter than the distance they span and the deep guys of the spine 2 percent shorter, which is close to the most this model can carry before the healthy body folds forward at the chest. Every tap truly redistributes force, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
-            <p>The cables are grouped into a few separate systems: nine named lines on each side, the deep guys of the spine on the left, the right and the midline, and seven regions of general web. A cut anywhere releases the whole system, as a cut rope carries no tension anywhere along its length. So one cut shifts the posture, and cutting enough, or breaking a bone that carries weight, makes the body really fall. Fascia slides along its lines toward even tension unless friction holds it.</p>
-            <p class="small muted" style="margin-bottom:0">What is simplified: the neck and chest vertebrae are grouped in pairs, the ribs are six pairs on a springy cartilage front, the pelvis is held as one ring by its ligaments, the wrist does not bend, and the feet are planted. Treating a whole line as one band that lets go at once is the strongest version of that idea; real fascia is also tied down along its length. Nothing here contracts. The model stands on passive tension alone, which a living body cannot do: real standing also takes active muscle.</p>
-          </div>
-          <div class="card" style="grid-column:1/-1">
-            <span class="tag">Where the model is going</span>
-            <p>This is a very simplified tensegrity. The back-end model will grow in fidelity, every version true to the science and still fun to use: as close to the molecule as the data allows, with the real lines of fascia, specific joints and specific bones, and the surface of the skin itself, so that skin tags, hair growth patterns and areas of excessive sweating can be placed and followed. Symptoms will get a code, like the body diagrams clinics already use, so a person's symptoms can be mapped onto the model and compared with what it predicts:</p>
-            <div class="symkey" aria-label="Planned symptom code">
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#1D5FD1"><circle cx="7" cy="6" r="1.6"/><circle cx="15" cy="10" r="1.6"/><circle cx="23" cy="6" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="27" cy="14" r="1.6"/></g></svg>Pins and needles</span>
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M6 17 L12 3 M14 17 L20 3 M22 17 L28 3" stroke="#D93B3B" stroke-width="1.8"/></svg>Burning</span>
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M5 6 H29 M5 10 H29 M5 14 H29" stroke="#0E3A75" stroke-width="1.6"/></svg>Numbness</span>
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M7 5 L13 11 M13 5 L7 11 M20 9 L26 15 M26 9 L20 15" stroke="#9A5B00" stroke-width="1.8"/></svg>Stabbing</span>
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M4 10 Q8 4 12 10 T20 10 T28 10" fill="none" stroke="#0F9C8E" stroke-width="1.8"/></svg>Aching</span>
-              <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#7C4DD6" opacity=".55"><circle cx="10" cy="10" r="5"/><circle cx="23" cy="10" r="5"/></g></svg>Sweating</span>
-            </div>
-          </div>
-        </div>
       </div>
-      <div class="simpanel">
-        <div class="pgroup">
+      <div class="simpanel simcard simctl">
+        <div class="pgroup pg-scen">
+          <div class="hrow"><h3>Try a scenario</h3>
+          <button class="simreset" id="sim3d-reset" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.7-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M3.2 3.6v3.6h3.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Reset to healthy</button></div>
+          <div class="btns" id="sim-scenarios"></div>
+        </div>
+        <div class="pg-ctl">
+        <div class="pgroup inl">
           <h3>Body</h3>
-          <div class="btns" role="group" aria-label="Reference body"><button class="btn ghost on" data-sex="male" type="button">Male, 183 cm</button><button class="btn ghost" data-sex="female" type="button">Female, 170 cm</button></div>
+          <div class="btns seg c2" role="group" aria-label="Reference body"><button class="btn ghost on" data-sex="male" type="button">Male, 183 cm</button><button class="btn ghost" data-sex="female" type="button">Female, 170 cm</button></div>
         </div>
         <div class="pgroup">
           <h3>Make an imperfection</h3>
-          <div class="btns" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button><button class="btn ghost" data-imode="torque" type="button">Twist</button></div>
-          <h3 style="margin-top:16px">Or operate</h3>
-          <div class="btns" role="group" aria-label="Surgical tools"><button class="btn ghost" data-imode="pluck" type="button">Pluck a node</button><button class="btn ghost" data-imode="cut" type="button">Cut a cable</button><button class="btn ghost" data-imode="break" type="button">Break a bone</button></div>
-          <p class="small muted" style="margin:8px 0 0">The fascia here is a few separate systems, each one continuous: every named line on each side of the body, the deep guys of the spine on each side, and the general web region by region. Cut one cord and the whole system it belongs to lets go, from end to end, so the body shifts far from the cut. Break a bone and it snaps where you tap. Tap the head with the bone tool and the skull is crushed. Some damage the rest absorbs with a shift in posture. Other damage brings the body down: a thigh bone, a shin bone, a vertebra in the lower back, the skull, or the front line on both sides. Press Reset to healthy, under the figures, to heal.</p>
+          <div class="btns seg c4" role="group" aria-label="Type of imperfection"><button class="btn ghost on" data-imode="point" type="button">Point</button><button class="btn ghost" data-imode="line" type="button">Line</button><button class="btn ghost" data-imode="plane" type="button">Plane</button><button class="btn ghost" data-imode="torque" type="button">Twist</button></div>
+          <h3 class="sub">Or operate</h3>
+          <div class="btns seg c3" role="group" aria-label="Surgical tools"><button class="btn ghost" data-imode="pluck" type="button">Pluck node</button><button class="btn ghost" data-imode="cut" type="button">Cut cable</button><button class="btn ghost" data-imode="break" type="button">Break bone</button></div>
           <label class="range">Strength <input type="range" id="sim-strength" min="1" max="6" value="3"></label>
           <label class="tog"><input type="checkbox" id="sim-creep"> Let time pass (imperfections creep along the lines)</label>
-          <div class="edbox">
-            <h4>Imperfections in this body</h4>
-            <div id="sim-implist" class="implist"></div>
-            <div id="sim-editor" hidden>
-              <h4 id="sim-ed-title" style="margin-top:12px"></h4>
-              <div id="sim-ed-fields"></div>
-              <div class="btns" style="margin-top:12px"><button class="btn ghost" id="sim-ed-remove" type="button">Remove</button><button class="btn ghost" id="sim-ed-done" type="button">Done</button></div>
-            </div>
-          </div>
         </div>
         <div class="pgroup">
-          <h3>Try a scenario</h3>
-          <div class="btns" id="sim-scenarios"></div>
+          <h3>Show</h3>
+          <div class="togs">
+          <label class="tog"><input type="checkbox" id="sim-skin" checked> Body outline</label>
+          <label class="tog"><input type="checkbox" id="sim-bones" checked> Bones</label>
+          <label class="tog"><input type="checkbox" id="sim-web" checked> Fascial web</label>
+          <label class="tog"><input type="checkbox" id="sim-heat"> Tension map</label>
+          <label class="tog"><input type="checkbox" id="sim-tint" checked> Strain on the skin</label>
+          </div>
         </div>
+        </div>
+      </div>
+      <div class="simres simcard">
         <div class="pgroup">
           <h3>What changed</h3>
           <dl class="metrics">
@@ -169,16 +244,63 @@
             <div><dt>Time</dt><dd id="m-time">paused</dd></div>
           </dl>
         </div>
-        <div class="pgroup">
-          <h3>Show</h3>
-          <label class="tog"><input type="checkbox" id="sim-skin" checked> Body outline on the tensegrity</label>
-          <label class="tog"><input type="checkbox" id="sim-bones" checked> Bones</label>
-          <label class="tog"><input type="checkbox" id="sim-web" checked> Fascial web</label>
-          <label class="tog"><input type="checkbox" id="sim-heat"> Tension map (blue relaxed, red strained, dashed slack)</label>
-          <label class="tog"><input type="checkbox" id="sim-tint" checked> Strain on the skin (computed per point)</label>
-          <div id="sim-lines" class="lines" aria-label="Fascial lines"></div>
-          <p class="note" style="margin:10px 0 0">The colored lines follow the myofascial chains described in anatomy, with the thoracolumbar fascia and the deep hip and knee rotators added. Densified cables turn red; cables remodeled longer by a twist are dashed orange.</p>
+        <div class="pgroup edbox">
+          <h3>Imperfections in this body</h3>
+          <div id="sim-implist" class="implist"></div>
+          <div id="sim-editor" hidden>
+            <h4 id="sim-ed-title" style="margin-top:10px"></h4>
+            <div id="sim-ed-fields"></div>
+            <div class="btns"><button class="btn ghost" id="sim-ed-remove" type="button">Remove</button><button class="btn ghost" id="sim-ed-done" type="button">Done</button></div>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <div class="simbelow">
+      <div>
+        <h3>The fascia</h3>
+        <p>The fascia here is a few separate systems, each one continuous: every named line on each side of the body, the deep guys of the spine on each side, and the general web region by region. Cut one cord and the whole system it belongs to lets go, from end to end, so the body shifts far from the cut. Break a bone and it snaps where you tap. Tap the head with the bone tool and the skull is crushed. Some damage the rest absorbs with a shift in posture. Other damage brings the body down: a thigh bone, a shin bone, a vertebra in the lower back, the skull, or the front line on both sides. Press Reset to healthy, beside the scenarios, to heal.</p>
+      </div>
+      <div>
+        <h3>Fascial lines</h3>
+        <div id="sim-lines" class="lines" aria-label="Fascial lines"></div>
+      </div>
+      <div>
+        <h3>Reading the colors</h3>
+        <p>Tension map: blue relaxed, red strained, dashed slack. The colored lines follow the myofascial chains described in anatomy, with the thoracolumbar fascia and the deep hip and knee rotators added. Densified cables turn red; cables remodeled longer by a twist are dashed orange. Strain on the skin is computed per point.</p>
+      </div>
+    </div>
+
+    <div class="simband simhow">
+      <span class="tag">How to use it</span>
+      <ul>
+        <li><b>Tap</b> either figure to place an imperfection. Choose <b>Point</b>, <b>Line</b>, <b>Plane</b> or <b>Twist</b> first.</li>
+        <li><b>Drag</b> to turn the body all the way around; pinch or scroll to zoom. A tap without a drag still picks a point. It stays still unless you switch on <b>Spin</b>.</li>
+        <li>Each imperfection opens an <b>editor</b>: density, friction, mass, volume and the boundary of its zone. They persist, and stack.</li>
+        <li><b>Let time pass</b> and the change creeps outward along the fascial lines that leave the zone.</li>
+        <li>The person on the right is drawn on the same computed skeleton. Their posture, symmetry, load and expression come only from the physics.</li>
+      </ul>
+    </div>
+    <div class="simband blue simmath">
+      <span class="tag">This is real math</span>
+      <div class="cols">
+        <p>Simple, but not a cartoon. The skeleton is 45 separate bones, jointed the way a real skeleton is: a ball at each hip and shoulder and between the vertebrae, a hinge at each knee, ankle and elbow. Nothing in it holds itself up. About 700 tension-only fascia cables do that, against real gravity, which pulls on every one of the 190 points all the time. The cables are drawn taut: the lines rest 1.25 percent shorter than the distance they span and the deep guys of the spine 2 percent shorter, which is close to the most this model can carry before the healthy body folds forward at the chest. Every tap truly redistributes force, and the posture you see is the balance the physics finds. Nothing is animated by hand.</p>
+        <p>The cables are grouped into a few separate systems: nine named lines on each side, the deep guys of the spine on the left, the right and the midline, and seven regions of general web. A cut anywhere releases the whole system, as a cut rope carries no tension anywhere along its length. So one cut shifts the posture, and cutting enough, or breaking a bone that carries weight, makes the body really fall. Fascia slides along its lines toward even tension unless friction holds it.</p>
+        <p class="muted">What is simplified: the neck and chest vertebrae are grouped in pairs, the ribs are six pairs on a springy cartilage front, the pelvis is held as one ring by its ligaments, the wrist does not bend, and the feet are planted. Treating a whole line as one band that lets go at once is the strongest version of that idea; real fascia is also tied down along its length. Nothing here contracts. The model stands on passive tension alone, which a living body cannot do: real standing also takes active muscle.</p>
+      </div>
+    </div>
+    <div class="simband simgoing">
+      <div>
+        <span class="tag">Where the model is going</span>
+        <p>This is a very simplified tensegrity. The back-end model will grow in fidelity, every version true to the science and still fun to use: as close to the molecule as the data allows, with the real lines of fascia, specific joints and specific bones, and the surface of the skin itself, so that skin tags, hair growth patterns and areas of excessive sweating can be placed and followed. Symptoms will get a code, like the body diagrams clinics already use, so a person's symptoms can be mapped onto the model and compared with what it predicts:</p>
+      </div>
+      <div class="symkey" aria-label="Planned symptom code">
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#1D5FD1"><circle cx="7" cy="6" r="1.6"/><circle cx="15" cy="10" r="1.6"/><circle cx="23" cy="6" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="27" cy="14" r="1.6"/></g></svg>Pins and needles</span>
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M6 17 L12 3 M14 17 L20 3 M22 17 L28 3" stroke="#D93B3B" stroke-width="1.8"/></svg>Burning</span>
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M5 6 H29 M5 10 H29 M5 14 H29" stroke="#0E3A75" stroke-width="1.6"/></svg>Numbness</span>
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M7 5 L13 11 M13 5 L7 11 M20 9 L26 15 M26 9 L20 15" stroke="#9A5B00" stroke-width="1.8"/></svg>Stabbing</span>
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><path d="M4 10 Q8 4 12 10 T20 10 T28 10" fill="none" stroke="#0F9C8E" stroke-width="1.8"/></svg>Aching</span>
+        <span><svg viewBox="0 0 34 20" aria-hidden="true"><g fill="#7C4DD6" opacity=".55"><circle cx="10" cy="10" r="5"/><circle cx="23" cy="10" r="5"/></g></svg>Sweating</span>
       </div>
     </div>
   </div>
@@ -187,8 +309,8 @@
 <section id="why-tensegrity">
   <div class="wrap">
     <span class="eyebrow">Why a tensegrity</span>
-    <h2>A mechanic needs the right wrench.</h2>
-    <div class="split" style="margin-top:8px">
+    <h2>A mechanic needs the right wrench</h2>
+    <div class="split nb-keep" style="margin-top:8px">
       <div>
         <p class="lede" style="color:var(--ink)">Medicine has treated the body as a set of separate systems built like a building: bones as columns, stacked to carry a load from above, with muscles and organs attached. That is a compression structure, and it calls for one toolkit. A tensegrity calls for a completely different one.</p>
         <p>In a tensegrity, the rigid parts do not rest on each other. They are held apart and in place by a continuous web of tension. Change the tension anywhere and the whole structure changes shape. Push on one part, and the load spreads through the web instead of down a column.</p>
@@ -210,7 +332,7 @@
       </div>
     </div>
 
-    <h3 style="margin:38px 0 14px" class="subhead">What the research says.</h3>
+    <h3 style="margin:38px 0 14px" class="subhead">What the research says</h3>
     <div class="grid g2">
       <div class="card"><p class="pull">&ldquo;An astoundingly wide variety of natural systems, including carbon atoms, water molecules, proteins, viruses, cells, tissues and even humans and other living creatures, are constructed using a common form of architecture known as tensegrity.&rdquo;</p><p class="note">Donald Ingber, cell biologist, Harvard. "The Architecture of Life", <i>Scientific American</i>, January 1998.</p></div>
       <div class="card"><p class="pull">&ldquo;Since its inception, osteopathic medicine has sought to identify the mechanical causes of disease.&rdquo;</p><p class="note">Randel Swanson, opening a review that concludes "the architectural principles of tensegrity can be applied to biological organisms" at every scale. <a href="https://doi.org/10.7556/jaoa.2013.113.1.34">Journal of the American Osteopathic Association, 2013</a>.</p></div>
@@ -222,13 +344,15 @@
 </section>
 
 <section class="tint">
-  <div class="wrap split">
+  <div class="wrap split nb-keep" id="what-for">
     <div>
-      <h2>What the simulation is for.</h2>
+      <h2>What the simulation is for</h2>
+      <div class="fourp">
       <p><b>A baseline.</b> Physical reality and its laws, with an ideal adult human body, male and female, built from real measurements with real limits.</p>
       <p><b>Disease, forwards.</b> Change the conditions: densify fascia in one place, alter a constraint of that world, and let the physics show what happens to the body's shape, its vessels, its nerves and its organs.</p>
       <p><b>Disease, backwards.</b> Start from the measured shape of a real condition and search for the imperfections that would produce it.</p>
       <p><b>Ways back.</b> Test practices from the ancient traditions and from modern science, from the outside in and from the inside out, and build fascia-first protocols from what the physics shows.</p>
+      </div>
     </div>
     <div class="card" style="background:var(--ice)">
       <span class="tag">How imperfections are modeled</span>
@@ -242,9 +366,7 @@
 
 <section id="building">
   <div class="wrap">
-    <span class="eyebrow">How we are building it</span>
-    <h2>From a test model to a measured human.</h2>
-    <p class="lede">The model above is a test. The full simulation is in a development environment, built from the data in our library layer by layer, so that every dimension and every tissue property comes from a measurement. How every force, tissue and imperfection is modeled is set out in full on <a href="methods.html">Methods</a>.</p>
+    <div class="sec-head"><div><span class="eyebrow">How we are building it</span><h2>From a test model to a measured human</h2></div><div><p class="lede">The model above is a test. The full simulation is in a development environment, built from the data in our library layer by layer, so that every dimension and every tissue property comes from a measurement. How every force, tissue and imperfection is modeled is set out in full on <a href="methods.html">Methods</a>.</p></div></div>
     <div class="grid g4" style="margin-top:22px">
       <div class="card"><span class="tag">1 · The scaffold</span><h3>79,224 cross-sections</h3><p>The Visible Human male and female, sectioned head to foot, give the true position of every bone, muscle, organ, vessel and layer of fascia in two real bodies.</p></div>
       <div class="card"><span class="tag">2 · The materials</span><h3>Measured mechanics</h3><p>Published tests of tendon, ligament, fascia and muscle give each tissue its stiffness, stretch and limits, with the source kept for every number.</p></div>
@@ -255,10 +377,10 @@
   </div>
 </section>
 
-<section class="tint">
-  <div class="wrap split" style="align-items:center">
+<section class="tint" id="tension">
+  <div class="wrap split nb-keep" style="align-items:center">
     <div>
-      <h2>Tension travels.</h2>
+      <h2>Tension travels</h2>
       <p>In a tensegrity, rigid parts never touch; they are held in place only by continuous tension. Change the tension in one place and the whole structure adjusts. That is why, in HMR, a small imperfection can have effects far from where it began.</p>
       <p>Tap a node on this simpler tensegrity to send a pulse of tension through it. Then cut a cable or collapse a strut and watch the whole structure settle into a new shape, slow the motion right down to follow the force, or switch to other everyday tensegrities, such as a tent, to see the same rule at work.</p>
     </div>
@@ -271,7 +393,7 @@
 <section class="navyband">
   <div class="wrap split">
     <div>
-      <h2>From model to protocols.</h2>
+      <h2>From model to protocols</h2>
       <p>Once the ideal body exists as a physical model, outside-in approaches (pressure, stretch, vibration, heat, movement) and inside-out approaches (breath, internal locks, posture, attention, hydration) can each be tested against it. The aim is fascia-first protocols grounded in physics, drawing on both the ancient traditions and modern science.</p>
     </div>
     <div>
@@ -282,17 +404,21 @@
 </section>
 <script src="sim-core.js?v=8336f575" defer></script>
 <script src="sim-figure.js?v=93c4c1bf" defer></script>
-<script src="sim3d.js?v=8adb43e6" defer></script>
+<script src="sim3d.js?v=d7d6dbbf" defer></script>
+<section class="nextup" aria-label="Summary and next page"><div class="wrap">
+<div class="nx-sum"><span class="eyebrow">In short</span><p>A working tensegrity of bones and fascia that you can load, cut and watch respond: a first sketch of the model the project is building from measured data.</p></div>
+<a class="nx-go" href="roadmap.html"><span class="nx-k">Next</span><b>Road Ahead</b><span class="nx-why">What it will take to get from this sketch to the full model.</span></a>
+</div></section>
 </main>
 <footer class="site-foot"><div class="wrap">
 <div><a class="brand" href="index.html"><span class="lg" aria-hidden="true"><i></i></span><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 </div>
-<div><h4>Start here</h4><ul><li><a href="about.html">About</a></li></ul><h4 style="margin-top:18px">Problems</h4><ul><li><a href="reality.html">Science today</a></li><li><a href="fixing-exercise.html">Exercise today</a></li><li><a href="mental-health.html">Mental health today</a></li></ul><h4 style="margin-top:18px">Solutions</h4><ul><li><a href="hmr.html">The HMR</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="health-model.html">HMR holistic health model</a></li><li><a href="physics-health.html">HMR physical health model</a></li><li><a href="mental-model.html">HMR mental health model</a></li><li><a href="health.html">The perfect body</a></li><li><a href="protocol.html">HMR Fascia Health Protocol</a></li><li><a href="science-bridge.html">Science Bridge</a></li><li><a href="math.html">HMR math paradigm</a></li><li><a href="physics.html">HMR physics paradigm</a></li><li><a href="values.html">HMR values</a></li><li><a href="answers.html">The answers</a></li></ul></div>
+<div><h4>Start here</h4><ul><li><a href="about.html">About</a></li></ul><h4 style="margin-top:18px">Problems</h4><ul><li><a href="reality.html">Science Today</a></li><li><a href="fixing-exercise.html">Exercise Today</a></li><li><a href="mental-health.html">Mental Health Today</a></li></ul><h4 style="margin-top:18px">Solutions</h4><ul><li><a href="hmr.html">The HMR</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="health-model.html">HMR Holistic Health Model</a></li><li><a href="physics-health.html">HMR Physical Health Model</a></li><li><a href="health.html">The Perfect Body</a></li><li><a href="protocol.html">HMR Fascia Health Protocol</a></li><li><a href="mental-model.html">HMR Mental Health Model</a></li><li><a href="science-bridge.html">Science Bridge</a></li><li><a href="math.html">HMR Math Paradigm</a></li><li><a href="physics.html">HMR Physics Paradigm</a></li><li><a href="values.html">HMR Values</a></li><li><a href="answers.html">The Answers</a></li></ul></div>
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=6631853c" defer></script>
-<script src="fx-stars.js?v=b2ed509a" defer></script>
+<script src="site.js?v=929d859d" defer></script>
+<script src="fx-stars.js?v=1ac35741" defer></script>
 </body>
 </html>
