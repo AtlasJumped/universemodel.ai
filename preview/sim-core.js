@@ -247,12 +247,15 @@
       m0 = N.map(n => n.soft ? C.M_SOFT : Math.max(0.05, n.m || 0.3));
       // ---- the skin envelope: the outer points, each tied to a bone axis and to its neighbours on the surface ----
       { const nm = (t, sd) => IDX[t + (sd > 0 ? 'L' : sd < 0 ? 'R' : '')] ?? IDX[t];
-        const spine = ['top', 'c1', 'c3', 'c5', 'c7', 't2', 't4', 't6', 't8', 't10', 't12', 'l1', 'l2', 'l3', 'l4', 's1', 'sacA', 'coccyx'];
-        const axesOf = n => { const g = limb(n), sd = n.side, out = [];
-          const chain = g === 'core' ? spine.map(t => nm(t, 0)) : g[0] === 'a' ? [nm('gh', sd), nm('elbow', sd), nm('wrist', sd), nm('hand', sd)] : [nm('hip', sd), nm('knee', sd), nm('ankle', sd)];
-          for (let q = 0; q + 1 < chain.length; q++) out.push([chain[q], chain[q + 1]]); return out; };
-        const near = (n, i) => { let best = null; for (const [a, b] of axesOf(n)) { const A = N[a].p0, B = N[b].p0, ab = v3.sub(B, A), L2 = v3.dot(ab, ab) || 1;
-            const t = Math.max(0, Math.min(1, v3.dot(v3.sub(n.p0, A), ab) / L2)), q = v3.add(A, v3.mul(ab, t)), r = v3.dist(n.p0, q); if (!best || r < best.r) best = { a, b, t, r, q }; } return best; };
+        const spine = [['top', 'c1', 'skull'], ['c1', 'c3', 'ce1'], ['c3', 'c5', 'ce2'], ['c5', 'c7', 'ce3'], ['c7', 't2', 'th1'], ['t2', 't4', 'th2'], ['t4', 't6', 'th3'], ['t6', 't8', 'th4'], ['t8', 't10', 'th5'], ['t10', 't12', 'th6'],
+          ['t12', 'l1', 'lu1'], ['l1', 'l2', 'lu2'], ['l2', 'l3', 'lu3'], ['l3', 'l4', 'lu4'], ['l4', 's1', 'lu5'], ['s1', 'sacA', 'sacrum'], ['sacA', 'coccyx', 'sacrum']];
+        // each axis piece is a stretch of one bone; if that bone breaks, the skin loses its hold on that piece
+        const axesOf = n => { const g = limb(n), sd = n.side, sf = sd > 0 ? 'L' : 'R';
+          if (g === 'core') return spine.map(([a, b, u]) => [IDX[a], IDX[b], u]);
+          return g[0] === 'a' ? [[nm('gh', sd), nm('elbow', sd), 'humerus' + sf], [nm('elbow', sd), nm('wrist', sd), 'ulna' + sf], [nm('wrist', sd), nm('hand', sd), 'handbone' + sf]]
+            : [[nm('hip', sd), nm('knee', sd), 'femur' + sf], [nm('knee', sd), nm('ankle', sd), 'tibia' + sf]]; };
+        const near = (n, i) => { let best = null; for (const [a, b, u] of axesOf(n)) { const A = N[a].p0, B = N[b].p0, ab = v3.sub(B, A), L2 = v3.dot(ab, ab) || 1;
+            const t = Math.max(0, Math.min(1, v3.dot(v3.sub(n.p0, A), ab) / L2)), q = v3.add(A, v3.mul(ab, t)), r = v3.dist(n.p0, q); if (!best || r < best.r) best = { a, b, t, r, q, u }; } return best; };
         const cand = [];
         N.forEach((n, i) => { if (FIXED.has(i)) return; const ax = near(n, i); if (!ax || ax.a === i || ax.b === i || ax.r < C.SKIN_RMIN) return; cand.push(Object.assign({ i, g: limb(n), u: v3.mul(v3.sub(n.p0, ax.q), 1 / ax.r) }, ax)); });
         const outer = cand.filter(c => !cand.some(o => o !== c && o.g === c.g && Math.abs(N[o.i].p0[1] - N[c.i].p0[1]) < 7 && o.r > c.r * C.SKIN_SHADOW && v3.dot(o.u, c.u) > C.SKIN_CONE));
@@ -260,7 +263,7 @@
         outer.forEach(c => { const cs = outer.filter(o => o !== c && o.g === c.g).map(o => [o, v3.dist(N[c.i].p0, N[o.i].p0)]).filter(([o, d]) => d < C.SKIN_R * sc && Math.abs(N[o.i].p0[1] - N[c.i].p0[1]) < C.SKIN_BAND * sc).sort((x, y) => x[1] - y[1]).slice(0, C.SKIN_NB);
           for (const [o, d] of cs) { const k = Math.min(c.i, o.i) + '-' + Math.max(c.i, o.i); if (!seen.has(k)) { seen.add(k); links.push([pos.get(c.i), pos.get(o.i), d]); } } });
         const nbr = outer.map(() => []); links.forEach(([a, b]) => { nbr[a].push(b); nbr[b].push(a); });
-        SK = { n: outer.length, node: Int32Array.from(outer.map(c => c.i)), axA: Int32Array.from(outer.map(c => c.a)), axB: Int32Array.from(outer.map(c => c.b)), axT: Float64Array.from(outer.map(c => c.t)), r0: Float64Array.from(outer.map(c => c.r)),
+        SK = { n: outer.length, node: Int32Array.from(outer.map(c => c.i)), axA: Int32Array.from(outer.map(c => c.a)), axB: Int32Array.from(outer.map(c => c.b)), axT: Float64Array.from(outer.map(c => c.t)), axU: outer.map(c => c.u), on: new Uint8Array(outer.length).fill(1), r0: Float64Array.from(outer.map(c => c.r)),
           la: Int32Array.from(links.map(l => l[0])), lb: Int32Array.from(links.map(l => l[1])), l0: Float64Array.from(links.map(l => l[2])), nbr, pos, dx: new Float64Array(3 * N.length), cnt: new Uint8Array(N.length), ratio: new Float64Array(outer.length) };
         S.skin = { nodes: Array.from(SK.node), links: links.length }; }
       S.N = N; S.IDX = IDX; S.E = E; S.adj = adj; S.FIXED = FIXED; S.O = O; S.bones = bones; S.chains = chains; S.bands = bands;
@@ -319,6 +322,7 @@
       // a crushed skull gives the fascia nothing to hold on to: every band and guy attached to the head lets go
       if (n && B.uid === 'skull') { const hd = new Set(B.ids); for (const b of bands) if (b.some(j => hd.has(E[j].a) || hd.has(E[j].b))) for (const j of b) if (!E[j].cut) E[j].released = true;
         E.forEach(f => { if (!f.strut && !f.cut && (hd.has(f.a) || hd.has(f.b))) f.released = true; }); }
+      if (n && SK) SK.axU.forEach((u, q) => { if (u === B.uid) SK.on[q] = 0; }); // the skin lets go of a bone that has snapped
       if (n) { S.damaged = true; S.moving = 1; }
       return n;
     };
@@ -327,7 +331,7 @@
       if (FIXED.has(i)) return; const p = P[i], c = [0, p[1], 0], d = v3.sub(p, c), l = v3.len(d) || 1, k = (cm || 5) / l;
       p[0] += d[0] * k; p[2] += d[2] * k; S.moving = 1; };
     S.reset = function () {
-      S.imps = []; S.months = 0;
+      S.imps = []; S.months = 0; if (SK) SK.on.fill(1);
       P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => { e.slide = base.slide[k]; e.cut = false; e.broken = false; e.released = false; e.breakT = undefined; }); S.damaged = false; S.P = P;
       applyImps(); S.moving = 1;
     };
@@ -475,13 +479,16 @@
         const vx = X[i3] - ux, vy = X[i3 + 1] - uy, vz = X[i3 + 2] - uz, r = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9; k.ratio[q] = r / k.r0[q]; }
       for (let q = 0; q < k.n; q++) { const i = k.node[q], a = k.axA[q], b = k.axB[q], t = k.axT[q], i3 = 3 * i, a3 = 3 * a, b3 = 3 * b;
         const ux = X[a3] + t * (X[b3] - X[a3]), uy = X[a3 + 1] + t * (X[b3 + 1] - X[a3 + 1]), uz = X[a3 + 2] + t * (X[b3 + 2] - X[a3 + 2]);
+        if (!k.on[q]) continue;
         const vx = X[i3] - ux, vy = X[i3 + 1] - uy, vz = X[i3 + 2] - uz, r = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9;
         let cap = k.r0[q] * G; const nb = k.nbr[q];
         if (nb.length && C.SKIN_LOCAL > 0) { let m = 0; for (const o of nb) m += k.ratio[o]; m /= nb.length; cap = Math.min(cap, k.r0[q] * Math.max(1, m + C.SKIN_LOCAL)); }
         if (r <= cap) continue;
-        if (!W[i]) continue; // the pull acts on the surface point only: the skin does not push on the bones, so it cannot splint or prop a limb
-        const c = (r - cap) / r * C.K_SKIN_R;
-        dx[i3] -= vx * c; dx[i3 + 1] -= vy * c; dx[i3 + 2] -= vz * c; cnt[i]++; }
+        const wp = W[i], wa = (1 - t) * (1 - t) * W[a] + t * t * W[b], w = wp + wa; if (!w) continue; // an equal and opposite pull on the axis: the skin only holds things together, it cannot prop or splint
+        const c = (r - cap) / r * C.K_SKIN_R / w;
+        dx[i3] -= vx * c * wp; dx[i3 + 1] -= vy * c * wp; dx[i3 + 2] -= vz * c * wp; cnt[i]++;
+        const fa = c * (1 - t) * W[a], fb = c * t * W[b];
+        dx[a3] += vx * fa; dx[a3 + 1] += vy * fa; dx[a3 + 2] += vz * fa; cnt[a]++; dx[b3] += vx * fb; dx[b3 + 1] += vy * fb; dx[b3 + 2] += vz * fb; cnt[b]++; }
       for (let l = 0; l < k.la.length; l++) { const a = k.node[k.la[l]], b = k.node[k.lb[l]], a3 = 3 * a, b3 = 3 * b, vx = X[b3] - X[a3], vy = X[b3 + 1] - X[a3 + 1], vz = X[b3 + 2] - X[a3 + 2];
         const d = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9, rest = k.l0[l] * SL; if (d <= rest) continue; const wa = W[a], wb = W[b], w = wa + wb; if (!w) continue;
         const c = (d - rest) / d * C.K_SKIN / w;

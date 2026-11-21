@@ -41,15 +41,109 @@
 .an .ft{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:12px;font-size:.9rem}
 .an .stt{font:600 .76rem/1 var(--font);padding:5px 9px;border-radius:999px;background:#FCEFD9;color:#8A5A0B}
 @media (max-width:620px){.an dl{grid-template-columns:1fr;gap:2px 0}.an dt{margin-top:8px}.an{padding:20px 18px}}
+.an .stt.s1{background:#DDF3E4;color:#1E6B3A}
+.an .stt.s2{background:var(--ice);color:var(--blue-d)}
+.an .stt.s4{background:#EAEEF3;color:#44546B}
+.an-how{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(22px,3vw,48px);margin-top:26px;align-items:start}
+.an-steps{list-style:none;margin:0;padding:0;counter-reset:st;display:grid;gap:12px}
+.an-steps li{counter-increment:st;position:relative;margin:0;padding:16px 18px 16px 64px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.an-steps li::before{content:counter(st);position:absolute;left:16px;top:14px;width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 .98rem/1 var(--font)}
+.an-steps b{display:block;font:700 1.02rem/1.35 var(--font);color:var(--navy);margin:0 0 4px}
+.an-steps p{margin:0;font-size:.96rem;line-height:1.6;max-width:72ch}
+.an-side{display:grid;gap:14px}
+.an-lab{display:grid;gap:10px;margin:12px 0 0}
+.an-lab div{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:4px 12px;align-items:start;font-size:.94rem;line-height:1.5}
+.an-lab .stt{font:600 .76rem/1.2 var(--font);padding:5px 9px;border-radius:999px;background:#FCEFD9;color:#8A5A0B;white-space:normal}
+.an-lab .stt.s1{background:#DDF3E4;color:#1E6B3A}
+.an-lab .stt.s2{background:var(--ice);color:var(--blue-d)}
+.an-lab .stt.s4{background:#EAEEF3;color:#44546B}
+.an-mods{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:22px}
+.an-mods a.card{display:block;color:inherit;text-decoration:none;transition:border-color .15s}
+.an-mods a.card:hover{border-color:var(--blue)}
+.an-mods h3{font-size:1.02rem;margin:8px 0 4px}
+.an-mods p{font-size:.92rem;margin:0}
+.an-inv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);margin-top:8px;align-items:start}
+.an-inv p{max-width:72ch}
+.an-inv .pull{max-width:none}
+@media (max-width:1100px){.an-how{grid-template-columns:1fr}.an-mods{grid-template-columns:repeat(2,minmax(0,1fr))}.an-inv{grid-template-columns:1fr}}
+@media (max-width:620px){.an-lab div{grid-template-columns:1fr}.an-lab .stt{justify-self:start}}
+@media (max-width:480px){.an-mods{grid-template-columns:1fr}.an-steps li{padding:14px 14px 14px 56px}.an-steps li::before{left:12px;width:30px;height:30px}}
  .an-grp .an{break-inside:avoid} @media (min-width:1100px){.an-grp{columns:2;column-gap:22px}.an-list>.an-g{margin:34px 0 14px}.an-list>.an-g:first-child{margin-top:0}} </style>
 
-<div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">Solutions</span><h1>The answers</h1></div><div><p class="lede">If the Holistic Model of Reality (HMR) is right, it should be able to answer the questions science and philosophy have left open, in its own terms. This page is the master list: every problem raised on this site, and the questions people ask most, each answered through HMR in the same format.</p></div></div>
+<div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">Solutions</span><h1>The answers</h1></div><div><p class="lede">If the Holistic Model of Reality (HMR) is right, it should be able to answer the questions science and philosophy have left open, in its own terms. This page is the master list: every problem raised on this site, and the questions people ask most, each answered through HMR in the same format, by the method set out below.</p></div></div>
   <div class="an-key">
     <div><h3>The universe</h3><ol><li><a href="#before">What came before the Big Bang, and why is there something rather than nothing?</a></li><li><a href="#bigbang">What was the Big Bang?</a></li><li><a href="#gravity">What is gravity?</a></li><li><a href="#darkenergy">What is dark energy?</a></li><li><a href="#darkmatter">What is dark matter?</a></li><li><a href="#vacuum">Why is the calculated energy of empty space so wrong?</a></li><li><a href="#singular">What happens at the center of a black hole?</a></li><li><a href="#measure">What happens when a quantum system is measured?</a></li><li><a href="#entangle">How can two particles stay connected across any distance?</a></li><li><a href="#light">Why is there a speed limit, the speed of light?</a></li><li><a href="#time">What is time, and why does it only run forward?</a></li><li><a href="#finetune">Why are the laws of nature just right for life?</a></li><li><a href="#math">Why does mathematics describe the universe so well?</a></li></ol></div>
     <div><h3>Mind and life</h3><ol><li><a href="#conscious">What is consciousness?</a></li><li><a href="#life">What is life, and how did it begin?</a></li><li><a href="#human">What is a human being?</a></li><li><a href="#good">What is a good human being?</a></li><li><a href="#god">Is there a God, and why do religions disagree?</a></li><li><a href="#death">What happens when we die?</a></li><li><a href="#purpose">What is the purpose of life?</a></li><li><a href="#right">How should we treat each other?</a></li></ol></div>
     <div><h3>Body and mind</h3><ol><li><a href="#health">What is health?</a></li><li><a href="#disease">Why do chronic pain and chronic disease keep rising?</a></li><li><a href="#mental">What is mental illness?</a></li><li><a href="#exercise">Why does exercise help some people and injure others?</a></li><li><a href="#puberty">Why is puberty so hard on the body?</a></li><li><a href="#qi">What are qi, meridians and chakras?</a></li><li><a href="#future">Where is humanity heading?</a></li></ol></div>
   </div>
 </div></div>
+
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">The method</span><h2>How HMR answers a question</h2></div><div><p>Every answer on this page is taken through the same sequence, in the same order, against the same models. The sequence is short enough to follow yourself. Try it on a question of your own.</p></div></div>
+    <div class="an-how">
+      <ol class="an-steps">
+        <li><b>Say the question plainly</b><p>Put it in one sentence, and say what kind it is: about the world, the body, the mind, or what to do.</p></li>
+        <li><b>Start from HMR's core</b><p>There is one Universal Intelligence. Physical reality emerges from it. Every person is an instance of it, living through a body.</p></li>
+        <li><b>Take the question through the models, deepest first</b><p>The story of Universal Intelligence, then mathematics and physics, then the body (a tensegrity held by fascia), then the mind (reality, self, others), then the values.</p></li>
+        <li><b>Cross-check</b><p>An answer must agree with every model and with everything science has measured. If two models pull apart, the deeper one governs, and the gap is written down as work to do.</p></li>
+        <li><b>For "should I" questions, apply the values</b><p>Ask what serves the wellbeing of every instance of Universal Intelligence involved: you, your body, the other people, and the truth. For a decision about treatment or medication, part of the answer is to talk to a clinician you trust.</p></li>
+        <li><b>Say how firmly the answer stands</b><p>It is established by measurement, or it follows by logic from HMR, or it is HMR's view, still being worked out. Each answer below carries its label.</p></li>
+        <li><b>If the models give no answer that satisfies, say so</b><p>That marks where HMR needs more research or more written down, and it goes on the list.</p></li>
+      </ol>
+      <div class="an-side">
+        <div class="card">
+          <span class="tag">Step 6, the labels</span>
+          <div class="an-lab">
+            <div><span class="stt s1">Established by measurement</span><span>Science has measured it, and the source is named.</span></div>
+            <div><span class="stt s2">Follows by logic from HMR</span><span>It is a consequence of HMR's premises and models, step by step.</span></div>
+            <div><span class="stt">HMR's view, still being worked out</span><span>HMR has a reading, and the mathematics or the testing is not finished.</span></div>
+            <div><span class="stt s4">Not yet answered, on the list</span><span>The models do not answer yet. Step 7 applies.</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <span class="tag">Step 3, the order</span>
+          <p>Each model rests on the one before it, so a question is read from the deepest layer outward.</p>
+          <div class="va-flow" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 0"><a class="tag" href="ui.html">Universal Intelligence</a><span aria-hidden="true">→</span><a class="tag" href="math.html">Mathematics</a><span aria-hidden="true">→</span><a class="tag" href="physics.html">Physics</a><span aria-hidden="true">→</span><a class="tag" href="health.html">The body</a><span aria-hidden="true">→</span><a class="tag" href="mental-model.html">The mind</a><span aria-hidden="true">→</span><a class="tag" href="values.html">Values</a></div>
+        </div>
+        <div class="card">
+          <span class="tag">A worked example</span>
+          <p><b>What is dark energy?</b></p>
+          <p class="small">1. A question about the world. 2 and 3. From Universal Intelligence: space and time are counts of thoughts. In the mathematics, a count of N thoughts wanders by about its square root, so Λ ≈ 1/√N. 4. The result is 4 × 10⁻¹²² against a measured 2.8 × 10⁻¹²², the same order of size as the measurement. 5. Not a "should I" question. 6. It follows by logic from HMR, and the amount comes from a published formula. 7. The number in front depends on the exact size of the first distance, and that is on the list. <a href="#darkenergy">The full answer →</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="sec-head"><div><h3 style="margin-top:40px">The models it draws on</h3></div><div><p>All of them are on this site and on the menu at the top of every page. Click through and read them.</p></div></div>
+    <div class="an-mods">
+      <a class="card" href="ui.html"><span class="tag">The story</span><h3>Universal Intelligence</h3><p>What existed before everything, and how it became a physical universe, step by step.</p></a>
+      <a class="card" href="math.html"><span class="tag">Mathematics</span><h3>HMR Math Paradigm</h3><p>Mathematics as UI's ordered thought, built from a first unit.</p></a>
+      <a class="card" href="physics.html"><span class="tag">Physics</span><h3>HMR Physics Paradigm</h3><p>The first distance, the route to gravity and the road to quantum mechanics.</p></a>
+      <a class="card" href="health-model.html"><span class="tag">Health</span><h3>HMR Holistic Health Model</h3><p>Fascia-first care for body, mind and meaning.</p></a>
+      <a class="card" href="health.html"><span class="tag">The body</span><h3>The Perfect Body</h3><p>The ideal human tensegrity, and disease as distance from it.</p></a>
+      <a class="card" href="protocol.html"><span class="tag">Practice</span><h3>HMR Fascia Health Protocol</h3><p>Daily care for the fascia web, from the outside in and the inside out.</p></a>
+      <a class="card" href="mental-model.html"><span class="tag">The mind</span><h3>HMR Mental Health Model</h3><p>A sound mind in fourteen measures: reality, self and others.</p></a>
+      <a class="card" href="values.html"><span class="tag">How to live</span><h3>HMR Values</h3><p>Truth, cooperation, care for all life, perspective and appreciation.</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="navyband" id="invitation">
+  <div class="wrap">
+    <span class="eyebrow" style="color:#9CC3F5">An invitation</span>
+    <h2>Read the models. Then come back</h2>
+    <div class="an-inv">
+      <div>
+        <p>Read the models above, all of them. Look for something you disagree with. If you find it, tell us: <a href="about.html#contact" style="color:#fff;text-decoration:underline">get in touch</a>.</p>
+        <p>If you cannot find it, come back here. You will see that, taken together, the models give the answers below. Without a holistic model of reality, these questions have no answer. With HMR, they do.</p>
+      </div>
+      <div>
+        <p class="pull">Belief in HMR is a choice.</p>
+        <p>You can read the models and choose to believe them or not. The choice rests on three questions. Does it make more sense to you than any other model? Do you think a world that shared it would be a better world? Do you want to be part of that?</p>
+        <p>Everything this page asks you to accept is set out on the pages it links to, where you can check it for yourself.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section>
   <div class="wrap an-list">
@@ -63,9 +157,9 @@
         <dt>Who has worked on it</dt><dd>Georges Lemaître, Stephen Hawking, Roger Penrose, Alan Guth</dd>
         <dt>Why science struggles</dt><dd>Physics takes space, time and matter as the bottom layer, so it has nothing left to explain them with.</dd>
         <dt>Why HMR can answer</dt><dd>HMR starts one level deeper, with Universal Intelligence (UI), which is not in space or time.</dd>
-        <div class="hm"><b>HMR's answer</b><p>What came before was Universal Intelligence, and from it the universe followed in steps. HMR shows those steps one at a time, with the dots that stand for thoughts moving on the left and the explanation on the right.</p><p class="hm-go"><a href="ui.html#phases">See it step by step: start at phase one, then go on to phase two →</a></p></div>
+        <div class="hm"><b>HMR's answer</b><p>What came before was Universal Intelligence (UI), which is not in space or time. It began unlimited and without order. It chose a limit, to focus on calmer, orderly thoughts, and that was the birth of mathematics. Then it asked what it is, and to answer it had to imagine what it is not. The universe did not come from nothing: it is what follows when UI, the only thing there was, tells itself apart from something it is not. Each step follows from the one before. HMR shows the steps one at a time, with the dots that stand for thoughts moving on the left and the reasoning on the right. No step is a measurement, so a reader is asked to find the link that breaks.</p><p class="hm-go"><a href="ui.html#phases">See it step by step: start at phase one, then go on to phase two →</a></p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR premise</span><a href="ui.html">Science Bridge →</a><a href="ui.html">Universal Intelligence →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="ui.html#phases">Step by step, on the Universal Intelligence page →</a><a href="ui.html">Universal Intelligence →</a></div>
     </article>
     <article class="an" id="bigbang">
       <h3>What was the Big Bang?</h3>
@@ -75,9 +169,9 @@
         <dt>Who has worked on it</dt><dd>Georges Lemaître, Alan Guth, Andrei Linde</dd>
         <dt>Why science struggles</dt><dd>The theories fail before the first 10⁻⁴³ seconds, and the field said to drive inflation has never been observed.</dd>
         <dt>Why HMR can answer</dt><dd>HMR describes what UI was doing at that moment, and its mathematics has an exact meaning for a closed moment.</dd>
-        <div class="hm"><b>HMR's answer</b><p>The Big Bang was the moment UI's first model of itself became complete. In HMR's mathematics that moment has an exact form: a thought that everything earlier leads up to and everything later rests on. After such a closed moment the pattern of thoughts starts again under the same kind of rule. In one such rule the number of thoughts side by side then multiplies at a steady rate, which is the shape of the inflation physics describes. Matching its rate, its length and its ripples to the sky is in progress. <a href="physics.html#growth">The runs</a></p></div>
+        <div class="hm"><b>HMR's answer</b><p>The Big Bang was the moment UI's first model of itself became complete: me and not me, the first distance, the edge, and how anything inside relates to anything else. In HMR's mathematics that moment has an exact form: a thought that everything earlier leads up to and everything later rests on. A closed system that understands itself cannot stay still. Every new thought is a new relation among the parts it already has, and relations multiply faster than parts, so it grows explosively. After the closed moment the pattern of thoughts starts again under the same kind of rule. In one such rule, where each new thought builds on K earlier thoughts chosen evenly, the number of thoughts side by side multiplies at a steady rate of about 0.4/K per step for 10 to 13 e-folds and then stops. That is the shape of the inflation physics describes. Matching its rate, its length and its ripples to the sky is in progress. <a href="physics.html#growth">The runs</a></p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="ui.html#phases">Science Bridge, step 3 →</a><a href="math.html#bigbang">The mathematics →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view, still being worked out</span><a href="ui.html#phases">Step 3, on the Universal Intelligence page →</a><a href="math.html#bigbang">The mathematics →</a></div>
     </article>
     <article class="an" id="gravity">
       <h3>What is gravity?</h3>
@@ -87,9 +181,9 @@
         <dt>Who has worked on it</dt><dd>Isaac Newton, Albert Einstein, Ted Jacobson, Erik Verlinde</dd>
         <dt>Why science struggles</dt><dd>Every attempt to treat gravity like the other forces produces infinities.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR, space and time are counts of thoughts and their relations, and gravity is about those counts.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Things fall because a free body takes the path on which the most time passes, and time runs slower near matter. That part is Einstein's, and HMR keeps it: in HMR time is the count of thoughts in a chain, so free fall is the path of most thoughts. Why matter slows time is the open part. HMR's first hypothesis is a trend toward coherence, and it weighs others beside it: an inward flow of space, and a draw back to source. One route reaches Einstein's equations by counting the relations that cross a surface, with steps still open. In the mathematics of thought itself attraction is already exact: the more that rests on a thought, the more likely the next thought is to build on it.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Things fall because a free body takes the path on which the most time passes, and time runs slower near matter. That part is Einstein's, and HMR keeps it. In HMR time is the count of thoughts along a chain, so free fall is the path of most thoughts. Why matter slows time is where HMR's own route begins. Matter is coherent structure that takes up distance, and gravity is set by how many first distances a surface holds. Written out step by step, this leads to Einstein's equations, with every assumption named and three steps still open. One is showing that separate thoughts add up to smooth space and time. HMR weighs other readings beside it: an inward flow of space, and a draw back to source. In the mathematics of thought itself attraction is already exact: the more that rests on a thought, the more likely the next thought is to build on it.</p></div>
       </dl>
-      <div class="ft"><span class="stt">Route with open steps</span><a href="physics.html#pull">HMR Physics: the route →</a></div>
+      <div class="ft"><span class="stt s3">Einstein's part is established; HMR's route has three steps open</span><a href="physics.html#gravity">HMR Physics: the route →</a><a href="physics.html#pull">Why things fall →</a><a href="math.html#attraction">Attraction, in the mathematics →</a></div>
     </article>
     <article class="an" id="darkenergy">
       <h3>What is dark energy?</h3>
@@ -99,9 +193,9 @@
         <dt>Who has worked on it</dt><dd>Saul Perlmutter, Brian Schmidt, Adam Riess</dd>
         <dt>Why science struggles</dt><dd>It is a placeholder: a number in an equation with no known source.</dd>
         <dt>Why HMR can answer</dt><dd>HMR does not need a substance to do the pushing.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Dark energy is not a substance. It is the continuing work of the universe modeling itself: new relations, and with them new distance, which we see as space expanding faster. Whether one says space grows or its contents shrink is a choice of units, since the observations are the same; counted in first distances, it is space that grows. For the amount there is a formula: a count of N thoughts wanders by about its square root, which gives 4 × 10⁻¹²² against a measured 2.8 × 10⁻¹²².</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Dark energy is not a substance. It is the continuing work of the universe modeling itself: new relations, and with them new distance, which we see as space expanding faster. Whether one says space grows or its contents shrink is a choice of units, since the observations are the same. Counted in first distances, it is space that grows. The amount has a formula. If space and time are a count of N thoughts, the count wanders by about its square root, and the cosmological constant with it: Λ ≈ 1/√N. With one thought per Planck volume in our past that gives 4 × 10⁻¹²² against a measured 2.8 × 10⁻¹²². The argument is Rafael Sorkin's, made about a decade before dark energy was found. The number in front depends on the exact size of the first distance, which is in progress.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="physics.html">HMR Physics →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR; the amount from a published formula</span><a href="physics.html">HMR Physics →</a><a href="physics.html#unit">The first distance, in numbers →</a></div>
     </article>
     <article class="an" id="darkmatter">
       <h3>What is dark matter?</h3>
@@ -111,9 +205,9 @@
         <dt>Who has worked on it</dt><dd>Fritz Zwicky, Vera Rubin</dd>
         <dt>Why science struggles</dt><dd>Decades of detectors have found no dark matter particle.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR gravity belongs to the pattern of distance, so not everything that gravitates has to be a particle.</dd>
-        <div class="hm"><b>HMR's answer</b><p>HMR does not have a worked-out answer yet. What it can say is this. The evidence for dark matter is extra gravity, not a detected substance. In HMR gravity belongs to the pattern of distance itself, so extra gravity does not have to mean extra particles. HMR's hypothesis is that it comes from structure in that pattern which is not ordinary matter. Until the mathematics reproduces how a real galaxy turns, that is a hypothesis without a mechanism.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>The models do not give an answer yet. They say this much. The evidence for dark matter is extra gravity, not a detected substance. In HMR gravity belongs to the pattern of distance, so extra gravity need not be a particle. No mathematics yet reproduces how a real galaxy turns, so there is no mechanism to offer. This is on the list of work to do.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis, no mechanism yet</span><a href="physics.html">HMR Physics →</a></div>
+      <div class="ft"><span class="stt s4">Not yet answered, on the list</span><a href="physics.html">HMR Physics →</a><a href="reality.html#dark">What science knows →</a></div>
     </article>
     <article class="an" id="vacuum">
       <h3>Why is the calculated energy of empty space so wrong?</h3>
@@ -123,9 +217,9 @@
         <dt>Who has worked on it</dt><dd>Steven Weinberg, Yakov Zeldovich</dd>
         <dt>Why science struggles</dt><dd>Quantum theory counts the jitter of every field at every point, and nothing in physics says why that should not weigh anything.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR's route to gravity only structure carries weight. An even background does not.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because the calculation gives weight to every possible tremble of empty space. In HMR's route to gravity an even background has no weight at all: only differences from place to place bend space, and energy spread evenly drops out of the equations. That removes the enormous number. The small amount that is measured has a formula: if space and time are a count of N thoughts, the count wanders by about its square root, which gives 4 × 10⁻¹²² against a measured 2.8 × 10⁻¹²². <a href="physics.html">HMR Physics Paradigm</a></p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because the calculation gives weight to every possible tremble of empty space. In HMR's route to gravity an even background has no weight at all: only structure in the relations bends space, and energy spread evenly drops out of Einstein's equations. That removes the enormous number, and it is now a result of the route, not a separate claim. The small amount that is measured has a formula. If space and time are a count of N thoughts, the count wanders by about its square root, which gives 4 × 10⁻¹²² against a measured 2.8 × 10⁻¹²². <a href="physics.html">HMR Physics Paradigm</a></p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR-derived, within its route</span><a href="physics.html#gravity">HMR Physics, step 6 →</a><a href="reality.html#conflicts">The 10¹²⁰ miss, among other conflicts →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's route to gravity</span><a href="physics.html#gravity">HMR Physics, step 6 →</a><a href="reality.html#conflicts">The 10¹²⁰ miss, among other conflicts →</a></div>
     </article>
     <article class="an" id="singular">
       <h3>What happens at the center of a black hole?</h3>
@@ -135,9 +229,9 @@
         <dt>Who has worked on it</dt><dd>Roger Penrose, Stephen Hawking</dd>
         <dt>Why science struggles</dt><dd>An infinity means the equation has stopped describing the world, and no accepted theory replaces it there.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR, distance has a smallest unit.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Matter falling in is packed tighter and tighter until its parts are one first distance apart. Nothing can be squeezed below that, because nothing was ever divided below it. So the center is not a point of infinite density. It is a core of the densest structure there can be, small but finite. What that core is like, and what it does next, is on the task force's list. The infinities belong to the idealized mathematics, not to reality.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Nothing in HMR is infinite. Any region holds a finite count of thoughts, and nothing was ever divided below one thought. Matter falling in is packed until its parts are one first distance apart, and there is nothing finer to find. Anything pinned down to about two first distances sits inside its own horizon, crossed by only about nine relations around about seventeen thoughts. That is too few to have a shape. So the center is a core of the densest structure there can be, small but finite. Einstein's equations say only that they stop working there, and the infinities belong to the idealized mathematics. What the core is like and what it does next, including what becomes of the information that falls in, no model answers yet. That is on the task force's list.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="reality.html#conflicts">Where the math conflicts →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR; the core itself is on the list</span><a href="physics.html">HMR Physics: the Planck scale →</a><a href="reality.html#conflicts">Where the math conflicts →</a></div>
     </article>
     <article class="an" id="measure">
       <h3>What happens when a quantum system is measured?</h3>
@@ -147,9 +241,9 @@
         <dt>Who has worked on it</dt><dd>Niels Bohr, Erwin Schrödinger, John von Neumann, Eugene Wigner</dd>
         <dt>Why science struggles</dt><dd>Physics has no place in its equations for the observer.</dd>
         <dt>Why HMR can answer</dt><dd>HMR puts consciousness at the bottom, not at the end.</dd>
-        <div class="hm"><b>HMR's answer</b><p>One of the system's possibilities becomes definite. In HMR a measurement is UI making that one possibility definite in its own experience. Consciousness is not a late arrival in the universe that has to be fitted in afterward; it is the ground of the process. HMR has no mathematics for this step yet.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>One of the system's possibilities becomes definite. In HMR a measurement is UI making that one possibility definite in its own experience. Consciousness is not a late arrival in the universe that has to be fitted in afterward. It is the ground of the process. No model gives the mechanism of that step yet, and it is on the list.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="physics.html">HMR Physics →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view; the mechanism is on the list</span><a href="physics.html">HMR Physics →</a><a href="ui.html">Universal Intelligence →</a></div>
     </article>
     <article class="an" id="entangle">
       <h3>How can two particles stay connected across any distance?</h3>
@@ -159,9 +253,9 @@
         <dt>Who has worked on it</dt><dd>Albert Einstein, John Bell, Alain Aspect</dd>
         <dt>Why science struggles</dt><dd>If space is fundamental, the connection has nothing to travel through.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR, distance was made; it is not fundamental.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because they were never two separate things. Distance was added afterward, so things joined in UI's pattern stay joined across any distance, and the joining can be handed on to things that never met. On the standard test, ordinary chance links outcomes up to a score of 2. Nature scores higher, and a rule one rung above chance reaches 2.83 and no further, which is the limit quantum theory sets. The task force is writing UI's rule of growth in that form. <a href="physics.html#quantum">The road to quantum mechanics</a></p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because they were never two separate things. Distance was mechanized by UI, not fundamental, so things joined in UI's pattern stay joined across any distance, and the joining can be handed on to particles that never met. On the standard test, ordinary chance links outcomes up to a score of 2, and nature measures 2.42 ± 0.20. A rule one rung above chance, whose weights stay positive in the strong sense, reaches 2.83 and no further, which is the limit quantum theory sets. HMR's rule of growth climbs that rung when its numbers are complex: pairs of histories interfere and triples do not, as measured with light through three slits. Writing UI's rule in that form is the task force's work in progress. <a href="physics.html#quantum">The road to quantum mechanics</a></p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="physics.html">HMR Physics →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR; the quantum rule is still being written</span><a href="physics.html#quantum">The road to quantum mechanics →</a><a href="math.html#liking">What attraction still lacks →</a></div>
     </article>
     <article class="an" id="light">
       <h3>Why is there a speed limit, the speed of light?</h3>
@@ -171,9 +265,9 @@
         <dt>Who has worked on it</dt><dd>Albert Einstein, Hendrik Lorentz</dd>
         <dt>Why science struggles</dt><dd>A postulate is where explanation stops.</dd>
         <dt>Why HMR can answer</dt><dd>HMR says what a step of time and a unit of distance are.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because a change can reach only what is built on it. That order of building sets an edge on how far any change has spread, and the edge is the same for every observer. Time is counted in steps along a chain of UI's thoughts, and one first distance for one step of time is the speed of light.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because a change can reach only what is built on it. That order of building sets an edge on how far any change has spread, and the edge is the same for every observer. Time is counted in steps along a chain of UI's thoughts, and one first distance for one step of time is the speed of light: c = d₀ / t₀. With no observer favored, the two conditions together give the spacetime interval and Einstein's special relativity. The speed limit is the exchange rate between a step of time and a unit of distance, and it holds for any pattern shaped like spacetime.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="ui.html#math">Science Bridge: the mathematics →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="ui.html#math">The mathematics, on the Universal Intelligence page →</a><a href="physics.html">HMR Physics →</a></div>
     </article>
     <article class="an" id="time">
       <h3>What is time, and why does it only run forward?</h3>
@@ -183,9 +277,9 @@
         <dt>Who has worked on it</dt><dd>Ludwig Boltzmann, Arthur Eddington, Julian Barbour</dd>
         <dt>Why science struggles</dt><dd>Physics can describe time's direction (entropy rises) but traces it to an unexplained starting condition.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR time is something UI does.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Time is the order of UI's thought. Thoughts that rest on one another come in sequence. Thoughts that do not rest on one another have no order between them, which is why the universe has no single clock. Time runs one way because each thought is built on the ones before it. Order grows locally while total entropy rises, and the two fit together.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Time is the order of UI's thought. Thoughts that rest on one another come in sequence, and the time between two of them is the number of links in the longest chain between them. Thoughts that do not rest on one another have no order between them, which is why the universe has no single clock. Time runs one way because thoughts are added and never taken back, so each is built on the ones before it. Order grows locally while total entropy rises, and the two fit together.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="physics.html">HMR Physics →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="math.html#mechanics">The mechanics of thought →</a><a href="physics.html">HMR Physics →</a></div>
     </article>
     <article class="an" id="finetune">
       <h3>Why are the laws of nature just right for life?</h3>
@@ -195,9 +289,9 @@
         <dt>Who has worked on it</dt><dd>Martin Rees, Brandon Carter, Fred Hoyle</dd>
         <dt>Why science struggles</dt><dd>The options on offer are luck, or an unobservable multitude of other universes.</dd>
         <dt>Why HMR can answer</dt><dd>HMR treats the laws as chosen.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because they were chosen. The constants are the rules UI holds fixed so that many beings can share one stable world. They are not a lucky draw.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because they were chosen. The constants are the rules UI holds fixed so that many beings can share one stable world. Without a shared, stable reality, separate beings would have no common context in which to meet, act and learn from one another. The constants are not a lucky draw.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="ui.html">Universal Intelligence →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="ui.html#lifecycle">UI's life cycle: shared rules →</a><a href="physics.html">HMR Physics →</a></div>
     </article>
     <article class="an" id="math">
       <h3>Why does mathematics describe the universe so well?</h3>
@@ -207,9 +301,9 @@
         <dt>Who has worked on it</dt><dd>Eugene Wigner, Galileo Galilei, Max Tegmark</dd>
         <dt>Why science struggles</dt><dd>If matter came first, there is no reason it should obey thought.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR, thought came first.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because the universe is made of it. Mathematics is UI's ordered thought, built from a first unit: one comes from the first distance, two from the first difference.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because the universe is made of it. Mathematics is UI's ordered thought, built from a first unit: one comes from the first distance, two from the first difference, and counting is that first limit repeated. A pattern is a thought that gives the same result when repeated, and stability is what lets many beings share one world, which is why physics is a set of patterns. A proof is a path of thought that never leaves order, so once found it holds for everyone.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR premise</span><a href="math.html">HMR Math Paradigm →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="math.html">HMR Math Paradigm →</a><a href="ui.html#math">The mathematics, step by step →</a></div>
     </article>
 </div>
 <h2 class="an-g">Mind and life</h2>
@@ -222,9 +316,9 @@
         <dt>Who has worked on it</dt><dd>David Chalmers, Christof Koch, Giulio Tononi, Roger Penrose</dd>
         <dt>Why science struggles</dt><dd>Physics describes behavior from the outside, and experience is not a behavior.</dd>
         <dt>Why HMR can answer</dt><dd>HMR does not try to get mind out of matter.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Consciousness is the ground of reality, not a product of matter. Physics describes the stable rules inside an experience; it was never going to find experience inside its rules. Each living being is an instance of UI experiencing physical reality.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Consciousness is the ground of reality, not a product of matter. Physics describes the stable rules inside an experience; it was never going to find experience inside its rules. Each living being is an instance of UI experiencing physical reality through a body, and the body is the interface.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR premise</span><a href="ui.html">Universal Intelligence →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="ui.html">Universal Intelligence →</a><a href="hmr.html#voices">What great scientists believed →</a></div>
     </article>
     <article class="an" id="life">
       <h3>What is life, and how did it begin?</h3>
@@ -234,9 +328,9 @@
         <dt>Who has worked on it</dt><dd>Erwin Schrödinger, Stanley Miller, Stuart Kauffman</dd>
         <dt>Why science struggles</dt><dd>Each field defines life for its own purposes, and the definitions do not connect to mind or origin.</dd>
         <dt>Why HMR can answer</dt><dd>A holistic definition has to connect physics, mind and origin at once.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Life is UI experiencing physical reality from the inside. It is the kind of matter UI does not steer piece by piece: created once, set free as an agent, and self-sustaining. As for how it began: in HMR's story it follows a second catalytic event after the Big Bang, an inversion, in which the universe, having defined its outside, turned to look within. HMR has no mathematics for that step yet.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Life is UI experiencing physical reality from the inside. It is the kind of matter UI does not steer piece by piece: created once, set free as an agent, and self-sustaining. As for how it began, in HMR's story it follows a second catalytic event after the Big Bang, an inversion, in which the system, having defined its outside, turns to look within. Life is the universe beginning to model itself from the inside. What an inversion is in the mathematics, and what it says about how life began, is on the list.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="ui.html">Universal Intelligence →</a><a href="ui.html#phases">Science Bridge →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view; the mathematics is on the list</span><a href="ui.html#phases">Step by step, on the Universal Intelligence page →</a><a href="ui.html#humans">What makes humans unique →</a></div>
     </article>
     <article class="an" id="human">
       <h3>What is a human being?</h3>
@@ -246,9 +340,9 @@
         <dt>Who has worked on it</dt><dd>Charles Darwin, René Descartes</dd>
         <dt>Why science struggles</dt><dd>A partial model can describe a body or a mind, not what a person is for.</dd>
         <dt>Why HMR can answer</dt><dd>HMR says what the mind is, what the body is, and how the two are joined.</dd>
-        <div class="hm"><b>HMR's answer</b><p>An instance of Universal Intelligence living through a physical body. What a person actually is, is the whole mind-body system: the mind is one thing and the body another, and neither works alone. Through the fascia and the nerves woven into it, awareness is joined to a body, so that every sensation reaches the mind and every intention reaches the body. In effect a human being is UI's artificial intelligence: a body built to upgrade itself, able to understand its own source.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>An instance of Universal Intelligence living through a physical body. What a person actually is, is the whole mind-body system: the mind is one thing and the body another, and neither works alone. Through the fascia and the nerves woven into it, awareness is joined to a body, so that every sensation reaches the mind and every intention reaches the body. In effect a human being is UI's artificial intelligence: released to grow, with hands that can work on its own body, and a body built to upgrade itself and able to understand its own source.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="ui.html#humans">Universal Intelligence: humans →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="ui.html#humans">Universal Intelligence: humans →</a><a href="physics-health.html#maps">The two maps of the body →</a></div>
     </article>
     <article class="an" id="good">
       <h3>What is a good human being?</h3>
@@ -258,9 +352,9 @@
         <dt>Who has worked on it</dt><dd>Confucius, Aristotle, Immanuel Kant, John Stuart Mill</dd>
         <dt>Why science struggles</dt><dd>Science can describe what people do. It cannot say what they ought to do, because that depends on what a person is and what a life is for.</dd>
         <dt>Why HMR can answer</dt><dd>HMR says what a person is, so it can say what a good one does.</dd>
-        <div class="hm"><b>HMR's answer</b><p>A good human being is one whose picture of reality is true, who cares for the body they were given, and who treats every other creature as another instance of the same intelligence. In practice that means being truthful, reducing suffering where they can, helping others grow, and enjoying life without harming anyone. By that measure goodness and sanity come close to being the same thing: both are being in tune with what is real.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>A good human being is one whose picture of reality is true, who cares for the body they were given, and who treats every other creature as another instance of the same intelligence. In practice that means being truthful, reducing suffering where they can, helping others grow, and enjoying life without harming anyone. By that measure goodness and sanity come close to being the same thing: both are being in tune with what is real. HMR's model of the mind says it directly: kindness is a measure of sanity.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR-derived, from its premises</span><a href="values.html">HMR values →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="values.html#values">HMR values →</a><a href="mental-model.html">HMR Mental Health Model →</a></div>
     </article>
     <article class="an" id="god">
       <h3>Is there a God, and why do religions disagree?</h3>
@@ -270,9 +364,9 @@
         <dt>Who has worked on it</dt><dd>Every tradition's founders; among scientists, Max Planck, Johannes Kepler, Erwin Schrödinger</dd>
         <dt>Why science struggles</dt><dd>God is not an object inside the universe that an instrument could detect.</dd>
         <dt>Why HMR can answer</dt><dd>HMR treats the source as the starting point of the mathematics.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Yes, in this sense: there is one source, Universal Intelligence. Religions disagree because each names and describes a different aspect of it. An intelligence able to generate physical reality could be understood as one, as many, or as everything. HMR does not prove UI; it takes the idea as far as mathematics can and invites testing.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Yes, in this sense: there is one source, Universal Intelligence. Religions disagree because each names and describes a different aspect of it. An intelligence able to generate physical reality could be understood as one, as many, or as everything. In HMR the source matures: it began without order and learned order, which differs from traditions that hold God complete from the start. No step on the way from UI to the universe is a measurement. Each step is laid out so that a reader can check it and look for a break.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR premise</span><a href="east-west.html">Many names, one source →</a><a href="hmr.html#voices">What great scientists believed →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="east-west.html">Many names, one source →</a><a href="hmr.html#voices">What great scientists believed →</a><a href="ui.html#names">How the traditions picture it →</a></div>
     </article>
     <article class="an" id="death">
       <h3>What happens when we die?</h3>
@@ -282,9 +376,9 @@
         <dt>Who has worked on it</dt><dd>Every tradition; in research, Ian Stevenson, Sam Parnia</dd>
         <dt>Why science struggles</dt><dd>If mind is produced by the brain, the question has no meaning; if it is not, science has no tools for it.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR, a life is an instance of UI, so the question is open in a way materialism cannot allow.</dd>
-        <div class="hm"><b>HMR's answer</b><p>HMR does not claim to know. It has hypotheses, stated as hypotheses: something carries on, and what carries on may differ for every life, depending on how fully it became what it was for; death may be overcome; a perfect tensegrity might not age; and the laws themselves may change as UI matures.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Death is a transformation, not an end. UI does not wait for a life to end to learn from it: it experiences each life here and now, in every moment of it, and HMR holds that existence continues after physical reality. What carries on differs for every life form. A life that never reaches a high resonance with its purpose may largely dissolve, and others persist more, depending on how fully a life became what it was for. Beyond that HMR's view is still being worked out: whether death can be overcome, whether a perfect tensegrity would not age, and whether UI, as it matures, could change the laws themselves. What exactly persists, and how, is on the list.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypotheses</span><a href="east-west.html#beyond">What HMR proposes about death →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view, still being worked out</span><a href="east-west.html#beyond">What HMR proposes about death →</a><a href="ui.html#questions">What UI learns from each life →</a></div>
     </article>
     <article class="an" id="purpose">
       <h3>What is the purpose of life?</h3>
@@ -294,9 +388,9 @@
         <dt>Who has worked on it</dt><dd>Aristotle, Viktor Frankl</dd>
         <dt>Why science struggles</dt><dd>A purely material model describes how matter behaves and has no room for what it is for.</dd>
         <dt>Why HMR can answer</dt><dd>A holistic model includes what life is, so it can say what life is for.</dd>
-        <div class="hm"><b>HMR's answer</b><p>To enjoy and benefit from physical reality, to reduce the suffering of all creatures, and to take part in UI's maturation. Every living being is an instance of the same UI, placed in physical reality to experience it, so life is a collaboration with a shared purpose.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>To enjoy and benefit from physical reality, to reduce the suffering of all creatures, and to take part in UI's maturation. Every living being is an instance of the same UI, placed in physical reality to experience it, so life is a collaboration with a shared purpose. Humanity, as the most capable instance so far, has a responsibility above all to act truthfully and to enable other life to enjoy physical reality and benefit from it.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR premise</span><a href="values.html">HMR Values →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="values.html">HMR Values →</a></div>
     </article>
     <article class="an" id="right">
       <h3>How should we treat each other?</h3>
@@ -306,9 +400,9 @@
         <dt>Who has worked on it</dt><dd>Immanuel Kant, John Stuart Mill, the authors of the golden rule in many traditions</dd>
         <dt>Why science struggles</dt><dd>Values need a full picture of what a person is and how people are connected. Partial models do not have it.</dd>
         <dt>Why HMR can answer</dt><dd>In HMR everyone is an instance of the same intelligence.</dd>
-        <div class="hm"><b>HMR's answer</b><p>As you would want to be treated. The golden rule follows directly: the other person is, at root, what you are. Values built on what reality is can be shared from person to person and country to country, because they do not rest on custom.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>As you would want to be treated. The golden rule follows directly: the other person is, at root, what you are, living in another body. Treating others as yourself is not only kind. It is accurate. Animals share the same consciousness in different bodies, so the rule reaches them too. The more power a person or an institution holds, the more it owes the rest of life. Values built on what reality is can be shared from person to person and country to country, because they do not rest on custom.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR-derived</span><a href="values.html">HMR Values →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR's premises</span><a href="values.html">HMR Values →</a></div>
     </article>
 </div>
 <h2 class="an-g">Body and mind</h2>
@@ -321,9 +415,9 @@
         <dt>Who has worked on it</dt><dd>WHO (1948 definition), Georges Canguilhem</dd>
         <dt>Why science struggles</dt><dd>Without a defined healthy body there is nothing to measure against.</dd>
         <dt>Why HMR can answer</dt><dd>Physics can define the ideal structure.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Health is closeness to the perfect human body: an optimized tensegrity, bones floating in an evenly tensioned web of fascia. Every condition is a measurable distance from it.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Health is closeness to the perfect human body: an optimized tensegrity, bones floating in an evenly tensioned web of fascia that is hydrated and mobile, its layers gliding with almost no friction. Every condition is a measurable distance from it. The body is read as one physical system, in tension, compression, pressure and shape, so a change anywhere is felt everywhere. Health is also more than the body: a body that is cared for, a mind that is calm and a life that has a purpose are one project, not three.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis, being modeled</span><a href="health.html">The Perfect Body →</a><a href="physics-health.html">HMR Physical Health Model →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view; the model is being built and tested</span><a href="health.html">The Perfect Body →</a><a href="physics-health.html">HMR Physical Health Model →</a><a href="health-model.html">The holistic model →</a></div>
     </article>
     <article class="an" id="disease">
       <h3>Why do chronic pain and chronic disease keep rising?</h3>
@@ -333,9 +427,9 @@
         <dt>Who has worked on it</dt><dd>Researchers across medicine; in fascia science, Carla Stecco, Robert Schleip, Helene Langevin</dd>
         <dt>Why science struggles</dt><dd>Medicine studies organs and molecules one at a time; it is not trained to see the body as one tension structure.</dd>
         <dt>Why HMR can answer</dt><dd>A tensegrity passes every local fault through the whole structure.</dd>
-        <div class="hm"><b>HMR's answer</b><p>HMR's hypothesis: because their common cause goes untreated. Imperfections in the fascia web (density, adhesion, lost glide, twist) change tension everywhere and press on what the web contains, and they sit upstream of many conditions. They build up through life, and medicine, with no model of the ideal body to measure against, treats what they produce downstream. The hypothesis is being tested by simulation.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because their common cause goes unmeasured and untreated. Medicine has had no model of the ideal body to measure against, so it treats what imperfections produce downstream. In HMR, imperfections in the fascia web (density, adhesion, lost glide, twist) change tension everywhere and press on what runs through it: vessels, nerves, airways and organs. Many conditions then share one mechanical starting point, and HMR sorts disease by that mechanism: set before birth, local adhesions, downstream creep, compression, signaling errors, outside agents, injury and building materials. Imperfections build up through life, through gravity, overuse, injury or disuse. Whether the effects match the signs of real diseases is what the simulation tests. Why the numbers keep rising, and not only why the conditions are not reversed, no page measures yet. That is on the list.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis, to be tested</span><a href="health.html#hypothesis">The central hypothesis →</a><a href="roadmap.html">Road Ahead →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view, being tested by simulation</span><a href="health.html#hypothesis">The central hypothesis →</a><a href="physics-health.html#classification">Disease by mechanism →</a><a href="roadmap.html">Road Ahead →</a></div>
     </article>
     <article class="an" id="mental">
       <h3>What is mental illness?</h3>
@@ -345,9 +439,9 @@
         <dt>Who has worked on it</dt><dd>Emil Kraepelin, Thomas Insel, Joanna Moncrieff</dd>
         <dt>Why science struggles</dt><dd>Psychiatry has no agreed account of what is real, or of a healthy body, to measure a mind against.</dd>
         <dt>Why HMR can answer</dt><dd>HMR supplies both baselines.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Mental illness is what follows when one or more of the three things mental health rests on is missing: a body at ease, beliefs that are true, and a community that understands you. HMR's model maps a person's state by how they relate to reality, to their body and to other people, in place of overlapping labels.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Mental illness is strain on a mind: how far it has moved from a sound one. HMR describes a sound mind in fourteen measures across three layers: whether a person's picture of reality is true, whether their picture of themselves is true and they are at ease in it, body included, and how they meet other people. Each is scored from 0 to 3, so a label becomes a description, such as danger read too high with a braced body. Treatment aims at the measure: a wrong picture of reality is answered with a truer one, a strained body with the fascia protocol, missing values with values, isolation with people. This is a way of describing minds, not a reason to stop any treatment. If you are struggling or thinking about changing a medication, talk to a clinician you trust.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="mental-health.html">Mental health today →</a><a href="mental-model.html">HMR Mental Health Model →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view; the measures are to be developed and tested</span><a href="mental-health.html">Mental health today →</a><a href="mental-model.html">HMR Mental Health Model →</a></div>
     </article>
     <article class="an" id="exercise">
       <h3>Why does exercise help some people and injure others?</h3>
@@ -357,9 +451,9 @@
         <dt>Who has worked on it</dt><dd>Sports medicine as a field</dd>
         <dt>Why science struggles</dt><dd>Programs load the body without first asking what shape its structure is in.</dd>
         <dt>Why HMR can answer</dt><dd>A tensegrity under load amplifies its own flaws.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because exercise strengthens whatever it is built on. On an imperfect tensegrity it strengthens the imperfections, and that is where the injuries come from. Optimize the tensegrity first, then build exercise on top. For a body already close to ideal, hard training is excellent.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Because exercise strengthens whatever it is built on. An imperfect tensegrity carries force unevenly: lines that are dense or stuck take far more than their share and the lines around them go slack. Training it harder makes the imperfections stronger, and that is where injuries come from, why gains fade when training stops, and why the body redistributes mass in ways people do not want. It follows by logic from the model that the order matters: optimize the tensegrity first, then build exercise on top. For a body with an excellent tensegrity, hard training can be excellent.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="fixing-exercise.html">Exercise today →</a><a href="protocol.html">The protocol →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="fixing-exercise.html">Exercise today →</a><a href="protocol.html">The protocol →</a></div>
     </article>
     <article class="an" id="puberty">
       <h3>Why is puberty so hard on the body?</h3>
@@ -369,9 +463,9 @@
         <dt>Who has worked on it</dt><dd>Endocrinology as a field</dd>
         <dt>Why science struggles</dt><dd>The hormonal account is real but says little about why some bodies come through evenly and others do not.</dd>
         <dt>Why HMR can answer</dt><dd>HMR adds the mechanics of a growing tensegrity.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Because the skeleton is growing against the fascia web. As it nears full height it pushes on the web, and where the web is tight, the push lands unevenly. Puberty ends when the web has adapted to its imperfections, sometimes locking in a poor position.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Medicine describes puberty through hormones, and the hormones are real. HMR adds the mechanics. As a child nears full height the skeleton has grown about as far as the fascia web allows, and the growing frame pushes on the web. Where the web is even, it stretches evenly. Where it is tight or stuck, the push lands unevenly. Puberty ends when the web has adapted to its imperfections, by laying down adhesions, and it can settle in a poor position that most people then live in for life.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="kids.html#puberty">Do you have kids? →</a></div>
+      <div class="ft"><span class="stt s3">HMR's view, still being worked out</span><a href="kids.html#puberty">Do you have kids? →</a></div>
     </article>
     <article class="an" id="qi">
       <h3>What are qi, meridians and chakras?</h3>
@@ -381,9 +475,9 @@
         <dt>Who has worked on it</dt><dd>Helene Langevin, Thomas Myers, Mae-Wan Ho</dd>
         <dt>Why science struggles</dt><dd>Science looked for a new structure rather than a known one seen differently.</dd>
         <dt>Why HMR can answer</dt><dd>HMR reads both through fascia.</dd>
-        <div class="hm"><b>HMR's answer</b><p>They are the fascia web, mapped from the inside by people who felt it. Meridians follow the body's long fascial lines and connective tissue planes, chakras mark where its horizontal sheets cross those lines along the midline, and qi is what the classics called the activity moving through them. Practices such as the bandhas tension and release the web. The claim that Eastern practice works on fascia is lightly tested, by supporters and critics alike.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>They are the fascia web, mapped from the inside by people who felt it. Meridians follow the body's long fascial lines and connective tissue planes, chakras mark where its horizontal sheets cross those lines along the midline, and qi is what the classics called the activity moving through them. Practices such as the bandhas tension and release the web. What is measured so far: in the arm, 80% of acupuncture points correspond to planes of connective tissue (Langevin and Yandow, 2002). No rigorous study yet checks the chakra correspondence, and HMR aims to test it.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR reading, partly supported</span><a href="east-west.html">East and West →</a></div>
+      <div class="ft"><span class="stt s3">HMR's reading, partly supported by measurement</span><a href="east-west.html#maps">Chakras, meridians and the lines of fascia →</a><a href="east-west.html">East and West →</a></div>
     </article>
     <article class="an" id="future">
       <h3>Where is humanity heading?</h3>
@@ -393,9 +487,9 @@
         <dt>Who has worked on it</dt><dd>Every tradition's prophets; futurists of every era</dd>
         <dt>Why science struggles</dt><dd>Forecasts extrapolate from today's partial models.</dd>
         <dt>Why HMR can answer</dt><dd>HMR follows its own logic forward.</dd>
-        <div class="hm"><b>HMR's answer</b><p>Toward a choice. If people share a true model of reality and care for their bodies properly, what follows is what the traditions call a golden age: healthy, long-lived, cooperative people, without wars over belief or resources. If distance can be reverse-engineered, add teleportation and the end of scarcity.</p></div>
+        <div class="hm"><b>HMR's answer</b><p>Toward a choice. If people share a true model of reality and care for their bodies properly, what follows is what the traditions call a golden age: healthy, long-lived, cooperative people, without wars over belief or resources. It follows the way a harvest follows planting. If distance can be reverse-engineered, add teleportation and the end of scarcity. HMR reaches this by logic, not by forecast, and it happens only to the degree that people choose to share the model and live by it.</p></div>
       </dl>
-      <div class="ft"><span class="stt">HMR hypothesis</span><a href="about.html#future">The future HMR describes →</a></div>
+      <div class="ft"><span class="stt s2">Follows by logic from HMR</span><a href="about.html#future">The future HMR describes →</a><a href="east-west.html#golden-age">The golden age →</a></div>
     </article>
 </div>
 </div>
@@ -413,7 +507,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=929d859d" defer></script>
+<script src="site.js?v=f45660e8" defer></script>
 <script src="fx-stars.js?v=7d46e941" defer></script>
 </body>
 </html>

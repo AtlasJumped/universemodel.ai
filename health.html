@@ -62,6 +62,45 @@
 .hx-alien{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:14px}
 .hx-alien div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.9rem;text-align:center}
 .hx-alien span{font-size:1.3rem;color:var(--blue)}
+
+.tg-ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:960px){.tg-ladder{grid-template-columns:1fr}}
+.tg-ladder .card{padding:0;overflow:hidden;border-top:4px solid var(--blue)}
+.tg-ladder .tg-vis{background:#F7FAFF;border-bottom:1px solid var(--line);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tg-vis .tg-svg{display:block;width:100%;height:100%}
+.tg-vis img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+.tg-ladder .tg-body{padding:16px 20px 20px}
+.tg-ladder h3{margin:0 0 6px;font-size:1.1rem}
+.tg-ladder p{margin:0 0 8px;font-size:.95rem}
+.tg-cap{font-size:.78rem;color:var(--soft);margin:0}
+.tg-share{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-top:22px}
+.tg-share .card{grid-column:span 2;padding:16px 18px}
+.tg-share .card:nth-child(n+4){grid-column:span 3}
+.tg-share h3{margin:0 0 4px;font-size:1rem}
+.tg-share p{margin:0;font-size:.95rem}
+@media (max-width:960px){.tg-share{grid-template-columns:repeat(2,minmax(0,1fr))}.tg-share .card,.tg-share .card:nth-child(n+4){grid-column:span 1}.tg-share .card:last-child{grid-column:span 2}}
+@media (max-width:620px){.tg-share{grid-template-columns:1fr}.tg-share .card,.tg-share .card:last-child{grid-column:span 1}}
+.tg-count{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;font-size:.95rem}
+.tg-count th,.tg-count td{border-top:1px solid var(--line);padding:10px 12px;text-align:left}
+.tg-count th{background:var(--mist);color:var(--navy);font-weight:650;border-top:0}
+.tg-count td.n{font:700 1.05rem/1 var(--font);color:var(--navy)}
+.tg-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:960px){.tg-three{grid-template-columns:1fr}}
+.tg-three .card{padding:18px 20px;border-top:4px solid var(--blue)}
+.tg-three h3{margin:0 0 6px;font-size:1.1rem}
+.tg-three p{margin:0 0 8px;font-size:.95rem}
+.tg-three .ev{font-size:.85rem;color:var(--soft)}
+.tg-three .tag,.tg-two .tag{margin-bottom:8px}
+.tg-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:860px){.tg-two{grid-template-columns:1fr}}
+.tg-two .card{padding:18px 20px}
+.tg-two h3{margin:0 0 6px;font-size:1.1rem}
+.tg-two p{margin:0 0 8px;font-size:.95rem}
+@media (max-width:860px){.tg-two .card[style*="grid-template-columns"]{grid-template-columns:1fr !important}}
+.tg-next{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;margin-top:24px;background:linear-gradient(135deg,#0E3A75,#1D5FD1);color:#fff;border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow)}
+.tg-next p{margin:0;color:#fff;max-width:none}
+.tg-next a.btn{background:#fff;color:var(--navy)}
+@media (max-width:760px){.tg-next{grid-template-columns:1fr}}
 </style>
 
 <div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">The perfect body</span><h1>There is a perfect human body. Start from it, and measure everything else against it</h1></div><div><p class="lede">Every person carries the design for a perfect body: an optimized tensegrity, in which every bone floats in a web of evenly tensioned fascia. Almost nobody has ever lived in one. Today, health is defined by what goes wrong. In the Holistic Model of Reality (HMR), it is defined by what fully right looks like, and every condition becomes a measurable distance from it.</p><p>This page describes that perfect body and why it is the right starting point. How it is used to diagnose and classify disease is the <a href="physics-health.html">HMR physical health model</a>.</p></div></div>
@@ -121,6 +160,84 @@
         <div><b>Ordinary stretching</b><span>Measured stiffness changes &ldquo;return to baseline levels within 10 to 20 minutes&rdquo; (<a href="https://doi.org/10.2519/jospt.2008.2843">Ryan et al., 2008</a>).</span></div>
         <div><b>Receptive fascia (HMR hypothesis)</b><span>Changes made after the fascia has been attended to directly are expected to hold, and to build on each other day after day.</span></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="tensegrities">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">What a tensegrity is</span><h2>Tensegrities, from the simplest to the most complex</h2></div><div><p>A tensegrity is a structure made of two kinds of part. Isolated struts take the compression, the pushing. They never touch one another. A continuous net of cables takes the tension, the pulling, and holds every strut in place. The name is Buckminster Fuller's, short for tensional integrity. The first sculptures of this kind were made by Kenneth Snelson in 1948.</p><p>You can put one on your desk, and you can find the same logic in a cell and in a body. Here is how they grow from simple to complex.</p></div></div>
+    <div class="tg-ladder">
+      <div class="card"><div class="tg-vis"><svg viewBox="0 0 300 225" role="img" aria-hidden="true" class="tg-svg"><line x1="206.4" y1="148.2" x2="104.0" y2="165.2" stroke="#2E7BE0" stroke-width="1.4"/><line x1="104.0" y1="165.2" x2="139.6" y2="73.4" stroke="#2E7BE0" stroke-width="1.4"/><line x1="139.6" y1="73.4" x2="206.4" y2="148.2" stroke="#2E7BE0" stroke-width="1.4"/><line x1="90.9" y1="105.9" x2="170.5" y2="43.1" stroke="#2E7BE0" stroke-width="1.4"/><line x1="170.5" y1="43.1" x2="188.6" y2="139.3" stroke="#2E7BE0" stroke-width="1.4"/><line x1="188.6" y1="139.3" x2="90.9" y2="105.9" stroke="#2E7BE0" stroke-width="1.4"/><line x1="206.4" y1="148.2" x2="188.6" y2="139.3" stroke="#2E7BE0" stroke-width="1.4"/><line x1="104.0" y1="165.2" x2="90.9" y2="105.9" stroke="#2E7BE0" stroke-width="1.4"/><line x1="139.6" y1="73.4" x2="170.5" y2="43.1" stroke="#2E7BE0" stroke-width="1.4"/><line x1="206.4" y1="148.2" x2="90.9" y2="105.9" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="104.0" y1="165.2" x2="170.5" y2="43.1" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="139.6" y1="73.4" x2="188.6" y2="139.3" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><circle cx="206.4" cy="148.2" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="104.0" cy="165.2" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="139.6" cy="73.4" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="90.9" cy="105.9" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="170.5" cy="43.1" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="188.6" cy="139.3" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/></svg></div><div class="tg-body"><span class="tag">Step 1</span><h3>The prism: 3 struts, 9 cables</h3><p>The simplest stable tensegrity. Three struts hang in a web of nine cables: three around the top, three around the bottom and three that join them.</p></div></div>
+      <div class="card"><div class="tg-vis"><svg viewBox="0 0 300 225" role="img" aria-hidden="true" class="tg-svg"><line x1="128.4" y1="113.4" x2="215.7" y2="121.8" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="113.4" x2="84.3" y2="60.1" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="113.4" x2="155.7" y2="189.6" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="113.4" x2="74.4" y2="151.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="41.7" x2="215.7" y2="121.8" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="41.7" x2="84.3" y2="60.1" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="41.7" x2="225.6" y2="73.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="41.7" x2="144.3" y2="35.4" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="183.3" x2="215.7" y2="164.9" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="183.3" x2="84.3" y2="103.2" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="183.3" x2="155.7" y2="189.6" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="183.3" x2="74.4" y2="151.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="111.6" x2="215.7" y2="164.9" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="111.6" x2="84.3" y2="103.2" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="111.6" x2="225.6" y2="73.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="171.6" y1="111.6" x2="144.3" y2="35.4" stroke="#2E7BE0" stroke-width="1.4"/><line x1="215.7" y1="121.8" x2="155.7" y2="189.6" stroke="#2E7BE0" stroke-width="1.4"/><line x1="215.7" y1="121.8" x2="225.6" y2="73.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="215.7" y1="164.9" x2="155.7" y2="189.6" stroke="#2E7BE0" stroke-width="1.4"/><line x1="215.7" y1="164.9" x2="225.6" y2="73.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="84.3" y1="60.1" x2="74.4" y2="151.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="84.3" y1="60.1" x2="144.3" y2="35.4" stroke="#2E7BE0" stroke-width="1.4"/><line x1="84.3" y1="103.2" x2="74.4" y2="151.5" stroke="#2E7BE0" stroke-width="1.4"/><line x1="84.3" y1="103.2" x2="144.3" y2="35.4" stroke="#2E7BE0" stroke-width="1.4"/><line x1="128.4" y1="113.4" x2="171.6" y2="41.7" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="128.4" y1="183.3" x2="171.6" y2="111.6" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="215.7" y1="121.8" x2="215.7" y2="164.9" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="84.3" y1="60.1" x2="84.3" y2="103.2" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="155.7" y1="189.6" x2="74.4" y2="151.5" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><line x1="225.6" y1="73.5" x2="144.3" y2="35.4" stroke="#0E3A75" stroke-width="5" stroke-linecap="round"/><circle cx="128.4" cy="113.4" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="171.6" cy="41.7" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="128.4" cy="183.3" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="171.6" cy="111.6" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="215.7" cy="121.8" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="215.7" cy="164.9" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="84.3" cy="60.1" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="84.3" cy="103.2" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="155.7" cy="189.6" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="74.4" cy="151.5" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="225.6" cy="73.5" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/><circle cx="144.3" cy="35.4" r="3.2" fill="#fff" stroke="#0E3A75" stroke-width="1.5"/></svg></div><div class="tg-body"><span class="tag">Step 2</span><h3>The icosahedron: 6 struts, 24 cables</h3><p>Six struts, in three pairs at right angles, and 24 cables make the expanded octahedron, often called the tensegrity icosahedron. Twelve strut ends float in one even web.</p></div></div>
+      <div class="card"><div class="tg-vis"><img src="img/hx-tensegrity-needle-tower.jpg" alt="Looking straight up through Kenneth Snelson's Needle Tower: long straight struts that never touch, held by thin cables." loading="lazy" width="1067" height="1600"></div><div class="tg-body"><span class="tag">Steps 3 and 4</span><h3>Towers, masts and domes</h3><p>Stack such units and you get a tower or a mast. Join many and the structure becomes a dome.</p><p class="tg-cap">Kenneth Snelson's Needle Tower, seen from below. Photo: Ben Stephenson, CC BY 2.0, <a href="https://commons.wikimedia.org/wiki/File:Converging_Pattern.jpg">Wikimedia Commons</a>.</p></div></div>
+    </div>
+    <h3 style="margin:34px 0 0">What every tensegrity shares</h3>
+    <div class="tg-share">
+      <div class="card"><h3>Prestress</h3><p>The cables are tight before any load arrives. The structure holds itself.</p></div>
+      <div class="card"><h3>Load spreads through the net</h3><p>A force does not stay where it lands. The whole web carries it.</p></div>
+      <div class="card"><h3>A push anywhere moves everything a little</h3><p>Press one corner and every part gives slightly, then returns.</p></div>
+      <div class="card"><h3>Light for their stiffness</h3><p>Few, slender parts make a structure that is firm for its weight.</p></div>
+      <div class="card"><h3>Stiffness rises with prestress and with load</h3><p>Tighten the net and it gets stiffer. Load it and it stiffens further.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="counting">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">The counting rule</span>
+      <h2>Why a few cables can make a stiff frame</h2>
+      <p>In 1864 James Clerk Maxwell gave a rule for frames. A frame of j joints needs 3j minus 6 bars to be rigid in space.</p>
+      <p>Tensegrities sit right on that count, yet they can be pulled tight into a state of tension in every cable at once. In 1978 C. R. Calladine showed what that means: the count leaves some small motions free, and prestress is what stiffens them (<a href="https://doi.org/10.1016/0020-7683(78)90052-5">Calladine, International Journal of Solids and Structures 14, 161 to 172, 1978</a>).</p>
+    </div>
+    <div>
+      <table class="tg-count">
+        <tr><th>Shape</th><th>Joints (j)</th><th>Maxwell asks for 3j - 6</th><th>Members it has</th></tr>
+        <tr><td>Prism</td><td class="n">6</td><td class="n">12</td><td class="n">3 + 9 = 12</td></tr>
+        <tr><td>Icosahedron form</td><td class="n">12</td><td class="n">30</td><td class="n">6 + 24 = 30</td></tr>
+      </table>
+      <p class="small muted" style="margin-top:10px">Check it yourself with the two shapes above. The count is met exactly. What makes the shape stand is the prestress.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tint" id="how-close">
+  <div class="wrap">
+    <span class="eyebrow">How close to ideal</span>
+    <h2>The shape sets the efficiency, and people differ in how near they are</h2>
+    <div class="tg-two">
+      <div class="card"><span class="tag">HMR's view, work in progress</span><h3>Efficiency follows shape</h3><p>HMR expects that the shape of a tensegrity fixes how efficiently it turns force into work. A perfect one would reach a best figure. The first imperfection would cost the most, and each later one a little less.</p><p>No formula is given here. This is HMR's view and is work in progress for the <a href="simulation.html">simulation</a>. Humans are far from the ideal, and vary in how far.</p></div>
+      <div class="card"><span class="tag">HMR's view</span><h3>Even the strongest bodies began untreated</h3><p>The most developed physiques in the world, in HMR's view, belong to people whose fascia web was closer to even before they ever trained. The same training gave them far more.</p><p>Even they began lifting before any fascia care.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="nature">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">In nature</span><h2>Tensegrities in living things</h2></div><div><p>Nature builds with the same logic, and also with a second one that the classic drawing leaves out.</p></div></div>
+    <div class="tg-three">
+      <div class="card"><span class="tag">The cell</span><h3>Struts and cables inside</h3><p>Donald Ingber's work shows that living cells behave as prestressed tensegrities. Microtubules bear compression. Actin filaments and intermediate filaments carry tension. The whole is anchored to its surroundings. The same idea has been applied from molecules to whole bodies (<a href="https://doi.org/10.1242/jcs.00359">Ingber, Journal of Cell Science 116, 1157 to 1173, 2003</a>).</p></div>
+      <div class="card"><span class="tag">HMR's view</span><h3>The balloon half of the picture</h3><p>A cell membrane, and the skin of a whole body, also acts as a tensioned envelope, like the skin of a balloon. It holds the shape evenly and does not let one place bulge. This is in addition to the strut and cable picture. Balloons have no struts.</p></div>
+      <div class="card"><span class="tag">A contrast</span><h3>The flea: store, then release</h3><p>The flea's jump is powered by energy stored in a pad of the elastic protein resilin and released suddenly: a spring and a catch (<a href="https://doi.org/10.1242/jeb.47.1.59">Bennet-Clark and Lucey, Journal of Experimental Biology 47, 59 to 76, 1967</a>). That is a stored-tension mechanism, not a tensegrity. A mechanism stores and releases. A standing tensegrity holds its shape all the time.</p></div>
+    </div>
+    <div class="tg-two">
+      <div class="card" style="grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center"><div><span class="tag">HMR's view</span><h3>Struts that slide, like a rope over a pulley</h3><p>In the classic tensegrity each strut end is fixed to the net at one point. In a body, as HMR reads it, many attachments can slide, like a rope over a pulley. That lets the web pass load along instead of holding it where it lands. <a href="fixing-exercise.html#pulleys">See the pulleys at work →</a></p></div><svg viewBox="0 0 440 150" role="img" aria-label="Left: a strut end tied to the cable net at one fixed point. Right: a cable passing over a wheel at the strut end, so the strut end can slide along it." style="display:block;width:100%;height:auto;background:#F7FAFF;border-radius:12px"><g stroke="#2E7BE0" stroke-width="2" fill="none"><path d="M20 120 L110 70 L200 120"/></g><line x1="110" y1="70" x2="110" y2="20" stroke="#0E3A75" stroke-width="7" stroke-linecap="round"/><circle cx="110" cy="70" r="5" fill="#fff" stroke="#0E3A75" stroke-width="2"/><text x="110" y="142" text-anchor="middle" font-size="12" fill="#5A6B80">Fixed at one point</text><g stroke="#2E7BE0" stroke-width="2" fill="none"><path d="M240 120 L330 76 A9 9 0 0 1 348 76 L420 120"/></g><line x1="339" y1="67" x2="339" y2="20" stroke="#0E3A75" stroke-width="7" stroke-linecap="round"/><circle cx="339" cy="76" r="9" fill="#fff" stroke="#0E3A75" stroke-width="2"/><path d="M300 100 L362 100" stroke="#0E3A75" stroke-width="1.5"/><text x="339" y="142" text-anchor="middle" font-size="12" fill="#5A6B80">Slides, like a rope over a pulley</text></svg></div>
+    </div>
+  </div>
+</section>
+
+<section id="physics-changes" style="border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">When the physics changes</span><h2>One fixed structure behaves differently as conditions change</h2></div><div><p>Keep the struts and cables exactly where they are. Change the warmth, the water and the lubrication, and the same structure moves differently. Warmth, hydration and lubrication change how freely the parts slide and how stiff the web is. Cold and dryness do the reverse.</p></div></div>
+    <div class="tg-three">
+      <div class="card"><span class="tag">Warmth</span><h3>Heat lets tissue lengthen</h3><p>In tendon, "the lower loads applied at elevated temperatures for prolonged periods were found to produce significantly greater residual elongation" (<a href="https://pubmed.ncbi.nlm.nih.gov/1267581/">Warren et al., Arch Phys Med Rehabil, 1976</a>, animal tissue). Cold does the reverse: in HMR's view it stiffens the web.</p></div>
+      <div class="card"><span class="tag">Lubrication</span><h3>The sliding film thins with warmth</h3><p>Fascial layers glide on a film rich in hyaluronan. It gets thinner the faster it is sheared and the warmer it is, and thicker and stickier when a part is kept still (<a href="https://doi.org/10.12688/f1000research.6885.1">Cowman, Schmidt, Raghavan and Stecco, F1000Research, 2015</a>).</p></div>
+      <div class="card"><span class="tag">Hydration</span><h3>Water changes the web</h3><p>After a sustained stretch and rest, fascia showed "matrix hydration higher than initial levels" (<a href="https://doi.org/10.1016/j.jbmt.2011.09.003">Schleip et al., J Bodyw Mov Ther, 2012</a>, animal tissue). Dryness does the reverse: in HMR's view it makes the web stiffer and the layers stickier.</p></div>
+    </div>
+    <div class="tg-next">
+      <p><b>Now we know what the body is as a structure, and what changes it. Here is how to care for it.</b></p>
+      <a class="btn" href="protocol.html">HMR Fascia Health Protocol →</a>
     </div>
   </div>
 </section>
@@ -395,7 +512,7 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=929d859d" defer></script>
+<script src="site.js?v=f45660e8" defer></script>
 <script src="fx-stars.js?v=7d46e941" defer></script>
 </body>
 </html>
