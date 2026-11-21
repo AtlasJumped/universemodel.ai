@@ -5,7 +5,7 @@
   --ice:#E8F0FA;       /* panels */
   --line:#D6E1EE;
   --navy:#0B2545;      /* headings */
-  --ink:#1E3350;       /* body text */
+  --ink:#0B2545;       /* body text */
   --soft:#53657E;      /* secondary text */
   --blue:#1D5FD1;      /* primary accent */
   --blue-d:#164BA8;
@@ -58,23 +58,24 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .nav .cta{position:relative}
 .cta-t{display:inline-block}
 .cta-w{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}
-.cta-w svg{display:block;height:62%;width:auto}
-.cta-w .e2w{opacity:0}
+.cta-w svg{display:block;height:74%;width:auto;overflow:visible}
+.cta-w .eo{transform-box:fill-box;transform-origin:50% 62%}
+.cta-w .ec{opacity:0}
 .site-head .nav .cta{animation:ctaglow var(--cyc) linear infinite}
 .site-head .nav .cta::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,255,255,0) 38%,rgba(255,255,255,.6) 50%,rgba(255,255,255,0) 62%) no-repeat;background-size:260% 100%;animation:ctasheen var(--cyc) linear infinite}
-.site-head .cta-t{animation:ctatext var(--cyc) linear infinite}
-.site-head .cta-w{animation:ctaface var(--cyc) linear infinite}
-.site-head .cta-w .e2{animation:ctaeye var(--cyc) linear infinite}
-.site-head .cta-w .e2w{animation:ctalid var(--cyc) linear infinite}
+.cta.wink .cta-t{animation:ctatext 1.9s ease both}
+.cta.wink .cta-w{animation:ctaface 1.9s ease both}
+.cta.wink .cta-w .eo{animation:ctaopen 1.9s ease both}
+.cta.wink .cta-w .ec{animation:ctashut 1.9s ease both}
 @keyframes ctaglow{0%,48.5%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}51%{box-shadow:0 0 0 3px rgba(242,169,59,.6),0 0 24px 5px rgba(109,74,255,.5);filter:brightness(1.2)}60%{box-shadow:0 0 0 2px rgba(242,169,59,.28),0 0 14px 2px rgba(109,74,255,.25);filter:brightness(1.08)}67%,100%{box-shadow:0 0 0 0 rgba(242,169,59,0),0 0 0 0 rgba(109,74,255,0);filter:none}}
 @keyframes ctasheen{0%,47.5%{opacity:0;background-position:130% 0}48.5%{opacity:1;background-position:130% 0}54.5%{opacity:1;background-position:-30% 0}55.5%,100%{opacity:0;background-position:-30% 0}}
-@keyframes ctatext{0%,51%{opacity:1}53%,64%{opacity:0}66%,100%{opacity:1}}
-@keyframes ctaface{0%,51.5%{opacity:0}53.5%,63.5%{opacity:1}65.5%,100%{opacity:0}}
-@keyframes ctaeye{0%,56%{opacity:1}56.4%,60.6%{opacity:0}61%,100%{opacity:1}}
-@keyframes ctalid{0%,56%{opacity:0}56.4%,60.6%{opacity:1}61%,100%{opacity:0}}
+@keyframes ctatext{0%{opacity:1}10%,88%{opacity:0}100%{opacity:1}}
+@keyframes ctaface{0%,4%{opacity:0}14%,84%{opacity:1}94%,100%{opacity:0}}
+@keyframes ctaopen{0%,34%{opacity:1;transform:scaleY(1)}44%{opacity:0;transform:scaleY(.08)}62%{opacity:0;transform:scaleY(.08)}72%,100%{opacity:1;transform:scaleY(1)}}
+@keyframes ctashut{0%,38%{opacity:0}44%,62%{opacity:1}68%,100%{opacity:0}}
 .cta-burst{position:absolute;top:0;pointer-events:none;z-index:2}
 @media (prefers-reduced-motion:reduce){.site-head .brand span,.site-head .nav a:not(.cta),.site-head .nav .grpbtn{animation:none;background-position:100% 0,0 0}
-  .site-head .brand .lg i,.site-head .nav .cta,.site-head .nav .cta::before,.site-head .cta-t,.site-head .cta-w,.site-head .cta-w .e2,.site-head .cta-w .e2w{animation:none}}
+  .site-head .brand .lg i,.site-head .nav .cta,.site-head .nav .cta::before{animation:none}}
 /* a column of plain paragraphs that flows into two balanced columns on wide screens */
 .prose2{columns:2;column-gap:clamp(24px,5vw,64px)}
 .prose2>p{break-inside:avoid;max-width:none}
@@ -87,7 +88,7 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 /* the end of every page: what it said, and the next page in the reading order */
 .nextup{padding:clamp(28px,4vw,46px) 0;background:var(--mist);border-top:1px solid var(--line)}
 .nextup .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(18px,4vw,56px);align-items:center}
-.nx-sum p{font-size:1.06rem;line-height:1.6;color:var(--ink);margin:8px 0 0;max-width:66ch}
+.nx-sum p{font-size:1rem;line-height:1.65;color:var(--ink);margin:8px 0 0;max-width:74ch}
 .nx-go{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;align-items:center;padding:22px 26px;border-radius:var(--radius);background:linear-gradient(135deg,#0B2545 0%,#123A6B 100%);color:#fff;box-shadow:var(--shadow)}
 .nx-go:hover{text-decoration:none}
 .nx-k{grid-column:1;font:600 .76rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#9CC3F5}
@@ -118,7 +119,7 @@ h2{font-weight:720;font-size:clamp(1.7rem,3.3vw,2.5rem);line-height:1.12;margin-
 h3{font-weight:650;font-size:1.22rem;line-height:1.3;margin-bottom:8px}
 p{margin:0 0 16px;max-width:68ch}
 .eyebrow{display:inline-block;font:600 .78rem/1 var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:14px}
-.lede{font-size:clamp(1.1rem,1.5vw,1.2rem);line-height:1.6;color:var(--soft);max-width:62ch}
+.lede{font-size:inherit;line-height:inherit;color:inherit;max-width:68ch}
 .muted{color:var(--soft)}
 .small{font-size:.9rem}
 
@@ -196,9 +197,9 @@ button.btn{cursor:pointer;font-family:var(--font)}
 .ds p{font-size:.96rem;color:var(--soft);margin:0}
 
 /* quote */
-.pull{font:600 clamp(1.2rem,2vw,1.4rem)/1.45 var(--font);letter-spacing:-.012em;color:var(--navy);max-width:40ch;margin:0 0 14px}
+.pull{font:600 clamp(1.2rem,2vw,1.4rem)/1.45 var(--font);letter-spacing:-.012em;color:var(--navy);max-width:40ch;margin:0 0 14px;position:relative;padding-left:30px;border:0}
 .navyband .pull{color:#fff}
-.note{font-size:.9rem;color:var(--soft);border-left:3px solid var(--sky);padding:4px 0 4px 14px;max-width:70ch}
+.note{font-size:.9rem;color:var(--soft);border:0;padding:0 0 0 24px;max-width:70ch;position:relative}
 .navyband .note{color:#C9DAF0;border-left-color:#7FB0EE}
 
 /* footer */
@@ -401,3 +402,12 @@ h3.subhead{font-size:clamp(1.3rem,2vw,1.5rem);font-weight:700;line-height:1.2;ma
 .split.nb-prose p{max-width:none}
 .split.nb-prose .pull{break-inside:avoid}
 .split.nb-prose p{orphans:3;widows:3}
+
+/* an aside in the running text is marked with a small star, the same shape as the sparkles in the top bar (never a line beside it) */
+.pull::before,.note::before{content:"";position:absolute;left:0;background:center/contain no-repeat}
+.pull::before{top:.34em;width:18px;height:18px;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%23F2A93B%22 d=%22M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z%22/%3E%3C/svg%3E")}
+.note::before{top:.42em;width:13px;height:13px;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%235B9BE6%22 d=%22M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z%22/%3E%3C/svg%3E")}
+/* the footer carries the same cloud of sparkles as the top bar, through its whole width; the monogram there does not turn */
+.site-foot{position:relative;overflow:hidden}
+.foot-aura{position:absolute;left:0;top:0;pointer-events:none;z-index:0}
+.site-foot .wrap{position:relative;z-index:1}
