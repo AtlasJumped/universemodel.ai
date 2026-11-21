@@ -203,7 +203,7 @@ const TG = (() => {
 
   // A neighbourhood of treehouses: each house hangs from the branches of its tree, and rope bridges join the houses.
   function treehouses() {
-    const b = builder(), houses = [];
+    const b = builder(), houses = [], people = [], grips = [];
     const trees = [[-2.4, -0.5, 3.0, 0.3], [-0.8, 0.75, 3.4, 1.1], [0.85, -0.6, 3.1, 0.2], [2.4, 0.65, 3.5, 0.9]]; // x, z, height, turn
     trees.forEach(([tx, tz, H, turn], ti) => {
       const g = 'tree' + ti, roots = [[0, 0], [0.55, 0.3], [-0.45, 0.45], [0, -0.6]].map(([dx, dz]) => b.node(tx + dx, 0, tz + dz, 1, true));
@@ -218,6 +218,9 @@ const TG = (() => {
       const rA = mid(0, 1, hy + 0.78), rB = mid(2, 3, hy + 0.78);
       b.body([...fl, rA, rB], [[fl[0], fl[1]], [fl[1], fl[2]], [fl[2], fl[3]], [fl[3], fl[0]], [fl[0], rA], [fl[1], rA], [fl[2], rB], [fl[3], rB], [rA, rB]], 'house' + ti);
       fl.forEach((f, k) => b.add(f, tips[k], 'cable'));
+      // a resident stands on the floor, held by their footing
+      const P = person(b, tx, hy, tz, 0.64, 'hp' + ti, false, true, { m: 0.4 }); people.push(P);
+      grips.push({ cs: footing(b, P, fl), pairs: [[fl[0], fl[1]], [fl[1], fl[2]]], max: 0.6 });
       houses.push({ fl, tips, crown });
     });
     // rope bridges: two ropes with planks between them, sagging between neighbouring houses
@@ -235,8 +238,8 @@ const TG = (() => {
     { const t = houses[3].tips, pa = b.P[t[0]], pb = b.P[t[3]], sA = b.node(pa[0] + 0.5, 0.55, pa[2] + 0.35, 0.5), sB = b.node(pa[0] + 0.85, 0.55, pa[2] + 0.1, 0.5), hook = b.node(pa[0] + 0.7, pa[1] + 0.05, pa[2] + 0.25, 0.2);
       b.add(t[0], hook, 'strut', { grp: 'tree3' }); b.add(t[3], hook, 'brace', { grp: 'tree3' }); b.add(houses[3].crown, hook, 'brace', { grp: 'tree3' }); void pb;
       b.add(hook, sA, 'cable', { strain: 0 }); b.add(hook, sB, 'cable', { strain: 0 }); b.add(sA, sB, 'strut'); }
-    return { b, ea: 900, strain: 0.004, iters: 2, kick: 1.6, view: [0.45, 0.3], thin: 0.6,
-      info: 'A neighbourhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbours.' };
+    return { b, ea: 900, strain: 0.004, iters: 4, kick: 1.6, view: [0.45, 0.3], thin: 0.6, people, grips,
+      info: 'A neighbourhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbours. Someone lives in each house. If what holds a house gives way, they fall.' };
   }
 
   function wheel() {
@@ -381,17 +384,23 @@ const TG = (() => {
     [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([x, z]) => bk.push(b.node(x * bw, yb, z * bw, 0.1)));
     [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([x, z]) => bk.push(b.node(x * bw * 0.85, yb - 0.08, z * bw * 0.85, 0.1)));
     const edges = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]].map(([p, q]) => [bk[p], bk[q]]);
-    b.body(bk, edges, 'basket');
+    // Each edge is its own strut (no shared group, so breaking one does not break the rest). Only the six face diagonals brace the
+    // box: with them it is just rigid, so a broken edge leaves a loose corner and nothing more.
+    edges.forEach(([p, q]) => b.add(p, q, 'strut'));
+    [[0, 2], [4, 6], [0, 5], [1, 6], [2, 7], [3, 4]].forEach(([p, q]) => b.add(bk[p], bk[q], 'brace'));
+    // two small people stand in the basket
+    const people = [-0.035, 0.035].map((z, i) => person(b, 0, yb - 0.08, z, 0.3, 'bp' + i, false, true, { m: 0.06 }));
+    const grips = people.map(P => ({ cs: footing(b, P, bk.slice(4)), pairs: [[bk[4], bk[5]], [bk[4], bk[7]]], max: 0.6 }));
     // suspension cables from the mouth of the envelope to the basket
     for (let c = 0; c < 4; c++) { const j = Math.round(c * m / 4 + 1) % m; b.add(rings[4][j], bk[c], 'cable'); b.add(rings[4][(j + 2) % m], bk[(c + 1) % 4], 'cable'); }
     // tethers to two stakes in the ground
     const s1 = b.node(-0.5, 0, 0, 0.1, true), s2 = b.node(0.5, 0, 0, 0.1, true);
     b.add(s1, bk[4], 'cable', { strain: 0.01 }); b.add(s2, bk[5], 'cable', { strain: 0.01 });
     // buoyancy: the hot air lifts the envelope with 1.5 times the weight of everything
-    const Mtot = env.length * 0.01 + 0.02 + 8 * 0.1, lift = 1.5 * Mtot * 9.81 / (env.length * 0.01);
+    const Mtot = env.length * 0.01 + 0.02 + 8 * 0.1 + 2 * 3.9 * 0.06, lift = 1.5 * Mtot * 9.81 / (env.length * 0.01);
     env.forEach(i => b.lift(i, lift));
-    return { b, ea: 400, eaFabric: 200, strain: 0.02, strainFabric: 0.005, kb: 300, iters: 3, kick: 0.6, view: [0.5, 0.25], balloon: cen,
-      info: 'Hot air pushes up on the envelope; the fabric and the cables are in tension, carrying the basket. Two tethers hold it down. Cut a tether and it drifts; cut the basket loose and it falls.' };
+    return { b, ea: 400, eaFabric: 200, strain: 0.02, strainFabric: 0.005, kb: 300, iters: 3, kick: 0.6, view: [0.5, 0.25], balloon: cen, people, grips,
+      info: 'Hot air pushes up on the envelope; the fabric and the cables are in tension, carrying the basket. Two small people ride in the basket. Two tethers hold it down. Cut a tether and it drifts; break one strut of the basket and only that corner gives way.' };
   }
 
   // A simplified human: bones as rigid struts, fascia as cables in tension crossing every joint. Feet are pinned.
@@ -570,13 +579,13 @@ const TG = (() => {
       const L = dist(P[c.a], P[c.b]);
       const tens = c.kind === 'cable' || c.kind === 'fabric';
       const strain = c.strain !== undefined ? c.strain : c.kind === 'fabric' ? (sh.strainFabric || sh.strain) : tens ? sh.strain : 0;
-      c.L0 = L * (1 - strain);
+      c.Lg = L; c.L0 = L * (1 - strain);
       const ea = c.kind === 'fabric' ? (sh.eaFabric || sh.ea) : sh.ea;
       c.comp = tens ? c.L0 / ea : c.kind === 'bend' ? 1 / (sh.kb || 200) : 0;
       c.uni = tens; c.draw = c.kind !== 'brace' && c.kind !== 'bend'; c.alive = true; c.T = 0; c.Tema = 0;
     });
     const ay0 = new Float64Array(cap); ay0.set(sh.b.A);
-    const S = { iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, n0: n, cap, c0: C.length, cracks: [], x, p: new Float64Array(x), v: new Float64Array(3 * cap), w, C, T, t: 0,
+    const S = { ash: [], fire: null, iters: sh.iters || 1, key: row[0], name: row[1], info: sh.info, view: sh.view, kick: sh.kick, n, n0: n, cap, c0: C.length, cracks: [], x, p: new Float64Array(x), v: new Float64Array(3 * cap), w, C, T, t: 0,
       ay0, ay: new Float64Array(ay0), deck: sh.deck, span: sh.span, water: sh.water, balloon: sh.balloon, thin: sh.thin || 1, head: sh.head, people: sh.people, grips: sh.grips, crush: sh.crush };
     // settle into equilibrium under gravity with strong damping, then freeze the result as time zero
     for (let k = 0; k < 150; k++) step(S, 1 / 60, 16, 14);
@@ -635,7 +644,7 @@ const TG = (() => {
     }
   }
 
-  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; }); if (S.grips) S.grips.forEach(g => { g.done = false; }); if (S.people) S.people.forEach(p => { p.hit = false; p.down = false; }); measure(S, 1); S.t = 0; }
+  function reset(S) { S.n = S.n0; S.C.length = S.c0; S.cracks = []; S.x.set(S.x0); S.p.set(S.x0); S.v.fill(0); S.ay.set(S.ay0); S.C.forEach(c => { c.alive = true; c.fs = undefined; c.su = undefined; }); S.fire = null; S.ash = []; if (S.grips) S.grips.forEach(g => { g.done = false; }); if (S.people) S.people.forEach(p => { p.hit = false; p.down = false; }); measure(S, 1); S.t = 0; }
 
   // A broken strut does not vanish: it cracks in the middle. The two halves stay, joined by a free hinge, so the strut
   // can no longer push its ends apart and the physics decides how the pieces fold.
@@ -658,6 +667,76 @@ const TG = (() => {
     return k;
   }
 
+
+  /* ----- fire: lit at a point, it runs along every member at a steady pace. A cable that has burned for a moment snaps,
+     a strut that has burned longer breaks (and its halves crumble to ash later), and what is left settles as ash. ----- */
+  const FIRE = { cable: 0.8, fabric: 0.5, strut: 2.0, hidden: 2.6, crumble: 1.7 };
+  function ignite(S, ci, u) {
+    const c = S.C[ci]; if (!c || c.Lg === undefined || !c.alive) return false;
+    if (!S.fire) {
+      const n0 = S.n0, adj = Array.from({ length: n0 }, () => []), lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+      for (let i = 0; i < S.c0; i++) { const m = S.C[i]; if (m.kind === 'bend') continue; adj[m.a].push([m.b, m.Lg]); adj[m.b].push([m.a, m.Lg]); }
+      for (let i = 0; i < n0; i++) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], S.x0[3 * i + k]); hi[k] = Math.max(hi[k], S.x0[3 * i + k]); }
+      const span = Math.max(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2], 0.3);
+      const fabN = new Float64Array(S.cap), fabA = new Float64Array(S.cap);
+      for (let i = 0; i < S.c0; i++) { const m = S.C[i]; if (m.kind === 'fabric') { fabN[m.a]++; fabN[m.b]++; fabA[m.a]++; fabA[m.b]++; } }
+      S.fire = { fabN, fabA, F: 0, F0: 0, acc: 0, v: span / 4.5, ign: new Float64Array(S.cap).fill(Infinity), adj, snapped: 0, broke: 0, last: 0 };
+    }
+    const f = S.fire, n0 = S.n0, d = new Float64Array(n0).fill(Infinity), done = new Uint8Array(n0);
+    d[c.a] = f.F + u * c.Lg / f.v; d[c.b] = Math.min(d[c.b], f.F + (1 - u) * c.Lg / f.v);
+    for (let it = 0; it < n0; it++) {
+      let k = -1, m = Infinity; for (let i = 0; i < n0; i++) if (!done[i] && d[i] < m) { m = d[i]; k = i; }
+      if (k < 0) break; done[k] = 1;
+      for (const [j, L] of f.adj[k]) { const t = m + L / f.v; if (t < d[j]) d[j] = t; }
+    }
+    for (let i = 0; i < n0; i++) { if (d[i] < f.ign[i]) f.ign[i] = d[i]; if (f.ign[i] < Infinity && f.ign[i] > f.last) f.last = f.ign[i]; }
+    if (c.fs === undefined) { c.fs = f.F; c.su = u; c.st0 = f.F; loseLift(S, c); }
+    return true;
+  }
+  // a burning envelope lets its hot air out: the lift on each node falls with the fabric around it that has caught fire
+  function loseLift(S, c) {
+    if (c.kind !== 'fabric') return; const f = S.fire;
+    [c.a, c.b].forEach(i => { f.fabA[i]--; });
+  }
+  function spawnAsh(S, c, k) {
+    const x = S.x, a = 3 * c.a, b = 3 * c.b, ash = S.ash;
+    for (let i = 0; i < k; i++) {
+      const u = Math.random(); if (ash.length >= 900) ash.shift();
+      ash.push({ x: x[a] + (x[b] - x[a]) * u, y: x[a + 1] + (x[b + 1] - x[a + 1]) * u, z: x[a + 2] + (x[b + 2] - x[a + 2]) * u, vx: (Math.random() - 0.5) * 0.12, vy: 0, vz: (Math.random() - 0.5) * 0.12, s: 0.6 + Math.random() * 0.9, on: 0 });
+    }
+  }
+  function ashStep(S, dt) {
+    for (const p of S.ash) {
+      if (p.on) continue;
+      p.vy = Math.max(-1.1, p.vy - 9.81 * 0.3 * dt); p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+      if (p.y <= 0) { p.y = 0; p.on = 1; }
+    }
+  }
+  // quant > 0: the fire advances in steps of that many seconds (for people who ask for less motion)
+  function fireStep(S, dt, quant) {
+    const f = S.fire; ashStep(S, dt); if (!f) return;
+    if (quant) { f.acc += dt; if (f.acc < quant) return; dt = f.acc; f.acc = 0; }
+    f.F += dt; const F = f.F;
+    // the hot air cools and leaks while anything burns, and leaves with the fabric that has caught fire
+    for (let i = 0; i < S.n0; i++) if (S.ay0[i] > 0 && f.fabN[i]) S.ay[i] = S.ay0[i] * Math.max(0, f.fabA[i]) / f.fabN[i] * Math.max(0, 1 - (F - f.F0) / 3);
+    for (let ci = 0; ci < S.C.length; ci++) {
+      const c = S.C[ci]; if (!c.alive) continue;
+      if (c.half) { if (F >= c.crumble) { c.alive = false; spawnAsh(S, c, 4); } continue; }
+      if (ci >= S.c0) continue;
+      if (c.fs === undefined) { const t = Math.min(f.ign[c.a], f.ign[c.b]); if (t <= F) { c.fs = t; loseLift(S, c); } else continue; }
+      const life = c.kind === 'strut' ? FIRE.strut : c.kind === 'cable' ? FIRE.cable : c.kind === 'fabric' ? FIRE.fabric : FIRE.hidden;
+      if (F - c.fs < life) continue;
+      if (c.kind === 'strut') {
+        const before = S.C.length; snap(S, c); f.broke++;
+        for (let k = before; k < S.C.length; k++) { S.C[k].burnt = true; S.C[k].fb = F; S.C[k].crumble = F + FIRE.crumble * (0.7 + 0.6 * Math.random()); }
+        if (S.C.length === before) spawnAsh(S, c, 4);
+      } else { c.alive = false; if (c.kind === 'cable') { f.snapped++; spawnAsh(S, c, 2); } else if (c.kind === 'fabric') {
+          f.snapped++; if (Math.random() < 0.5) spawnAsh(S, c, 1);
+        } }
+    }
+    f.over = F > f.last + FIRE.strut + FIRE.crumble * 1.4 + 0.3;
+  }
+
   function pluck(S, i, mag) {
     const x = S.x; let cx = 0, cy = 0, cz = 0, m = 0;
     for (let k = 0; k < S.n; k++) if (S.w[k]) { cx += x[3 * k]; cy += x[3 * k + 1]; cz += x[3 * k + 2]; m++; }
@@ -677,7 +756,7 @@ const TG = (() => {
 
   const ok = S => { for (let i = 0; i < S.x.length; i++) if (!isFinite(S.x[i]) || Math.abs(S.x[i]) > 50) return false; return true; };
 
-  return { SHAPES, make, step, measure, reset, kill, pluck, ok, hazards };
+  return { SHAPES, make, step, measure, reset, kill, pluck, ok, hazards, ignite, fireStep };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 
@@ -691,6 +770,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
   st.textContent = `
 .stage{touch-action:pan-y;cursor:grab}
 .stage.pick{cursor:crosshair}
+.cur-hammer,.cur-hammer canvas{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M12 12 L28 28' stroke='%23fff' stroke-width='6.5' stroke-linecap='round'/%3E%3Cpath d='M7 16 L16 7' stroke='%23fff' stroke-width='12' stroke-linecap='butt'/%3E%3Cpath d='M12 12 L28 28' stroke='%238A5A0B' stroke-width='3.6' stroke-linecap='round'/%3E%3Cpath d='M7.6 15.4 L15.4 7.6' stroke='%230E3A75' stroke-width='9' stroke-linecap='butt'/%3E%3Cpath d='M4.6 17.4 L8.4 13.6' stroke='%23EEF3F9' stroke-width='3' stroke-linecap='butt'/%3E%3C/svg%3E") 5 17,crosshair!important}
+.cur-fire,.cur-fire canvas{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 C18 8 25 11 25 20 C25 26 21 30 16 30 C11 30 7 26 7 20 C7 16 9 14 11 12 C11 15 13 16 14 16 C13 10 14 6 16 2 Z' fill='%23E8761C' stroke='%23fff' stroke-width='2.4' stroke-linejoin='round' paint-order='stroke'/%3E%3Cpath d='M16 14 C17 18 21 19 21 23 C21 26 19 28 16 28 C13 28 11 26 11 23 C11 20 15 18 16 14 Z' fill='%23F7C62F'/%3E%3C/svg%3E") 16 28,crosshair!important}
 .tgc{width:100%;margin:10px auto 0;display:grid;gap:8px;font-size:.9rem}
 .tgc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tgc-two{gap:6px}
@@ -709,6 +790,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 .tgc .chipbtn{padding:8px 10px}
 .tgc .chipbtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .tgc .chipbtn.cut.on{background:#B4232F;border-color:#B4232F}
+.tgc .chipbtn.fire.on{background:#D9661F;border-color:#D9661F}
+.tgc-two .chipbtn{padding:8px 6px;font-size:.82rem}
+.tgc-two .tgc-grp+.tgc-grp{padding-left:6px}
+.tgc-two .tgc-grp{gap:5px}
+.tgc [data-a=speed]{min-width:5.7em;text-align:center}
+.tgc [data-a=speed] small{font-size:.74em;font-weight:600;opacity:.85;margin-left:.2em}
 .tgc-seg{display:inline-flex;align-items:center;gap:4px;color:var(--soft);font-size:.82rem;font-weight:600}
 .tgc-info{margin:0;max-width:none;font-size:.9rem;line-height:1.5;color:var(--ink);background:var(--mist);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
 .tgc-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:.8rem;color:var(--soft)}
@@ -726,8 +813,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const cv = stage.querySelector('canvas#tg'), ctx = cv.getContext('2d');
     const auto = stage.dataset.autospin === '1' && !reduce;
     const start = TG.SHAPES.some(r => r[0] === stage.dataset.start) ? stage.dataset.start : 'six';
-    let S = TG.make(start), running = true, spin = auto, speed = 1, mode = 'pluck', hover = -1, cuts = 0, removed = 0, flashes = [], visible = true;
-    let water = true, traffic = true, cars = [], flown = 0;
+    let S = TG.make(start), running = true, spin = auto, speed = 1, mode = 'pluck', hover = -1, cuts = 0, removed = 0, flashes = [], visible = true, smoke = [];
+    let water = true, traffic = true, cars = [], flown = 0, burningList = [], fireKey = '';
     let yaw = S.view[0], pitch = S.view[1], vyaw = 0, W = 0, H = 0, cam = null;
 
     // controls
@@ -736,8 +823,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 <div class="tgc-row"><label class="tgc-sel">Change the tensegrity <select>${[...new Set(TG.SHAPES.map(s => s[3]))].map(g => `<optgroup label="${g}">${TG.SHAPES.filter(s => s[3] === g).map(s => `<option value="${s[0]}"${s[0] === start ? ' selected' : ''}>${s[1]}</option>`).join('')}</optgroup>`).join('')}</select></label>
   <span class="tgc-seg tgc-bridge"><label class="tgc-chk"><input type="checkbox" data-o="water" checked> Water</label><label class="tgc-chk"><input type="checkbox" data-o="traffic" checked> Traffic</label></span></div>
 <div class="tgc-row tgc-two">
-  <span class="tgc-grp" role="group" aria-label="What a tap does"><button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button><button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button><button type="button" class="chipbtn cut" data-m="strut">Break a strut</button></span>
-  <span class="tgc-grp" role="group" aria-label="Playback"><button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button><button type="button" class="chipbtn" data-a="speed" aria-label="Speed, tap to change">Speed 1x</button><button type="button" class="chipbtn" data-a="reset">Reset</button></span>
+  <span class="tgc-grp" role="group" aria-label="What a tap does"><button type="button" class="chipbtn on" data-m="pluck">Pluck a node</button><button type="button" class="chipbtn cut" data-m="cut">Cut a cable</button><button type="button" class="chipbtn cut" data-m="strut">Break a strut</button><button type="button" class="chipbtn fire" data-m="fire">Fire</button></span>
+  <span class="tgc-grp" role="group" aria-label="Playback"><button type="button" class="chipbtn" data-a="play" aria-pressed="false">Pause</button><button type="button" class="chipbtn" data-a="speed" aria-label="Slow motion, tap to change the speed">Slow <small>1x</small></button><button type="button" class="chipbtn" data-a="reset">Reset</button></span>
 </div>
 <p class="tgc-info"><span class="tgc-text"></span>
 <span class="tgc-key"><span><i style="height:6px;background:var(--deep)"></i>strut: compression</span><span><i style="height:3px;background:var(--sky)"></i>cable: tension</span><span><i style="height:0;border-top:2px dashed #A9B8CC"></i>slack cable</span><span><i style="height:4px;background:#1D5FD1;box-shadow:0 0 6px #5B9BE6"></i>tension changing</span></span></p>
@@ -750,18 +837,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const $ = q => box.querySelector(q), sel = $('select'), status = $('.tgc-status');
     const setInfo = () => { $('.tgc-text').textContent = S.info; $('.tgc-bridge').style.display = S.deck ? '' : 'none'; };
     box.querySelectorAll('[data-o]').forEach(c => c.addEventListener('change', () => { if (c.dataset.o === 'water') water = c.checked; else { traffic = c.checked; if (!traffic) { cars = []; S.ay.set(S.ay0); } } }));
-    const setCursor = () => { stage.classList.remove('cur-pluck', 'cur-cut', 'cur-strut'); stage.classList.add('cur-' + mode); };
+    const setCursor = () => { stage.classList.remove('cur-pluck', 'cur-cut', 'cur-strut', 'cur-hammer', 'cur-fire'); stage.classList.add(mode === 'strut' ? 'cur-hammer' : 'cur-' + mode); };
     setCursor();
+    const fireLine = () => { const f = S.fire; return f.over ? 'Everything has burned. Only ash is left. Press Reset to start again.' : `Burning. ${f.snapped} cable${f.snapped === 1 ? '' : 's'} snapped, ${f.broke} strut${f.broke === 1 ? '' : 's'} broken. Tap to light another spot.`; };
     const say = () => {
       const parts = [];
       if (cuts) parts.push(`${cuts} cable${cuts > 1 ? 's' : ''} cut`);
       if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} broken`);
-      let m = parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : 'Tap a node to send a pulse of tension; drag to turn.';
+      if (S.fire) parts.length = 0;
+      let m = S.fire ? fireLine() : parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : mode === 'fire' ? 'Tap a point on the structure to light a fire there. It spreads along the cables and struts.' : 'Tap a node to send a pulse of tension; drag to turn.';
       if (!running) m = 'Paused. ' + m + ' Press Play to run the physics.';
       status.textContent = m;
     };
     const chips = (attr, val) => box.querySelectorAll(`[data-${attr}]`).forEach(b => b.classList.toggle('on', b.dataset[attr] === String(val)));
-    function load(key) { S = TG.make(key); S.deckSeg = null; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; fit(); setInfo(); say(); draw(); }
+    function load(key) { S = TG.make(key); S.deckSeg = null; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; cuts = removed = 0; hover = -1; cars = []; smoke = []; fit(); setInfo(); say(); draw(); }
     sel.addEventListener('change', () => load(sel.value));
     stage.tg = { state: () => S, cut: ci => { cuts += TG.kill(S, ci) ? 1 : 0; say(); }, load };
     box.addEventListener('click', e => {
@@ -769,8 +858,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       if (b.dataset.m) { mode = b.dataset.m; chips('m', mode); setCursor(); hover = -1; say(); }
       const a = b.dataset.a;
       if (a === 'play') { running = !running; b.textContent = running ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', !running); say(); }
-      if (a === 'speed') { speed = speed === 1 ? 0.25 : speed === 0.25 ? 0.1 : 1; b.textContent = 'Speed ' + speed + 'x'; b.classList.toggle('on', speed !== 1); }
-      if (a === 'reset') { TG.reset(S); cuts = removed = 0; cars = []; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; say(); }
+      if (a === 'speed') { speed = speed === 1 ? 0.25 : speed === 0.25 ? 0.1 : 1; b.innerHTML = 'Slow <small>' + speed + 'x</small>'; b.classList.toggle('on', speed !== 1); }
+      if (a === 'reset') { TG.reset(S); cuts = removed = 0; cars = []; smoke = []; yaw = S.view[0]; pitch = S.view[1]; vyaw = 0; say(); }
     });
 
     // camera
@@ -824,6 +913,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         const a = pr(x[3 * c.a], 0, x[3 * c.a + 2]), b = pr(x[3 * c.b], 0, x[3 * c.b + 2]);
         ctx.lineWidth = c.kind === 'strut' ? 5 : 1.5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       });
+      // ash: grey flecks, falling and settled
+      if (S.ash.length) {
+        const sc = Math.min(1.3, Math.min(W, H) / 420);
+        S.ash.forEach(a => { const q = pr(a.x, a.y, a.z), z = Math.max(1.3, 2.3 * a.s * q[3] * sc); ctx.fillStyle = a.on ? (a.s > 1 ? '#8E9298' : '#A7ABB1') : '#5E6269'; ctx.fillRect(q[0] - z / 2, q[1] - z / 3, z, z * 0.66); });
+      }
       // fabric
       if (S.T.length) {
         const tris = S.T.filter(t => S.C[t[3]].alive && S.C[t[4]].alive && S.C[t[5]].alive).map(t => [t, (P[t[0]][2] + P[t[1]][2] + P[t[2]][2]) / 3]).sort((p, q) => q[1] - p[1]);
@@ -846,7 +940,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       // struts, far to near
       S.C.map((c, ci) => [c, ci]).filter(([c]) => c.alive && c.kind === 'strut').sort((p, q) => (P[q[0].a][2] + P[q[0].b][2]) - (P[p[0].a][2] + P[p[0].b][2])).forEach(([c, ci]) => {
         const a = P[c.a], b = P[c.b];
-        ctx.strokeStyle = ci === hover ? '#D33A45' : c.col || deep; ctx.lineCap = 'round';
+        ctx.strokeStyle = ci === hover ? '#D33A45' : c.burnt ? '#4B4541' : c.col || deep; ctx.lineCap = 'round';
         ctx.lineWidth = S.thin * (c.thin || 1) * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * Math.min(1.3, Math.min(W, H) / 420)));
         ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       });
@@ -864,11 +958,15 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         let r = 0; S.head.forEach(i => { r = Math.max(r, Math.hypot(P[i][0] - cx, P[i][1] - cy)); });
         ctx.fillStyle = 'rgba(91,155,230,.14)'; ctx.strokeStyle = deep; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, cy, r * 0.95, r * 1.05, 0, 0, 7); ctx.fill(); ctx.stroke();
       }
-      if (S.people) S.people.forEach(p => { const h = P[p.head], nk = P[p.neck], r = Math.max(3, Math.hypot(h[0] - nk[0], h[1] - nk[1]) * 0.62);
+      if (S.people) S.people.forEach(p => { if (S.fire && !S.C.some(c => c.alive && c.grp === p.grp && c.kind === 'strut')) return; const h = P[p.head], nk = P[p.neck], r = Math.max(3, Math.hypot(h[0] - nk[0], h[1] - nk[1]) * 0.62);
         ctx.fillStyle = p.hit ? '#F6D9CC' : '#FBE7D6'; ctx.strokeStyle = '#D9661F'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(h[0], h[1] - r * 0.25, r, 0, 7); ctx.fill(); ctx.stroke(); });
+      if (S.fire) drawFire(P);
       // nodes
+      let held = null;
+      if (S.fire) { held = new Uint8Array(S.n); S.C.forEach(c => { if (c.alive && c.draw) { held[c.a] = 1; held[c.b] = 1; } }); }
       for (let i = 0; i < S.n; i++) {
         const p = P[i];
+        if (held && S.w[i] && !held[i]) continue;
         if (!S.w[i]) { ctx.fillStyle = '#7C8DA6'; ctx.fillRect(p[0] - 3, p[1] - 3, 6, 6); continue; }
         if (i >= S.n0) { // the crack in a broken strut: a short red line across it
           const h = S.C.find(c => c.half && c.alive && c.b === i) || S.C.find(c => c.half && c.alive && c.a === i); if (!h) continue;
@@ -881,6 +979,47 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       const now = performance.now();
       flashes = flashes.filter(f => now - f.t0 < 500);
       flashes.forEach(f => { const q = pr(f.x, f.y, f.z), k = (now - f.t0) / 500; ctx.strokeStyle = `rgba(211,58,69,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0], q[1], 4 + 18 * k, 0, 7); ctx.stroke(); });
+    }
+
+
+    // fire: charred overlay on what has burned, flickering flames along it, and a little smoke
+    function drawFire(P) {
+      const f = S.fire, F = f.F, k = Math.min(1.3, Math.min(W, H) / 420), tm = reduce ? 0 : performance.now() / 1000, burning = [];
+      S.C.forEach((c, ci) => {
+        if (!c.alive) return;
+        if (c.half) { if (c.burnt && F - c.fb < 1.4) burning.push([ci, [[0.2, 0.8]], 1 - (F - c.fb) / 1.4, 0]); return; }
+        if (c.fs === undefined || ci >= S.c0) return;
+        const L = c.Lg || 1e-6, fa = Math.min(1, Math.max(0, (F - f.ign[c.a]) * f.v / L)), fb = Math.min(1, Math.max(0, (F - f.ign[c.b]) * f.v / L)), segs = [];
+        if (fa + fb >= 1) segs.push([0, 1]); else { if (fa > 0) segs.push([0, fa]); if (fb > 0) segs.push([1 - fb, 1]); }
+        if (c.su !== undefined) { const g = Math.max(0.02, (F - c.st0) * f.v / L); segs.push([Math.max(0, c.su - g), Math.min(1, c.su + g)]); }
+        if (!segs.length) segs.push([c.su === undefined ? 0 : c.su, c.su === undefined ? 0 : c.su]);
+        const life = c.kind === 'strut' ? 2.0 : c.kind === 'cable' ? 0.8 : c.kind === 'fabric' ? 0.5 : 2.6;
+        burning.push([ci, segs, Math.max(0.25, 1 - (F - c.fs) / life * 0.6), Math.min(1, (F - c.fs) / life)]);
+      });
+      const stride = Math.ceil(burning.length / 150);
+      ctx.lineCap = 'round';
+      burning.forEach(([ci, segs, vig, age], bi) => {
+        const c = S.C[ci], a = P[c.a], b = P[c.b], fab = c.kind === 'fabric', show = c.draw && !c.half;
+        if (show && (!fab || bi % stride === 0)) {
+          const w = c.kind === 'strut' ? S.thin * (c.thin || 1) * Math.max(3, Math.min(10, 7.5 * (a[3] + b[3]) / 2 * k)) : fab ? 1.4 : 2.4;
+          ctx.strokeStyle = `rgb(${Math.round(232 - 174 * age)},${Math.round(118 - 72 * age)},${Math.round(28 + 12 * age)})`; ctx.lineWidth = w;
+          segs.forEach(([u0, u1]) => { if (u1 - u0 < 0.002) return; ctx.beginPath(); ctx.moveTo(a[0] + (b[0] - a[0]) * u0, a[1] + (b[1] - a[1]) * u0); ctx.lineTo(a[0] + (b[0] - a[0]) * u1, a[1] + (b[1] - a[1]) * u1); ctx.stroke(); });
+        }
+        if (fab && bi % (stride * 3) !== 0) return;
+        const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        segs.forEach(([u0, u1], si) => {
+          const cnt = Math.max(1, Math.min(4, Math.round((u1 - u0) * len / 18)));
+          for (let j = 0; j < cnt; j++) {
+            const u = u0 + (u1 - u0) * (j + 0.5) / cnt, ph = ci * 1.7 + j * 2.3 + si, x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u, q = (a[3] + b[3]) / 2;
+            const h = (13 + 5 * ((ci * 7 + j * 3) % 5) / 4) * q * k * vig * (0.8 + 0.22 * Math.sin(tm * 9 + ph) + 0.1 * Math.sin(tm * 17 + ph * 1.9)), w = h * 0.34, sw = 3 * k * Math.sin(tm * 6 + ph);
+            ctx.fillStyle = '#E8761C'; ctx.beginPath(); ctx.moveTo(x - w, y); ctx.quadraticCurveTo(x - w * 0.7, y - h * 0.55, x + sw, y - h); ctx.quadraticCurveTo(x + w * 0.7, y - h * 0.5, x + w, y); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = '#F7C62F'; ctx.beginPath(); ctx.moveTo(x - w * 0.5, y); ctx.quadraticCurveTo(x - w * 0.35, y - h * 0.4, x + sw * 0.6, y - h * 0.68); ctx.quadraticCurveTo(x + w * 0.35, y - h * 0.35, x + w * 0.5, y); ctx.closePath(); ctx.fill();
+          }
+        });
+      });
+      // smoke
+      smoke.forEach(m => { const q = pr(m.x, m.y, m.z), t = (performance.now() - m.t0) / 1700; if (t >= 1) return; ctx.fillStyle = `rgba(70,72,78,${(0.2 * (1 - t)).toFixed(3)})`; ctx.beginPath(); ctx.arc(q[0] + 6 * k * t * m.d, q[1], (3 + 10 * t) * q[3] * k, 0, 7); ctx.fill(); });
+      burningList = burning;
     }
 
     // traffic: each car presses on the two deck nodes it sits between, so the bridge carries a real moving load
@@ -928,7 +1067,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           const sdt = dt * speed;
           trafficStep(sdt);
           TG.step(S, sdt, speed < 1 ? 12 : 20, 0.7);
-          if (S.balloon !== undefined && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
+          if (S.balloon !== undefined && !S.fire && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
+          TG.fireStep(S, sdt, reduce ? 0.5 : 0);
+          if (!S.fire) burningList = [];
+          if (S.fire && !reduce && burningList.length) {
+            smoke = smoke.filter(m => now - m.t0 < 1700); smoke.forEach(m => { m.y += cam.R * 0.22 * sdt; m.x += m.vx * sdt; });
+            const want = Math.min(2, Math.ceil(burningList.length / 30)) * (Math.random() < Math.min(1, dt * 40) ? 1 : 0);
+            for (let i = 0; i < want && smoke.length < 60; i++) { const e = burningList[Math.floor(Math.random() * burningList.length)], c = S.C[e[0]], sg = e[1][Math.floor(Math.random() * e[1].length)]; if (!c) continue; const u = sg[0] + (sg[1] - sg[0]) * Math.random(), A = 3 * c.a, B = 3 * c.b, X = S.x;
+              smoke.push({ x: X[A] + (X[B] - X[A]) * u, y: X[A + 1] + (X[B + 1] - X[A + 1]) * u + cam.R * 0.03, z: X[A + 2] + (X[B + 2] - X[A + 2]) * u, t0: now, vx: (Math.random() - 0.5) * cam.R * 0.08, d: Math.random() * 2 - 1 }); }
+          }
+          if (S.fire) { const key = S.fire.snapped + ',' + S.fire.broke + ',' + (S.fire.over ? 1 : 0); if (key !== fireKey) { fireKey = key; say(); } }
           TG.measure(S, 1 - Math.exp(-sdt / 0.5));
           if (!TG.ok(S)) { TG.reset(S); cuts = removed = 0; say(); }
           const ev = TG.hazards(S);
@@ -946,16 +1094,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 
     // picking
     function nearest(mx, my, want) {
-      const x = S.x; let best = -1, bd = 1e9;
+      const x = S.x; let best = -1, bd = 1e9, bt = 0;
       S.C.forEach((c, ci) => {
         if (!c.alive || !c.draw || !want(c)) return;
         const a = pr(x[3 * c.a], x[3 * c.a + 1], x[3 * c.a + 2]), b = pr(x[3 * c.b], x[3 * c.b + 1], x[3 * c.b + 2]);
         const ux = b[0] - a[0], uy = b[1] - a[1], l2 = ux * ux + uy * uy || 1;
         const t = Math.max(0, Math.min(1, ((mx - a[0]) * ux + (my - a[1]) * uy) / l2));
         const d = Math.hypot(a[0] + t * ux - mx, a[1] + t * uy - my);
-        if (d < bd) { bd = d; best = ci; }
+        if (d < bd) { bd = d; best = ci; bt = t; }
       });
-      return [best, bd];
+      return [best, bd, bt];
     }
     const isCable = c => c.uni, isStrut = c => c.kind === 'strut';
     function act(mx, my, touch) {
@@ -964,6 +1112,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         let best = -1, bd = 1e9; const x = S.x;
         for (let i = 0; i < S.n; i++) { if (!S.w[i]) continue; const q = pr(x[3 * i], x[3 * i + 1], x[3 * i + 2]), d = Math.hypot(q[0] - mx, q[1] - my); if (d < bd) { bd = d; best = i; } }
         if (best >= 0 && bd < 60) { TG.pluck(S, best, S.kick); if (!running) say(); }
+        return;
+      }
+      if (mode === 'fire') {
+        const [fi, fd, ft] = nearest(mx, my, c => c.Lg !== undefined && !c.half);
+        if (fi < 0 || fd > tol + 8) return;
+        if (TG.ignite(S, fi, ft)) { smoke = []; say(); }
         return;
       }
       const [ci, d] = nearest(mx, my, mode === 'cut' ? isCable : isStrut);
@@ -981,7 +1135,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     stage.addEventListener('pointermove', e => {
       const r = stage.getBoundingClientRect();
       if (!dragging) {
-        if (e.pointerType === 'mouse' && mode !== 'pluck') { const [ci, d] = nearest(e.clientX - r.left, e.clientY - r.top, mode === 'cut' ? isCable : isStrut); hover = d < 16 ? ci : -1; }
+        if (e.pointerType === 'mouse' && (mode === 'cut' || mode === 'strut')) { const [ci, d] = nearest(e.clientX - r.left, e.clientY - r.top, mode === 'cut' ? isCable : isStrut); hover = d < 16 ? ci : -1; }
         return;
       }
       const dx = e.clientX - lx, dy = e.clientY - ly; moved = Math.hypot(e.clientX - sx, e.clientY - sy);
@@ -1003,7 +1157,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     });
 
     // small handle for automated checks (headless screenshots); not used by the page itself
-    stage.tgToy = { load: k => { sel.value = k; load(k); }, get S() { return S; }, cut: ci => { TG.kill(S, ci); cuts++; say(); }, draw: () => draw() };
+    stage.tgToy = { load: k => { sel.value = k; load(k); }, get S() { return S; }, cut: ci => { TG.kill(S, ci); cuts++; say(); }, draw: () => draw(), mid: ci => { const c = S.C[ci], x = S.x, q = pr((x[3 * c.a] + x[3 * c.b]) / 2, (x[3 * c.a + 1] + x[3 * c.b + 1]) / 2, (x[3 * c.a + 2] + x[3 * c.b + 2]) / 2); return [q[0], q[1]]; } };
     setInfo(); say();
     if (auto) setTimeout(() => TG.pluck(S, 3, S.kick), 900);
     requestAnimationFrame(frame);
