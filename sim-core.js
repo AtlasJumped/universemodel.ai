@@ -148,7 +148,16 @@
     WEB_K: 5, WEB_R: 24, BULK_K: 3,
     SLIDE: 0.15, SLIDE_DEAD: 1e-3,             // how fast fascia slides along a line to even out tension (healthy, low friction)
     SHORTEN: 0.015,           // rest-length shortening per unit of added relative density
-    SETTLE: 240
+    SETTLE: 240,
+    // The skin: a tension-only envelope over the outer points, like the rubber of a balloon. It never pushes and never holds
+    // the body up. It only pulls back when a patch of the surface strays outward.
+    SKIN: 1,                  // 1 = the skin is on, 0 = off (for comparison tests)
+    SKIN_GIVE: 0.4,            // how far a whole patch of surface may stand off its bone axis, beyond its healthy distance, before the skin pulls it back (30%)
+    SKIN_LOCAL: 0.3,          // how much more one point may bulge than the average of its neighbours before it is pulled back (30%): no single bump on the envelope
+    SKIN_SLACK: 0.3,          // how much a patch of skin may stretch before it resists (30%): the healthy body feels no skin force at all
+    K_SKIN_R: 0.03, K_SKIN: 0.03, // how firmly it pulls back toward the axis, and how firmly neighbours pull on each other (share of the excess undone per sub-step)
+    SKIN_NB: 3, SKIN_R: 16, SKIN_BAND: 5, // each surface point is tied to its 3 nearest neighbours at about the same height (within 5 cm) on the same limb or trunk: the skin is a hoop, it resists swelling round a section and carries no load along the body
+    SKIN_RMIN: 2.5, SKIN_CONE: 0.8, SKIN_SHADOW: 1.15 // a point counts as surface unless another point farther out lies in the same direction (cone of 37 degrees) and band
   };
   // The healthy standing shape, found once by letting each reference body settle under gravity (regenerate with the
   // reference script whenever the model changes; if it does not match, the body is settled when the page loads).
@@ -158,7 +167,7 @@
   function create(opt) {
     const C = Object.assign({}, DEF, opt && opt.C);
     const S = { sex: (opt && opt.sex) || 'male', HEIGHT: 183, LINES, JOINTS, BASE, BONES, C, imps: [], months: 0, creep: false };
-    let sliding = true, N, IDX, E, adj, FIXED, P, O, OLD, chains, bands, m0, mass, invm, dampN, spacers, base, CAB, STR, bones;
+    let sliding = true, SK = null, skinLive = false, N, IDX, E, adj, FIXED, P, O, OLD, chains, bands, m0, mass, invm, dampN, spacers, base, CAB, STR, bones;
 
     S.build = function (sex) {
       if (sex) S.sex = sex;
@@ -236,18 +245,42 @@
       CAB = []; STR = []; E.forEach((e, k) => (e.strut ? STR : CAB).push(k)); X = null;
       O = N.map(n => [...n.p0]);
       m0 = N.map(n => n.soft ? C.M_SOFT : Math.max(0.05, n.m || 0.3));
+      // ---- the skin envelope: the outer points, each tied to a bone axis and to its neighbours on the surface ----
+      { const nm = (t, sd) => IDX[t + (sd > 0 ? 'L' : sd < 0 ? 'R' : '')] ?? IDX[t];
+        const spine = [['top', 'c1', 'skull'], ['c1', 'c3', 'ce1'], ['c3', 'c5', 'ce2'], ['c5', 'c7', 'ce3'], ['c7', 't2', 'th1'], ['t2', 't4', 'th2'], ['t4', 't6', 'th3'], ['t6', 't8', 'th4'], ['t8', 't10', 'th5'], ['t10', 't12', 'th6'],
+          ['t12', 'l1', 'lu1'], ['l1', 'l2', 'lu2'], ['l2', 'l3', 'lu3'], ['l3', 'l4', 'lu4'], ['l4', 's1', 'lu5'], ['s1', 'sacA', 'sacrum'], ['sacA', 'coccyx', 'sacrum']];
+        // each axis piece is a stretch of one bone; if that bone breaks, the skin loses its hold on that piece
+        const axesOf = n => { const g = limb(n), sd = n.side, sf = sd > 0 ? 'L' : 'R';
+          if (g === 'core') return spine.map(([a, b, u]) => [IDX[a], IDX[b], u]);
+          return g[0] === 'a' ? [[nm('gh', sd), nm('elbow', sd), 'humerus' + sf], [nm('elbow', sd), nm('wrist', sd), 'ulna' + sf], [nm('wrist', sd), nm('hand', sd), 'handbone' + sf]]
+            : [[nm('hip', sd), nm('knee', sd), 'femur' + sf], [nm('knee', sd), nm('ankle', sd), 'tibia' + sf]]; };
+        const near = (n, i) => { let best = null; for (const [a, b, u] of axesOf(n)) { const A = N[a].p0, B = N[b].p0, ab = v3.sub(B, A), L2 = v3.dot(ab, ab) || 1;
+            const t = Math.max(0, Math.min(1, v3.dot(v3.sub(n.p0, A), ab) / L2)), q = v3.add(A, v3.mul(ab, t)), r = v3.dist(n.p0, q); if (!best || r < best.r) best = { a, b, t, r, q, u }; } return best; };
+        const cand = [];
+        N.forEach((n, i) => { if (FIXED.has(i)) return; const ax = near(n, i); if (!ax || ax.a === i || ax.b === i || ax.r < C.SKIN_RMIN) return; cand.push(Object.assign({ i, g: limb(n), u: v3.mul(v3.sub(n.p0, ax.q), 1 / ax.r) }, ax)); });
+        const outer = cand.filter(c => !cand.some(o => o !== c && o.g === c.g && Math.abs(N[o.i].p0[1] - N[c.i].p0[1]) < 7 && o.r > c.r * C.SKIN_SHADOW && v3.dot(o.u, c.u) > C.SKIN_CONE));
+        const pos = new Map(outer.map((c, q) => [c.i, q])), links = [], seen = new Set();
+        outer.forEach(c => { const cs = outer.filter(o => o !== c && o.g === c.g).map(o => [o, v3.dist(N[c.i].p0, N[o.i].p0)]).filter(([o, d]) => d < C.SKIN_R * sc && Math.abs(N[o.i].p0[1] - N[c.i].p0[1]) < C.SKIN_BAND * sc).sort((x, y) => x[1] - y[1]).slice(0, C.SKIN_NB);
+          for (const [o, d] of cs) { const k = Math.min(c.i, o.i) + '-' + Math.max(c.i, o.i); if (!seen.has(k)) { seen.add(k); links.push([pos.get(c.i), pos.get(o.i), d]); } } });
+        const nbr = outer.map(() => []); links.forEach(([a, b]) => { nbr[a].push(b); nbr[b].push(a); });
+        SK = { n: outer.length, node: Int32Array.from(outer.map(c => c.i)), axA: Int32Array.from(outer.map(c => c.a)), axB: Int32Array.from(outer.map(c => c.b)), axT: Float64Array.from(outer.map(c => c.t)), axU: outer.map(c => c.u), grp: outer.map(c => c.g), on: new Uint8Array(outer.length).fill(1), r0: Float64Array.from(outer.map(c => c.r)),
+          la: Int32Array.from(links.map(l => l[0])), lb: Int32Array.from(links.map(l => l[1])), l0: Float64Array.from(links.map(l => l[2])), nbr, pos, dx: new Float64Array(3 * N.length), cnt: new Uint8Array(N.length), ratio: new Float64Array(outer.length) };
+        S.skin = { nodes: Array.from(SK.node), links: links.length }; }
       S.N = N; S.IDX = IDX; S.E = E; S.adj = adj; S.FIXED = FIXED; S.O = O; S.bones = bones; S.chains = chains; S.bands = bands;
       // settle the healthy body once under gravity and keep it as the reference
       S.imps = []; S.months = 0; applyImps();
       P = O.map(p => [...p]); OLD = null; E.forEach(e => { e.slide = 0; e.T0 = 0; e.cut = false; e.broken = false; e.released = false; });
       const ref = !C.NOREF && REF[S.sex]; S.fromRef = !!(ref && ref.n === N.length && ref.e === E.length);
       if (S.fromRef) P = N.map((_, i) => FIXED.has(i) ? [...O[i]] : [ref.P[3 * i], ref.P[3 * i + 1], ref.P[3 * i + 2]]);
-      sliding = false; for (let i = 0, n = S.fromRef ? 20 : C.SETTLE; i < n; i++) step(); sliding = true;
+      skinLive = false; sliding = false; for (let i = 0, n = S.fromRef ? 20 : C.SETTLE; i < n; i++) step(); sliding = true;
       // the healthy pattern of tension is the one the fascia has settled into; sliding responds to changes from it
       E.forEach(e => { if (!e.strut) { const r = restOf(e), d = v3.dist(P[e.a], P[e.b]); e.T0 = e.k * Math.max(0, d - r) / r; } });
       base = { P: P.map(p => [...p]), slide: E.map(e => e.slide), energy: 0 };
       S.P = P; S.ref = base.P; base.energy = energy(); base.asym = asymmetry(); S.base = base;
-      base.slack = E.map(e => isSlack(e)); base.nodeStrain = null; base.nodeStrain = S.nodeStrain();
+      if (SK) { for (let q = 0; q < SK.n; q++) { const i = SK.node[q], A = P[SK.axA[q]], B = P[SK.axB[q]], t = SK.axT[q];
+          SK.r0[q] = v3.dist(P[i], [A[0] + t * (B[0] - A[0]), A[1] + t * (B[1] - A[1]), A[2] + t * (B[2] - A[2])]); }
+        for (let l = 0; l < SK.la.length; l++) SK.l0[l] = v3.dist(P[SK.node[SK.la[l]]], P[SK.node[SK.lb[l]]]); }
+      skinLive = true; base.slack = E.map(e => isSlack(e)); base.nodeStrain = null; base.nodeStrain = S.nodeStrain();
       S.reset();
       return S;
     };
@@ -289,6 +322,9 @@
       // a crushed skull gives the fascia nothing to hold on to: every band and guy attached to the head lets go
       if (n && B.uid === 'skull') { const hd = new Set(B.ids); for (const b of bands) if (b.some(j => hd.has(E[j].a) || hd.has(E[j].b))) for (const j of b) if (!E[j].cut) E[j].released = true;
         E.forEach(f => { if (!f.strut && !f.cut && (hd.has(f.a) || hd.has(f.b))) f.released = true; }); }
+      // the skin lets go of a bone that has snapped: of the whole limb it belongs to, or of the stretch of trunk around that bone, so it cannot splint the break
+      if (n && SK) { const hit = new Set(); SK.axU.forEach((u, q) => { if (u === B.uid) hit.add(q); });
+        hit.forEach(q => { if (SK.grp[q] !== 'core') SK.grp.forEach((g, r) => { if (g === SK.grp[q]) SK.on[r] = 0; }); else { SK.on[q] = 0; SK.nbr[q].forEach(r => { SK.on[r] = 0; }); } }); }
       if (n) { S.damaged = true; S.moving = 1; }
       return n;
     };
@@ -297,7 +333,7 @@
       if (FIXED.has(i)) return; const p = P[i], c = [0, p[1], 0], d = v3.sub(p, c), l = v3.len(d) || 1, k = (cm || 5) / l;
       p[0] += d[0] * k; p[2] += d[2] * k; S.moving = 1; };
     S.reset = function () {
-      S.imps = []; S.months = 0;
+      S.imps = []; S.months = 0; if (SK) SK.on.fill(1);
       P = base.P.map(p => [...p]); OLD = null; E.forEach((e, k) => { e.slide = base.slide[k]; e.cut = false; e.broken = false; e.released = false; e.breakT = undefined; }); S.damaged = false; S.P = P;
       applyImps(); S.moving = 1;
     };
@@ -434,6 +470,33 @@
           X[a3] += D[o] * wa; X[a3 + 1] += D[o + 1] * wa; X[a3 + 2] += D[o + 2] * wa; X[b3] -= D[o] * wb; X[b3 + 1] -= D[o + 1] * wb; X[b3 + 2] -= D[o + 2] * wb; }
       }
     }
+    // The skin pass. Three tension-only rules, all solved from the same state and averaged so that left and right stay mirror images:
+    // (1) a surface point may not stand farther from its bone axis than it did when healthy (plus a little give);
+    // (2) neighbours on the surface may not be pulled farther apart than they were (plus a little slack);
+    // (3) a point that swells out more than its neighbours is pulled back toward their average, so the strain is shared round the envelope.
+    function skinPass() {
+      const k = SK, dx = k.dx, cnt = k.cnt, G = 1 + C.SKIN_GIVE, SL = 1 + C.SKIN_SLACK; dx.fill(0); cnt.fill(0);
+      for (let q = 0; q < k.n; q++) { const i = k.node[q], a = k.axA[q], b = k.axB[q], t = k.axT[q], i3 = 3 * i, a3 = 3 * a, b3 = 3 * b;
+        const ux = X[a3] + t * (X[b3] - X[a3]), uy = X[a3 + 1] + t * (X[b3 + 1] - X[a3 + 1]), uz = X[a3 + 2] + t * (X[b3 + 2] - X[a3 + 2]);
+        const vx = X[i3] - ux, vy = X[i3 + 1] - uy, vz = X[i3 + 2] - uz, r = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9; k.ratio[q] = r / k.r0[q]; }
+      for (let q = 0; q < k.n; q++) { const i = k.node[q], a = k.axA[q], b = k.axB[q], t = k.axT[q], i3 = 3 * i, a3 = 3 * a, b3 = 3 * b;
+        const ux = X[a3] + t * (X[b3] - X[a3]), uy = X[a3 + 1] + t * (X[b3 + 1] - X[a3 + 1]), uz = X[a3 + 2] + t * (X[b3 + 2] - X[a3 + 2]);
+        if (!k.on[q]) continue;
+        const vx = X[i3] - ux, vy = X[i3 + 1] - uy, vz = X[i3 + 2] - uz, r = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9;
+        let cap = k.r0[q] * G; const nb = k.nbr[q];
+        if (nb.length && C.SKIN_LOCAL > 0) { let m = 0; for (const o of nb) m += k.ratio[o]; m /= nb.length; cap = Math.min(cap, k.r0[q] * Math.max(1, m + C.SKIN_LOCAL)); }
+        if (r <= cap) continue;
+        const wp = W[i], wa = (1 - t) * (1 - t) * W[a] + t * t * W[b], w = wp + wa; if (!w) continue; // an equal and opposite pull on the axis: the skin only holds things together, it cannot prop or splint
+        const c = (r - cap) / r * C.K_SKIN_R / w;
+        dx[i3] -= vx * c * wp; dx[i3 + 1] -= vy * c * wp; dx[i3 + 2] -= vz * c * wp; cnt[i]++;
+        const fa = c * (1 - t) * W[a], fb = c * t * W[b];
+        dx[a3] += vx * fa; dx[a3 + 1] += vy * fa; dx[a3 + 2] += vz * fa; cnt[a]++; dx[b3] += vx * fb; dx[b3 + 1] += vy * fb; dx[b3 + 2] += vz * fb; cnt[b]++; }
+      for (let l = 0; l < k.la.length; l++) { if (!k.on[k.la[l]] || !k.on[k.lb[l]]) continue; const a = k.node[k.la[l]], b = k.node[k.lb[l]], a3 = 3 * a, b3 = 3 * b, vx = X[b3] - X[a3], vy = X[b3 + 1] - X[a3 + 1], vz = X[b3 + 2] - X[a3 + 2];
+        const d = Math.sqrt(vx * vx + vy * vy + vz * vz) || 1e-9, rest = k.l0[l] * SL; if (d <= rest) continue; const wa = W[a], wb = W[b], w = wa + wb; if (!w) continue;
+        const c = (d - rest) / d * C.K_SKIN / w;
+        dx[a3] += vx * c * wa; dx[a3 + 1] += vy * c * wa; dx[a3 + 2] += vz * c * wa; dx[b3] -= vx * c * wb; dx[b3 + 1] -= vy * c * wb; dx[b3 + 2] -= vz * c * wb; cnt[a]++; cnt[b]++; }
+      for (let i = 0, j = 0; i < cnt.length; i++, j += 3) { const c = cnt[i]; if (!c) continue; X[j] += dx[j] / c; X[j + 1] += dx[j + 1] / c; X[j + 2] += dx[j + 2] / c; }
+    }
     function step() {
       const n = N.length, SUB = C.SUB, g = C.GRAV / (SUB * SUB), fl = C.FLOOR, ff = Math.pow(C.FLOOR_FRICTION, 1 / SUB), v0 = C.V0 / SUB, dFall = Math.pow(C.DAMP_FALL, 1 / SUB);
       if (!X || X.length !== 3 * n || cabA.length !== CAB.length) { load(); OLD = null; }
@@ -465,6 +528,7 @@
             mx /= ws; my /= ws; mz /= ws;
             sp.nodes.forEach(([j], q) => { const j3 = 3 * j; X[j3] += dl[3 * q] - mx; X[j3 + 1] += dl[3 * q + 1] - my; X[j3 + 2] += dl[3 * q + 2] - mz; });
           }
+          if (SK && skinLive && C.SKIN) skinPass();
           sweep(strA, strB, strR, strK, strOn, strU, strM, fwd);
           for (let i = 0, j = 0; i < n; i++, j += 3) if (X[j + 1] < fl && !fixedArr[i]) { X[j + 1] = fl; X[j] = XO[j] + (X[j] - XO[j]) * ff; X[j + 2] = XO[j + 2] + (X[j + 2] - XO[j + 2]) * ff; }
         }
@@ -530,6 +594,17 @@
       const r = out.map((s, i) => cnt[i] ? s / cnt[i] : 0);
       if (!base.nodeStrain) return r;
       return r.map((v, i) => Math.max(0, v - base.nodeStrain[i]));
+    };
+    // How far the envelope is stretched beyond its healthy shape, per point (0 = healthy). A surface point shows the larger of how far it stands
+    // off its axis and how far its neighbours are pulled apart; every other point shows the nearest surface point's value.
+    S.skinStrain = function () {
+      const n = N.length, out = new Float64Array(n); if (!SK) return Array.from(out);
+      const acc = new Float64Array(SK.n), cn = new Uint8Array(SK.n);
+      for (let l = 0; l < SK.la.length; l++) { const a = SK.la[l], b = SK.lb[l], st = Math.max(0, v3.dist(P[SK.node[a]], P[SK.node[b]]) / SK.l0[l] - 1); acc[a] += st; acc[b] += st; cn[a]++; cn[b]++; }
+      for (let q = 0; q < SK.n; q++) { const A = P[SK.axA[q]], B = P[SK.axB[q]], t = SK.axT[q], c = [A[0] + t * (B[0] - A[0]), A[1] + t * (B[1] - A[1]), A[2] + t * (B[2] - A[2])];
+        out[SK.node[q]] = Math.max(SK.on[q] ? Math.max(0, v3.dist(P[SK.node[q]], c) / SK.r0[q] - 1) : 0, cn[q] ? acc[q] / cn[q] : 0); }
+      for (let i = 0; i < n; i++) if (!SK.pos.has(i) && !FIXED.has(i)) { let best = 1e9, v = 0; for (let q = 0; q < SK.n; q++) { const d = v3.dist(O[i], O[SK.node[q]]); if (d < best) { best = d; v = out[SK.node[q]]; } } out[i] = v; }
+      return Array.from(out);
     };
     S.cableState = k => { const e = E[k], r = restOf(e), d = v3.dist(P[e.a], P[e.b]); return { strain: (d - r) / r, slack: !e.strut && d < r * 0.996, dense: e.strut ? 0 : Math.max(0, 1 - e.restBase / e.rest0), longer: e.restBase > e.rest0 * 1.002 }; };
 
