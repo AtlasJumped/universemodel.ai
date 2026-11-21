@@ -11,7 +11,7 @@
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   const ortho = (v, axis) => norm(sub(v, mul(axis, dot(v, axis))));
 
-  // A ring: centre C, unit axes A (body left) and B (forward or up), half extents a1 (+A), a2 (-A), b1 (+B), b2 (-B).
+  // A ring: center C, unit axes A (body left) and B (forward or up), half extents a1 (+A), a2 (-A), b1 (+B), b2 (-B).
   function ringFrom(Lp, Rp, Fp, Bp, pad, st) {
     const A = norm(sub(Lp, Rp)), Cl = mul(add(Lp, Rp), 0.5);
     const fd = sub(Fp, Cl), bd = sub(Bp, Cl), f2 = sub(fd, mul(A, dot(A, fd))), b2 = sub(bd, mul(A, dot(A, bd)));
@@ -216,7 +216,7 @@
       if (norm(n)[2] > 0.2 && !female) { const q = S(V(ep)); ctx.fillStyle = 'rgba(176,128,96,.55)'; ctx.beginPath(); ctx.ellipse(q[0], q[1] + q[3] * 0.4, q[3] * 1.1, q[3] * 2.4, 0, 0, 7); ctx.fill(); } }
 
     // helpers (hoisted)
-    function smooth(R, insertAfter) { // put an interpolated ring between neighbours where asked, for smoother skin
+    function smooth(R, insertAfter) { // put an interpolated ring between neighbors where asked, for smoother skin
       const out = []; for (let i = 0; i < R.length; i++) { out.push(R[i]); if (i + 1 < R.length && insertAfter[i]) { out.push(lerpRing(R[i], R[i + 1], 1 / 3)); out.push(lerpRing(R[i], R[i + 1], 2 / 3)); } } return out;
     }
     function pushQuad(p, kind, st, c, n) { quads.push({ p, kind, st, c, n }); }

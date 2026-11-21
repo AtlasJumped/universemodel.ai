@@ -181,7 +181,7 @@
   var ST_OPT = freshState();
   LTOT = LG0 + chain(pose({}), ST_OPT, YM0, MU_OPT).len;
 
-  // janky amounts per wheel: own value, and a share of what the neighbours on the rope have
+  // janky amounts per wheel: own value, and a share of what the neighbors on the rope have
   function jank() {
     var own = [], i, jf = [], je = [];
     for (i = 0; i < N; i++) own.push(sel[WH[i].id] ? sev : 0);

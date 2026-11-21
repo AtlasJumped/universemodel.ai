@@ -412,7 +412,3 @@ h3.subhead{font-size:clamp(1.3rem,2vw,1.5rem);font-weight:700;line-height:1.2;ma
 .site-foot{position:relative;overflow:hidden}
 .foot-aura{position:absolute;left:0;top:0;pointer-events:none;z-index:0}
 .site-foot .wrap{position:relative;z-index:1}
-/* two tabs were added on 2026-11-21: on laptop widths just above the phone menu the bar tightens a little so it still fits on one line */
-@media (min-width:1181px) and (max-width:1320px){.site-head .wrap{padding-left:16px;padding-right:16px}.site-head .nav{gap:0}.site-head .nav a:not(.cta),.site-head .nav .grpbtn{padding-left:6px;padding-right:6px;font-size:.85rem}.site-head .nav .cta{padding-left:10px;padding-right:10px;font-size:.85rem}.site-head .brand span{font-size:1.02rem}}
-.site-head .nav .grp:last-of-type .drop{left:auto;right:0}
-@media (min-width:1181px) and (max-width:1250px){.site-head .wrap{gap:8px}.site-head .nav a:not(.cta),.site-head .nav .grpbtn{padding-left:4px;padding-right:4px;font-size:.8rem}.site-head .nav .cta{padding-left:8px;padding-right:8px;font-size:.8rem}.site-head .brand span{font-size:.95rem}}

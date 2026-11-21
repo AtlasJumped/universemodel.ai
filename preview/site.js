@@ -64,7 +64,7 @@ const TG = (() => {
     });
   }
 
-  /* ----- shapes. Units: metres, kilograms, newtons. ----- */
+  /* ----- shapes. Units: meters, kilograms, newtons. ----- */
   function sixStrut() {
     const b = builder(), s = 0.5, N = [], struts = [];
     [0, 1, 2].forEach(i => [-s, s].forEach(o => {
@@ -201,7 +201,7 @@ const TG = (() => {
       info: 'A big marquee. Two king poles and fourteen side poles are in compression; the ridge line, the fabric and fourteen guy lines are in tension. Cut guy lines or take out poles and watch which part of the roof comes down.' };
   }
 
-  // A neighbourhood of treehouses: each house hangs from the branches of its tree, and rope bridges join the houses.
+  // A neighborhood of treehouses: each house hangs from the branches of its tree, and rope bridges join the houses.
   function treehouses() {
     const b = builder(), houses = [], people = [], grips = [];
     const trees = [[-2.4, -0.5, 3.0, 0.3], [-0.8, 0.75, 3.4, 1.1], [0.85, -0.6, 3.1, 0.2], [2.4, 0.65, 3.5, 0.9]]; // x, z, height, turn
@@ -223,7 +223,7 @@ const TG = (() => {
       grips.push({ cs: footing(b, P, fl), pairs: [[fl[0], fl[1]], [fl[1], fl[2]]], max: 0.6 });
       houses.push({ fl, tips, crown });
     });
-    // rope bridges: two ropes with planks between them, sagging between neighbouring houses
+    // rope bridges: two ropes with planks between them, sagging between neighboring houses
     const d2 = (i, j) => { const p = b.P[i], q = b.P[j]; return (p[0] - q[0]) ** 2 + (p[2] - q[2]) ** 2; };
     for (let h = 0; h + 1 < houses.length; h++) { const A = houses[h].fl, B = houses[h + 1].fl, cb = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[B[k]][0] / 4, 0, acc[2] + b.P[B[k]][2] / 4], [0, 0, 0]), ca = [0, 1, 2, 3].reduce((acc, k) => [acc[0] + b.P[A[k]][0] / 4, 0, acc[2] + b.P[A[k]][2] / 4], [0, 0, 0]);
       const near = (F, c) => F.slice().sort((i, j) => ((b.P[i][0] - c[0]) ** 2 + (b.P[i][2] - c[2]) ** 2) - ((b.P[j][0] - c[0]) ** 2 + (b.P[j][2] - c[2]) ** 2)).slice(0, 2);
@@ -239,7 +239,7 @@ const TG = (() => {
       b.add(t[0], hook, 'strut', { grp: 'tree3' }); b.add(t[3], hook, 'brace', { grp: 'tree3' }); b.add(houses[3].crown, hook, 'brace', { grp: 'tree3' }); void pb;
       b.add(hook, sA, 'cable', { strain: 0 }); b.add(hook, sB, 'cable', { strain: 0 }); b.add(sA, sB, 'strut'); }
     return { b, ea: 900, strain: 0.004, iters: 4, kick: 1.6, view: [0.45, 0.3], thin: 0.6, people, grips,
-      info: 'A neighbourhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbours. Someone lives in each house. If what holds a house gives way, they fall.' };
+      info: 'A neighborhood of treehouses. The trees are in compression. Each house hangs from its branches by four ropes in tension, and rope bridges in tension tie the houses together. Cut a rope and a house tilts; take out a tree and its house hangs on its neighbors. Someone lives in each house. If what holds a house gives way, they fall.' };
   }
 
   function wheel() {
@@ -543,9 +543,9 @@ const TG = (() => {
     b.body([P.fL, P.fR, P.hip, P.neck, P.head, P.hL, P.hR, poleL, poleR], [[P.hL, poleL], [P.hR, poleR], [P.hL, P.hR]], 'p0');
     for (let i = c0; i < b.C.length; i++) if (b.C[i].kind === 'strut') { b.C[i].col = '#8A5A0B'; b.C[i].thin = 0.4; }
     spikes(b, -1.4, 1.4, 0, 8);
-    // the walker touches the rope at one point only, and stays upright because the heavy drooping pole puts the centre of mass below it
+    // the walker touches the rope at one point only, and stays upright because the heavy drooping pole puts the center of mass below it
     return { b, ea: 60000, strain: 0.002, iters: 10, kick: 1.2, view: [0.3, 0.18], thin: 0.65, people: [P], grips: [{ cs: footing(b, P, [r[k]]), pairs: [[r[k - 1], r[k + 1]]], max: 0.6 }],
-      info: 'A tightrope walker between two masts. Each mast is in compression and leans on two guy lines. The rope is in tension. The walker touches it at one point only, and stays upright because the long drooping pole puts the centre of their weight below the rope. Cut a guy line and a mast goes over, and the rope sinks toward the spikes. Cut the rope and there is nothing else.' };
+      info: 'A tightrope walker between two masts. Each mast is in compression and leans on two guy lines. The rope is in tension. The walker touches it at one point only, and stays upright because the long drooping pole puts the center of their weight below the rope. Cut a guy line and a mast goes over, and the rope sinks toward the spikes. Cut the rope and there is nothing else.' };
   }
 
   const SHAPES = [
@@ -559,7 +559,7 @@ const TG = (() => {
     ['balloon', 'Hot air balloon', balloon, 'Everyday tension'],
     ['tent', 'A tent', tent, 'Tents and treehouses'],
     ['mansion', 'A mansion of a tent', mansionTent, 'Tents and treehouses'],
-    ['treehouse', 'Treehouse neighbourhood', treehouses, 'Tents and treehouses'],
+    ['treehouse', 'Treehouse neighborhood', treehouses, 'Tents and treehouses'],
     ['wheel', 'Bicycle wheel', wheel, 'Everyday tension'],
     ['piano', 'Under a hanging piano', piano, 'A life on the line'],
     ['gorge', 'Crossing a rope bridge', gorge, 'A life on the line'],
@@ -879,7 +879,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
     const c = cv.getContext('2d'); let W = 0, H = 0;
     const size = () => { W = innerWidth; H = innerHeight; cv.width = Math.round(W * d); cv.height = Math.round(H * d); c.setTransform(d, 0, 0, d, 0, 0); };
     size(); document.body.appendChild(cv); addEventListener('resize', size);
-    // the sparkles that repair it: the same look as the pointer trail (soft glow, sometimes a four-pointed glint), same colours
+    // the sparkles that repair it: the same look as the pointer trail (soft glow, sometimes a four-pointed glint), same colors
     const nsp = Math.round((28 + 150 * I) * (coarse ? 0.55 : 1)), T_REP = 2.2 + 1.6 * I, T_END = T_FIRE + T_REP + 0.7, spark = [];
     for (let i = 0; i < nsp; i++) { const a = Math.random() * 6.283, e = Math.random() < 0.6, tr = Math.random() < 0.3 ? null : T[Math.floor(Math.random() * T.length)];
       spark.push({ sx: W / 2 + Math.cos(a) * W * 0.7, sy: H / 2 + Math.sin(a) * H * 0.7, a: Math.random() * 6.283, rr: Math.sqrt(Math.random()), tr, tx: Math.random(), ty: Math.random(),
@@ -1052,7 +1052,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         const a = pr(x[3 * c.a], 0, x[3 * c.a + 2]), b = pr(x[3 * c.b], 0, x[3 * c.b + 2]);
         ctx.lineWidth = c.kind === 'strut' ? 5 : 1.5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
       });
-      // ash: grey flecks, falling and settled
+      // ash: gray flecks, falling and settled
       if (S.ash.length) {
         const sc = Math.min(1.3, Math.min(W, H) / 420);
         S.ash.forEach(a => { const q = pr(a.x, a.y, a.z), z = Math.max(1.3, 2.3 * a.s * q[3] * sc); ctx.fillStyle = a.on ? (a.s > 1 ? '#8E9298' : '#A7ABB1') : '#5E6269'; ctx.fillRect(q[0] - z / 2, q[1] - z / 3, z, z * 0.66); });
@@ -1310,7 +1310,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 // with the reader instead. New blocks should be given a tile here (or be built balanced by hand, as the kids page is).
 if (typeof document !== 'undefined') (() => {
   const IMG = { // picture tiles: file, alt text, credit
-    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of coloured fascial lines.', 'Universe Model simulation'],
+    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of colored fascial lines.', 'Universe Model simulation'],
     cells: ['hx-cytoskeleton-cells.jpg', 'Cells under fluorescence: blue nuclei inside a green web of cytoskeleton filaments.', 'Erin Rod, CC BY 4.0, Wikimedia Commons'],
     hudf: ['rv-hudf.jpg', 'The Hubble Ultra Deep Field: thousands of galaxies in one small patch of sky.', 'NASA, ESA and others, public domain'],
     webb: ['ew-deep-field.jpg', 'Webb\'s first deep field: a cluster of galaxies bending the light of those behind it.', 'NASA, ESA, CSA, STScI, public domain'],
@@ -1346,7 +1346,7 @@ if (typeof document !== 'undefined') (() => {
     'physics-health': { 'Watch the body move': { p: ['gallop', 'It began with a horse', 'Muybridge froze motion in 1878 and motion science began. The same idea, with today\'s imaging, applied to the whole fascia web.', 'simulation.html'] } },
     'east-west': { 'Practices that work': { p: ['beach', 'Long holds, done together', 'A yoga class holding one pose on a beach in France. The protocol uses the same long, slow loading.', 'protocol.html'] },
       'The golden age': { p: ['siddhas', 'The traditions pictured it', 'Adepts who spent their lives on the body and mind, painted in eighteenth century Tibet.', 'ui.html'] } },
-    simulation: { 'A mechanic needs': { p: ['tower', 'The same principle at 18 metres', 'Tubes that never touch, held up only by cables in tension. Scroll up and try it on a body.', '#model'] } },
+    simulation: { 'A mechanic needs': { p: ['tower', 'The same principle at 18 meters', 'Tubes that never touch, held up only by cables in tension. Scroll up and try it on a body.', '#model'] } },
     methods: { 'Compute': { p: ['sim', 'What the compute is for', 'Millions of simulated bodies, each with a different set of imperfections, solved as physics.', 'roadmap.html#campaign'] },
       'Data sources': { p: ['vhp', 'The raw material', 'One of 9,808 cross-sections of a complete male body, from the Visible Human Project.', 'library.html'] },
       'The full model': { p: ['cells', 'Down to the cell', 'The model is meant to reach from whole-body lines of fascia to the filaments inside each cell.', 'health.html#ideal'] } }
