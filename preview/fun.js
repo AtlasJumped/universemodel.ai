@@ -611,7 +611,7 @@ function substep(h) {
       const hg = rift.gap / 2, x = px[i];
       if (Math.abs(x) >= hg && py[i] < gy - 0.05 * S.u && py[i] > -S.pit - 2) { px[i] = x < 0 ? -hg + 0.02 : hg - 0.02; }
     }
-    if (py[i] < gy + r) { py[i] = gy + r; c = 1; if (groundMove) { px[i] += groundMove * 0.85; pz[i] += groundMoveZ * 0.85; } if (riftDrag) px[i] += (px[i] < 0 ? -1 : 1) * riftDrag * 0.9; }
+    if (py[i] < gy + r) { py[i] = gy + r; c = 1; if (groundMove) { px[i] += groundMove * 0.85; pz[i] += groundMoveZ * 0.85; } if (riftDrag) px[i] += (px[i] < 0 ? -1 : 1) * riftDrag * (isRider[i] ? 0.5 : 0.9); }
     if (c && Math.abs(px[i]) < rift.gap / 2 + 1 && rift.gap > 0 && py[i] > -1) { /* standing near the lip */ }
     cont[i] = c || cont[i];
   }
@@ -661,7 +661,7 @@ function collidePanels(h) {
           if (C > 0.01 * S.u || C < -0.55 * Math.max(r, 0.2)) continue;
           const wa = wI[A] * l1 * l1 + wI[B] * l2 * l2 + wI[Cc] * l3 * l3, ws = wI[i] + wa; if (ws === 0) continue;
           const dl = -C / ws;
-          py[i] += wI[i] * dl; py[A] -= wI[A] * l1 * dl; py[B] -= wI[B] * l2 * dl; py[Cc] -= wI[Cc] * l3 * dl;
+          py[i] += wI[i] * dl; { const dA = wI[A] * l1 * dl, dB = wI[B] * l2 * dl, dC = wI[Cc] * l3 * dl; py[A] -= dA; py[B] -= dB; py[Cc] -= dC; qy[A] -= dA; qy[B] -= dB; qy[Cc] -= dC; }
           if (dl > 0) qy[i] = py[i] - clamp(l1 * vy[A] + l2 * vy[B] + l3 * vy[Cc], -VMAX, VMAX) * h;
           cont[i] = 1;
         }
@@ -870,8 +870,8 @@ function ridersStep(dt) {
       if (py[i] < -1) R.fell = true;
       if (!R.st || grace) continue;
       if (cont[i]) R.air = 0; else R.air += dt;
-      let fall = R.air > 0.3;
-      if (!quakeOn && R.run <= 0 && (spd > 4.5 || rise > 5)) fall = true;
+      let fall = (R.air > 0.25 && rise < -1.5) || R.air > 0.8; R.why = fall ? 'air' : '';
+      if (!quakeOn && R.run <= 0 && (spd > 4.5 || rise > 5)) { fall = true; R.why = 'speed ' + spd.toFixed(1) + ' rise ' + rise.toFixed(1); }
       if (quakeOn && cont[i]) { R.tq += dt * Q.env; if (R.tq > R.tp) fall = true; }
       if (gs > 8 && Math.random() < dt * 0.8 * gs / 15) fall = true;
       // fire nearby: run away, or get flung clear when it is right beside them
@@ -1527,7 +1527,8 @@ window.funRoom = {
   deadMem: () => mem.map((m, i) => [i, m.alive, m.kind, +m.st.toFixed(3), +m.L0.toFixed(1), m.orig]).filter(a => !a[1] && a[5]),
   fast: v => { const r = []; for (let i = 0; i < nN; i++) if (alive[i] && Math.hypot(vx[i], vy[i], vz[i]) > v) r.push([i, isRider[i], +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), +Math.hypot(vx[i], vy[i], vz[i]).toFixed(1)]); return r; },
   dead: () => { const r = []; for (let i = 0; i < nN; i++) if (!alive[i]) r.push([i, +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), deg[i]]); return r; },
-  riders: () => riders.map(R => ({ id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, air: R.air, tq: R.tq, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
+  riders: () => riders.map(R => ({ n: R.n, id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, air: R.air, why: R.why, tq: R.tq, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
+  killRiders: (t) => { riders.forEach(R => { if (t && R.t !== t) return; R.dead = true; R.ns.forEach(i => { alive[i] = 0; }); }); },
   render, paused: p => { paused = p; }
 };
 resize();

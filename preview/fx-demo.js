@@ -500,8 +500,10 @@ const FX_PATCHES = [
   let headSkyOK = false;
   def('constellation', 'Constellation on page load', 'x', null, 6, X => {
     const sec = targets[0] ? targets[0].sec : X.sec, r = sec.getBoundingClientRect(), hb = hdrBottom(), top = Math.max(r.top, hb) + 12, bot = Math.min(r.bottom, H - 20) - 8, left = 20, right = W - 20; if (bot - top < 70) return null;
-    const rects = textRects(sec, 3), dark = darkAt(W / 2, (top + bot) / 2), clearP = (x, y) => !hit(x, y, rects, 5), h0 = X.opt.name ? Math.max(0, CONS_ORDER.indexOf(X.opt.name)) : hash(page) % CONS_ORDER.length;
-    const segOK = (A, B) => { let ok = clearP(A.x, A.y) && clearP(B.x, B.y); for (let k = 1; ok && k < 14; k++) if (!clearP(lerp(A.x, B.x, k / 14), lerp(A.y, B.y, k / 14))) ok = false; return ok; };
+    const rects = textRects(sec, 3); let nb = 0;   // plus every box with its own border or fill (callouts, panels), so no line crosses one
+    for (const e of sec.querySelectorAll('div,aside,article,li,a,button')) { if (nb > 120) break; const cs = getComputedStyle(e), bg = /rgba?\(([^)]+)\)/.exec(cs.backgroundColor), al = bg ? (bg[1].split(',').length < 4 ? 1 : parseFloat(bg[1].split(',')[3])) : 0; if (!(parseFloat(cs.borderTopWidth) > 0 || al > 0.3)) continue; const q = e.getBoundingClientRect(); if (q.width < 60 || q.height < 30 || q.width > (right - left) * 0.9 && q.height > (bot - top) * 0.9) continue; nb++; rects.push({ l: q.left - 3, t: q.top - 3, r: q.right + 3, b: q.bottom + 3 }); }
+    const dark = darkAt(W / 2, (top + bot) / 2), clearP = (x, y) => !hit(x, y, rects, 5), h0 = X.opt.name ? Math.max(0, CONS_ORDER.indexOf(X.opt.name)) : hash(page) % CONS_ORDER.length;
+    const segOK = (A, B) => { let ok = clearP(A.x, A.y) && clearP(B.x, B.y); const nn = Math.max(8, Math.ceil(Math.hypot(B.x - A.x, B.y - A.y) / 14)); for (let k = 1; ok && k < nn; k++) if (!clearP(lerp(A.x, B.x, k / nn), lerp(A.y, B.y, k / nn))) ok = false; return ok; };
     function fitOne(name) {
       const sh = consShape(name); if (!sh) return null; let best = null, maxSpan = 0; const rotInfo = [];
       for (let rot = 0; rot < 16; rot++) { const ca = Math.cos(rot * 0.3927), sa = Math.sin(rot * 0.3927); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; sh.pos.forEach(p => { const x = p.x * ca - p.y * sa, y = p.x * sa + p.y * ca; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
