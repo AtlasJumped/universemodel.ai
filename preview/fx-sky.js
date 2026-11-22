@@ -501,9 +501,23 @@ const FX_PATCHES = [
     return { pos, segs: SKYLINES.filter(([a, b]) => a.c === name && pos.has(a) && pos.has(b)) };
   }
   let headSkyOK = false;
+  // home page, wide screens: a second, small constellation in the open area at the top right, above the tensegrity (owner, 2026-11-22)
+  function addMini(mainName) {
+    try {
+      if (!keptCons || W < 1200 || !/(^|\/)(index\.html)?$/.test(location.pathname.replace(/^.*\/preview\//, '/'))) return;
+      const hb = hdrBottom(), bx = { l: W * 0.62, r: W - 80, t: hb + 24, b: hb + 170 };
+      const name = CONS_ORDER.find(n => n !== mainName && /Cassiopeia|Ursa|Cygnus/.test(n)) || CONS_ORDER.find(n => n !== mainName), sh = consShape(name); if (!sh) return;
+      let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; sh.pos.forEach(p => { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+      const k = Math.min((bx.r - bx.l) / Math.max(1, x1 - x0), (bx.b - bx.t) / Math.max(1, y1 - y0)), ox = (bx.l + bx.r) / 2 - (x0 + x1) / 2 * k, oy = (bx.t + bx.b) / 2 - (y0 + y1) / 2 * k, P = new Map(); sh.pos.forEach((p, q) => P.set(q, { x: ox + p.x * k, y: oy + p.y * k }));
+      keptCons.mini = { segs: sh.segs.map(([a, b]) => ({ A: P.get(a), B: P.get(b) })), stars: [...P.entries()].map(([q, pt]) => ({ P: pt, big: q.mag < 2.2 })), born: performance.now() };
+    } catch (e) { errors.push('mini: ' + (e && e.stack || e)); }
+  }
   function drawKept(now) {
     const K = keptCons; if (!K || !c) return; const off = 0, hb = hdrBottom(), t = now / 1000, f = 0.7 - 0.38 * clamp(Math.abs(scrollY - K.sy0) / 320, 0, 1);   // pinned to the screen, fainter once the page has scrolled under it
     c.save(); c.beginPath(); c.rect(0, hb, W, H - hb); c.clip(); c.lineWidth = 1.2; c.lineCap = 'round'; c.strokeStyle = `rgba(${K.lineC[0]},${K.lineC[1]},${K.lineC[2]},${(K.dark ? 0.7 : 0.62) * f})`;
+    if (K.mini) { const m = K.mini, g = clamp((now - m.born) / 1400, 0, 1), n = m.segs.length; c.save(); c.globalAlpha = 1;
+      m.segs.forEach((sg, i) => { const u = clamp(g * n - i, 0, 1); if (u <= 0) return; c.beginPath(); c.moveTo(sg.A.x, sg.A.y); c.lineTo(lerp(sg.A.x, sg.B.x, u), lerp(sg.A.y, sg.B.y, u)); c.stroke(); });
+      for (const q of m.stars) spark(c, q.P.x, q.P.y, q.big ? 3 : 2.2, f * g * (0.8 + 0.2 * Math.sin(t * 2.2 + q.P.x)), q.big ? GOLD : [29, 95, 209], true); c.restore(); }
     for (const sg of K.segs) { if (Math.max(sg.A.y, sg.B.y) + off < hb - 4 || Math.min(sg.A.y, sg.B.y) + off > H + 4) continue; c.beginPath(); c.moveTo(sg.A.x, sg.A.y + off); c.lineTo(sg.B.x, sg.B.y + off); c.stroke(); }
     for (const q of K.stars) { const y = q.P.y + off; if (y < hb - 6 || y > H + 6) continue; spark(c, q.P.x, y, q.big ? 3 : 2.2, f * (0.8 + 0.2 * Math.sin(t * 2.2 + q.P.x)), K.dark ? (q.big ? [255, 244, 214] : [225, 236, 255]) : (q.big ? GOLD : [29, 95, 209]), true); }
     c.restore();
@@ -542,7 +556,7 @@ const FX_PATCHES = [
       shown.forEach((ta, k) => { const u = (t - ta) / 0.25; if (u <= 0) return; const P = best.P.get(k), a = Math.min(1, u) * fade, tw = 0.8 + 0.2 * Math.sin(t * 5 + P.x), big = k.mag < 2.2;
         if (u < 1) glow(c, P.x, P.y + off, 18 * (1 - u) + 6, 0.5 * (1 - u), GOLD); if (!popped.has(k)) { popped.add(k); for (let i = 0; i < 4; i++) { const an = rnd(0, 6.28); sw.add({ x: P.x, y: P.y + off, vx: Math.cos(an) * 0.9, vy: Math.sin(an) * 0.9, life: 0.5, r: 1, col: GOLD, drag: 0.9 }); } }
         spark(c, P.x, P.y + off, big ? 3 : 2.2, a * tw, dark ? (big ? [255, 244, 214] : [225, 236, 255]) : (big ? GOLD : [29, 95, 209]), true); });
-      sw.step(dt); sw.draw(c, fade); if (t > holdEnd + fadeLen) { keptCons = { segs, stars: [...shown.keys()].map(k => ({ P: best.P.get(k), big: k.mag < 2.2 })), sy0, lineC, dark }; return true; } return false;
+      sw.step(dt); sw.draw(c, fade); if (t > holdEnd + fadeLen) { keptCons = { segs, stars: [...shown.keys()].map(k => ({ P: best.P.get(k), big: k.mag < 2.2 })), sy0, lineC, dark }; addMini(name); return true; } return false;
     } };
   });
 
@@ -551,12 +565,13 @@ const FX_PATCHES = [
     const dir = Math.random() < 0.5 ? 1 : -1, sgn = Math.random() < 0.5 ? 1 : -1, hb = hdrBottom(), L = Math.min(560, W * 0.42), tn = Math.tan(rnd(0.12, 0.3)), half = W / 2 * tn;
     const lo = hb + 30 + half, hi = Math.max(lo + 10, H * 0.66), ym = rnd(lo, hi), dur = rnd(1.2, 2.0), span = W + L + 80, N = COARSE ? 24 : 42;
     const ux = dir / Math.hypot(1, tn), uy = dir * sgn * tn / Math.hypot(1, tn), jit = []; for (let k = 0; k < N; k++) jit.push({ a: rnd(-1.8, 1.8), s: rnd(-0.02, 0.02), ph: rnd(0, 6.28), col: BRIGHT[k % 6] });
-    let dk = 0, dkT = 0, fr = 0;
+    let dk = 0, dkT = 0, fr = 0; const under = Math.random() < 0.5;   // half the comets pass behind the cards, as part of the sky
     return { label: 'A comet', frame(c, t, dt) {
       const u = t / dur; if (u >= 1) return true; const tr = u * span, hx = dir > 0 ? -40 + tr : W + 40 - tr, hy = ym + sgn * (hx - W / 2) * tn;
       if (fr++ % 6 === 0 && hx > 0 && hx < W) dkT = darkAt(hx, hy) ? 1 : 0; dk += (dkT - dk) * Math.min(1, dt * 5);
       const m = lerp(0.55, 1, dk), hc = dk > 0.5 ? WHITE : GOLD, tx = hx - ux * L, ty = hy - uy * L;
       c.save(); c.beginPath(); c.rect(0, hdrBottom(), W, H); c.clip();
+      if (under) { c.beginPath(); c.rect(0, 0, W, H); for (const e of document.querySelectorAll('.card, .tile')) { if (e.parentElement && e.parentElement.closest('.card')) continue; const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > H || r.width < 40) continue; c.rect(r.left, r.top, r.width, r.height); } c.clip('evenodd'); }
       const g = c.createLinearGradient(hx, hy, tx, ty); g.addColorStop(0, `rgba(${hc[0]},${hc[1]},${hc[2]},${0.5 * m})`); g.addColorStop(1, `rgba(${hc[0]},${hc[1]},${hc[2]},0)`);
       c.strokeStyle = g; c.lineWidth = 0.9; c.lineCap = 'round'; c.beginPath(); c.moveTo(hx, hy); c.lineTo(tx, ty); c.stroke();
       for (let k = 0; k < N; k++) { const q = jit[k], s = (k + 1) / N, d = s * L, x = hx - ux * d + -uy * q.a * (0.4 + s), y = hy - uy * d + ux * q.a * (0.4 + s), al = Math.pow(1 - s, 1.5) * m * (0.7 + 0.3 * Math.sin(t * 14 + q.ph)), col = dk > 0.5 ? (k % 3 === 0 ? WHITE : [160, 200, 255]) : q.col;
@@ -812,8 +827,7 @@ const FX_PATCHES = [
     if (!targets.length || REDUCE || !enabled || document.hidden || !cvOK()) return; const hb = hdrBottom(), now = performance.now();
     for (const tg of skyTargets) { if (tg === targets[0] && (!headSkyOK || keptCons)) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) skyNow(tg); }
     if (now - lastScroll < 250 || laneBusy('x') || pending.length) return;
-    for (const tg of targets) { if (tg.nextup || !tg.safe || tg.nitems < 2 || !freshCards(tg.sec).length) continue; if (tg === targets[0] && !headSkyOK) continue; const r = tg.sec.getBoundingClientRect(); if (r.top > H - 30 || r.bottom < hb + 20) continue;
-      if (startFx(DEF.cardin, tg, { quiet: true })) break; }
+    // card sparkle on scroll is off: the owner wants cards static for now (2026-11-22); the effect stays in the review panel
   }
   // a comet every 20 to 45 s (the first within 6 to 12 s), only while the page is visible, still, and nothing else of ours is running
   function scheduleComet(first) { clearTimeout(cometT); cometT = setTimeout(tryComet, first ? rnd(6000, 12000) : rnd(20000, 45000)); }

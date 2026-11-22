@@ -1,4 +1,4 @@
-// Video player: any <button data-yt="VIDEO_ID" data-yt-title="..."> opens the video in a window over the page. Nothing loads from YouTube until the button is pressed.
+// Video player: any <button data-yt="VIDEO_ID" data-yt-title="..."> (or data-yt-list="PLAYLIST_ID" for a channel's uploads) opens the video in a window over the page. Nothing loads from YouTube until the button is pressed.
 (function () {
   'use strict';
   let box = null, last = null;
@@ -8,18 +8,18 @@
   document.head.appendChild(css);
   function close() { if (!box) return; box.remove(); box = null; document.documentElement.style.overflow = ''; if (last && last.focus) last.focus(); }
   function open(id, title, btn) {
-    if (!/^[\w-]{11}$/.test(id)) return; close(); last = btn;
+    const list = btn && btn.getAttribute('data-yt-list'); if (list ? !/^[\w-]{12,40}$/.test(list) : !/^[\w-]{11}$/.test(id || '')) return; close(); last = btn;
     box = document.createElement('div'); box.className = 'ytm'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', title || 'Video');
     const inn = document.createElement('div'); inn.className = 'ytm-in';
     const top = document.createElement('div'); top.className = 'ytm-top'; const tt = document.createElement('span'); tt.textContent = title || ''; const x = document.createElement('button'); x.type = 'button'; x.className = 'ytm-x'; x.textContent = 'Close';
     top.appendChild(tt); top.appendChild(x);
     const f = document.createElement('div'); f.className = 'ytm-f'; const fr = document.createElement('iframe');
-    fr.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'; fr.title = title || 'Video'; fr.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; fr.allowFullscreen = true; fr.referrerPolicy = 'strict-origin-when-cross-origin';
+    fr.src = list ? 'https://www.youtube-nocookie.com/embed/videoseries?list=' + list + '&autoplay=1&rel=0' : 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0'; fr.title = title || 'Video'; fr.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; fr.allowFullscreen = true; fr.referrerPolicy = 'strict-origin-when-cross-origin';
     f.appendChild(fr); inn.appendChild(top); inn.appendChild(f); box.appendChild(inn); document.body.appendChild(box);
     document.documentElement.style.overflow = 'hidden';
     x.addEventListener('click', close); box.addEventListener('click', e => { if (e.target === box) close(); });
     requestAnimationFrame(() => { if (box) box.classList.add('on'); }); x.focus();
   }
-  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-yt]'); if (!b) return; e.preventDefault(); open(b.getAttribute('data-yt'), b.getAttribute('data-yt-title'), b); });
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-yt],[data-yt-list]'); if (!b) return; e.preventDefault(); open(b.getAttribute('data-yt'), b.getAttribute('data-yt-title'), b); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && box) close(); });
 })();
