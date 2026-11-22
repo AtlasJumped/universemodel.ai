@@ -23,34 +23,44 @@
 </div></div>
 
 <style>
-.fun-sec{padding:clamp(18px,2.4vw,30px) 0 clamp(26px,3vw,44px)}
-.fun-app{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:stretch}
-.fun-stage{position:relative;min-height:max(580px,78vh);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;background:linear-gradient(#EAF1FA,#F8FBFF 60%,#fff)}
+.fun-sec{padding:clamp(14px,2vw,24px) 0 clamp(26px,3vw,44px)}
+.fun-app{display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:12px;align-items:start}
+.fun-stage{position:relative;height:clamp(460px,calc(100vh - 66px - 24px),800px);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;background:linear-gradient(#EAF1FA,#F8FBFF 60%,#fff)}
 .fun-stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;outline-offset:-3px}
-.fun-read{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none;max-width:calc(100% - 20px)}
-.fun-read span{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font:600 .8rem/1 var(--font);color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fun-read{position:absolute;left:8px;top:8px;display:flex;flex-wrap:wrap;gap:4px;pointer-events:none;max-width:calc(100% - 56px)}
+.fun-read span{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:999px;padding:4px 8px;font:600 12px/1 var(--font);color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
 .fun-read b{font-weight:750}
-.fun-zoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
-.fun-zoom .chipbtn{width:40px;height:40px;padding:0;font-size:1.25rem;line-height:1}
-.fun-msg{position:absolute;left:10px;bottom:10px;right:10px;margin:0;pointer-events:none;font:600 .86rem/1.3 var(--font);color:var(--navy)}
-.fun-msg span{display:inline-block;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.fun-zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
+.fun-zoom .chipbtn{width:34px;height:34px;padding:0;font-size:1.15rem;line-height:1}
+.fun-reset{position:absolute;right:8px;bottom:8px;z-index:2;min-height:40px;padding:8px 16px;font-size:.9rem;box-shadow:0 4px 14px rgba(14,58,117,.28)}
+.fun-msg{position:absolute;left:8px;bottom:8px;right:176px;margin:0;pointer-events:none;font:600 .82rem/1.3 var(--font);color:var(--navy)}
+.fun-msg span{display:inline-block;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:10px;padding:5px 9px}
 .fun-msg span:empty{display:none}
-.fun-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px}
+.fun-panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px;display:flex;flex-direction:column;gap:9px;min-width:0}
 .fun-grp{border:0;margin:0;padding:0;min-width:0}
-.fun-h{display:block;font:700 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 7px}
-.fun-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-.fun-row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.fun-panel .chipbtn{min-height:40px;padding:8px 8px;text-align:center;white-space:normal;line-height:1.15}
+.fun-h{display:block;font:700 .66rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:0 0 5px}
+.fun-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.fun-panel .chipbtn{min-height:30px;padding:4px 7px;text-align:center;white-space:normal;font:600 12.5px/1.1 var(--font)}
+.fun-panel .chipbtn:focus-visible,.fun-reset:focus-visible,.fun-zoom .chipbtn:focus-visible,.fun-sel select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .fun-panel .chipbtn[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
 .fun-panel .chipbtn.hot{border-color:#E7B08A;color:#8A3B0B;background:#FFF6EE}
 .fun-panel .chipbtn.hot:hover{border-color:#D9822B}
 .fun-panel .chipbtn.wide{grid-column:1/-1}
-.fun-panel .btn{width:100%;justify-content:center;text-align:center}
+.fun-sel select{width:100%;min-height:32px;font:600 12.5px/1.1 var(--font);color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 8px}
 .fun-note{margin:14px 0 0}
 @media (max-width:900px){
-  .fun-app{grid-template-columns:minmax(0,1fr)}
-  .fun-stage{min-height:max(430px,66vh)}
-  .fun-row.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fun-app{grid-template-columns:minmax(0,1fr);gap:8px}
+  .fun-stage{height:clamp(320px,calc(100vh - 66px - 140px),520px)}
+  .fun-panel{padding:8px;gap:7px}
+  .fun-sel{order:5}
+  .fun-scroll{display:flex;grid-template-columns:none;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:3px;scrollbar-width:thin}
+  .fun-scroll .chipbtn{flex:0 0 auto;white-space:nowrap;padding:4px 11px}
+  .fun-grp.hdr-hide .fun-h{display:none}
+  .fun-row.fun-ctl{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .fun-msg{right:150px;font-size:.76rem}
+  .fun-read{gap:3px}
+  .fun-read span{font-size:11px;padding:3px 7px}
+  .fun-reset{min-height:38px;padding:6px 12px}
 }
 @media (prefers-reduced-motion:reduce){.fun-stage canvas{scroll-behavior:auto}}
 </style>
@@ -59,27 +69,26 @@
   <div class="wrap">
     <div class="fun-app" id="fun">
       <div class="fun-stage" id="fun-stage">
-        <canvas id="fun-cv" tabindex="0" role="img" aria-label="A 3D tensegrity smash room. A structure made of struts in compression and cables in tension stands on the ground. Choose a scene and a tool, then pluck, cut, break, slice, burn, shake or smash it. Drag empty space to rotate, pinch or use the zoom buttons to zoom. With the canvas focused, arrow keys turn the view and plus and minus zoom."></canvas>
+        <canvas id="fun-cv" tabindex="0" role="img" aria-label="A 3D tensegrity smash room. A structure made of struts in compression and cables in tension stands on the ground, with toy people and cars. Choose a scene and a tool, then pluck, cut, break, slice, burn, shake or smash it. Drag empty space to rotate, pinch or use the zoom buttons to zoom. With the canvas focused, arrow keys turn the view and plus and minus zoom."></canvas>
         <div class="fun-zoom"><button type="button" class="chipbtn" id="fun-zin" aria-label="Zoom in">+</button><button type="button" class="chipbtn" id="fun-zout" aria-label="Zoom out">&minus;</button></div>
         <div class="fun-read" id="fun-read" aria-hidden="true"></div>
         <p class="fun-msg" id="fun-msg" role="status" aria-live="polite"><span></span></p>
+        <button class="btn primary fun-reset" type="button" id="fun-reset">Reset to healthy</button>
       </div>
       <div class="fun-panel">
-        <div class="fun-row">
-          <button class="btn primary" type="button" id="fun-reset">Reset to healthy</button>
-          <button class="chipbtn" type="button" id="fun-surprise">Surprise me</button>
-        </div>
-        <div class="fun-row r3">
-          <button class="chipbtn" type="button" id="fun-pause" aria-pressed="false">Pause</button>
-          <button class="chipbtn" type="button" id="fun-slow">Slow 1x</button>
-          <button class="chipbtn" type="button" id="fun-moon" aria-pressed="false">Low gravity</button>
-        </div>
-        <div class="fun-grp" role="group" aria-labelledby="fun-h1"><span class="fun-h" id="fun-h1">Scene</span><div class="fun-row" id="fun-scenes"></div></div>
-        <div class="fun-grp" role="group" aria-labelledby="fun-h2"><span class="fun-h" id="fun-h2">Tool</span><div class="fun-row" id="fun-tools"></div></div>
-        <div class="fun-grp" role="group" aria-labelledby="fun-h3"><span class="fun-h" id="fun-h3">Disasters</span><div class="fun-row" id="fun-acts"></div></div>
+        <div class="fun-grp fun-sel"><label class="fun-h" for="fun-scene">Scene</label><select id="fun-scene"></select></div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h2"><span class="fun-h" id="fun-h2">Tools</span><div class="fun-row fun-scroll" id="fun-tools"></div></div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h3"><span class="fun-h" id="fun-h3">Disasters</span><div class="fun-row fun-scroll" id="fun-acts"></div></div>
+        <div class="fun-grp" role="group" aria-labelledby="fun-h4"><span class="fun-h" id="fun-h4">Time and surprises</span>
+          <div class="fun-row fun-ctl">
+            <button class="chipbtn" type="button" id="fun-pause" aria-pressed="false">Pause</button>
+            <button class="chipbtn" type="button" id="fun-slow">Slow 1x</button>
+            <button class="chipbtn" type="button" id="fun-moon" aria-pressed="false">Low gravity</button>
+            <button class="chipbtn" type="button" id="fun-surprise">Surprise me</button>
+          </div></div>
       </div>
     </div>
-    <p class="fun-note">What to notice: cut one cable and watch the load move through the whole structure. Slack cables pull tight, and each line changes color as it takes more strain. The working human model is on the <a href="simulation.html">simulation page</a>.</p>
+    <p class="fun-note">What to notice: cut one cable and watch the load move through the whole structure. Slack cables pull tight, and each line changes color as it takes more strain. The toy people and cars follow the same physics: they ride whatever is under them, fall when it goes, and get tossed by quakes, wind, and the tornado. The working human model is on the <a href="simulation.html">simulation page</a>.</p>
   </div>
 </section>
 <script src="fun.js" defer></script>
@@ -96,7 +105,9 @@
 <div><h4>More</h4><ul><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="fun.html">For fun</a></li><li><a href="roadmap.html">Road Ahead</a></li><li><a href="influencers.html">Influencers</a></li><li><a href="collaborators.html">Collaborators</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li></ul>
 <h4 style="margin-top:18px">Contact</h4><ul><li><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a></li><li>© 2026 Universe Model</li></ul></div>
 </div></footer>
-<script src="site.js?v=95b4340c" defer></script>
+<script src="site.js?v=488aea81" defer></script>
 <script src="fx-stars.js?v=5a13ce3b" defer></script>
+<script src="fx-sky.js?v=7cd41669" defer></script>
+<script src="fx-progress.js?v=024db3f8" defer></script>
 </body>
 </html>

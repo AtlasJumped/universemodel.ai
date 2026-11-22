@@ -75,6 +75,8 @@ const FX_PATCHES = [
 .fxd-row button:hover,.fxd-all:hover{background:#eef4ff;border-color:#5B9BE6}.fxd-all{width:100%;margin-top:9px;padding:8px 10px}
 .fxd-label{position:fixed;left:12px;bottom:52px;z-index:80;font:600 12px/1.2 var(--font,system-ui,sans-serif);color:#fff;background:rgba(14,58,117,.9);border-radius:8px;padding:6px 10px;pointer-events:none;opacity:0;transition:opacity .25s}
 .fxd-label.on{opacity:1}`;
+  // The review panel (pill, panel, name label) shows only in the preview copy of the site. On the live site the effects run without it.
+  if (!/\/preview\//.test(location.pathname)) css.textContent += '.fxd-pill,.fxd-panel,.fxd-label{display:none!important}';
   document.head.appendChild(css);
   const pill = document.createElement('button'); pill.type = 'button'; pill.className = 'fxd-pill'; pill.setAttribute('aria-expanded', 'false');
   pill.innerHTML = '<i aria-hidden="true"></i><b style="font-weight:600">Effects demo</b>';
