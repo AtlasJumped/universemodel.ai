@@ -27,6 +27,10 @@
 .co-av.sm{width:58px;height:58px;border-style:dashed;background:#fff}
 .co-av.sm svg{width:32px;height:32px;opacity:.55}
 .co-top b{margin-top:10px;color:var(--navy);font-size:1.15rem}
+.co-me{margin-top:14px;max-width:620px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.co-me b{margin-top:0}
+.co-me-l{margin:4px 0 0;display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.co-me blockquote{margin:10px 0 0;padding:0;border:0;color:var(--ink);font-size:1rem;line-height:1.6}
 .co-top span{font-size:.92rem;color:var(--soft)}
 .co-stem{width:2px;height:28px;background:var(--line);margin:10px auto 0}
 .co-bar{height:2px;background:var(--line);margin:0 16.66%}
@@ -71,11 +75,17 @@
   <div class="wrap">
     <span class="eyebrow">Who is here</span>
     <h2>One name at the top, and room underneath</h2>
-    <div class="co-tree" role="img" aria-label="A tree with HMR at the top and three empty branches beneath it: professionals, friends and family, and interested strangers. No one has joined yet.">
+    <div class="co-tree" role="group" aria-label="A tree with HMR at the top, where Leo is listed, and three empty branches beneath it: professionals, friends and family, and interested strangers.">
       <div class="co-top">
         <div class="co-av"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.2" fill="#9DB4D0"/><path d="M3.5 21c.6-4.6 4.1-7.2 8.5-7.2s7.900 2.600 8.500 7.200z" fill="#9DB4D0"/></svg></div>
         <b>HMR</b>
         <span>Where the idea stands today: we (the royal we)</span>
+        <div class="co-me">
+          <b>Leo</b>
+          <span>Anduril</span>
+          <p class="co-me-l"><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a><a href="https://universemodel.ai/">universemodel.ai</a></p>
+          <blockquote>"HMR is my life's work. I know most people don't think one person is going to solve everything, and I'm no exception. I am sharing my deepest beliefs about a vision I have of a future nobody else sees. Without your help HMR dies with me."</blockquote>
+        </div>
       </div>
       <div class="co-stem"></div>
       <div class="co-bar"></div>
