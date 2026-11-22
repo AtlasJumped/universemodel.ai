@@ -465,7 +465,7 @@ function buildHuman() {
 function riftRiders(sc) {
   let zm = 0; for (let i = 0; i < nN; i++) if (!isRider[i] && Math.abs(px[i]) < 3.5 * sc) zm = Math.min(zm, pz[i]);
   const z = zm - 3.4 * sc;
-  person(0.3 * sc, 0, z, sc, PCOL[2]); person(-0.5 * sc, 0, z - 1.6 * sc, sc, PCOL[4]); car(0, 0, z - 4.6 * sc, 1.0 * sc, '#D98A1C', null, true);
+  person(0.05 * sc, 0, z, sc, PCOL[2]); person(-0.1 * sc, 0, z - 1.8 * sc, sc, PCOL[4]); car(0, 0, z - 4.6 * sc, 1.0 * sc, '#D98A1C', null, true);
 }
 const SCENES = [
   { id: 'tent', name: 'Tent camp', build: buildTent },
@@ -486,8 +486,8 @@ let tornadoes = [], gust = null, grab = null;
 const cnt = { cut: 0, broke: 0, burnt: 0, alive: 0, total: 0, peak: 0 };
 const FR = { sub: 10, ms: 0 };
 
-function groundY(x) {
-  if (rift.gap > 0 && Math.abs(x) < rift.gap / 2) return -S.pit;
+function groundY(x, r) {
+  if (rift.gap > 0 && Math.abs(x) < rift.gap / 2 - 0.35 * (r || 0)) return -S.pit;
   if (Q.kind === 'up') return Q.oy;
   if (Q.kind === 'roll') return Q.amp * 0.8 * Q.env * Math.sin(Q.k * x - Q.w * Q.t);
   return 0;
@@ -572,9 +572,9 @@ function substep(h) {
     for (let t = 0; t < tornadoes.length; t++) {
       const T = tornadoes[t], dx = px[i] - T.x - Math.sin(py[i] * 0.07 + T.ph) * T.r * 0.35 * Math.min(1, py[i] / T.h), dz = pz[i] - T.z, d = Math.hypot(dx, dz), Rf = T.r * (1 + py[i] / T.h * 1.4), Rm = Rf * 2.6;
       if (d > Rm || py[i] > T.h * 1.6) continue;
-      const inf = (1 - d / Rm) * T.fade, dd = d + 1e-6, tx = -dz / dd, tz = dx / dd, k = Math.min(1, 4 * h * (0.3 + inf));
+      const inf = (1 - d / Rm) * T.fade, dd = d + 1e-6, tx = -dz / dd, tz = dx / dd, k = Math.min(1, 4 * h * (0.3 + inf) * (isRider[i] === 1 ? 2.8 : isRider[i] === 2 ? 1.9 : 1));
       const tx0 = tx * T.v * Math.min(1, d / Rf + 0.35) - dx / dd * T.v * 0.45 * inf, tz0 = tz * T.v * Math.min(1, d / Rf + 0.35) - dz / dd * T.v * 0.45 * inf;
-      vx[i] += (tx0 * inf - vx[i] * inf) * k; vz[i] += (tz0 * inf - vz[i] * inf) * k; vy[i] += (T.up * inf * (isRider[i] ? 0.7 : 1) - vy[i] * inf * 0.5) * k + T.up * 0.12 * inf * h;
+      vx[i] += (tx0 * inf - vx[i] * inf) * k; vz[i] += (tz0 * inf - vz[i] * inf) * k; vy[i] += (T.up * inf * (isRider[i] ? 1.1 : 1) - vy[i] * inf * 0.5) * k + T.up * 0.12 * inf * h;
     }
     vx[i] *= dmp; vy[i] *= dmp; vz[i] *= dmp;
     const sp = Math.hypot(vx[i], vy[i], vz[i]); if (sp > VMAX) { const f = VMAX / sp; vx[i] *= f; vy[i] *= f; vz[i] *= f; }
@@ -606,12 +606,12 @@ function substep(h) {
   // ground
   for (let i = 0; i < nN; i++) {
     if (!alive[i] || pinned[i]) { continue; }
-    const r = nr[i]; let gy = groundY(px[i]), c = 0;
+    const r = nr[i]; let gy = groundY(px[i], r), c = 0;
     if (rift.gap > 0) {
-      const hg = rift.gap / 2, x = px[i];
-      if (Math.abs(x) >= hg && py[i] < gy - 0.05 * S.u && py[i] > -S.pit - 2) { px[i] = x < 0 ? -hg + 0.02 : hg - 0.02; }
+      const hg = rift.gap / 2 - 0.35 * r, x = px[i];
+      if (Math.abs(x) >= hg && py[i] < gy - 0.05 * S.u && py[i] > -S.pit - 2) { px[i] = x < 0 ? -Math.max(0, hg - 0.02) : Math.max(0, hg - 0.02); gy = -S.pit; }
     }
-    if (py[i] < gy + r) { py[i] = gy + r; c = 1; if (groundMove) { px[i] += groundMove * 0.85; pz[i] += groundMoveZ * 0.85; } if (riftDrag) px[i] += (px[i] < 0 ? -1 : 1) * riftDrag * (isRider[i] ? 0.5 : 0.9); }
+    if (py[i] < gy + r) { py[i] = gy + r; c = 1; if (groundMove) { px[i] += groundMove * 0.85; pz[i] += groundMoveZ * 0.85; } if (riftDrag) px[i] += (px[i] < 0 ? -1 : 1) * riftDrag * (isRider[i] ? 0 : 0.9); }
     if (c && Math.abs(px[i]) < rift.gap / 2 + 1 && rift.gap > 0 && py[i] > -1) { /* standing near the lip */ }
     cont[i] = c || cont[i];
   }
@@ -683,7 +683,6 @@ function collideRiders(h) {
       px[i] += dx * k * wI[i]; py[i] += dy * k * wI[i]; pz[i] += dz * k * wI[i]; px[j] -= dx * k * wI[j]; py[j] -= dy * k * wI[j]; pz[j] -= dz * k * wI[j];
     }
   }
-  if (window.__nowall) return;
   for (let pi = 0; pi < panels.length; pi++) {
     const P = panels[pi]; if (P.floor || !P.ok) continue;
     const n = P.n, A = n[0], c2 = n[2 % n.length], cx = (px[A] + px[c2]) * 0.5, cy = (py[A] + py[c2]) * 0.5, cz = (pz[A] + pz[c2]) * 0.5, rad = Math.hypot(px[A] - px[c2], py[A] - py[c2], pz[A] - pz[c2]) * 0.6 + 0.2;
@@ -1209,7 +1208,7 @@ function render() {
   for (let i = 0; i < nN; i++) if (glow[i] && alive[i]) items.push([sz[i], 5, i]);
   items.sort((a, b) => b[0] - a[0]);
   for (const it of items) {
-    switch (it[1]) { case 0: drawMember(mem[it[2]]); break; case 1: drawPanel(panels[it[2]]); break; case 2: { const R = riders[it[2]]; R.t === 'p' ? drawPerson(R) : drawCar(R); break; } case 3: drawBall(balls[it[2]]); break; case 4: drawTornado(tornadoes[it[2]]); break; case 5: drawLamp(it[2]); break; }
+    switch (it[1]) { case 0: drawMember(mem[it[2]]); break; case 1: drawPanel(panels[it[2]]); break; case 2: { const R = riders[it[2]], dp = -py[R.n]; if (dp > 0.15 * S.u && rift.gap > 0) ctx.globalAlpha = Math.max(0.12, 1 - dp / (S.pit * 0.9)); R.t === 'p' ? drawPerson(R) : drawCar(R); ctx.globalAlpha = 1; break; } case 3: drawBall(balls[it[2]]); break; case 4: drawTornado(tornadoes[it[2]]); break; case 5: drawLamp(it[2]); break; }
   }
   drawParticles();
   // shock rings
@@ -1528,7 +1527,6 @@ window.funRoom = {
   fast: v => { const r = []; for (let i = 0; i < nN; i++) if (alive[i] && Math.hypot(vx[i], vy[i], vz[i]) > v) r.push([i, isRider[i], +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), +Math.hypot(vx[i], vy[i], vz[i]).toFixed(1)]); return r; },
   dead: () => { const r = []; for (let i = 0; i < nN; i++) if (!alive[i]) r.push([i, +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), deg[i]]); return r; },
   riders: () => riders.map(R => ({ n: R.n, id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, air: R.air, why: R.why, tq: R.tq, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
-  killRiders: (t) => { riders.forEach(R => { if (t && R.t !== t) return; R.dead = true; R.ns.forEach(i => { alive[i] = 0; }); }); },
   render, paused: p => { paused = p; }
 };
 resize();
