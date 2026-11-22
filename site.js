@@ -852,7 +852,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       let x = r.left + sx, w = r.width; if (win && w > 150) { const ww = rnd(70, 150); x += rnd(0, w - ww); w = ww; }
       const o = { x, y: r.top + sy, w, h: r.height, arr, crumble, org: rnd(0.2, 0.8) * w, sl: [], lit: false };
       const ns = Math.max(3, Math.ceil(w / 6)), sw = w / ns;
-      for (let j = 0; j < ns; j++) { const cx = (j + 0.5) * sw, ts = arr + Math.abs(cx - o.org) / spd + Math.random() * 0.15, L = crumble ? rnd(1.5, 2.9) : rnd(0.8, 1.6);
+      for (let j = 0; j < ns; j++) { const cx = (j + 0.5) * sw, ts = arr + Math.abs(cx - o.org) / spd + Math.random() * 0.15, L = 60; // letters stay alight until the sparkles put them out (owner, 2026-11-21)
         o.sl.push({ x: j * sw, w: sw, ts, L, ph: Math.random() * 6.283, hh: Math.random() < 0.25 ? rnd(1.3, 1.9) : rnd(0.5, 1.1), cr: false }); }
       T.push(o); return o;
     };
@@ -901,11 +901,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       const ox = scrollX, oy = scrollY;
       const rep = clamp((t - T_FIRE) / T_REP, 0, 1), heal = ease(clamp((rep - 0.12) / 0.8, 0, 1)), fl = 1 - clamp(rep / 0.3, 0, 1), keep = 1 - heal;
       // char on the letters: a dark overlay that creeps along from where the fire caught, ragged at the top, with bits crumbling off
-      for (const o of T) { const X = o.x - ox, Y = o.y - oy; if (Y > H + 40 || Y + o.h < -40) continue;
+      for (const o of T) { if (o !== FB) continue; // only the Fire button chars; the words burn without turning black (owner, 2026-11-21)
+        const X = o.x - ox, Y = o.y - oy; if (Y > H + 40 || Y + o.h < -40) continue;
         for (const s of o.sl) { const a = clamp((t - s.ts - 0.2) / 0.7, 0, 1); if (a <= 0) continue;
           const k = (o.crumble ? 0.86 : 0.3) * a * keep, jag = o.crumble ? (0.12 + 0.2 * Math.abs(Math.sin(s.ph * 3))) * o.h : 0.1 * o.h;
           c.fillStyle = o.crumble ? `rgba(24,16,14,${k})` : `rgba(80,44,20,${k})`; c.fillRect(X + s.x, Y + jag * (1 - a * 0.5), s.w + 0.6, o.h - jag * (1 - a * 0.5) + 1);
-          if (o.crumble && !s.cr && t > s.ts + s.L * 0.8 && crumbs.length < (coarse ? 36 : 80)) { s.cr = true; for (let q = 0; q < 2; q++) crumbs.push({ x: o.x + s.x + Math.random() * s.w, y: o.y + o.h * rnd(0.4, 0.9), vx: rnd(-8, 8), vy: rnd(-10, 6), z: rnd(1.4, 3), l: 1 }); } } }
+          if (o.crumble && !s.cr && t > s.ts + 1.2 && crumbs.length < (coarse ? 36 : 80)) { s.cr = true; for (let q = 0; q < 2; q++) crumbs.push({ x: o.x + s.x + Math.random() * s.w, y: o.y + o.h * rnd(0.4, 0.9), vx: rnd(-8, 8), vy: rnd(-10, 6), z: rnd(1.4, 3), l: 1 }); } } }
       for (let i = crumbs.length - 1; i >= 0; i--) { const b = crumbs[i]; b.vy += 120 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.l -= dt * 0.9; if (b.l <= 0) { crumbs.splice(i, 1); continue; }
         c.fillStyle = `rgba(30,20,16,${0.85 * b.l * keep})`; c.fillRect(b.x - ox, b.y - oy, b.z, b.z); }
       // flames dancing along the letters
@@ -1208,7 +1209,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           TG.step(S, sdt, speed < 1 ? 12 : 20, 0.7);
           if (S.balloon !== undefined && !S.fire && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.fireStep(S, sdt, reduce ? 0.5 : 0);
-          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > S.fire.last + 2)) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
+          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > S.fire.last + 1)) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
           if (!S.fire) burningList = [];
           if (S.fire && !reduce && burningList.length) {
             smoke = smoke.filter(m => now - m.t0 < 1700); smoke.forEach(m => { m.y += cam.R * 0.22 * sdt; m.x += m.vx * sdt; });
