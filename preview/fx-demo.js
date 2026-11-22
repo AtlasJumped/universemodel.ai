@@ -84,7 +84,7 @@ const FX_PATCHES = [
   function say(txt, ms) { label.textContent = txt; label.classList.add('on'); clearTimeout(labelTimer); labelTimer = setTimeout(() => label.classList.remove('on'), ms || 2000); }
 
   // ---------------------------------------------------------------- engine
-  let cv = null, c = null, W = innerWidth, H = innerHeight, D = 1, raf = 0, lastDraw = 0;
+  let forceDraw = false, cv = null, c = null, W = innerWidth, H = innerHeight, D = 1, raf = 0, lastDraw = 0;
   const running = [], pending = [], errors = [], skies = [];
   const ptr = { x: null, y: null, t: 0 };
   addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.t = performance.now(); }, { passive: true });
@@ -123,7 +123,7 @@ const FX_PATCHES = [
   }
   function tick(now) {
     raf = requestAnimationFrame(tick);
-    if (COARSE && now - lastDraw < 32) return;
+    if (!forceDraw && now - lastDraw < (running.length ? (COARSE ? 32 : 0) : (COARSE ? 66 : 40))) return; forceDraw = false;
     const dt = Math.min(0.05, Math.max(0.001, (now - (lastDraw || now - 16)) / 1000)); lastDraw = now;
     if (!c) { idleCheck(); return; }
     if (!cvOK()) { stopAll(); return; }
@@ -228,6 +228,13 @@ const FX_PATCHES = [
       const r = isBox ? e.getBoundingClientRect() : tbox(e); if (r.width < 4 || r.height < 4) continue;
       out.push({ l: r.left - pad, t: r.top - pad, r: r.right + pad, b: r.bottom + pad });
     }
+    return out;
+  }
+  // every visible text node and every box (cards, pictures, canvases, form controls), for the quiet background sky
+  function allRects(root, pad) {
+    const out = [], tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => /\S/.test(n.nodeValue) && !(n.parentElement && n.parentElement.closest('script,style,noscript')) ? 1 : 2 }); let n, k = 0, rg = document.createRange();
+    while ((n = tw.nextNode()) && k++ < 1400) { rg.selectNodeContents(n); const r = rg.getBoundingClientRect(); if (r.width < 2 || r.height < 2) continue; out.push({ l: r.left - pad, t: r.top - pad, r: r.right + pad, b: r.bottom + pad }); }
+    k = 0; for (const e of root.querySelectorAll(BOX + ',a.btn,.btn,.chipbtn,button,.pull,.note,.tgc,.stat')) { if (k++ > 400) break; const r = e.getBoundingClientRect(); if (r.width < 4 || r.height < 4) continue; out.push({ l: r.left - pad, t: r.top - pad, r: r.right + pad, b: r.bottom + pad }); }
     return out;
   }
   const hit = (x, y, rects, m) => { m = m || 0; for (const q of rects) if (x > q.l - m && x < q.r + m && y > q.t - m && y < q.b + m) return true; return false; };
@@ -387,11 +394,17 @@ const FX_PATCHES = [
     }
     gen = script();
 
+    // the fairy IS a sparkle: the site's soft radial dot with the fine four-point cross (fx-stars.js), grown to about 1 cm with its glow,
+    // twinkling, its color drifting through the site's sparkle colors
+    const FCOL = [[29, 95, 209], [91, 155, 230], [109, 74, 255], [214, 120, 210], [242, 169, 59]];
+    const fcol = t => { const k = ((t * 0.28) % 5 + 5) % 5, i = Math.floor(k), u = k - i, A = FCOL[i], B = FCOL[(i + 1) % 5]; return [lerp(A[0], B[0], u), lerp(A[1], B[1], u), lerp(A[2], B[2], u)]; };
     function drawFairy(c, x, y, s, a, t) {
-      if (a <= 0.01) return;
-      c.globalAlpha = Math.min(1, a); c.drawImage(ballSprite(), x - 20 * s, y - 20 * s, 40 * s, 40 * s); c.globalAlpha = 1;
-      for (let k = 0; k < 3; k++) { const an = t * (3 + k * 1.3) * (k % 2 ? 1 : -1) + k * 2.1, rr = (12 + k * 2.2) * s; spark(c, x + Math.cos(an) * rr, y + Math.sin(an) * rr * 0.9, 0.7 * s, a * (0.7 + 0.3 * Math.sin(t * 9 + k)), k === 1 ? [91, 155, 230] : GOLD, false); }
-      const gl = (0.55 + 0.45 * Math.sin(t * 7.3)) * a; cross(c, x, y, 14 * s, gl * 0.8, [242, 169, 59], 1);
+      if (a <= 0.01) return; const col = fcol(t + (tg.i || 0) * 1.7), tw = 0.82 + 0.18 * Math.sin(t * 9), rgb = col.map(Math.round);
+      glow(c, x, y, 20 * s, a * 0.55 * tw, rgb); glow(c, x, y, 14 * s, a * tw, rgb); glow(c, x, y, 8.5 * s, a * tw, rgb);
+      const gl = (0.7 + 0.3 * Math.sin(t * 7.3)) * a, ln = (17 + 3 * Math.sin(t * 5.1)) * s;
+      cross(c, x, y, ln, gl, rgb, 1.5);
+      c.save(); c.translate(x, y); c.rotate(0.785 + Math.sin(t * 2) * 0.3); cross(c, 0, 0, 10 * s, gl * 0.75, [109, 74, 255], 1.1); c.restore();
+      for (let k = 0; k < 3; k++) { const an = t * (2.6 + k * 1.2) * (k % 2 ? 1 : -1) + k * 2.1, rr = (13 + k * 2.4) * s; spark(c, x + Math.cos(an) * rr, y + Math.sin(an) * rr * 0.9, 0.8 * s, a * (0.65 + 0.35 * Math.sin(t * 9 + k)), FCOL[(k * 2 + Math.floor(t)) % 5], k !== 1); }
     }
     function flameFrame(c, ft, d, fx, fy) {
       if (!flames || ft < 0) return; const s = fSeg(); if (!s) return; const w = s.x1 - s.x0, sx = s.big, hbv = hdrBottom(); let alive = 0;
@@ -419,13 +432,13 @@ const FX_PATCHES = [
         const vis = f.a;
         // the trail: small quick sparkles laid along the path, tapering as they age
         if (px != null && vis > 0) { const dd = Math.hypot(X0 - px, Y0 - py), n = Math.min(14, Math.floor(dd / 3) + (dd < 1 ? (Math.random() < d * 18 ? 1 : 0) : 0));
-          for (let i = 0; i < n && tr.length < trMax; i++) { const u = (i + 1) / n; tr.push({ x: lerp(px, X0, u) + rnd(-2, 2), y: lerp(py, Y0, u) + rnd(-2, 2), vx: rnd(-0.15, 0.15), vy: rnd(-0.12, 0.12) + 0.03, age: 0, life: rnd(0.2, 0.55), r: rnd(0.7, 2.1), col: Math.random() < 0.45 ? GOLD : Math.random() < 0.5 ? [232, 140, 30] : pick([[91, 155, 230], [109, 74, 255], [214, 120, 210]]), pl: Math.random() < 0.1 }); } }
+          for (let i = 0; i < n && tr.length < trMax; i++) { const u = (i + 1) / n; tr.push({ x: lerp(px, X0, u) + rnd(-2, 2), y: lerp(py, Y0, u) + rnd(-2, 2), vx: rnd(-0.15, 0.15), vy: rnd(-0.12, 0.12) + 0.03, age: 0, life: rnd(0.2, 0.55), r: rnd(0.7, 1.6), col: pick(FCOL), pl: Math.random() < 0.4 }); } }
         px = X0; py = Y0; sw.step(d);
         for (let i = tr.length - 1; i >= 0; i--) { const p = tr[i]; p.age += d; if (p.age >= p.life) { tr.splice(i, 1); continue; } p.x += p.vx * d * 60; p.y += p.vy * d * 60; }
         c.save();
         if (f.occ) { const r = occRect(); c.beginPath(); c.rect(-10, -10, W + 20, H + 20); const rr = f.occ.type === 'rect' ? parseFloat(getComputedStyle(f.occ.el).borderTopLeftRadius) || 0 : 2; if (c.roundRect) c.roundRect(r.left, r.top, r.width, r.height, rr); else c.rect(r.left, r.top, r.width, r.height); c.clip('evenodd'); }
         const hbv = hdrBottom();
-        for (const p of tr) { if (p.y < hbv) continue; const u = p.age / p.life, a = Math.pow(1 - u, 1.3) * Math.min(1, p.age * 30), rad = p.r * (1 - 0.7 * u); glow(c, p.x, p.y, rad * 2.8, a * 0.4, p.col); c.fillStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${Math.min(1, a * 1.1)})`; c.beginPath(); c.arc(p.x, p.y, rad, 0, 6.283); c.fill(); if (p.pl && u < 0.6) cross(c, p.x, p.y, rad * 2.4, a * 0.7, p.col, 0.8); }
+        for (const p of tr) { if (p.y < hbv) continue; const u = p.age / p.life, a = Math.pow(1 - u, 1.2) * Math.min(1, p.age * 30) * (0.75 + 0.25 * Math.sin(p.age * 30 + p.x)); spark(c, p.x, p.y, p.r * (1 - 0.45 * u), a, p.col, p.pl); }
         sw.draw(c, 1);
         if (X0 > -60 && Y0 > hbv - 40) drawFairy(c, X0, Y0, 1, vis, t);
         c.restore();
@@ -499,7 +512,9 @@ const FX_PATCHES = [
     for (let g = 0; g < 400 && pts.length < 13; g++) { const x = rnd(left, right), y = rnd(top, bot); const k = Math.min(2, Math.floor((x - left) / ((right - left) / 3))); if (third(k) >= 5) continue; if (!hit(x, y, rects, 6)) add(x, y, false); }
     for (let k = 0; k < 3; k++) for (let g = 0; g < 200 && third(k) < 2; g++) { const x = rnd(left + (right - left) * k / 3, left + (right - left) * (k + 1) / 3), y = rnd(top, bot); if (!hit(x, y, rects, 6)) add(x, y, false); }
     if (pts.length < 5) return null; pts.sort((a, b) => a.x - b.x);
-    const links = []; for (let i = 0; i + 1 < pts.length; i++) links.push([i, i + 1]); for (let i = 0; i + 2 < pts.length; i += 3) links.push([i, i + 2]);
+    // lines only through empty space: a link that would cross text or a box is left out
+    const clear = (A, B) => { for (let k = 1; k < 16; k++) if (hit(lerp(A.x, B.x, k / 16), lerp(A.y, B.y, k / 16), rects, 2)) return false; return true; };
+    const links = []; for (let i = 0; i < pts.length; i++) for (const d of [1, 2, 3]) { const j = i + d; if (j < pts.length && Math.hypot(pts[j].x - pts[i].x, pts[j].y - pts[i].y) < 460 && clear(pts[i], pts[j]) && (d === 1 || links.filter(l => l[0] === i || l[1] === i).length < 2)) links.push([i, j]); }
     const sy0 = scrollY, dur = 2.5, sw = new Swarm(40);
     return { frame(c, t, dt) {
       const off = -(scrollY - sy0), fade = 1 - clamp((t - 1.9) / 0.6, 0, 1), appear = i => clamp((t - i * 0.12) / 0.3, 0, 1);
@@ -663,9 +678,10 @@ const FX_PATCHES = [
     if (Math.acos(clamp(cosc, -1, 1)) / d2r > P.span * 0.85) return null;
     return { x: -x * 57.2958 * sc, y: -y * 57.2958 * sc };
   }
+  const LCOL = [[29, 95, 209], [91, 155, 230], [109, 74, 255], [242, 169, 59], [214, 120, 210]];
   function buildSky(tg) {
     const r = tg.sky.getBoundingClientRect(), w = r.width, h = r.height; if (w < 100 || h < 60) return null;
-    const rects = textRects(tg.sky, 9).map(q => ({ l: q.l - r.left, t: q.t - r.top, r: q.r - r.left, b: q.b - r.top }));
+    const dark = !!tg.dark, rects = (dark ? textRects(tg.sky, 9) : allRects(tg.sky, 12)).map(q => ({ l: q.l - r.left, t: q.t - r.top, r: q.r - r.left, b: q.b - r.top }));
     // occupancy grid of the text rectangles (8 px cells): a cheap "is this point on text" test
     const gw = Math.ceil(w / 8) + 1, gh = Math.ceil(h / 8) + 1, occ = new Uint8Array(gw * gh);
     for (const q of rects) { const x0 = Math.max(0, Math.floor(q.l / 8)), x1 = Math.min(gw - 1, Math.floor(q.r / 8)), y0 = Math.max(0, Math.floor(q.t / 8)), y1 = Math.min(gh - 1, Math.floor(q.b / 8)); for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) occ[y * gw + x] = 1; }
@@ -682,17 +698,17 @@ const FX_PATCHES = [
           for (let gx = 0; gx <= 12; gx++) for (let gy = 0; gy <= 9; gy++) { const ox = lerp(w * 0.1 - bx1, w * 0.9 - bx0, gx / 12), oy = lerp(h * 0.1 - by1, h * 0.9 - by0, gy / 9), byC = {}; let score = 0;
             for (const q of proj) { const x = ox + q.p.x, y = oy + q.p.y, o = byC[q.s.c] || (byC[q.s.c] = { ok: 0, wsum: 0 }), wt = clamp(3.8 - q.s.mag, 0.6, 5) * (y < H * 1.1 ? 1.3 : 1); o.wsum += wt; if (x > 10 && x < w - 10 && y > 10 && y < h - 10) o.ok += cov(x, y) ? wt * 0.2 : wt; }
             for (const cn in byC) { const o = byC[cn], fr = o.ok / o.wsum; score += o.wsum * fr * fr * fr * (cn === 'Singles' ? 0.3 : 1) * (FX_STAR_TABLE[cn].l.length ? 1 : 0.6); }
-            score *= Math.pow(mult, 0.3) * (pi === pref ? 1.12 : 1); score += Math.random() * 0.3; if (!best || score > best.score) best = { score, ox, oy, sc, proj, P }; } } } }
+            score *= Math.pow(mult, 0.3) * (pi === pref ? (dark ? 1.12 : 1.35) : 1); score += Math.random() * 0.3; if (!best || score > best.score) best = { score, ox, oy, sc, proj, P }; } } } }
     if (!best) return null;
     // keep a constellation only if most of its stars sit in the open; a star that falls on text is dimmed to almost nothing
     const stars = [], by = new Map(), tally = {};
     for (const q of best.proj) { const x = best.ox + q.p.x, y = best.oy + q.p.y, inb = x > 4 && x < w - 4 && y > 4 && y < h - 4, t = tally[q.s.c] || (tally[q.s.c] = { n: 0, free: 0 }); t.n++; if (inb && !cov(x, y)) t.free++; q.x = x; q.y = y; q.inb = inb; }
-    for (const q of best.proj) { if (!q.inb) continue; const t = tally[q.s.c], single = q.s.c === 'Singles', dim = !!cov(q.x, q.y); if (dim && single) continue; if (!single && t.free / t.n < 0.5) continue;
-      const st = { x: q.x, y: q.y, mag: q.s.mag, name: q.s.name, dim, ph: rnd(0, 6.28), sp: rnd(0.6, 1.6), s: q.s }; stars.push(st); by.set(q.s, st); }
+    for (const q of best.proj) { if (!q.inb) continue; const t = tally[q.s.c], single = q.s.c === 'Singles', dim = dark && !!cov(q.x, q.y); if (!dark && cov(q.x, q.y)) continue; if (dim && single) continue; if (!single && t.free / t.n < (dark ? 0.5 : 0.34)) continue;
+      const st = { x: q.x, y: q.y, mag: q.s.mag, name: q.s.name, dim, lc: LCOL[stars.length % 5], ph: rnd(0, 6.28), sp: rnd(0.6, 1.6), s: q.s }; stars.push(st); by.set(q.s, st); }
     const lines = []; for (const [a, b] of SKYLINES) { const A = by.get(a), B = by.get(b); if (A && B) lines.push([A, B, A.dim || B.dim]); }
-    const dust = [], nd = Math.round(clamp(w * h / 12000, 14, 80) * (COARSE ? 0.6 : 1));
-    for (let i = 0, g = 0; i < nd && g < 900; g++) { const x = rnd(8, w - 8), y = rnd(8, h - 8); if (cov(x, y)) continue; i++; dust.push({ x, y, r: rnd(0.5, 1.3), ph: rnd(0, 6.28), sp: rnd(0.4, 1.4), col: Math.random() < 0.16 ? GOLD : Math.random() < 0.3 ? [150, 190, 255] : [235, 242, 255], pl: Math.random() < 0.15 }); }
-    return { w, h, stars, lines, dust, patch: best.P.id, sc: best.sc, rects, cr: parseFloat(getComputedStyle(tg.sky).borderTopLeftRadius) || 0 };
+    const dust = [], nd = Math.round(clamp(w * h / (dark ? 12000 : 22000), 12, dark ? 80 : 50) * (COARSE ? 0.6 : 1));
+    for (let i = 0, g = 0; i < nd && g < 900; g++) { const x = rnd(8, w - 8), y = rnd(8, h - 8); if (cov(x, y)) continue; i++; dust.push({ x, y, r: rnd(0.5, 1.3), ph: rnd(0, 6.28), sp: rnd(0.4, 1.4), col: Math.random() < 0.16 ? GOLD : Math.random() < 0.3 ? [150, 190, 255] : [235, 242, 255], lc: LCOL[i % 5], pl: Math.random() < 0.15 }); }
+    return { dark, w, h, stars, lines, dust, patch: best.P.id, sc: best.sc, rects, cr: parseFloat(getComputedStyle(tg.sky).borderTopLeftRadius) || 0 };
   }
   function drawSkies(dt, now) {
     const hb = hdrBottom(), t = now / 1000;
@@ -703,18 +719,26 @@ const FX_PATCHES = [
       const L = s.layout, a = easeIO(s.a), top = Math.max(r.top, hb), bot = Math.min(r.bottom, H);
       c.save(); c.beginPath(); const cr = L.cr; if (cr && c.roundRect) c.roundRect(r.left, r.top, r.width, r.height, cr); else c.rect(r.left, r.top, r.width, r.height); c.clip();
       c.beginPath(); c.rect(r.left, top, r.width, Math.max(0, bot - top)); c.clip();
-      for (const d of L.dust) { const y = r.top + d.y; if (y < top - 4 || y > bot + 4) continue; const tw = 0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(t * d.sp + d.ph), 1.5); spark(c, r.left + d.x, y, d.r, a * tw * 0.7, d.col, d.pl && tw > 0.8); }
-      c.lineWidth = 0.9; c.strokeStyle = `rgba(175,205,250,${0.24 * a})`; c.beginPath(); for (const [A, B, dm] of L.lines) { if (dm) continue; c.moveTo(r.left + A.x, r.top + A.y); c.lineTo(r.left + B.x, r.top + B.y); } c.stroke();
-      c.strokeStyle = `rgba(175,205,250,${0.06 * a})`; c.beginPath(); for (const [A, B, dm] of L.lines) { if (!dm) continue; c.moveTo(r.left + A.x, r.top + A.y); c.lineTo(r.left + B.x, r.top + B.y); } c.stroke();
-      for (const st of L.stars) { const y = r.top + st.y; if (y < top - 8 || y > bot + 8) continue; const mag = st.mag, R = clamp(2.0 - mag * 0.26, 0.9, 3.1), tw = 0.8 + 0.2 * Math.sin(t * st.sp * 1.6 + st.ph), col = mag < 1.2 ? [255, 244, 214] : mag < 2.6 ? [225, 236, 255] : [200, 220, 255];
-        spark(c, r.left + st.x, y, R, a * tw * (st.dim ? 0.13 : 1), col, !st.dim && mag < 2.0); }
+      if (L.dark) {
+        for (const d of L.dust) { const y = r.top + d.y; if (y < top - 4 || y > bot + 4) continue; const tw = 0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(t * d.sp + d.ph), 1.5); spark(c, r.left + d.x, y, d.r, a * tw * 0.7, d.col, d.pl && tw > 0.8); }
+        c.lineWidth = 0.9; c.strokeStyle = `rgba(175,205,250,${0.24 * a})`; c.beginPath(); for (const [A, B, dm] of L.lines) { if (dm) continue; c.moveTo(r.left + A.x, r.top + A.y); c.lineTo(r.left + B.x, r.top + B.y); } c.stroke();
+        c.strokeStyle = `rgba(175,205,250,${0.06 * a})`; c.beginPath(); for (const [A, B, dm] of L.lines) { if (!dm) continue; c.moveTo(r.left + A.x, r.top + A.y); c.lineTo(r.left + B.x, r.top + B.y); } c.stroke();
+        for (const st of L.stars) { const y = r.top + st.y; if (y < top - 8 || y > bot + 8) continue; const mag = st.mag, R = clamp(2.0 - mag * 0.26, 0.9, 3.1), tw = 0.8 + 0.2 * Math.sin(t * st.sp * 1.6 + st.ph), col = mag < 1.2 ? [255, 244, 214] : mag < 2.6 ? [225, 236, 255] : [200, 220, 255];
+          spark(c, r.left + st.x, y, R, a * tw * (st.dim ? 0.13 : 1), col, !st.dim && mag < 2.0); }
+      } else {   // a quiet background on the light sections: the site's sparkle colors at low opacity, lines very faint, slow twinkle, empty areas only
+        for (const d of L.dust) { const y = r.top + d.y; if (y < top - 4 || y > bot + 4) continue; const tw = 0.3 + 0.7 * Math.pow(0.5 + 0.5 * Math.sin(t * d.sp * 0.7 + d.ph), 1.5); spark(c, r.left + d.x, y, d.r * 0.9, a * tw * 0.3, d.lc, false); }
+        c.lineWidth = 0.8; c.strokeStyle = `rgba(80,120,200,${0.13 * a})`; c.beginPath(); for (const [A, B] of L.lines) { c.moveTo(r.left + A.x, r.top + A.y); c.lineTo(r.left + B.x, r.top + B.y); } c.stroke();
+        for (const st of L.stars) { const y = r.top + st.y; if (y < top - 8 || y > bot + 8) continue; const mag = st.mag, R = clamp(1.7 - mag * 0.22, 0.8, 2.6), tw = 0.75 + 0.25 * Math.sin(t * st.sp + st.ph);
+          spark(c, r.left + st.x, y, R, a * tw * 0.42, st.lc, mag < 2.0); }
+      }
       c.restore();
     }
   }
-  def('nightsky', 'Night sky (dark blue sections)', 'sky', null, 8, X => null);   // played through play(): see skyNow()
+  def('nightsky', 'Night sky (bright, on this section)', 'sky', null, 8, X => null);   // played through play(): see skyNow()
   function skyNow(tg) {
-    if (REDUCE) return false; if (!cvOK()) return false; if (skies.some(s => s.tg === tg && s.dir > 0)) return true;
-    ensureCanvas(); skies.push({ tg: Object.assign({}, tg, { sky: tg.sky || tg.sec, navyIdx: tg.navyIdx || 0 }), a: 0, dir: 1, layout: null, until: tg.navy ? 0 : performance.now() + 7000 }); kick(); say('Night sky: real constellations'); return true;
+    if (REDUCE || !cvOK()) return false; if (!tg.forced && skies.some(s => s.tg.sky === tg.sky && s.dir > 0)) return true;
+    ensureCanvas(); if (tg.forced) { skies.forEach(s => { if (s.tg.sky === tg.sec) s.a = 0; s.dir = s.tg.sky === tg.sec ? -1 : s.dir; }); }
+    skies.push({ tg: tg.forced ? { sec: tg.sec, sky: tg.sec, navyIdx: tg.navyIdx, dark: true } : tg, a: 0, dir: 1, layout: null, until: tg.forced ? performance.now() + 7000 : 0 }); kick(); if (tg.forced) say('Night sky: real constellations'); return true;
   }
 
   // ---------------------------------------------------------------- sections: classification, the plan, triggers
@@ -734,13 +758,13 @@ const FX_PATCHES = [
       targets.push(tg);
     });
     // navy rectangles (the dark blue sections, and the navy next-page cards) for the night sky
-    let ni = 0; for (const tg of targets) if (tg.navy) { tg.sky = tg.sec; tg.navyIdx = ni++; skyTargets.push(tg); }
-    document.querySelectorAll('.nx-go').forEach(el => { if (el.closest('.site-foot')) return; const tg = { sec: el.closest('section') || el, sky: el, navy: true, navyIdx: ni++, i: -1, head: null, eyebrow: null, safe: true, nitems: 0, nbold: 0 }; skyTargets.push(tg); });
+    // the background sky: every section except the 'In short / Next' block (kept regular blue); dark blue sections get the bright night sky
+    targets.forEach((tg, i) => { if (tg.nextup) return; tg.sky = tg.sec; tg.navyIdx = i; tg.dark = tg.navy; skyTargets.push(tg); });
     // the plan: on scroll only the fairy and the night sky run by themselves, plus the fire-then-sparkles effect on at most ONE section per page,
     // and only where the heading or eyebrow itself is about something really bad. Every other effect lives in the demo panel only.
     const STRONG = /\b(harm\w*|kill\w*|death|deaths|dead|die[sd]?|burn\w*|poison\w*|trauma\w*|abus\w*|punish\w*|violen\w*|injur\w*|disease\w*|suffer\w*|torture\w*|murder\w*|crisis|danger\w*)\b/i;
     let pickI = -1, pickScore = 0;
-    targets.forEach((tg, i) => { if (tg.isHead || tg.navy || tg.nextup || !(tg.eyebrow || tg.nitems)) return; const sc = (tg.head && STRONG.test(tg.head.textContent) ? 2 : 0) + (tg.eyebrow && STRONG.test(tg.eyebrow.textContent) ? 1 : 0); if (sc > pickScore) { pickScore = sc; pickI = i; } });
+    targets.forEach((tg, i) => { if (tg.isHead || tg.nextup || !(tg.eyebrow || tg.nitems)) return; const sc = (tg.head && STRONG.test(tg.head.textContent) ? 2 : 0) + (tg.eyebrow && STRONG.test(tg.eyebrow.textContent) ? 1 : 0); if (sc > pickScore) { pickScore = sc; pickI = i; } });
     if (pickI >= 0) targets[pickI].x = 'danger';
   }
 
@@ -760,7 +784,7 @@ const FX_PATCHES = [
     // at the very bottom of the page the last sections cannot reach the upper part of the window: the one resting in view gets its fairy
     if (cand < 0 && scrollY + H >= document.documentElement.scrollHeight - 6) for (let i = targets.length - 1; i >= 0; i--) { const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (!tg.firedF && r.top < H * 0.9 && r.bottom > H * 0.15) { cand = i; break; } }
     if (cand >= 0) { for (let j = 0; j < cand; j++) targets[j].firedF = true; fireFairy(targets[cand]); }   // fast scrolling: only the section that comes to rest
-    for (const tg of skyTargets) { const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) { if (enabled && !document.hidden && cvOK()) skyNow(tg); } }
+    for (const tg of skyTargets) { if (tg === targets[0] && performance.now() - t0 < 5200) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) { if (enabled && !document.hidden && cvOK()) skyNow(tg); } }
     if (targets.every(t => t.firedF) && !skyTargets.length) { clearInterval(iv); iv = 0; }
   }
   const start = () => { if (!iv) iv = setInterval(check, 400); };
@@ -776,7 +800,7 @@ const FX_PATCHES = [
   function play(name, sec, dance) {
     if (REDUCE) return false; const d = DEF[name] || Object.values(DEF).find(x => x.label === name); if (!d) return false; const tg = resolveTarget(sec); if (!tg) return false;
     if (!cvOK()) { say('The page fire is running. Try again in a moment.', 2200); return false; }
-    if (d.id === 'nightsky') { const nt = skyTargets.find(s => { const r = s.sky.getBoundingClientRect(); return r.bottom > hdrBottom() + 8 && r.top < H - 8; }); return skyNow(nt || Object.assign({}, tg, { sky: tg.sec, navyIdx: tg.i || 0, navy: false })); }
+    if (d.id === 'nightsky') return skyNow({ sec: tg.sec, navyIdx: tg.i || 0, forced: true });
     if ((d.need === 'cards' && !(tg.safe && tg.nitems >= 2)) || (d.need === 'bold' && !tg.nbold)) { say(d.need === 'cards' && !tg.safe ? 'This section holds a form or a toy, so card effects are skipped here.' : 'This section has nothing for that effect.', 2200); return false; }
     if (d.id === 'thought' && !startFx(d, targets[0] || tg, {})) { say('The page title is not in view. Scroll to the top first.', 2200); return false; } else if (d.id === 'thought') return true;
     const old = running.find(f => f.lane === d.lane); if (old) finish(old);
@@ -806,10 +830,12 @@ const FX_PATCHES = [
   };
   function init() {
     buildUI(); if (REDUCE) return; collect();
-    let ticking = false; addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; check(); }); }, { passive: true });
+    let ticking = false; addEventListener('scroll', () => { forceDraw = true; if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; check(); }); }, { passive: true });
     start(); setTimeout(check, 4700);
     // page load: the title forms from sparkles (with the icicles under the menu), then the constellation across the page head
-    if (enabled && cvOK() && !document.hidden) { startFx(DEF.thought, targets[0], {}); setTimeout(() => { if (enabled && !document.hidden && cvOK() && scrollY < 250 && targets[0]) startFx(DEF.constellation, targets[0], {}); }, 1900); }
+    const open = () => { if (!enabled || !cvOK()) return; startFx(DEF.thought, targets[0], {}); setTimeout(() => { if (enabled && !document.hidden && cvOK() && scrollY < 250 && targets[0]) startFx(DEF.constellation, targets[0], {}); }, 1900); };
+    const go = () => { if (document.hidden) { const once = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', once); open(); } }; document.addEventListener('visibilitychange', once); } else open(); };
+    if (document.fonts && document.fonts.status === 'loading') Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 700))]).then(go); else go();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

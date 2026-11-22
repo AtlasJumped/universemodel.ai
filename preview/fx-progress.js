@@ -335,5 +335,6 @@
   // ---- start ----
   scrollCalc(); render();
   // every page load: icicles under the header (skipped for reduced motion, a hidden tab, or while the page fire runs)
-  setTimeout(() => { if (!document.hidden) celebrate('icicles'); }, 250);
+  const arrive = () => { if (document.hidden) { const once = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', once); celebrate('icicles'); } }; document.addEventListener('visibilitychange', once); } else celebrate('icicles'); };
+  setTimeout(arrive, 250);
 })();
