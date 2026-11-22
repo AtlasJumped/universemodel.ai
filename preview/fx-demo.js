@@ -130,7 +130,8 @@ const FX_PATCHES = [
     drawSkies(dt, now);
     for (const fx of running.slice()) {
       if (fx.ended) continue;
-      if (!fx.hurrying && !fx.def.stay) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.6 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
+      if (fx.lane === 'fairy') { if (!fx.hurrying && fx.t > 2.6 && (fx.wantHurry || (() => { const r = fx.sec.getBoundingClientRect(); return r.bottom < H * 0.04 || r.top > H * 0.99; })())) hurry(fx); }   // the fairy stays at least 2.6 s
+      else if (!fx.hurrying) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.6 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
       if (fx.hurrying) fx.rate += (6 - fx.rate) * Math.min(1, dt * 8);
       fx.t += dt * fx.rate;
       let fin = false;
@@ -141,14 +142,14 @@ const FX_PATCHES = [
     }
     for (let i = 0; i < pending.length; i++) {
       const p = pending[i]; if (laneBusy(p.def.lane)) continue; pending.splice(i--, 1);
-      const r = p.tg.sec.getBoundingClientRect(); if (r.bottom > H * 0.12 && r.top < H * 0.9) startFx(p.def, p.tg, p.opt);
+      const r = p.tg.sec.getBoundingClientRect(); if (r.bottom > H * 0.05 && r.top < H * 0.98) startFx(p.def, p.tg, p.opt);
     }
     idleCheck();
   }
   function launch(ids, tg, opt) {
     for (const id of ids) {
       const d = DEF[id]; if (!d || !staticOK(d, tg)) continue;
-      if (laneBusy(d.lane)) { const old = running.find(f => f.lane === d.lane); if (old) hurry(old); if (!pending.some(p => p.def === d && p.tg === tg)) pending.push({ def: d, tg, opt }); kick(); return id; }
+      if (laneBusy(d.lane)) { const old = running.find(f => f.lane === d.lane); if (old) { if (old.t > 2.6) hurry(old); else old.wantHurry = true; } for (let k = pending.length - 1; k >= 0; k--) if (pending[k].def.lane === d.lane) pending.splice(k, 1); pending.push({ def: d, tg, opt }); kick(); return id; }
       if (startFx(d, tg, opt)) return id;
     }
     return false;
@@ -188,7 +189,7 @@ const FX_PATCHES = [
   }
 
   // ---------------------------------------------------------------- DOM reading helpers (nothing here changes layout)
-  function holdStyle(X, el) { const was = el.getAttribute('style'); X.guard(() => { if (was === null) el.removeAttribute('style'); else el.setAttribute('style', was); }); }
+  function holdStyle(X, el) { const was = el.getAttribute('style'); X.guard(() => { const put = () => { if (was === null) el.removeAttribute('style'); else el.setAttribute('style', was); }; put(); requestAnimationFrame(put); setTimeout(put, 400); }); }
   const unsafeIn = el => !!el.querySelector('canvas,input,textarea,select,form,video,iframe');
   const bgOpaque = el => { const m = /rgba?\(([^)]+)\)/.exec(getComputedStyle(el).backgroundColor); if (!m) return false; const p = m[1].split(','); return p.length < 4 || parseFloat(p[3]) > 0.8; };
   function tbox(el) { const r = document.createRange(); r.selectNodeContents(el); const b = r.getBoundingClientRect(); return b.width ? b : el.getBoundingClientRect(); }
@@ -387,7 +388,7 @@ const FX_PATCHES = [
 
     function drawFairy(c, x, y, s, a, t) {
       if (a <= 0.01) return;
-      c.globalAlpha = Math.min(1, a); c.drawImage(ballSprite(), x - 19 * s, y - 19 * s, 38 * s, 38 * s); c.globalAlpha = 1;
+      c.globalAlpha = Math.min(1, a); c.drawImage(ballSprite(), x - 20 * s, y - 20 * s, 40 * s, 40 * s); c.globalAlpha = 1;
       for (let k = 0; k < 3; k++) { const an = t * (3 + k * 1.3) * (k % 2 ? 1 : -1) + k * 2.1, rr = (12 + k * 2.2) * s; spark(c, x + Math.cos(an) * rr, y + Math.sin(an) * rr * 0.9, 0.7 * s, a * (0.7 + 0.3 * Math.sin(t * 9 + k)), k === 1 ? [91, 155, 230] : GOLD, false); }
       const gl = (0.55 + 0.45 * Math.sin(t * 7.3)) * a; cross(c, x, y, 14 * s, gl * 0.8, [242, 169, 59], 1);
     }
@@ -662,42 +663,32 @@ const FX_PATCHES = [
     // navy rectangles (the dark blue sections, and the navy next-page cards) for the night sky
     let ni = 0; for (const tg of targets) if (tg.navy) { tg.sky = tg.sec; tg.navyIdx = ni++; skyTargets.push(tg); }
     document.querySelectorAll('.nx-go').forEach(el => { if (el.closest('.site-foot')) return; const tg = { sec: el.closest('section') || el, sky: el, navy: true, navyIdx: ni++, i: -1, head: null, eyebrow: null, safe: true, nitems: 0, nbold: 0 }; skyTargets.push(tg); });
-    // the plan: at most one sparkle effect per two or three sections; negative sections get the danger effect (at most twice per page)
-    const POOL = { positive: ['rain', 'burst', 'galaxy', 'tornado', 'border', 'boldtw', 'cardin', 'steambold', 'twinkle'], neutral: ['cardin', 'boldtw', 'twinkle', 'steamcard', 'border', 'burst', 'rain'], negative: ['steamcard', 'boldtw', 'twinkle', 'cardin'] };
-    const h0 = hash(page); let last = -9, gap = 2, dangers = 0, prevX = store.get('fxdemo-lastx') || '', used = [];
-    targets.forEach((tg, i) => {
-      if (tg.isHead || tg.navy || tg.nextup) return; if (i - last < (tg.mood === 'neutral' ? gap : 2)) return;
-      let pool = POOL[tg.mood].slice(); const off = (h0 + i * 3) % pool.length; pool = pool.slice(off).concat(pool.slice(0, off));
-      if (tg.mood === 'negative' && dangers < 2) { tg.x = 'danger'; dangers++; }
-      else { if (tg.mood !== 'positive' && (hash(page + i) % 6 === 0)) pool.unshift('flip'); const ok = pool.filter(id => staticOK(DEF[id], tg) && id !== prevX && !(used.length && used[used.length - 1] === id)); tg.x = ok[0] || null; tg.xAlt = ok.slice(1, 3); }
-      if (tg.x === 'danger' && !(tg.eyebrow || tg.nitems)) { tg.x = null; dangers--; }
-      if (tg.x) { prevX = tg.x; used.push(tg.x); last = i; gap = 2 + ((h0 + i) % 2); }
-    });
-    store.set('fxdemo-lastx', prevX);
+    // the plan: on scroll only the fairy and the night sky run by themselves, plus the fire-then-sparkles effect on at most ONE section per page,
+    // and only where the heading or eyebrow itself is about something really bad. Every other effect lives in the demo panel only.
+    const STRONG = /\b(harm\w*|kill\w*|death|deaths|dead|die[sd]?|burn\w*|poison\w*|trauma\w*|abus\w*|punish\w*|violen\w*|injur\w*|disease\w*|suffer\w*|torture\w*|murder\w*|crisis|danger\w*)\b/i;
+    let pickI = -1, pickScore = 0;
+    targets.forEach((tg, i) => { if (tg.isHead || tg.navy || tg.nextup || !(tg.eyebrow || tg.nitems)) return; const sc = (tg.head && STRONG.test(tg.head.textContent) ? 2 : 0) + (tg.eyebrow && STRONG.test(tg.eyebrow.textContent) ? 1 : 0); if (sc > pickScore) { pickScore = sc; pickI = i; } });
+    if (pickI >= 0) targets[pickI].x = 'danger';
   }
 
   let t0 = performance.now(), iv = 0;
   function fireFairy(tg) {
     tg.firedF = true; if (!enabled || REDUCE || document.hidden || !cvOK()) return;
-    const id = tg.x === 'danger' ? 'danger' : tg.x === 'flip' ? 'flip' : 'fairy', r = launch([id, 'fairy'], tg, {});
-    if (tg.x === 'danger' || tg.x === 'flip') tg.firedX = true;
-  }
-  function fireX(tg) {
-    tg.firedX = true; if (!enabled || REDUCE || document.hidden || !cvOK() || !tg.x || tg.x === 'danger' || tg.x === 'flip') return;
-    launch([tg.x].concat(tg.xAlt), tg, {});
+    launch([tg.x === 'danger' ? 'danger' : 'fairy', 'fairy'], tg, {});
   }
   function check() {
     if (!targets.length || REDUCE) return; const hb = hdrBottom();
+    let cand = -1;
     for (let i = 0; i < targets.length; i++) {
-      const tg = targets[i], r = tg.sec.getBoundingClientRect();
-      if (!tg.firedF) {
-        if (tg.isHead) { if (scrollY > 6 || performance.now() - t0 > 2600) { if (r.bottom > H * 0.2 && r.top < H) fireFairy(tg); else tg.firedF = true; } }
-        else if (r.top <= H * 0.40 && r.bottom > H * 0.18) { for (let j = 0; j < i; j++) { targets[j].firedF = true; if (!(targets[j].x === 'tornado')) targets[j].firedX = targets[j].firedX || (targets[j].sec.getBoundingClientRect().bottom < H * 0.1); } fireFairy(tg); }
-      }
-      if (!tg.firedX && tg.x && !tg.isHead) { const thr = tg.x === 'tornado' ? 0.76 : 0.44; if (r.top <= H * thr && r.bottom > H * 0.2) fireX(tg); }
+      const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (tg.firedF) continue;
+      if (tg.isHead) { if ((scrollY > 6 || performance.now() - t0 > 2600) && i === 0) { if (r.bottom > H * 0.2 && r.top < H) cand = i; else tg.firedF = true; } }
+      else if (r.top <= H * 0.40 && r.bottom > H * 0.18) cand = i;
     }
+    // at the very bottom of the page the last sections cannot reach the upper part of the window: the one resting in view gets its fairy
+    if (cand < 0 && scrollY + H >= document.documentElement.scrollHeight - 6) for (let i = targets.length - 1; i >= 0; i--) { const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (!tg.firedF && r.top < H * 0.9 && r.bottom > H * 0.15) { cand = i; break; } }
+    if (cand >= 0) { for (let j = 0; j < cand; j++) targets[j].firedF = true; fireFairy(targets[cand]); }   // fast scrolling: only the section that comes to rest
     for (const tg of skyTargets) { const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) { if (enabled && !document.hidden && cvOK()) skyNow(tg); } }
-    if (targets.every(t => t.firedF && t.firedX) && !skyTargets.length) { clearInterval(iv); iv = 0; }
+    if (targets.every(t => t.firedF) && !skyTargets.length) { clearInterval(iv); iv = 0; }
   }
   const start = () => { if (!iv) iv = setInterval(check, 400); };
 
@@ -734,7 +725,7 @@ const FX_PATCHES = [
 
   window.fxDemo = {
     list: () => ORDER.map(id => DEF[id].label), ids: () => ORDER.slice(), play, running: () => running.map(f => f.def.id), errors: () => errors.slice(),
-    plan: () => targets.map(t => ({ i: t.i, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, mood: t.mood, extra: t.x, navy: t.navy, safe: t.safe, cards: t.nitems, bolds: t.nbold })),
+    plan: () => targets.map(t => ({ i: t.i, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, mood: t.mood, extra: t.x, auto: t.x ? 'danger' : null, navy: t.navy, safe: t.safe, cards: t.nitems, bolds: t.nbold })),
     fairyLog: () => { try { return JSON.parse(store.get('fxdemo-log') || '[]'); } catch (e) { return fairyLogArr.slice(); } },
     skies: () => skies.map(s => ({ patch: s.layout && s.layout.patch, a: +s.a.toFixed(2), stars: s.layout ? s.layout.stars.length : 0, named: s.layout ? [...new Set(s.layout.stars.filter(q => q.s.c !== 'Singles').map(q => q.s.c))] : [], dust: s.layout ? s.layout.dust.length : 0 })),
     stars: () => FX_STAR_TABLE, stop: stopAll, pos: () => { const f = running.find(r => r.inst && r.inst.pos); return f ? f.inst.pos() : null; }
