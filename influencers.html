@@ -10,7 +10,7 @@
 <link rel="icon" href="img/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="img/favicon.svg"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;750&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=b2ec2eac">
+<link rel="stylesheet" href="style.css?v=a6d655a5">
 </head>
 <body>
 <header class="site-head"><div class="wrap">
@@ -20,26 +20,39 @@
 </div></header>
 <main>
 <style>
-.inf-p{display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px 22px;padding:26px 28px;align-items:start}
-.inf-av{width:84px;height:84px;border-radius:50%;background:var(--ice);border:2px solid var(--line);display:grid;place-items:center;font:750 1.5rem/1 var(--font);color:var(--navy);letter-spacing:-.02em}
-.inf-p h3{margin:2px 0 2px;font-size:1.35rem}
-.inf-when{font-size:.92rem;color:var(--soft);margin:0 0 10px}
-.inf-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;grid-column:1/-1;margin-top:8px}
-.inf-cols h4{font:700 .78rem/1.2 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin:0 0 8px}
-.inf-cols p,.inf-cols li{font-size:.96rem;line-height:1.6}
-.inf-cols ul{margin:0;padding-left:1.1em}
-.inf-cols p{margin:0 0 10px;max-width:none}
-.inf-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.inf-links a{font:600 .88rem/1 var(--font);border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;text-decoration:none}
+/* one calm system: body text is the site's p; one label style (same as .tag); links in the site's link style */
+.inf-list{display:grid;gap:22px;margin-top:24px}
+.inf-p{padding:30px 32px 26px}
+.inf-hd{display:grid;grid-template-columns:72px minmax(0,1fr);gap:4px 20px;align-items:center;padding-bottom:20px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.inf-av{grid-row:1/3;width:72px;height:72px;border-radius:50%;background:var(--ice);border:2px solid var(--line);display:grid;place-items:center;font:750 1.35rem/1 var(--font);color:var(--navy);letter-spacing:-.02em}
+.inf-hd h3{margin:0;align-self:end}
+.inf-hd p{margin:0;align-self:start;max-width:none}
+.inf-cols{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1fr);gap:20px 40px}
+.inf-cols h4{font:600 .74rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:0 0 12px}
+.inf-cols p{margin:0 0 14px;max-width:none}
+.inf-cols p:last-child{margin-bottom:0}
+.inf-links{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.card>.inf-links{margin-top:18px}
+.inf-links a,.inf-links .ytb{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;height:40px;margin:0;font:600 .9rem/1 var(--font);border:1px solid var(--line);border-radius:999px;padding:0 16px;background:#fff;text-decoration:none;white-space:nowrap}
 .inf-links a:hover{border-color:var(--sky)}
-.inf-list{display:grid;gap:18px;margin-top:24px}
+.inf-links .ytb{background:#0B2545;border-color:#0B2545;color:#fff;padding:0 18px 0 14px}
+.inf-links .ytb:hover{background:#1D5FD1;border-color:#1D5FD1}
+.inf-links.plain{border-top:0;padding-top:0}
 .inf-jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .inf-jump a{font:600 .9rem/1 var(--font);border:1px solid var(--line);border-radius:999px;padding:9px 13px;background:#fff;text-decoration:none}
 .inf-names{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 22px;margin:10px 0 0;padding:0;list-style:none}
-.inf-names li{padding:8px 0;border-top:1px solid var(--line);font-size:.96rem}
+.inf-names li{padding:8px 0;border-top:1px solid var(--line)}
 .inf-names b{color:var(--navy)}
-@media (max-width:900px){.inf-cols{grid-template-columns:1fr}.inf-names{grid-template-columns:1fr}}
-@media (max-width:560px){.inf-p{grid-template-columns:1fr;padding:22px 18px}.inf-av{width:64px;height:64px;font-size:1.2rem}}
+.inf-sc{display:flex;flex-direction:column}
+.inf-sc .inf-links{margin-top:auto;padding-top:0;border-top:0}
+.inf-sc>p:nth-last-of-type(1){margin-bottom:18px}
+.inf-sc .inf-links{margin-top:auto;gap:8px}
+#channels .inf-links{flex-wrap:nowrap}
+.inf-sc .inf-links a,.inf-sc .inf-links .ytb{padding:0 12px;font-size:.86rem}
+.inf-sc .inf-links .ytb{padding:0 14px 0 11px}
+@media (max-width:1100px){#channels .inf-links{flex-wrap:wrap}}
+@media (max-width:1100px){.inf-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.inf-cols>div:first-child{grid-column:1/-1}}
+@media (max-width:760px){.inf-cols{grid-template-columns:1fr}.inf-names{grid-template-columns:1fr}.inf-p{padding:22px 18px}.inf-hd{grid-template-columns:56px minmax(0,1fr);gap:2px 14px}.inf-av{width:56px;height:56px;font-size:1.1rem}}
 </style>
 
 <div class="page-head"><div class="wrap"><div class="split ph-auto"><div><span class="eyebrow">Influencers</span><h1>The people and work that shaped HMR</h1></div><div><p class="lede">HMR did not come from nowhere. These are the teachers, thinkers, scientists, and channels we learned the most from on the way here, with links to the best places to find their work.</p><p>None of them is affiliated with HMR, and none has endorsed it. Where we say what HMR shares with someone, that is our reading of their work.</p></div></div>
@@ -51,54 +64,45 @@
 <section id="people">
   <div class="wrap">
     <span class="eyebrow">Teachers and thinkers</span>
-    <h2>Five people who were trying to do what HMR is trying to do</h2>
+    <h2>Five people whose work aligns with HMR</h2>
     <div class="inf-list">
 
       <article class="card inf-p" id="sadhguru">
-        <div class="inf-av" aria-hidden="true">S</div>
-        <div>
+        <div class="inf-hd">
+          <div class="inf-av" aria-hidden="true">S</div>
           <h3>Sadhguru</h3>
-          <p class="inf-when">Jagadish "Jaggi" Vasudev, born 3 September 1957 in Mysore, India. Living.</p>
-          <p>A yogi and teacher who founded the Isha Foundation in 1992, based in Coimbatore in southern India. The foundation teaches yoga and runs large public projects on rivers, trees, and soil.</p>
+          <p>Born 3 September 1957 in Mysore, India. Living.</p>
         </div>
         <div class="inf-cols">
           <div>
-            <h4>Work and highlights</h4>
-            <ul class="nobul">
-              <li>Isha Yoga and the Inner Engineering course. His book <i>Inner Engineering: A Yogi's Guide to Joy</i> was a New York Times bestseller, as were <i>Karma</i> and <i>Death</i>.</li>
-              <li>Designed the 112-foot Adiyogi statue at the Isha Yoga Center, inaugurated in 2017.</li>
-              <li>Rally for Rivers (2017), Cauvery Calling (2019), and the Save Soil journey of 2022: 100 days and about 30,000 km by motorcycle from London to southern India.</li>
-              <li>Awarded the Padma Vibhushan, one of India's highest civilian honors, in 2017.</li>
-            </ul>
+            <h4>Life and work</h4>
+            <p>Sadhguru is a yogi and teacher. He was born Jagadish Vasudev in Mysore, India, on 3 September 1957. He earned a degree in English literature at the University of Mysore and declined postgraduate study. He built a poultry farm, then co-founded a construction firm, Buildaids. On 23 September 1982, on Chamundi Hill in Mysore, he had his first spiritual experience. A similar one followed about six days later, and about six weeks after that he closed his businesses.</p>
+            <p>He gave his first yoga class in Mysore in 1983 and founded the Isha Foundation in 1992. In 1994 he bought land near the Velliangiri mountains in Coimbatore and opened the Isha Yoga Center there, where in 2017 he consecrated the 112-foot Adiyogi statue. He has written more than thirty books, including the New York Times bestseller <i>Inner Engineering</i>, and in 2017 he was awarded the Padma Vibhushan, one of India's highest civilian honors.</p>
           </div>
           <div>
             <h4>What he is doing now</h4>
-            <p>Save Soil continues as an international campaign. In 2026 he led a Mahasatsang at Batu Caves in Malaysia, attended by more than 8,000 people and described as the first held outside India. In India, the foundation's outreach arm now operates crematoria for the state of Bihar.</p>
+            <p>Save Soil continues as an international campaign. It began as a 100-day motorcycle journey of about 30,000 km from London to southern India in 2022, and it followed Rally for Rivers (2017) and Cauvery Calling (2019). In 2026 he led a Mahasatsang at Batu Caves in Malaysia, attended by more than 8,000 people and described as the first held outside India. In India, the foundation's outreach arm now operates crematoria for the state of Bihar.</p>
             <p>He and the foundation have also drawn criticism, including for some health claims, and the foundation is party to legal disputes, which it contests.</p>
           </div>
           <div>
             <h4>What HMR shares with him</h4>
             <p>We took the Inner Engineering course. In HMR's view his techniques are very good for fascia, and his values, though he does not know of HMR, are naturally in tune with it.</p>
-            <div class="inf-links"><a href="https://isha.sadhguru.org">Isha Foundation</a><a href="https://programs.sadhguru.org/">Programs</a><a href="https://www.youtube.com/results?search_query=Sadhguru">On YouTube</a></div>
           </div>
         </div>
+        <div class="inf-links"><a href="https://isha.sadhguru.org">Isha Foundation</a><a href="https://programs.sadhguru.org/">Programs</a><button type="button" class="ytb" data-yt-list="UUcYzLCs3zrQIBVHYA1sK2sw" data-yt-title="Sadhguru: latest videos">YouTube</button></div>
       </article>
 
       <article class="card inf-p" id="watts">
-        <div class="inf-av" aria-hidden="true">AW</div>
-        <div>
+        <div class="inf-hd">
+          <div class="inf-av" aria-hidden="true">AW</div>
           <h3>Alan Watts</h3>
-          <p class="inf-when">Born 6 January 1915 in Chislehurst, England. Died 16 November 1973 in Marin County, California.</p>
-          <p>A British-born writer and speaker who interpreted Buddhist, Taoist, and Hindu thought for Western audiences. He called himself a "philosophical entertainer".</p>
+          <p>Born 6 January 1915 in Chislehurst, England. Died 16 November 1973 in Marin County, California.</p>
         </div>
         <div class="inf-cols">
           <div>
             <h4>Life and work</h4>
-            <ul class="nobul">
-              <li>Moved to the United States in 1938. Served as an Episcopal priest and left the priesthood in 1950.</li>
-              <li>Taught at the American Academy of Asian Studies in San Francisco, and built a following through a weekly radio program on KPFA in Berkeley from 1953 to 1962.</li>
-              <li>Books include <i>The Way of Zen</i> (1957), <i>Psychotherapy East and West</i> (1961), <i>The Book: On the Taboo Against Knowing Who You Are</i> (1966), and <i>Tao: The Watercourse Way</i> (1975).</li>
-            </ul>
+            <p>Alan Watts was a British-born writer and speaker who interpreted Buddhist, Taoist, and Hindu thought for Western audiences. He called himself a "philosophical entertainer". He was born in Chislehurst, Kent, on 6 January 1915, and at 16 he was secretary of the London Buddhist Lodge. In 1936 he met D. T. Suzuki and published <i>The Spirit of Zen</i>. He moved to the United States in 1938, served as an Episcopal priest, and left the priesthood in 1950.</p>
+            <p>From 1951 to 1957 he taught at the American Academy of Asian Studies in San Francisco, and from 1953 to 1962 he built a following with a weekly radio program on KPFA in Berkeley. His books include <i>The Wisdom of Insecurity</i> (1951), <i>The Way of Zen</i> (1957), <i>Psychotherapy East and West</i> (1961), and <i>The Book: On the Taboo Against Knowing Who You Are</i> (1966). He died on 16 November 1973 at Druid Heights, his cabin on Mount Tamalpais, aged 58.</p>
           </div>
           <div>
             <h4>His central idea</h4>
@@ -108,27 +112,22 @@
             <h4>What HMR shares with him</h4>
             <p>He married East and West, which is what HMR sets out to do. His gift was saying it clearly. Listening to him opened us to ideas from the East that we had never come across growing up in the West, and it can reshape how a person thinks.</p>
             <p>Many hours of his talks are on YouTube. We like to listen while falling asleep.</p>
-            <div class="inf-links"><a href="https://alanwatts.org">Alan Watts Organization</a><a href="https://www.youtube.com/results?search_query=Alan+Watts+lecture">Talks on YouTube</a><a href="east-west.html">East and West</a></div>
           </div>
         </div>
+        <div class="inf-links"><a href="https://alanwatts.org">Alan Watts Organization</a><a href="east-west.html">East and West</a><a href="https://www.youtube.com/results?search_query=Alan+Watts+lecture">YouTube</a></div>
       </article>
 
       <article class="card inf-p" id="mckenna">
-        <div class="inf-av" aria-hidden="true">TM</div>
-        <div>
+        <div class="inf-hd">
+          <div class="inf-av" aria-hidden="true">TM</div>
           <h3>Terence McKenna</h3>
-          <p class="inf-when">Born 16 November 1946 in Paonia, Colorado. Died 3 April 2000 in San Rafael, California, of brain cancer.</p>
-          <p>An American ethnobotanist, author, and lecturer who argued for the responsible use of naturally occurring psychedelics, and one of the most original speakers of his time.</p>
+          <p>Born 16 November 1946 in Paonia, Colorado. Died 3 April 2000 in San Rafael, California.</p>
         </div>
         <div class="inf-cols">
           <div>
             <h4>Life and work</h4>
-            <ul class="nobul">
-              <li>Traveled to the Colombian Amazon with his brother Dennis in 1970, the journey told in <i>True Hallucinations</i> (1993).</li>
-              <li>Co-founded Botanical Dimensions, an ethnobotanical preserve in Hawaii, in 1985.</li>
-              <li>Books include <i>The Invisible Landscape</i> (1975, with Dennis McKenna), <i>The Archaic Revival</i> (1991), and <i>Food of the Gods</i> (1992).</li>
-              <li>Some of his best-known proposals, such as the "stoned ape" idea and novelty theory, are not accepted by science.</li>
-            </ul>
+            <p>Terence McKenna was an American ethnobotanist, author, and lecturer. In 1969 he went to Nepal to study Tibetan Bon shamanism. He worked as a hashish smuggler until US Customs seized a shipment, and later he collected butterflies in Indonesia. After his mother's death in 1970 he and his brother Dennis traveled to the Colombian Amazon, looking for a DMT preparation called oo-koo-hé. They found Psilocybe cubensis mushrooms instead. At La Chorrera they experimented with mushrooms, harmine, and vocal techniques, and Terence described contact with a voice he called the "Logos". The journey is told in <i>True Hallucinations</i> (1993).</p>
+            <p>The brothers wrote <i>The Invisible Landscape</i> in 1975, and in 1976 they published a mushroom growers' guide under the pseudonyms O. T. Oss and O. N. Oeric. In 1985 he and his wife, Kathleen Harrison, founded Botanical Dimensions, a nonprofit ethnobotanical preserve in Hawaii. Some of his best-known proposals, such as the "stoned ape" idea and novelty theory, are not accepted by science. He died of brain cancer on 3 April 2000, aged 53.</p>
           </div>
           <div>
             <h4>Dennis McKenna</h4>
@@ -138,26 +137,22 @@
             <h4>What HMR shares with him</h4>
             <p>He was unafraid to explore the limits of the human psyche, and he trusted his own experience of reality over what society told him to think. He did it his way and shared what he found. In HMR's terms that is living true to your own model of reality.</p>
             <p>These substances are illegal in most places. HMR's view is that they deserve careful, responsible, legal research, and the McKenna brothers' work is part of why that research now exists.</p>
-            <div class="inf-links"><a href="https://www.youtube.com/results?search_query=Terence+McKenna+lecture">Talks on YouTube</a><a href="https://mckenna.academy/">McKenna Academy</a></div>
           </div>
         </div>
+        <div class="inf-links"><a href="https://mckenna.academy/">McKenna Academy</a><a href="https://www.youtube.com/results?search_query=Terence+McKenna+lecture">YouTube</a></div>
       </article>
 
       <article class="card inf-p" id="aurobindo">
-        <div class="inf-av" aria-hidden="true">SA</div>
-        <div>
+        <div class="inf-hd">
+          <div class="inf-av" aria-hidden="true">SA</div>
           <h3>Sri Aurobindo</h3>
-          <p class="inf-when">Born 15 August 1872 in Calcutta, India. Died 5 December 1950 in Pondicherry.</p>
-          <p>An Indian philosopher, poet, and yogi. He studied at King's College, Cambridge, became a leader of India's independence movement, and after his acquittal in the Alipore trial of 1909 turned wholly to spiritual work.</p>
+          <p>Born 15 August 1872 in Calcutta, India. Died 5 December 1950 in Pondicherry.</p>
         </div>
         <div class="inf-cols">
           <div>
             <h4>Life and work</h4>
-            <ul class="nobul">
-              <li>Moved to Pondicherry in 1910 and founded the Sri Aurobindo Ashram there in 1926 with Mirra Alfassa, known as the Mother.</li>
-              <li>Major works: <i>The Life Divine</i>, <i>The Synthesis of Yoga</i>, and the epic poem <i>Savitri</i>, about 24,000 lines long.</li>
-              <li>Nominated for the Nobel Prize in Literature (1943) and for Peace (1950).</li>
-            </ul>
+            <p>Sri Aurobindo was an Indian philosopher, poet, and yogi. He was born Aurobindo Ghose in Calcutta on 15 August 1872 and studied in England, at King's College, Cambridge, on a scholarship. He deliberately failed the riding test for the Indian Civil Service. He returned to India in 1893, entered the service of the state of Baroda, and became vice-principal of Baroda College.</p>
+            <p>He became a leader of the independence movement. In 1908 he was arrested in the Alipore Bomb Case and held in solitary confinement, and his spiritual experiences in jail changed his aims. After his acquittal in 1909 he turned wholly to spiritual work and in 1910 moved to Pondicherry. In 1926 he founded the Sri Aurobindo Ashram there with Mirra Alfassa, known as the Mother. He also wrote <i>Savitri</i>, an epic of about 24,000 lines, and was nominated for the Nobel Prize in Literature (1943) and for Peace (1950). He died in Pondicherry on 5 December 1950, aged 78.</p>
           </div>
           <div>
             <h4>His central idea</h4>
@@ -166,38 +161,34 @@
           <div>
             <h4>What HMR shares with him</h4>
             <p>We know his work less well than the others here. What drew us is that he took the link between mind and body seriously enough to expect consciousness to change the physical body. HMR holds the same.</p>
-            <div class="inf-links"><a href="https://www.sriaurobindoashram.org">Sri Aurobindo Ashram</a></div>
           </div>
         </div>
+        <div class="inf-links"><a href="https://www.sriaurobindoashram.org">Sri Aurobindo Ashram</a></div>
       </article>
 
       <article class="card inf-p" id="spinoza">
-        <div class="inf-av" aria-hidden="true">BS</div>
-        <div>
+        <div class="inf-hd">
+          <div class="inf-av" aria-hidden="true">BS</div>
           <h3>Baruch Spinoza</h3>
-          <p class="inf-when">Born 24 November 1632 in Amsterdam. Died 21 February 1677 in The Hague.</p>
-          <p>A Dutch philosopher from Amsterdam's Portuguese-Jewish community, which expelled him in 1656, at the age of 23, for his views. He earned his living grinding lenses and turned down a university chair to keep his freedom of thought.</p>
+          <p>Born 24 November 1632 in Amsterdam. Died 21 February 1677 in The Hague.</p>
         </div>
         <div class="inf-cols">
           <div>
             <h4>Life and work</h4>
-            <ul class="nobul">
-              <li><i>Theological-Political Treatise</i> (1670), published anonymously, caused an uproar across Europe.</li>
-              <li><i>Ethics</i>, his chief work, was published in 1677, after his death.</li>
-            </ul>
+            <p>Baruch Spinoza was a Dutch philosopher, born in Amsterdam on 24 November 1632 to a Portuguese-Jewish merchant family that had fled Portugal. He had a traditional Jewish schooling, then studied Latin with Franciscus van den Enden, who introduced him to Descartes. On 27 July 1656 the Amsterdam Portuguese-Jewish community expelled him for his views, at the age of 23. He supported himself by grinding lenses.</p>
+            <p>In 1663 he published his exposition of Descartes' <i>Principles of Philosophy</i>, the only book that appeared under his name in his lifetime. His <i>Theological-Political Treatise</i> (1670) was published anonymously, banned, and caused an uproar across Europe. He turned down a university chair at Heidelberg to keep his freedom of thought. His chief work, the <i>Ethics</i>, is laid out like Euclid's geometry, with definitions, axioms, and proofs, which makes him one of the first to reason about God with the rigor of geometry. He died in The Hague on 21 February 1677, aged 44, probably of tuberculosis. The <i>Ethics</i> was published that year.</p>
           </div>
           <div>
             <h4>His central idea</h4>
-            <p>There is one infinite substance, which he called God or Nature. Everything that exists is a way that one substance is. Mind and body are the same thing understood in two ways.</p>
+            <p>There is one infinite substance, which he called God or Nature (<i>Deus sive Natura</i>). Everything that exists is a way that one substance is. Mind and body are the same thing understood in two ways.</p>
           </div>
           <div>
             <h4>What HMR shares with him</h4>
             <p>One reality, with mind and body as two sides of it, reasoned step by step: that is the shape of HMR. He also paid the price of holding a model of reality that his community would not accept, and held it anyway.</p>
-            <div class="inf-links"><a href="https://plato.stanford.edu/entries/spinoza/">Stanford Encyclopedia of Philosophy</a><a href="hmr.html#voices">In their words</a></div>
           </div>
         </div>
+        <div class="inf-links"><a href="https://plato.stanford.edu/entries/spinoza/">Stanford Encyclopedia of Philosophy</a><a href="hmr.html#voices">In their words</a></div>
       </article>
-
     </div>
   </div>
 </section>
@@ -232,9 +223,9 @@
   <div class="wrap">
     <div class="sec-head"><div><span class="eyebrow">Scientists who share it</span><h2>Three physicists who make science exciting for everyone</h2></div><div><p class="lede">Each of them does serious physics, and each has put a great deal of exciting, entertaining work in public, where people who are not scientists can enjoy it.</p></div></div>
     <div class="grid g3" style="margin-top:22px">
-      <div class="card" id="kaku"><span class="tag">Born 24 January 1947, San Jose, California</span><h3>Michio Kaku</h3><p>Professor of theoretical physics at the City College of New York and a co-founder of string field theory: in 1974 he and Keiji Kikkawa wrote the first papers putting string theory in field form.</p><p>His books for general readers include <i>Hyperspace</i> (1994), <i>Physics of the Impossible</i> (2008), <i>Physics of the Future</i> (2011), <i>The Future of the Mind</i> (2014), and <i>The God Equation</i> (2021). He hosts the radio program <i>Science Fantastic</i> and has presented many television series on the future of science.</p><div class="inf-links"><a href="https://mkaku.org">mkaku.org</a><a href="https://www.youtube.com/results?search_query=Michio+Kaku">On YouTube</a></div><p><button type="button" class="ytb" data-yt="kYAdwS5MFjQ" data-yt-title="Michio Kaku explains string theory (Floating University)">Watch: Kaku explains string theory</button></p></div>
-      <div class="card" id="tyson"><span class="tag">Born 5 October 1958, New York City</span><h3>Neil deGrasse Tyson</h3><p>An astrophysicist with a doctorate from Columbia University, and director of the Hayden Planetarium at the American Museum of Natural History since 1996.</p><p>He hosted <i>Cosmos: A Spacetime Odyssey</i> (2014) and has hosted the <i>StarTalk</i> podcast since 2009. His books include <i>Death by Black Hole</i> (2007) and <i>Astrophysics for People in a Hurry</i> (2017).</p><div class="inf-links"><a href="https://neildegrassetyson.com">neildegrassetyson.com</a><a href="https://www.youtube.com/results?search_query=StarTalk+Neil+deGrasse+Tyson">StarTalk on YouTube</a></div></div>
-      <div class="card" id="greene"><span class="tag">Born 9 February 1963, New York City</span><h3>Brian Greene</h3><p>Professor of physics and mathematics at Columbia University, where he directs the center for theoretical physics. A string theorist, he co-discovered mirror symmetry.</p><p>His books include <i>The Elegant Universe</i> (1999), <i>The Fabric of the Cosmos</i> (2004), <i>The Hidden Reality</i> (2011), and <i>Until the End of Time</i> (2020). He hosted the NOVA series based on the first, and in 2008 he co-founded the World Science Festival with Tracy Day.</p><div class="inf-links"><a href="https://www.briangreene.org/">briangreene.org</a><a href="https://www.worldsciencefestival.com">World Science Festival</a><a href="https://www.youtube.com/results?search_query=Brian+Greene+World+Science+Festival">On YouTube</a></div><p><button type="button" class="ytb" data-yt="YtdE662eY_M" data-yt-title="Making sense of string theory, Brian Greene (TED)">Watch: Greene on string theory</button></p></div>
+      <div class="card inf-sc" id="kaku"><span class="tag">Born 24 January 1947, San Jose, California</span><h3>Michio Kaku</h3><p>Professor of theoretical physics at the City College of New York and a co-founder of string field theory: in 1974 he and Keiji Kikkawa wrote the first papers putting string theory in field form.</p><p>His books for general readers include <i>Hyperspace</i> (1994), <i>Physics of the Impossible</i> (2008), <i>Physics of the Future</i> (2011), <i>The Future of the Mind</i> (2014), and <i>The God Equation</i> (2021). He hosts the radio program <i>Science Fantastic</i> and has presented many television series on the future of science.</p><div class="inf-links"><a href="https://mkaku.org">mkaku.org</a><a href="https://www.youtube.com/results?search_query=Michio+Kaku">YouTube</a><button type="button" class="ytb" data-yt="kYAdwS5MFjQ" data-yt-title="Michio Kaku explains string theory (Floating University)">Watch: Kaku explains string theory</button></div></div>
+      <div class="card inf-sc" id="tyson"><span class="tag">Born 5 October 1958, New York City</span><h3>Neil deGrasse Tyson</h3><p>An astrophysicist with a doctorate from Columbia University, and director of the Hayden Planetarium at the American Museum of Natural History since 1996.</p><p>He hosted <i>Cosmos: A Spacetime Odyssey</i> (2014) and has hosted the <i>StarTalk</i> podcast since 2009. His books include <i>Death by Black Hole</i> (2007) and <i>Astrophysics for People in a Hurry</i> (2017).</p><div class="inf-links"><a href="https://neildegrassetyson.com">neildegrassetyson.com</a><a href="https://www.youtube.com/results?search_query=StarTalk+Neil+deGrasse+Tyson">YouTube</a></div></div>
+      <div class="card inf-sc" id="greene"><span class="tag">Born 9 February 1963, New York City</span><h3>Brian Greene</h3><p>Professor of physics and mathematics at Columbia University, where he directs the center for theoretical physics. A string theorist, he co-discovered mirror symmetry.</p><p>His books include <i>The Elegant Universe</i> (1999), <i>The Fabric of the Cosmos</i> (2004), <i>The Hidden Reality</i> (2011), and <i>Until the End of Time</i> (2020). He hosted the NOVA series based on the first, and in 2008 he co-founded the World Science Festival with Tracy Day.</p><div class="inf-links"><a href="https://www.briangreene.org/">briangreene.org</a><a href="https://www.worldsciencefestival.com">World Science Festival</a><a href="https://www.youtube.com/results?search_query=Brian+Greene+World+Science+Festival">YouTube</a><button type="button" class="ytb" data-yt="YtdE662eY_M" data-yt-title="Making sense of string theory, Brian Greene (TED)">Watch: Greene on string theory</button></div></div>
     </div>
   </div>
 </section>
@@ -244,12 +235,11 @@
     <span class="eyebrow">Channels we watch</span>
     <h2>Four channels that taught us a great deal</h2>
     <div class="grid g4">
-      <div class="card"><span class="tag">Science</span><h3>Veritasium</h3><p>Made by Derek Muller, who holds a doctorate in physics education research from the University of Sydney. Since 2011 the channel has taken on the ideas in science that people most often get wrong, with experiments and interviews. It is a model of how to teach in a way that is fun, creative, and exciting. We have learned a great deal from it.</p><div class="inf-links"><a href="https://www.youtube.com/veritasium">YouTube</a><a href="https://veritasium.com">veritasium.com</a></div></div>
-      <div class="card"><span class="tag">Physics and astronomy</span><h3>PBS Space Time</h3><p>Hosted and written since 2015 by Matt O'Dowd, an astrophysicist at Lehman College of the City University of New York. It is rigorous about the mathematics and still watchable for anyone curious. Its community on Discord gave HMR some strong criticism early on, and that criticism helped us get here.</p><div class="inf-links"><a href="https://www.pbs.org/show/pbs-space-time/">PBS Space Time</a><a href="https://www.youtube.com/results?search_query=PBS+Space+Time">On YouTube</a></div></div>
-      <div class="card"><span class="tag">Mathematics</span><h3>3Blue1Brown</h3><p>Made by Grant Sanderson, a Stanford mathematics graduate, since 2015. He teaches higher mathematics through animation, so that you watch an idea being invented instead of being handed a formula. To us it is the best mathematics channel there is.</p><div class="inf-links"><a href="https://www.3blue1brown.com">3blue1brown.com</a><a href="https://www.youtube.com/results?search_query=3Blue1Brown">On YouTube</a></div></div>
-      <div class="card"><span class="tag">Health</span><h3>Huberman Lab</h3><p>Hosted by Andrew Huberman, associate professor of neurobiology and ophthalmology at Stanford. Since 2021 he has put long conversations about health science in front of the public, where they can be examined. Our views differ from those of many of his guests, and some scientists have criticized claims made on the show. The body of material it has opened up is very large and very useful.</p><div class="inf-links"><a href="https://www.hubermanlab.com">hubermanlab.com</a></div></div>
+      <div class="card inf-sc"><span class="tag">Science</span><h3>Veritasium</h3><p>Made by Derek Muller, who holds a doctorate in physics education research from the University of Sydney. Since 2011 the channel has taken on the ideas in science that people most often get wrong, with experiments and interviews. It is a model of how to teach in a way that is fun, creative, and exciting. We have learned a great deal from it.</p><div class="inf-links"><a href="https://veritasium.com">veritasium.com</a><button type="button" class="ytb" data-yt-list="UUHnyfMqiRRG1u-2MsSQLbXA" data-yt-title="Veritasium: latest videos">YouTube</button></div></div>
+      <div class="card inf-sc"><span class="tag">Physics and astronomy</span><h3>PBS Space Time</h3><p>Hosted and written since 2015 by Matt O'Dowd, an astrophysicist at Lehman College of the City University of New York. It is rigorous about the mathematics and still watchable for anyone curious. Its community on Discord gave HMR some strong criticism early on, and that criticism helped us get here.</p><div class="inf-links"><a href="https://www.pbs.org/show/pbs-space-time/">PBS Space Time</a><button type="button" class="ytb" data-yt-list="UU7_gcs09iThXybpVgjHZ_7g" data-yt-title="PBS Space Time: latest videos">YouTube</button></div></div>
+      <div class="card inf-sc"><span class="tag">Mathematics</span><h3>3Blue1Brown</h3><p>Made by Grant Sanderson, a Stanford mathematics graduate, since 2015. He teaches higher mathematics through animation, so that you watch an idea being invented instead of being handed a formula. To us it is the best mathematics channel there is.</p><div class="inf-links"><a href="https://www.3blue1brown.com">3blue1brown.com</a><button type="button" class="ytb" data-yt-list="UUYO_jab_esuFRV4b17AJtAw" data-yt-title="3Blue1Brown: latest videos">YouTube</button></div></div>
+      <div class="card inf-sc"><span class="tag">Health</span><h3>Huberman Lab</h3><p>Hosted by Andrew Huberman, associate professor of neurobiology and ophthalmology at Stanford. Since 2021 he has put long conversations about health science in front of the public, where they can be examined. Our views differ from those of many of his guests, and some scientists have criticized claims made on the show. The body of material it has opened up is very large and very useful.</p><div class="inf-links"><a href="https://www.hubermanlab.com">hubermanlab.com</a><button type="button" class="ytb" data-yt-list="UU2D2CMWXMOVWx7giW1n3LIg" data-yt-title="Huberman Lab: latest videos">YouTube</button></div></div>
     </div>
-    <p style="margin-top:22px">If this resonates with you, <a href="collaborators.html">engage with us here</a>.</p>
   </div>
 </section>
 <section class="nextup" aria-label="Summary and next page"><div class="wrap">
@@ -261,14 +251,15 @@
 <div><a class="brand" href="index.html"><span class="lg" aria-hidden="true"><i></i></span><span>Universe Model</span></a>
 <p style="margin-top:12px">Universe Model presents the Holistic Model of Reality (HMR), starting with a physics-based model of the healthy human body.</p>
 <p style="margin-top:10px"><a href="mailto:leo@universemodel.ai">leo@universemodel.ai</a><br>© 2026 Universe Model</p>
+<div style="margin-top:20px"><div><h4>Problems</h4><ul><li><a href="reality.html">Science Today</a></li><li><a href="fixing-exercise.html">Exercise Today</a></li><li><a href="mental-health.html">Mental Health Today</a></li></ul></div></div>
 </div>
-<div class="foot-links"><div><h4>Problems</h4><ul><li><a href="reality.html">Science Today</a></li><li><a href="fixing-exercise.html">Exercise Today</a></li><li><a href="mental-health.html">Mental Health Today</a></li></ul></div><div><h4>Solutions</h4><ul><li><a href="hmr.html">The HMR</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="health-model.html">HMR Holistic Health Model</a></li><li><a href="physics-health.html">HMR Physical Health Model</a></li><li><a href="health.html">The Perfect Body</a></li><li><a href="protocol.html">HMR Fascia Health Protocol</a></li><li><a href="mental-model.html">HMR Mental Health Model</a></li><li><a href="math.html">HMR Math Paradigm</a></li><li><a href="physics.html">HMR Physics Paradigm</a></li><li><a href="values.html">HMR Values</a></li><li><a href="answers.html">The Answers</a></li></ul></div><div><h4>Future and fun</h4><ul><li><a href="roadmap.html">Road Ahead</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li><li><a href="fun.html">For fun</a></li></ul></div><div><h4>More</h4><ul><li><a href="about.html">About (start here)</a></li><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="influencers.html">Influencers</a></li><li><a class="foot-gold" href="collaborators.html">Collaborators</a></li></ul></div></div>
+<div><h4>Solutions</h4><ul><li><a href="hmr.html">The HMR</a></li><li><a href="ui.html">Universal Intelligence</a></li><li><a href="health-model.html">HMR Holistic Health Model</a></li><li><a href="physics-health.html">HMR Physical Health Model</a></li><li><a href="health.html">The Perfect Body</a></li><li><a href="protocol.html">HMR Fascia Health Protocol</a></li><li><a href="mental-model.html">HMR Mental Health Model</a></li><li><a href="math.html">HMR Math Paradigm</a></li><li><a href="physics.html">HMR Physics Paradigm</a></li><li><a href="values.html">HMR Values</a></li><li><a href="answers.html">The Answers</a></li></ul></div><div><div><h4>Future and fun</h4><ul><li><a href="roadmap.html">Road Ahead</a></li><li><a href="simulation.html">Simulation</a></li><li><a href="methods.html">Methods</a></li><li><a href="library.html">The library</a></li><li><a href="fun.html">For fun</a></li></ul></div><div style="margin-top:18px"><h4>More</h4><ul><li><a href="about.html">About (start here)</a></li><li><a href="east-west.html">East and West</a></li><li><a href="kids.html">Do you have kids?</a></li><li><a href="influencers.html">Influencers</a></li><li><a class="foot-gold" href="collaborators.html">Collaborators</a></li></ul></div></div>
 </div></footer>
-<script src="site.js?v=6250b65e" defer></script>
+<script src="site.js?v=0704e455" defer></script>
 <script src="fx-stars.js?v=5a13ce3b" defer></script>
-<script src="fx-sky.js?v=0f546731" defer></script>
+<script src="fx-sky.js?v=3f611253" defer></script>
 <script src="fx-progress.js?v=024db3f8" defer></script>
 <script src="fx-react.js?v=a82646c5" defer></script>
-<script src="video.js?v=ca88e52e" defer></script>
+<script src="video.js?v=a6054a26" defer></script>
 </body>
 </html>
