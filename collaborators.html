@@ -27,6 +27,9 @@
 .co-av.sm{width:58px;height:58px;border-style:dashed;background:#fff}
 .co-av.sm svg{width:32px;height:32px;opacity:.55}
 .co-top b{margin-top:10px;color:var(--navy);font-size:1.15rem}
+.co-next{margin:10px 0 0;max-width:none}
+.co-next b{color:var(--navy)}
+.co-num{display:inline-block;min-width:1.6em;padding:1px 9px;border-radius:999px;background:#F2A93B;color:#0B2545;text-align:center}
 .co-me{margin-top:14px;max-width:620px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:4px}
 .co-me b{margin-top:0}
 .co-me-l{margin:4px 0 0;display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
@@ -75,6 +78,7 @@
   <div class="wrap">
     <span class="eyebrow">Who is here</span>
     <h2>One name at the top, and room underneath</h2>
+    <p class="co-next"><b>The next person to join will be collaborator number <span class="co-num">1</span>.</b> We number collaborators in the order they join. It carries no rank; it only records who came when, and it will be fun to look back on.</p>
     <div class="co-tree" role="group" aria-label="A tree with HMR at the top, where Leo is listed, and three empty branches beneath it: professionals, friends and family, and interested strangers.">
       <div class="co-top">
         <div class="co-av"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.2" fill="#9DB4D0"/><path d="M3.5 21c.6-4.6 4.1-7.2 8.5-7.2s7.900 2.600 8.500 7.200z" fill="#9DB4D0"/></svg></div>
@@ -188,6 +192,7 @@
   <div class="wrap">
     <span class="eyebrow">Join in</span>
     <h2>Tell us who you are</h2>
+    <p class="co-next"><b>You would be collaborator number <span class="co-num">1</span>.</b></p>
     <div class="split nb-keep">
       <div>
         <p>Fill in as much or as little as you like. Every box is optional. Beside each one, choose whether it may appear on this page; nothing is shown publicly unless you tick it.</p>
@@ -235,6 +240,8 @@
 </section>
 
 <script>
+// live tally: every listed collaborator is a .co-card inside the branches; the next number is that count plus one
+(function () { var n = document.querySelectorAll('.co-br .co-card').length + 1; [].forEach.call(document.querySelectorAll('.co-num'), function (e) { e.textContent = n; }); })();
 (function () {
   var f = document.getElementById('coForm');
   if (!f) return;
