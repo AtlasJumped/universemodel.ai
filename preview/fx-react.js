@@ -19,12 +19,12 @@
   const SCOL = [SG, SV, SB, SP, ST, SO];
   const MAD = ['fire', 'tornado', 'hole', 'quake', 'lightning', 'meteor'], HAPPY = ['sparkle', 'fireworks', 'shooting', 'constellation', 'aurora'];
   // rows are opposite pairs: [negative (left), positive (right)]
-  const ROWS = [['Mad', '😡', 'Excited', '🤩'], ['Sad', '😢', 'Happy', '😊'], ['Worried', '😟', 'Hopeful', '🥹'], ['Afraid', '😨', 'Calm', '😌'], ['Confused', '😕', 'Curious', '🤔'],
-    ['Skeptical', '🤨', 'Amazed', '😮'], ['Disappointed', '😞', 'Grateful', '🥰'], ['Frustrated', '😤', 'Inspired', '😇'], ['Burn it all', '🔥', 'Mind blown', '🤯']];
-  const NAMES = []; ROWS.forEach(r => { NAMES.push(r[0], r[2]); });
-  const NEG = { 'Mad': 1, 'Sad': 1, 'Worried': 1, 'Afraid': 1, 'Confused': 1, 'Skeptical': 1, 'Disappointed': 1, 'Frustrated': 1, 'Burn it all': 1 };   // text destroyed, repaired 5 s later
+  const ROWS = [['Dislike', '👎', 'Like', '👍'], ['Mad', '😡', 'Excited', '🤩'], ['Sad', '😢', 'Happy', '😊'], ['Worried', '😟', 'Hopeful', '🥹'], ['Afraid', '😨', 'Calm', '😌'], ['Confused', '😕', 'Curious', '🤔'],
+    ['Skeptical', '🤨', 'Amazed', '😮'], ['Disappointed', '😞', 'Grateful', '🥰'], ['Frustrated', '😤', 'Inspired', '😇'], ['Burn it all', '🔥', 'Mind blown', '🤯'], ['Dragons burn it all', '🐉', null, null]];
+  const NAMES = []; ROWS.forEach(r => { NAMES.push(r[0]); if (r[2]) NAMES.push(r[2]); });
+  const NEG = { 'Dislike': 1, 'Dragons burn it all': 1, 'Mad': 1, 'Sad': 1, 'Worried': 1, 'Afraid': 1, 'Confused': 1, 'Skeptical': 1, 'Disappointed': 1, 'Frustrated': 1, 'Burn it all': 1 };   // text destroyed, repaired 5 s later
   const BLAST = { 'Mind blown': 1 };                                                                                                                  // text destroyed, repaired 1 s later
-  const TINT = { Happy: '#F2A93B', Curious: '#5B9BE6', Amazed: '#8E7CFF', Grateful: '#F2A93B', Hopeful: '#FFB347', Excited: '#E8499A', Inspired: '#9B7BFF', Calm: '#6FC7C0', 'Mind blown': '#8E7CFF' };
+  const TINT = { Like: '#F2A93B', Happy: '#F2A93B', Curious: '#5B9BE6', Amazed: '#8E7CFF', Grateful: '#F2A93B', Hopeful: '#FFB347', Excited: '#E8499A', Inspired: '#9B7BFF', Calm: '#6FC7C0', 'Mind blown': '#8E7CFF' };
 
   // ---------------------------------------------------------------- styles
   const css = document.createElement('style');
@@ -33,7 +33,7 @@
 .rx-row{display:flex;align-items:center;gap:6px}
 .rx-panel{width:262px;max-width:calc(100vw - 24px);box-sizing:border-box;background:#fff;border:1px solid #cfdcf0;border-radius:14px;box-shadow:0 6px 24px rgba(14,58,117,.2);padding:8px;max-height:min(72vh,calc(100vh - 150px));max-height:min(72vh,calc(100dvh - 150px));overflow:auto;overscroll-behavior:contain}
 .rx-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 7px;padding:0 2px;font-weight:600;font-size:12px;line-height:1.25}
-.rx-min,.rx-pill,.rx-chip,.rx-mini{font:600 13px/1 var(--font,system-ui,sans-serif);color:#0E2A55;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.rx-min,.rx-pill,.rx-chip{font:600 13px/1 var(--font,system-ui,sans-serif);color:#0E2A55;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .rx-min{min-width:32px;min-height:30px;border:1px solid #d9e3f3;background:#f7faff;border-radius:8px;padding:0 8px}
 .rx-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .rx-chip{min-height:32px;min-width:0;display:flex;align-items:center;gap:5px;padding:0 6px;font-size:12.5px;border:1px solid #d9e3f3;background:#f7faff;border-radius:10px;text-align:left;white-space:nowrap;overflow:hidden}
@@ -41,6 +41,8 @@
 .rx-chip.neg{background:#fff4f3;border-color:#f1d3cf}.rx-chip.pos{background:#fff9e8;border-color:#f1e0b3}
 .rx-chip.neg:hover{background:#ffe6e3;border-color:#e6aaa3}.rx-chip.pos:hover{background:#fff0c9;border-color:#e3c778}
 .rx-chip.burn{background:#C62828;border-color:#9f1d1d;color:#fff}.rx-chip.burn:hover{background:#a81f1f}
+.rx-chip.dragon{white-space:normal;line-height:1.1;font-size:12px;min-height:38px}
+.rx-bar[data-busy="1"] .rx-chip:not(.rx-reset){opacity:.4;cursor:default}
 .rx-min:hover{background:#e8f1ff;border-color:#b8cdee}
 .rx-reset{grid-column:1/-1;justify-content:center;background:#fff;border-color:#C62828;color:#C62828}
 .rx-reset:hover{background:#fdeeee}
@@ -48,10 +50,8 @@
 .rx-pill{display:flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border:1px solid #cfdcf0;background:#fff;border-radius:999px;box-shadow:0 4px 16px rgba(14,58,117,.2)}
 .rx-pill .e{font-size:16px}
 .rx-pill[aria-disabled="true"]{opacity:.5;cursor:default}
-.rx-mini{display:none;min-height:30px;padding:0 12px;font-size:12px;border:1px solid #C62828;color:#C62828;background:#fff;border-radius:999px;box-shadow:0 3px 12px rgba(14,58,117,.2)}
-.rx-bar[data-reset="1"] .rx-mini{display:block}
 .rx-bar[data-open="0"] .rx-panel{display:none}
-.rx-min:focus-visible,.rx-pill:focus-visible,.rx-chip:focus-visible,.rx-mini:focus-visible{outline:2px solid #0E3A75;outline-offset:2px;box-shadow:0 0 0 4px #fff}
+.rx-min:focus-visible,.rx-pill:focus-visible,.rx-chip:focus-visible{outline:2px solid #0E3A75;outline-offset:2px;box-shadow:0 0 0 4px #fff}
 .rx-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .rx-gone{color:transparent!important;-webkit-text-fill-color:transparent!important;text-decoration-color:transparent!important;text-shadow:none!important;transition:none!important}
 .rx-clip{background-image:none!important}`;
@@ -73,7 +73,7 @@
   function start(j) { ensureCanvas(); j.t = 0; JOB = j; if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
   function frame(ts) {
     raf = 0; const j = JOB; if (!j) { clear(); last = 0; return; }
-    const dt0 = last ? clamp((ts - last) / 1000, 0, 0.05) : 0.016; last = ts; const sp = j.speed || 1, dt = dt0 * sp;
+    const dt0 = last ? clamp((ts - last) / 1000, 0, 0.066) : 0.016; last = ts; const sp = j.speed || 1, dt = dt0 * sp;
     ensureCanvas(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, VW, VH); cx.globalAlpha = 1;
     const r = RX ? RX.X.r : { left: 0, top: 0, width: VW, height: VH };
     cx.save(); cx.beginPath(); cx.rect(0, r.top, VW, VH - r.top); cx.clip();
@@ -185,7 +185,7 @@
       if (!fo) {
         const cs = getComputedStyle(p), fill = cs.webkitTextFillColor; let col = cs.color;
         if (isClear(fill)) col = isClear(cs.color) ? '#0E3A75' : cs.color; else if (fill) col = fill;
-        fo = { font: cs.font || `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, color: col, rgb: rgbOf(col), up: cs.textTransform === 'uppercase', op: inf.op, by: 0, bi: fos.size, clip: cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text' };
+        fo = { font: cs.font || `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, color: col, rgb: rgbOf(col), up: cs.textTransform === 'uppercase', op: inf.op, by: 0, fs: parseFloat(cs.fontSize) || 14, bi: fos.size, clip: cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text' };
         cx.font = fo.font; const m = cx.measureText('Hg'); fo.by = m.fontBoundingBoxAscent != null ? (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2 : parseFloat(cs.fontSize) * .33; fos.set(p, fo);
       }
       const t = n.nodeValue; wid++; const cl = inf.clip; let any = false;
@@ -725,6 +725,24 @@
     };
   }
 
+  // ---------------------------------------------------------------- Dislike: the text dims to gray and shakes side to side twice, like a head saying no, and slumps
+  function fxDislike(X) {
+    const items = X.items, W = X.W, H = X.H, GRAY = [128, 130, 138], shk = t => Math.sin(t / 1.1 * Math.PI * 4) * 9 * (1 - clamp(t / 1.1, 0, 1) * .35) * (t < 1.1 ? 1 : 0);
+    return {
+      hide: true,
+      step(dt, r, g) {
+        const t = this.t, ox = r.left, oy = r.top, u = clamp(t / .35, 0, 1), dx = shk(t), dy = 3 * eOut(clamp(t / .7, 0, 1));
+        const bx = -200 + (W + 400) * clamp((t - .1) / 1.1, 0, 1), gr = g.createLinearGradient(ox + bx - 160, 0, ox + bx + 160, 0);
+        gr.addColorStop(0, 'rgba(110,125,150,0)'); gr.addColorStop(.5, 'rgba(110,125,150,.16)'); gr.addColorStop(1, 'rgba(110,125,150,0)'); g.fillStyle = gr; g.fillRect(ox, oy, W, H);
+        g.fillStyle = `rgba(110,125,150,${.06 * u})`; g.fillRect(ox, oy, W, H);
+        for (const L of items) put(g, L, ox + L.x + dx, oy + L.y + dy, dx * .004, 1, 1, lerp(1, .72, u), mixc(L.fo.rgb, GRAY, u));
+        return t > 1.5;
+      },
+      look: L => ({ x: L.x0, y: L.y0 + 3, rot: 0, a: .72, col: GRAY }),
+      overlay(g, r, m) { g.fillStyle = `rgba(110,125,150,${.06 * m})`; g.fillRect(r.left, r.top, X.W, X.H); }
+    };
+  }
+
   // ---------------------------------------------------------------- positive emotions: they play over the whole screen, the text never moves, nothing persists (about 2.5 s)
   function hSparkle(X) {
     const W = X.W, H = X.H, ps = [], rate = clamp(W * H / 2600, 50, X.coarse ? 120 : 220);
@@ -888,6 +906,185 @@
     };
   }
 
+  // Like: a quick warm wave of gold sparkles sweeps up the screen and every block of text glows softly. The text is never touched.
+  function tLike(X) {
+    const W = X.W, H = X.H, words = X.words, stride = Math.max(1, Math.ceil(words.length / 260)), ps = [];
+    return {
+      step(dt, r, g) {
+        const t = this.t, u = clamp(t / 1.15, 0, 1), env = Math.sin(Math.PI * clamp(t / 1.5, 0, 1)), yb = H * (1.06 - 1.12 * eIO(u));
+        for (let i = 0; i < words.length; i += stride) { const w = words[i], d = Math.abs(w.y - yb), k = clamp(1 - d / (H * .35), 0, 1) * .6 + .4; glow(g, r.left + w.x, r.top + w.y, Math.max(16, (w.r - w.l) * .7), .34 * env * k, [255, 188, 60]); }
+        if (t < 1.25) { const sg = g.createLinearGradient(0, r.top + yb - 60, 0, r.top + yb + 60); sg.addColorStop(0, 'rgba(255,200,90,0)'); sg.addColorStop(.5, `rgba(255,190,70,${.3 * env})`); sg.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = sg; g.fillRect(r.left, r.top + yb - 60, W, 120);
+          for (let k = Math.round(dt * (X.coarse ? 110 : 200) + Math.random()); k > 0; k--) ps.push({ x: rnd(0, W), y: yb + rnd(-30, 30), vy: -rnd(40, 110), age: 0, life: rnd(.45, .8), rr: rnd(2.6, 4.6), col: Math.random() < .6 ? SG : SO, rot: rnd(0, 1) }); }
+        for (let i = ps.length - 1; i >= 0; i--) { const p = ps[i]; p.age += dt; if (p.age >= p.life) { ps.splice(i, 1); continue; } p.y += p.vy * dt; const q = p.age / p.life; star(g, r.left + p.x, r.top + p.y, p.rr, Math.sin(q * Math.PI) * 1.15, p.col, p.rot); }
+        return t > 1.5 && !ps.length || t > 2;
+      }
+    };
+  }
+
+  // ---------------------------------------------------------------- dragons (generic, drawn with canvas paths) and a small army of stick figures
+  const DRAG = [
+    { body: [30, 118, 76], belly: [168, 212, 128], wing: [58, 158, 104], wingFar: [24, 90, 58], line: [8, 40, 24] },       // deep green
+    { body: [184, 100, 48], belly: [240, 196, 134], wing: [220, 136, 72], wingFar: [132, 70, 34], line: [72, 32, 12] },    // copper
+    { body: [36, 56, 136], belly: [126, 150, 216], wing: [62, 92, 184], wingFar: [24, 36, 98], line: [8, 14, 52] }         // midnight blue
+  ];
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const MOUTH = { x: 52, y: -16.5 };   // the snout tip in dragon units (nose to tail is 100 units)
+  // draws one dragon facing right, 100 units nose to tail, scaled by s (px per unit). ang: pitch. sx: -1 mirrors it to fly leftward. ph: flap phase. open: jaw 0..1
+  function drawDragon(g, x, y, ang, sx, s, col, t, ph, open, rider) {
+    g.save(); g.translate(x, y); g.scale(sx * s, s); g.rotate(ang); g.lineJoin = 'round'; g.lineCap = 'round';
+    const lw = 1.05 / s, LN = rgba(col.line, .85), flap = .35 + .85 * Math.sin(t * 9 + ph);
+    const wing = (a, fill, sx0, sy0) => {
+      g.save(); g.translate(sx0, sy0); g.rotate(a);
+      g.beginPath(); g.moveTo(0, 0); g.lineTo(-3, -18); g.lineTo(-8, -38);
+      g.quadraticCurveTo(-13, -27, -24, -31); g.quadraticCurveTo(-24, -21, -31, -17); g.quadraticCurveTo(-25, -9, -15, -1); g.quadraticCurveTo(-8, 1, 0, 0); g.closePath();
+      g.fillStyle = rgba(fill, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke();
+      g.beginPath(); g.moveTo(-3, -18); g.lineTo(-24, -31); g.moveTo(-3, -18); g.lineTo(-31, -17); g.moveTo(-3, -18); g.lineTo(-15, -1); g.strokeStyle = rgba(col.line, .55); g.lineWidth = lw * .8; g.stroke();
+      g.restore();
+    };
+    wing(flap - .3, col.wingFar, 4, -9);                                   // far wing, behind everything
+    // tail: a tapering, waving band ending in a small spade
+    const n = 9, top = [], bot = [];
+    for (let i = 0; i <= n; i++) { const u = i / n, px = -20 - u * 31, py = 1 - u * 4 + Math.sin(t * 5 - u * 4 + ph) * 3.2 * u, w = 3.6 * (1 - u) + .5; top.push([px, py - w]); bot.push([px, py + w]); }
+    g.beginPath(); top.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1]));
+    const e = top[n], e2 = bot[n]; g.lineTo(e[0] - 5, (e[1] + e2[1]) / 2 - .3);
+    for (let i = n; i >= 0; i--) g.lineTo(bot[i][0], bot[i][1]); g.closePath(); g.fillStyle = rgba(col.body, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke();
+    // hind leg and fore leg, tucked under the body
+    g.fillStyle = rgba(col.wingFar, 1);
+    [[-12, 5], [9, 5]].forEach(([lx, ly]) => { g.beginPath(); g.moveTo(lx - 3, ly - 2); g.lineTo(lx - 6, ly + 6); g.lineTo(lx - 1, ly + 8); g.lineTo(lx + 3, ly + 5); g.lineTo(lx + 3, ly - 2); g.closePath(); g.fill(); g.stroke(); });
+    // body and belly
+    g.beginPath(); g.moveTo(-23, 2); g.bezierCurveTo(-27, -7, -14, -13, -2, -12); g.bezierCurveTo(8, -12, 14, -10, 20, -8); g.lineTo(23, 0); g.bezierCurveTo(12, 8, -9, 9, -23, 2); g.closePath();
+    g.fillStyle = rgba(col.body, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke();
+    g.beginPath(); g.moveTo(-21, 3); g.bezierCurveTo(-8, 8, 12, 7, 22, 0); g.bezierCurveTo(12, 3, -8, 4, -21, 3); g.fillStyle = rgba(col.belly, .95); g.fill();
+    // back spines
+    g.fillStyle = rgba(col.line, .8); for (let i = 0; i < 5; i++) { const px = -18 + i * 6.5; g.beginPath(); g.moveTo(px - 2, -11.6 + (i % 2) * .2); g.lineTo(px, -15.5); g.lineTo(px + 2, -11.8); g.closePath(); g.fill(); }
+    // neck
+    g.beginPath(); g.moveTo(18, -9); g.bezierCurveTo(26, -11, 29, -17, 34, -23); g.lineTo(39, -18); g.bezierCurveTo(35, -12, 29, -5, 22, 0); g.closePath(); g.fillStyle = rgba(col.body, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke();
+    // lower jaw (hinged), then head
+    g.save(); g.translate(38.5, -16.5); g.rotate(open * .5); g.beginPath(); g.moveTo(0, 0); g.lineTo(12.5, 1); g.lineTo(12, 2.6); g.lineTo(1, 2.8); g.closePath(); g.fillStyle = rgba(col.body, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke(); g.restore();
+    g.beginPath(); g.moveTo(30.5, -23); g.bezierCurveTo(35, -27, 40, -25, 43, -22.5); g.lineTo(51.5, -19.5); g.lineTo(52.5, -16.8); g.lineTo(44, -16); g.lineTo(38.5, -16.2); g.bezierCurveTo(35, -16, 32, -19, 30.5, -23); g.closePath();
+    g.fillStyle = rgba(col.body, 1); g.fill(); g.strokeStyle = LN; g.lineWidth = lw; g.stroke();
+    g.beginPath(); g.moveTo(33, -24); g.lineTo(26.5, -29.5); g.moveTo(36, -25.2); g.lineTo(31, -31); g.strokeStyle = rgba(col.line, .95); g.lineWidth = lw * 1.5; g.stroke();   // horns
+    g.fillStyle = 'rgb(255,226,120)'; g.beginPath(); g.arc(40.5, -21, 1.5, 0, 6.283); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(41, -21, .7, 0, 6.283); g.fill();   // eye
+    if (open > .3) { g.fillStyle = 'rgba(255,120,30,.9)'; g.beginPath(); g.arc(52.5, -15.6, 1.6 + open * 1.2, 0, 6.283); g.fill(); }
+    wing(flap, col.wing, 6, -9);                                            // near wing, in front
+    // rider: a plain line figure sitting astride, dark helmet, one hand on the neck
+    if (rider) { g.save(); g.translate(-8, 0);
+      const R = 'rgba(18,22,40,.95)'; g.strokeStyle = R; g.lineWidth = 1.9 / 1; g.lineCap = 'round';
+      g.beginPath(); g.moveTo(-7, -12); g.lineTo(-10.5, -7.5); g.moveTo(-7, -12); g.lineTo(-3.2, -8); g.moveTo(-7, -12); g.lineTo(-6, -22.5);
+      g.moveTo(-6, -20.5); g.lineTo(2, -16.5); g.moveTo(-6, -20.5); g.lineTo(-12, -17 + Math.sin(t * 9 + ph) * .8); g.stroke();
+      g.fillStyle = 'rgb(236,206,176)'; g.beginPath(); g.arc(-5.6, -26, 2.7, 0, 6.283); g.fill(); g.lineWidth = 1; g.stroke();
+      g.fillStyle = R; g.beginPath(); g.arc(-5.6, -26.4, 2.9, Math.PI, 0); g.closePath(); g.fill(); g.beginPath(); g.moveTo(-5.6, -29.8); g.lineTo(-5.6, -31.8); g.lineWidth = 1.4; g.stroke();
+      g.beginPath(); g.moveTo(-8.4, -24); g.quadraticCurveTo(-15, -24 + Math.sin(t * 9 + ph) * 1.6, -19, -21); g.lineWidth = 1.1; g.strokeStyle = 'rgba(190,40,50,.9)'; g.stroke();   // a plain scarf
+      g.restore(); }
+    g.restore();
+  }
+  // a small line figure, about 20 px tall. pose: 'walk' | 'stand' | 'cheer'. banner: color array or null. feet at (x,y)
+  function drawFigure(g, x, y, k, ph, pose, banner, a, flip) {
+    g.save(); g.translate(x, y); g.scale(flip, 1); g.globalAlpha = a; g.lineCap = 'round'; g.lineJoin = 'round'; const H = 20 * k;
+    const st = Math.sin(ph) * 3.6 * k, bob = pose === 'walk' ? Math.abs(Math.sin(ph)) * 1.4 * k : pose === 'cheer' ? Math.abs(Math.sin(ph)) * 3 * k : 0;
+    g.strokeStyle = 'rgba(30,34,52,.95)'; g.fillStyle = 'rgba(30,34,52,.95)'; g.lineWidth = 1.6 * k;
+    g.beginPath(); g.moveTo(0, -H * .32 - bob); g.lineTo(pose === 'walk' ? st : -2.6 * k, 0); g.moveTo(0, -H * .32 - bob); g.lineTo(pose === 'walk' ? -st : 2.6 * k, 0);     // legs
+    g.moveTo(0, -H * .32 - bob); g.lineTo(0, -H * .72 - bob); g.stroke();                                                                                                     // body
+    g.beginPath(); g.arc(0, -H * .86 - bob, 2.5 * k, 0, 6.283); g.fillStyle = 'rgb(236,206,176)'; g.fill(); g.lineWidth = 1.1 * k; g.stroke();
+    g.fillStyle = 'rgba(30,34,52,.95)'; g.beginPath(); g.arc(0, -H * .88 - bob, 2.7 * k, Math.PI, 0); g.closePath(); g.fill();                                                  // helmet
+    g.lineWidth = 1.5 * k; g.beginPath();
+    if (pose === 'cheer') { g.moveTo(0, -H * .68 - bob); g.lineTo(-4.5 * k, -H * 1.02 - bob); g.moveTo(0, -H * .68 - bob); g.lineTo(4.5 * k, -H * 1.02 - bob); g.stroke(); }
+    else {   // one arm holds a spear, the other a banner pole when it has one
+      g.moveTo(0, -H * .68 - bob); g.lineTo(4 * k, -H * .45 - bob); g.stroke();
+      g.lineWidth = 1.1 * k; g.beginPath(); g.moveTo(4 * k, 2 * k); g.lineTo(4 * k, -H * 1.18 - bob); g.stroke(); g.beginPath(); g.moveTo(4 * k - 1.5 * k, -H * 1.18 - bob); g.lineTo(4 * k, -H * 1.18 - 4 * k - bob); g.lineTo(4 * k + 1.5 * k, -H * 1.18 - bob); g.closePath(); g.fill();
+      if (banner) { g.lineWidth = 1.2 * k; g.beginPath(); g.moveTo(-4 * k, -H * .5 - bob); g.lineTo(-4 * k, -H * 1.3 - bob); g.stroke(); flag(g, -4 * k, -H * 1.3 - bob, k, ph, banner); g.beginPath(); g.moveTo(0, -H * .66 - bob); g.lineTo(-4 * k, -H * .6 - bob); g.lineWidth = 1.5 * k; g.stroke(); }
+    }
+    g.restore();
+  }
+  function flag(g, x, y, k, ph, col) {   // a plain single-color banner with a simple star, fluttering
+    const w = 11 * k, h = 8 * k, f = Math.sin(ph * 1.3) * 1.2 * k;
+    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + w * .5, y + f, x + w, y + f * .5); g.lineTo(x + w, y + h + f * .5); g.quadraticCurveTo(x + w * .5, y + h + f, x, y + h); g.closePath(); g.fillStyle = rgbs(col); g.fill(); g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = .7 * k; g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath(); const cx0 = x + w * .5, cy0 = y + h * .5 + f * .4, R = 2.3 * k;
+    for (let i = 0; i < 10; i++) { const an = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? R * .45 : R; const px = cx0 + Math.cos(an) * rr, py = cy0 + Math.sin(an) * rr; i ? g.lineTo(px, py) : g.moveTo(px, py); } g.closePath(); g.fill();
+  }
+  const BANNERS = [[190, 40, 52], [30, 130, 140], [230, 160, 30], [90, 60, 170], [40, 140, 80]];
+
+  // Dragons burn it all: three dragons sweep the page breathing flame, the text catches fire and crumbles, an army of stick figures plants banners, then everything is repaired
+  function fxDragons(X) {
+    const W = X.W, H = X.H, items = X.items, small = X.coarse || W < 600, L0 = small ? 72 : 96, s = L0 / 100, fs = small ? .75 : 1, maxP = small ? 260 : 380, nArmy = small ? 10 : 20;
+    const cr = (a, b, c2, d, f) => .5 * ((2 * b) + (-a + c2) * f + (2 * a - 5 * b + 4 * c2 - d) * f * f + (-a + 3 * b - 3 * c2 + d) * f * f * f);
+    const mk = pts => u => { const n = pts.length - 1, v = clamp(u, 0, 1) * n, k = Math.min(n - 1, Math.floor(v)), f = v - k, a = pts[Math.max(0, k - 1)], b = pts[k], c2 = pts[k + 1], d = pts[Math.min(n, k + 2)]; return [cr(a[0], b[0], c2[0], d[0], f), cr(a[1], b[1], c2[1], d[1], f)]; };
+    const ry = () => rnd(.18, .85) * H, T = 4.5;
+    const paths = [
+      mk([[-90, H * .3], [W * .22, ry()], [W * .5, H * .25], [W * .76, ry()], [W * .45, H * .75], [W * .8, H * .4], [W + 100, H * .2]]),
+      mk([[W + 90, H * .62], [W * .78, ry()], [W * .5, H * .7], [W * .24, ry()], [W * .55, H * .3], [W * .2, H * .6], [-100, H * .8]]),
+      mk([[W * .55, -90], [W * .8, H * .35], [W * .4, H * .55], [W * .15, H * .3], [W * .35, H * .8], [W * .7, H * .6], [W * .95, -100]])
+    ];
+    const drag = paths.map((p, i) => ({ p, col: DRAG[i], ph: rnd(0, 6), t0: i * .35, T: T - i * .1, breath: [], last: null, ang: 0, sx: 1 }));
+    const parts = [], breath = [], ash = []; let tCheer = 4.5, tEnd = 5.6, forced = false;
+    items.forEach(L => { L.bt = -1; L.cr = 0; L.ash = false; L.st = 0; L.jx = rnd(0, 6); });
+    const ignite = (L, t, d) => { if (L.bt >= 0) return; L.bt = t + (d || 0); L.cr = L.bt + .35 + rnd(0, .45); };
+    // the army: perches on card tops and on the tops of text lines
+    const perches = [];
+    try { document.querySelectorAll('.card').forEach(c => { if (c.closest('.site-head,.rx-bar')) return; const r = c.getBoundingClientRect(); if (r.width < 80 || r.top < X.hb + 14 || r.top > innerHeight - 14 || r.right < 0 || r.left > innerWidth) return; for (let k = 0; k < 2; k++) perches.push({ x: clamp(r.left + rnd(.1, .9) * r.width, 12, W - 12), y: r.top - X.hb }); }); } catch (e) { }
+    const seen = new Set(); X.words.forEach(w => { const k = w.bi + ':' + w.ln; if (seen.has(k)) return; seen.add(k); perches.push({ x: rnd(w.l + 4, Math.max(w.l + 5, w.r - 4)), y: w.y - (w.fo.fs || 14) * .55 }); });
+    const army = []; shuffle(perches);
+    for (const p of perches) { if (army.length >= nArmy) break; if (p.y < 16 || p.y > H - 10 || army.every(a => Math.hypot(a.px - p.x, a.py - p.y) > (small ? 60 : 90))) army.push({ px: p.x, py: p.y }); }
+    army.forEach((a, i) => { const left = a.px < W / 2 ? Math.random() < .85 : Math.random() < .15; a.sx0 = left ? rnd(-20, 40) : W - rnd(-20, 40); a.sy0 = H + 24; a.ta = 2.0 + rnd(0, 1.9); a.flip = a.px >= a.sx0 ? 1 : -1; a.ph = rnd(0, 6); a.ban = i % 2 ? BANNERS[i % BANNERS.length] : null; a.k = rnd(.9, 1.1); a.spd = Math.hypot(a.px - a.sx0, a.py - a.sy0) / a.ta; });
+    const drawArmy = (g, ox, oy, t, al) => {
+      army.forEach(a => {
+        const u = clamp((t - .6) / (a.ta - .6 + .001), 0, 1); if (t < .6) return; const x = lerp(a.sx0, a.px, u), y = lerp(a.sy0, a.py, u), arrived = u >= 1;
+        const pose = !arrived ? 'walk' : t > tCheer ? 'cheer' : 'stand', ph = t * (arrived ? 9 : a.spd / 9) + a.ph;
+        if (arrived && a.ban && pose !== 'cheer') { g.globalAlpha = al; g.strokeStyle = 'rgba(30,34,52,.95)'; g.lineWidth = 1.3 * a.k; g.beginPath(); g.moveTo(ox + x - 6 * a.k * a.flip, oy + y + 1); g.lineTo(ox + x - 6 * a.k * a.flip, oy + y - 25 * a.k); g.stroke(); flag(g, ox + x - 6 * a.k * a.flip, oy + y - 25 * a.k, a.k, t * 5 + a.ph, a.ban); g.globalAlpha = 1; }
+        drawFigure(g, ox + x, oy + y, a.k, ph, pose, arrived ? null : a.ban, al, a.flip);
+      });
+    };
+    let ot = 0;
+    return {
+      hide: true,
+      step(dt, r, g) {
+        const t = this.t, ox = r.left, oy = r.top, act = [];
+        if (t > 3.0 && !forced) { forced = true; items.forEach(L => ignite(L, t, rnd(0, .8))); }
+        // dragons: position, heading, wings, breath
+        drag.forEach((D, i) => {
+          const u = (t - D.t0) / D.T; if (u < 0 || u > 1.02) { D.on = false; return; } D.on = true;
+          const P = D.p(u), Q = D.p(Math.min(1, u + .01)), vx = Q[0] - P[0], vy = Q[1] - P[1]; D.x = P[0]; D.y = P[1]; D.sx = vx >= 0 ? 1 : -1; D.ang = Math.atan2(vy, Math.abs(vx)) * .8;
+          const ph = (t - D.t0 - .5) % 1.5, br = ph >= 0 && ph < .95 && u > .08 && u < .93; D.br = br;
+          const ca = Math.cos(D.ang), sa = Math.sin(D.ang), tilt = .55, dl = [Math.cos(tilt), Math.sin(tilt)];   // breath goes forward and down, in dragon space
+          const loc = (lx, ly) => [D.x + D.sx * s * (lx * ca - ly * sa), D.y + s * (lx * sa + ly * ca)];
+          const m = loc(MOUTH.x, MOUTH.y), d0 = [D.sx * (dl[0] * ca - dl[1] * sa), dl[0] * sa + dl[1] * ca]; D.mx = m[0]; D.my = m[1]; D.dx = d0[0]; D.dy = d0[1];
+          if (br) {
+            const cnt = Math.round(dt * (small ? 160 : 250) + Math.random());
+            for (let k = 0; k < cnt && breath.length < maxP; k++) { const sp = rnd(240, 400), an = Math.atan2(d0[1], d0[0]) + rnd(-.2, .2); breath.push({ x: m[0], y: m[1], vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, life: rnd(.45, .75), age: 0, sz: rnd(8, 14) * fs, ph: rnd(0, 6), sh: (Math.random() * 6) | 0 }); }
+            // letters inside the cone catch fire
+            const cd = Math.atan2(d0[1], d0[0]), cc = Math.cos(cd), sn = Math.sin(cd);
+            for (const L of items) { if (L.bt >= 0) continue; const dx = L.x - m[0], dy = L.y - m[1]; const along = dx * cc + dy * sn; if (along < 8 || along > 250 * fs + 30) continue; const perp = Math.abs(-dx * sn + dy * cc); if (perp < 12 + along * .3) ignite(L, t, rnd(0, .15)); }
+          }
+        });
+        // letters: normal, burning, charred, crumbling to ash
+        let left = 0;
+        for (const L of items) {
+          if (L.st === 2) continue; left++;
+          if (L.bt < 0 || t < L.bt) { put(g, L, ox + L.x, oy + L.y, 0, 1, 1, 1); continue; }
+          if (t < L.cr) { const u = clamp((t - L.bt) / (L.cr - L.bt), 0, 1), col = u < .35 ? mixc(L.fo.rgb, ORG, u / .35) : mixc(ORG, CHAR, (u - .35) / .65), j = (1 - u) * 1.3; put(g, L, ox + L.x + rnd(-j, j), oy + L.y + rnd(-j, j), 0, 1, 1, 1, col); if (Math.random() < dt * 4 && parts.length < maxP) flameAt(parts, L.x, L.y + 4, rnd(12, 24) * fs); continue; }
+          const age = t - L.cr; if (!L.ash) { L.ash = true; for (let k = 0; k < 2 && ash.length < (small ? 260 : 700); k++) ash.push({ x: L.x + rnd(-4, 4), y: L.y + rnd(-3, 3), vx: rnd(-14, 14), vy: rnd(10, 40), life: rnd(.6, 1.1), age: 0, s: rnd(1, 2.2) }); }
+          if (age > .8) { L.st = 2; continue; }
+          const u = age / .8; put(g, L, ox + L.x + Math.sin(age * 12 + L.jx) * 2, oy + L.y + age * age * 120 + age * 14, rnd(-.1, .1), 1 - .5 * u, 1 - .5 * u, 1 - u, mixc(CHAR, [140, 132, 125], u));
+        }
+        for (let i = ash.length - 1; i >= 0; i--) { const p = ash[i]; p.age += dt; if (p.age >= p.life) { ash.splice(i, 1); continue; } p.x += p.vx * dt; p.vy += 120 * dt; p.y += p.vy * dt; const u = p.age / p.life; g.fillStyle = `rgba(95,88,82,${.75 * (1 - u)})`; g.fillRect(ox + p.x, oy + p.y, p.s, p.s); }
+        // flame: breath cones (flames point along their travel) and ordinary rising flames
+        for (let i = breath.length - 1; i >= 0; i--) {
+          const p = breath[i]; p.age += dt; if (p.age >= p.life) { breath.splice(i, 1); continue; }
+          const u = p.age / p.life; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .985; p.vy *= .985;
+          const st = u < .3 ? 0 : u < .66 ? 1 : 2, w = p.sz * (.7 + 1.5 * u), h = w * 1.9, rot = Math.atan2(p.vy, p.vx) + Math.PI / 2;
+          if (p.sh % 3 === 0) glow(g, ox + p.x, oy + p.y, w * 1.1, .35 * (1 - u), [255, 150, 40]); g.globalAlpha = Math.min(1, (1 - u) * 1.9); g.save(); g.translate(ox + p.x, oy + p.y); g.rotate(rot + Math.sin(p.age * 20 + p.ph) * .12); g.drawImage(FS[st][p.sh], -w / 2, -h, w, h); g.restore(); g.globalAlpha = 1;
+        }
+        stepParts(g, parts, dt, ox, oy);
+        // army, then dragons on top
+        drawArmy(g, ox, oy, t, 1);
+        drag.forEach(D => { if (D.on) drawDragon(g, ox + D.x, oy + D.y, D.ang, D.sx, s, D.col, t, D.ph, D.br ? .8 : .1, true); });
+        return t > tEnd && left === 0 && !ash.length || t > 9;
+      },
+      look: () => null,
+      overlay(g, r, m, dt) { ot += dt || 0; drawArmy(g, r.left, r.top, tEnd + ot, m); }
+    };
+  }
+
   // ---------------------------------------------------------------- repair: sparkles come and the text returns
   function repairJob(dur) {   // the letters are still where the effect left them, so they come back in place
     const X = RX.X, eff = RX.eff, items = X.items, W = X.W, H = X.H, sp = [], maxSp = X.coarse ? 200 : 360;
@@ -921,25 +1118,12 @@
       end() { finish(); }
     };
   }
-  function holdJob() {
-    const X = RX.X, eff = RX.eff, items = X.items;
-    return {
-      step(dt, r, g) {
-        if (eff.look) for (const L of items) { const lk = eff.look(L); if (lk && lk.a > .01) put(g, L, r.left + lk.x, r.top + lk.y, lk.rot || 0, 1, 1, lk.a, lk.col ? rgbs(lk.col) : undefined); }
-        if (eff.overlay) eff.overlay(g, r, 1, dt);
-        return false;
-      }
-    };
-  }
-  function enterHold() {
-    RX.phase = 'hold'; start(holdJob()); setUI();
-    RX.timer = setTimeout(() => beginRepair('auto'), BLAST[RX.name] ? 1000 : 5000);
-  }
+  function enterRepair() { RX.phase = 'repair'; start(repairJob(BLAST[RX.name] ? 1.0 : 1.5)); setUI(); }
   function beginRepair(mode) {
     if (!RX) return; clearTimeout(RX.timer);
     if (RX.phase === 'repair' || RX.phase === 'spark') { if (JOB) JOB.speed = Math.min(4, (JOB.speed || 1) * 1.4 + .15); return; }
     if (rm() || document.hidden) { restoreDOM(); finish(); return; }
-    if (RX.phase === 'hold' && mode !== 'scroll') { RX.phase = 'repair'; start(repairJob(mode === 'reset' ? .9 : BLAST[RX.name] ? 1.0 : 1.5)); }
+    if (RX.phase === 'hold' && mode !== 'scroll') { RX.phase = 'repair'; start(repairJob(.9)); }
     else { restoreDOM(); RX.phase = 'spark'; start(sparkJob(mode === 'scroll' ? .5 : .8)); }
     setUI();
   }
@@ -959,7 +1143,7 @@
   let madN = (Math.random() * 6) | 0, hapN = (Math.random() * 5) | 0;
   const MADFX = { fire: fxFire, tornado: fxTornado, hole: fxHole, quake: fxQuake, lightning: fxLightning, meteor: fxMeteor };
   const HAPFX = { sparkle: hSparkle, fireworks: hFireworks, shooting: hShooting, constellation: hConstellation, aurora: hAurora };
-  const OTHER = { 'Sad': fxSad, 'Worried': fxWorried, 'Afraid': fxAfraid, 'Confused': fxConfused, 'Skeptical': fxSkeptic, 'Disappointed': fxDisappointed, 'Frustrated': fxFrustrated, 'Burn it all': fxBurn, 'Mind blown': fxBlown,
+  const OTHER = { 'Sad': fxSad, 'Worried': fxWorried, 'Afraid': fxAfraid, 'Confused': fxConfused, 'Dislike': fxDislike, 'Like': tLike, 'Dragons burn it all': fxDragons, 'Skeptical': fxSkeptic, 'Disappointed': fxDisappointed, 'Frustrated': fxFrustrated, 'Burn it all': fxBurn, 'Mind blown': fxBlown,
     'Curious': tCurious, 'Amazed': tAmazed, 'Grateful': tGrateful, 'Hopeful': tHopeful, 'Excited': tExcited, 'Inspired': tInspired, 'Calm': tCalm };
   const MSG = { fire: 'Text burned.', tornado: 'Text carried away by tornadoes.', hole: 'Text pulled into a black hole.', quake: 'Text shaken loose and fallen.', lightning: 'Text shattered by lightning.', meteor: 'Text knocked off by meteors.' };
   function press(name) {
@@ -971,12 +1155,12 @@
     if (name === 'Mad') fx = MAD[madN++ % MAD.length]; else if (name === 'Happy') fx = HAPPY[hapN++ % HAPPY.length];
     RX = { name, fx, X, neg: !!(NEG[name] || BLAST[name]), phase: 'play', blocks: X.blocks, orig: new Map(), hidden: false, timer: 0, sx: scrollX, sy: scrollY, t0: performance.now() };
     if (rm()) {
-      if (NEG[name]) { RX.neg = true; hideDOM(); RX.phase = 'hold'; say(name + '. The text returns in a few seconds.'); setUI(); RX.timer = setTimeout(() => beginRepair('auto'), 5000); }
+      if (NEG[name]) { RX.neg = true; hideDOM(); RX.phase = 'hold'; say(name + '. The text returns in a moment.'); setUI(); RX.timer = setTimeout(() => beginRepair('auto'), 1200); }
       else { RX.neg = false; ensureCanvas(); cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, VW, VH); cx.globalAlpha = .14; cx.fillStyle = TINT[name] || '#8E7CFF'; cx.fillRect(0, X.hb, VW, VH - X.hb); cx.globalAlpha = 1; say(name + '.'); setUI(); RX.timer = setTimeout(finish, 1000); }
       return;
     }
     const eff = (name === 'Mad' ? MADFX[fx] : name === 'Happy' ? HAPFX[fx] : OTHER[name])(X); RX.eff = eff;
-    eff.end = function (err) { if (!RX) return; if (!RX.neg) { finish(); return; } if (err) { restoreDOM(); finish(); return; } enterHold(); };
+    eff.end = function (err) { if (!RX) return; if (!RX.neg) { finish(); return; } if (err) { restoreDOM(); finish(); return; } enterRepair(); };
     start(eff); setUI(); say(name === 'Mad' ? MSG[fx] || name : name + '.');
   }
   // the visitor scrolls: the text moved, so the canvas copy is stale. Hide it cleanly, put the real text back and let sparkles run fast.
@@ -997,22 +1181,20 @@
   addEventListener('pagehide', () => { resetNow(); });
 
   // ---------------------------------------------------------------- the pill and the panel
-  const bar = document.createElement('div'); bar.className = 'rx-bar'; bar.setAttribute('data-hmr', ''); bar.setAttribute('data-open', '0'); bar.setAttribute('data-reset', '0');
+  const bar = document.createElement('div'); bar.className = 'rx-bar'; bar.setAttribute('data-hmr', ''); bar.setAttribute('data-open', '0'); bar.setAttribute('data-busy', '0');
   bar.innerHTML = '<div class="rx-panel" id="rx-panel" role="group" aria-label="Reactions"><div class="rx-hd"><span>How does this make you feel?</span><button type="button" class="rx-min" aria-label="Close reactions">×</button></div><div class="rx-grid">' +
-    ROWS.map(r => [0, 2].map(k => `<button type="button" class="rx-chip ${k ? 'pos' : (r[0] === 'Burn it all' ? 'burn' : 'neg')}" data-e="${r[k]}"><span class="e" aria-hidden="true">${r[k + 1]}</span>${r[k]}</button>`).join('')).join('') +
+    ROWS.map(r => [0, 2].map(k => !r[k] ? '<span></span>' : `<button type="button" class="rx-chip ${k ? 'pos' : (/^(Burn it all|Dragons)/.test(r[0]) ? 'burn' + (r[0][0] === 'D' && r[0][1] === 'r' ? ' dragon' : '') : 'neg')}" data-e="${r[k]}"><span class="e" aria-hidden="true">${r[k + 1]}</span>${r[k]}</button>`).join('')).join('') +
     '<button type="button" class="rx-chip rx-reset" aria-disabled="true">Reset</button></div></div>' +
-    '<div class="rx-row"><button type="button" class="rx-mini" aria-label="Reset the page text now">Reset</button><button type="button" class="rx-pill" aria-expanded="false" aria-controls="rx-panel" aria-disabled="false"><span class="e" aria-hidden="true">😊</span>React</button></div>';
+    '<div class="rx-row"><button type="button" class="rx-pill" aria-expanded="false" aria-controls="rx-panel" aria-disabled="false"><span class="e" aria-hidden="true">😊</span>React</button></div>';
   bar.appendChild(live);
-  const pill = bar.querySelector('.rx-pill'), mini = bar.querySelector('.rx-mini'), min = bar.querySelector('.rx-min'), resetBtn = bar.querySelector('.rx-reset');
+  const pill = bar.querySelector('.rx-pill'), min = bar.querySelector('.rx-min'), resetBtn = bar.querySelector('.rx-reset');
   let open = false;
   function setOpen(o) { open = o; bar.setAttribute('data-open', o ? '1' : '0'); pill.setAttribute('aria-expanded', o ? 'true' : 'false'); }
   function setUI() {
-    pill.setAttribute('aria-disabled', RX ? 'true' : 'false'); resetBtn.setAttribute('aria-disabled', RX ? 'false' : 'true');
-    bar.setAttribute('data-reset', RX && RX.neg && (RX.phase === 'play' || RX.phase === 'hold') ? '1' : '0');
+    pill.setAttribute('aria-disabled', RX ? 'true' : 'false'); resetBtn.setAttribute('aria-disabled', RX ? 'false' : 'true'); bar.setAttribute('data-busy', RX ? '1' : '0');
   }
-  pill.addEventListener('click', () => { if (RX) { say('Still reacting.'); return; } if (open) { setOpen(false); return; } setOpen(true); const f = bar.querySelector('.rx-chip'); if (f) f.focus({ preventScroll: true }); });
+  pill.addEventListener('click', () => { if (open) { setOpen(false); return; } setOpen(true); const f = bar.querySelector('.rx-chip'); if (f) f.focus({ preventScroll: true }); });
   min.addEventListener('click', () => { setOpen(false); pill.focus({ preventScroll: true }); });
-  mini.addEventListener('click', () => resetAll());
   bar.addEventListener('click', ev => {
     const b = ev.target.closest('.rx-chip'); if (!b) return;
     if (b.classList.contains('rx-reset')) { if (RX) { setOpen(false); resetAll(); } return; }
@@ -1023,6 +1205,7 @@
   document.body.appendChild(bar);
 
   window.hmrReact = {
+    dragonLength: () => (coarse() || innerWidth < 600 ? 72 : 96),
     emotions: NAMES.slice(), press, resetNow,
     target: () => { const X = gather(); return X ? Array.from(X.blocks.keys()) : null; },
     state: el => RX && RX.blocks.has(el) ? RX.phase + ':' + RX.name : 'ready',
