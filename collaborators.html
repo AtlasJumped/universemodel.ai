@@ -80,7 +80,7 @@
   <div class="wrap">
     <span class="eyebrow">Who is here</span>
     <h2>One name at the top, and room underneath</h2>
-    <p class="co-next"><b>The next person to join will be collaborator number <span class="co-num">1</span>.</b> We number collaborators in the order they join. It carries no rank; it only records who came when, and it will be fun to look back on.</p>
+    <p class="co-next"><b>As of now, up next is collaborator number <span class="co-num">1</span>.</b> We number collaborators in the order they join. It carries no rank; it only records who came when, and it will be fun to look back on.</p>
     <div class="co-tree" role="group" aria-label="A tree with HMR at the top, where Leo is listed, and three empty branches beneath it: professionals, friends and family, and interested strangers.">
       <div class="co-top">
         <div class="co-av"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.2" fill="#9DB4D0"/><path d="M3.5 21c.6-4.6 4.1-7.2 8.5-7.2s7.900 2.600 8.500 7.200z" fill="#9DB4D0"/></svg></div>
@@ -195,7 +195,7 @@
   <div class="wrap">
     <span class="eyebrow">Join in</span>
     <h2>Tell us who you are</h2>
-    <p class="co-next"><b>You would be collaborator number <span class="co-num">1</span>.</b></p>
+    <p class="co-next"><b>As of now, up next is collaborator number <span class="co-num">1</span>.</b> Numbers are given in the order messages arrive, so yours may be later.</p>
     <div class="split nb-keep">
       <div>
         <p>Fill in as much or as little as you like. Every box is optional. Beside each one, choose whether it may appear on this page; nothing is shown publicly unless you tick it.</p>
@@ -244,7 +244,8 @@
 
 <script>
 // live tally: every listed collaborator is a .co-card inside the branches; the next number is that count plus one
-(function () { var n = document.querySelectorAll('.co-br .co-card').length + 1; [].forEach.call(document.querySelectorAll('.co-num'), function (e) { e.textContent = n; }); })();
+// CO_NEXT is the next number to hand out. Raise it by one for every collaborator message received, as soon as it is received, even before the card is added.
+(function () { var CO_NEXT = 1; var n = Math.max(CO_NEXT, document.querySelectorAll('.co-br .co-card').length + 1); [].forEach.call(document.querySelectorAll('.co-num'), function (e) { e.textContent = n; }); })();
 (function () {
   var f = document.getElementById('coForm');
   if (!f) return;
