@@ -7,12 +7,12 @@
   if (!head || window.hmrProgress) return;
 
   const PAGES = [
-    ['index.html', 'Home'], ['about.html', 'About'], ['reality.html', 'Reality'], ['fixing-exercise.html', 'The fixing exercise'],
-    ['mental-health.html', 'Mental health'], ['hmr.html', 'The model (HMR)'], ['ui.html', 'Universal intelligence'],
-    ['health-model.html', 'Health model'], ['physics-health.html', 'Physics of health'], ['health.html', 'Health'],
-    ['protocol.html', 'Protocol'], ['mental-model.html', 'Mental model'], ['math.html', 'Math'], ['physics.html', 'Physics'],
-    ['values.html', 'Values'], ['answers.html', 'Answers'], ['east-west.html', 'East and West'], ['kids.html', 'Kids'],
-    ['simulation.html', 'Simulation'], ['fun.html', 'Fun'], ['roadmap.html', 'Roadmap'], ['collaborators.html', 'Collaborators'],
+    ['index.html', 'Home'], ['about.html', 'About'], ['reality.html', 'Science Today'], ['fixing-exercise.html', 'Exercise Today'],
+    ['mental-health.html', 'Mental Health Today'], ['hmr.html', 'The HMR'], ['ui.html', 'Universal Intelligence'],
+    ['health-model.html', 'HMR Holistic Health Model'], ['physics-health.html', 'HMR Physical Health Model'], ['health.html', 'The Perfect Body'],
+    ['protocol.html', 'HMR Fascia Health Protocol'], ['mental-model.html', 'HMR Mental Health Model'], ['math.html', 'HMR Math Paradigm'], ['physics.html', 'HMR Physics Paradigm'],
+    ['values.html', 'HMR Values'], ['answers.html', 'The Answers'], ['east-west.html', 'East and West'], ['kids.html', 'Do you have kids?'],
+    ['simulation.html', 'Simulation'], ['fun.html', 'For fun'], ['roadmap.html', 'Road Ahead'], ['collaborators.html', 'Collaborators'],
     ['influencers.html', 'Influencers'], ['methods.html', 'Methods'], ['library.html', 'Library']
   ];
   const N = PAGES.length, KEY = 'hmr-progress-v1', MILES = [25, 50, 75];
