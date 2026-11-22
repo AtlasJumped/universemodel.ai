@@ -190,7 +190,7 @@ const FX_PATCHES = [
   }
 
   // ---------------------------------------------------------------- DOM reading helpers (nothing here changes layout)
-  function holdStyle(X, el) { const was = el.getAttribute('style'); X.guard(() => { const put = () => { if (was === null) el.removeAttribute('style'); else el.setAttribute('style', was); }; put(); requestAnimationFrame(put); setTimeout(put, 400); }); }
+  function holdStyle(X, el) { const was = el.getAttribute('style'); X.guard(() => { const put = () => { if (was === null) { el.style.cssText = ''; el.removeAttribute('style'); } else el.setAttribute('style', was); }; put(); requestAnimationFrame(put); setTimeout(put, 400); setTimeout(put, 900); setTimeout(put, 1600); }); }
   const unsafeIn = el => !!el.querySelector('canvas,input,textarea,select,form,video,iframe');
   const bgOpaque = el => { const m = /rgba?\(([^)]+)\)/.exec(getComputedStyle(el).backgroundColor); if (!m) return false; const p = m[1].split(','); return p.length < 4 || parseFloat(p[3]) > 0.8; };
   function tbox(el) { const r = document.createRange(); r.selectNodeContents(el); const b = r.getBoundingClientRect(); return b.width ? b : el.getBoundingClientRect(); }
@@ -656,13 +656,13 @@ const FX_PATCHES = [
   // ===== Card sparkle-in: a sparkle lands on each card's top-left corner in turn, and the card lifts 4 px and settles
   def('cardin', 'Card sparkle-in', 'x', 'cards', 4.8, X => {
     const cards = safeCards(X.sec, 8); if (cards.length < 2) return null; const sw = new Swarm(60), step = 0.36, t0 = 0.2, st = [];
-    cards.forEach((el, i) => { holdStyle(X, el); st.push({ el, t: t0 + i * step, lifted: false, down: false }); });
+    const anims = []; X.guard(() => anims.forEach(a => { try { a.cancel(); } catch (e) {} }));
+    cards.forEach((el, i) => { st.push({ el, t: t0 + i * step, lifted: false, down: true }); });
     return { frame(c, t, dt) {
       for (const q of st) { const r = q.el.getBoundingClientRect(), tx = r.left + 7, ty = r.top + 7, u = (t - q.t) / 0.32;
         if (u >= 0 && u < 1) { const e = u * u; spark(c, lerp(tx - 40, tx, e), lerp(ty - 52, ty, e), 1.7, 0.95, GOLD, true); }
-        if (u >= 1 && !q.lifted) { q.lifted = true; q.el.style.transition = 'transform .22s ease-out'; q.el.style.transform = 'translateY(-4px)'; for (let i = 0; i < 6; i++) { const a = rnd(0, 6.28), s = rnd(0.3, 1.4); sw.add({ x: tx, y: ty, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(0.4, 0.8), r: rnd(0.8, 1.5), col: pickBright(), drag: 0.93 }); } }
-        if (u >= 1.8 && !q.down) { q.down = true; q.el.style.transition = 'transform .3s ease-in-out'; q.el.style.transform = 'translateY(0)'; }
-        if (u >= 1 && u < 3.2) { const a = Math.min(1, (u - 1) * 6) * (1 - clamp((u - 2.2) / 1, 0, 1)); spark(c, tx, ty, 1.5 + 0.5 * Math.sin(t * 9), a * 0.9, GOLD, true); } }
+        if (u >= 1 && !q.lifted) { q.lifted = true; if (q.el.animate) anims.push(q.el.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-4px)', offset: 0.25 }, { transform: 'translateY(-4px)', offset: 0.66 }, { transform: 'translateY(0)' }], { duration: 880, easing: 'ease-in-out' })); for (let i = 0; i < 6; i++) { const a = rnd(0, 6.28), s = rnd(0.3, 1.4); sw.add({ x: tx, y: ty, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(0.4, 0.8), r: rnd(0.8, 1.5), col: pickBright(), drag: 0.93 }); } }
+                if (u >= 1 && u < 3.2) { const a = Math.min(1, (u - 1) * 6) * (1 - clamp((u - 2.2) / 1, 0, 1)); spark(c, tx, ty, 1.5 + 0.5 * Math.sin(t * 9), a * 0.9, GOLD, true); } }
       sw.step(dt); sw.draw(c); return t > t0 + st.length * step + 1.7;
     } };
   });

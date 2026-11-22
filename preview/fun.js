@@ -24,6 +24,8 @@ const ax0 = new Float64Array(NMAX), ay0 = new Float64Array(NMAX), az0 = new Floa
 const alive = new Uint8Array(NMAX), cont = new Uint8Array(NMAX), pinned = new Uint8Array(NMAX), isRider = new Uint8Array(NMAX), glow = new Uint8Array(NMAX);
 const deg = new Int16Array(NMAX), fric = new Float32Array(NMAX), infl = new Float32Array(NMAX), axX = new Float64Array(NMAX), axZ = new Float64Array(NMAX);
 const sx = new Float64Array(NMAX), sy = new Float64Array(NMAX), sz = new Float64Array(NMAX);
+const riderOf = new Int16Array(NMAX).fill(-1), chx = new Float32Array(NMAX), chz = new Float32Array(NMAX), RN = new Int16Array(NMAX);
+let nRN = 0; const upList = [];
 let nN = 0, mem = [], adj = [], pins = [], panels = [], riders = [], balls = [], burning = [];
 let S = null; // current scene info
 const STRUT = 0, BEAM = 1, CABLE = 2, FAB = 3, LINK = 4;
@@ -36,7 +38,7 @@ const KD = [
 
 function resetWorld() {
   nN = 0; mem = []; adj = []; pins = []; panels = []; riders = []; balls = []; burning = [];
-  alive.fill(0); cont.fill(0); pinned.fill(0); isRider.fill(0); lift.fill(0); drg.fill(0); glow.fill(0); deg.fill(0);
+  alive.fill(0); cont.fill(0); pinned.fill(0); isRider.fill(0); riderOf.fill(-1); chx.fill(0); chz.fill(0); nRN = 0; upList.length = 0; lift.fill(0); drg.fill(0); glow.fill(0); deg.fill(0);
 }
 function node(x, y, z, m, pin, o) {
   if (nN >= NMAX) return nN - 1;
@@ -70,17 +72,52 @@ function panel(ns, col, alpha, o) {
 }
 const lerp = (a, b, t) => a + (b - a) * t;
 
-/* riders: little people and cars */
+/* riders: toy people and cars. Every one is made of real solver nodes, so gravity, support, wind, quakes and impacts all apply.
+   A person is a hip and a head joined by a rigid link, with a soft balance that keeps them upright until they are knocked
+   over (then they tumble and lie where they land). A car is a rigid triangle of two axles and a roof, so it can roll and flip. */
 function person(x, y, z, s, col) {
-  const r = 0.5 * s, i = node(x, y + r, z, 1.2 * s * s * s + 0.15, false);
-  nr[i] = r; isRider[i] = 1; drg[i] = 0.5; fric[i] = 0.3;
-  riders.push({ t: 'p', n: i, s, col, ang: 0, spin: 0, was: true, hat: Math.random() < 0.4 });
+  const r = 0.5 * s, hip = node(x, y + r, z, s * s * s + 0.12, false), head = node(x, y + r + 0.86 * s, z, 0.25 * s * s * s + 0.03, false);
+  nr[hip] = r; nr[head] = 0.2 * s; isRider[hip] = isRider[head] = 1; drg[hip] = drg[head] = 0.5; fric[hip] = 0.3; fric[head] = 0.05;
+  const lk = add(hip, head, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[lk].orig = false;
+  riders.push({ t: 'p', n: hip, h: head, ns: [hip, head], s, col, st: 1, air: 0, run: 0, tq: 0, tp: rnd(0.5, 2.4), lx: x, ly: y + r, lz: z, lks: [lk], fell: false, id: riders.length });
+  riderOf[hip] = riderOf[head] = riders.length - 1;
 }
-function car(x, y, z, s, col, drive) {
-  const L = 2.3 * s, r = 0.3 * s, a = node(x + L / 2, y + r, z, 3 * s * s, false), b = node(x - L / 2, y + r, z, 3 * s * s, false);
-  nr[a] = nr[b] = r; isRider[a] = isRider[b] = 2; fric[a] = fric[b] = 0.004; drg[a] = drg[b] = 0.2;
-  const lk = add(a, b, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[lk].orig = false;
-  riders.push({ t: 'c', n: a, n2: b, s, col, drive: drive || null, lk, was: true, z0: z, ux: drive ? drive.ux : 1 });
+function car(x, y, z, s, col, drive, rot) {
+  const L = 2.3 * s, r = 0.3 * s, ax = rot ? 0 : 1, az = rot ? 1 : 0;
+  const a = node(x + ax * L / 2, y + r, z + az * L / 2, 3 * s * s, false), b = node(x - ax * L / 2, y + r, z - az * L / 2, 3 * s * s, false), c = node(x, y + r + 0.85 * s, z, 1.2 * s * s, false);
+  nr[a] = nr[b] = r; nr[c] = 0.12 * s; for (const n of [a, b, c]) { isRider[n] = 2; drg[n] = 0.5; fric[n] = 0.25; } fric[a] = fric[b] = 0.004;
+  const lks = [[a, b], [a, c], [b, c]].map(([p, q]) => { const l = add(p, q, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[l].orig = false; return l; });
+  riders.push({ t: 'c', n: a, n2: b, n3: c, ns: [a, b, c], s, col, drive: drive || null, lks, z0: z, ux: drive ? drive.ux : 1, upy: 1, fell: false, id: riders.length });
+  const k = riders.length - 1; riderOf[a] = riderOf[b] = riderOf[c] = k;
+}
+// knock a person over: the balance stops, the body gets thinner so it can lie down, and it tumbles from whatever it was doing
+function knock(R, kx, ky, kz) {
+  if (R.t !== 'p' || R.dead) return;
+  if (R.st) { R.st = 0; nr[R.n] = 0.22 * R.s; fric[R.n] = 0.3; fric[R.h] = 0.3; R.air = 0; const q = 1.2 * Math.sqrt(R.s), a = rnd(0, TAU); vx[R.h] += Math.cos(a) * q; vz[R.h] += Math.sin(a) * q; }
+  if (kx || ky || kz) for (let k = 0; k < 2; k++) { const i = R.ns[k]; vx[i] += kx; vy[i] += ky; vz[i] += kz; }
+}
+// break a car into two halves that tumble apart
+function splitCar(R, kx, ky, kz) {
+  if (R.dead || R.t !== 'c' || nN + 3 >= NMAX || mem.length + 3 >= MMAX) return;
+  R.dead = true;
+  for (const id of R.lks) killMem(id, 'x');
+  const A = R.n, B = R.n2, C = R.n3, s = R.s;
+  let ux = px[A] - px[B], uy = py[A] - py[B], uz = pz[A] - pz[B]; const L = Math.hypot(ux, uy, uz) || 1; ux /= L; uy /= L; uz /= L;
+  let rx = px[C] - (px[A] + px[B]) / 2, ry = py[C] - (py[A] + py[B]) / 2, rz = pz[C] - (pz[A] + pz[B]) / 2; const dd = rx * ux + ry * uy + rz * uz; rx -= dd * ux; ry -= dd * uy; rz -= dd * uz; const rl = Math.hypot(rx, ry, rz) || 1;
+  const up = [rx / rl, ry / rl, rz / rl], mx = (px[A] + px[B]) / 2, my = (py[A] + py[B]) / 2, mz = (pz[A] + pz[B]) / 2, gap = 0.05 * s, sp = 0.35 * Math.sqrt(S.size);
+  const mk2 = (sg, src) => { const n = node(mx + sg * ux * gap, my + sg * uy * gap, mz + sg * uz * gap, 1.5 * s * s, false); nr[n] = 0.24 * s; isRider[n] = 2; drg[n] = 0.5; fric[n] = 0.2; vx[n] = vx[src]; vy[n] = vy[src]; vz[n] = vz[src]; return n; };
+  const M1 = mk2(1, A), M2 = mk2(-1, B);
+  alive[C] = 0; riderOf[C] = -1; fric[A] = fric[B] = 0.2;
+  const vC = [vx[C], vy[C], vz[C]];
+  for (const [n, sg] of [[A, 1], [M1, 1], [B, -1], [M2, -1]]) { vx[n] += kx + sg * ux * sp; vy[n] += ky + 0.5 * sp + (n === A || n === B ? 0 : 0.3 * sp); vz[n] += kz + sg * uz * sp; }
+  const base = riders.length, hs = [[A, M1, 1], [B, M2, -1]];
+  hs.forEach(([n, n2, end], k) => {
+    const l = add(n, n2, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[l].orig = false;
+    riders.push({ t: 'h', n, n2, ns: [n, n2], s, col: R.col, rgb: R.rgb, up: up.slice(), end, lks: [l], fell: R.fell, id: R.id });
+    riderOf[n] = riderOf[n2] = base + k;
+  });
+  for (let q = 0; q < 14; q++) emit(1, mx, my + 0.3 * s, mz, rnd(-1, 1) * S.size * 0.1, rnd(0, 1) * S.size * 0.12, rnd(-1, 1) * S.size * 0.1, rnd(0.25, 0.6), 0.6);
+  if (!reduce) shake = Math.max(shake, 0.4);
 }
 
 /* ===================== 2. scenes ===================== */
@@ -193,7 +230,7 @@ function buildTent() {
   [b1, b2, big.t1].forEach(t => cable(ft, t, { pre: 1.05, ts: 0.5 }));
   const f1 = node(1.7, 8.1, 2, 0.4, false, { drag: 1.2 }), f2 = node(1.7, 7.2, 2, 0.4, false, { drag: 1.2 });
   fab(ft, f1, { pre: 1.0 }); fab(f1, f2, { pre: 1.0 }); fab(f2, ft, { pre: 1.0 }); panel([ft, f1, f2], '#D9553E', 0.9);
-  [[-6, 2], [-2, 4], [3, 7], [7, 1], [-8, -6], [4, -5], [-1, -3], [10, -3], [-5, 10], [1, 0]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[i % 6]));
+  [[-6, 2], [-2, 4], [3, 7], [14, -2], [-8, -6], [-14, 2], [-1, -3], [10, -3], [-5, 10], [1, 0]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[i % 6]));
   car(14, 0, -6, 1.1, '#C23B3B', null); car(-15, 0, -8, 1.0, '#2F6DB5', null);
   S.view = [0.5, 0.4]; S.name = 'Tent camp';
 }
@@ -262,7 +299,7 @@ function buildBridge() {
   });
   for (let i = 0; i < xs.length - 1; i++) { cable(D.l[i], D.r[i + 1], { pre: 0.985, k: 3, ts: 0.5 }); cable(D.r[i], D.l[i + 1], { pre: 0.985, k: 3, ts: 0.5 }); }
   [[-18, 1], [-4, 1], [12, 1], [-24, -1], [6, -1], [20, -1]].forEach(([x, dir], i) => car(x, dy + 0.1, dir * 0.9, 1.0, PCOL[i % 6], { ux: dir, lim: 27, zalt: -dir * 0.9 }));
-  [-10, -2, 8, 16, -26, 14].forEach((x, i) => person(x, dy + 0.1, (i % 2 ? -1 : 1) * 1.7, 0.8, PCOL[(i + 2) % 6]));
+  [-10, -2, 8, 16, -26, 14].forEach((x, i) => person(x, dy + 0.1, (i % 2 ? -1 : 1) * 1.9, 0.8, PCOL[(i + 2) % 6]));
   person(-12, 0, 9, 1, PCOL[1]); person(10, 0, -8, 1, PCOL[4]); car(-14, 0, 12, 1.1, '#2F6DB5', null);
   S.view = [0.35, 0.22]; S.name = 'Suspension bridge';
 }
@@ -356,7 +393,7 @@ function buildMall() {
   }
   for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) panel([G[i][j], G[i + 1][j], G[i + 1][j + 1], G[i][j + 1]], (i + j) % 2 ? '#F5F1E6' : '#8FC3C7', 0.62);
   [[-9, -3], [0, -3], [9, -3], [-9, 3.5], [0, 3.5], [9, 3.5]].forEach(([x, z], i) => {
-    const t = frame({ x0: x - 1.4, z0: z - 0.7, nx: 1, nz: 1, bw: 2.8, bd: 1.4, ns: 1, sh: 1.1, y0: 0, m: 2, col: ['#B5533C', '#3F6E5B', '#C79A3A'][i % 3], ts: 0.7, faces: 'fb', floorCol: ['#E3A18F', '#9CC4B2', '#E6CB86'][i % 3] });
+    const t = frame({ x0: x - 1.4, z0: z - 0.7, nx: 1, nz: 1, bw: 2.8, bd: 1.4, ns: 1, sh: 1.1, y0: 0, m: 2, col: ['#B5533C', '#3F6E5B', '#C79A3A'][i % 3], ts: 0.7, faces: 'fblr', floorCol: ['#E3A18F', '#9CC4B2', '#E6CB86'][i % 3] });
     person(x - 0.6, 1.12, z, 0.5, PCOL[i % 6]);
   });
   [[-14, 0], [-5, 9], [4, -9], [14, 1], [-1, 0], [6, 9], [-12, -9], [11, -8], [0, -7], [-6, -6]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[(i + 3) % 6]));
@@ -391,7 +428,7 @@ function buildRoom() {
 
 /* --- stick-figure human: stacked tensegrity prisms for legs, torso, neck, head and arms --- */
 function buildHuman() {
-  S.m = 3; S.k = 3; S.u = 1; S.ks = 1; const K = 4.2, n = 3, tw = P3 / 2 + P3 / n;
+  S.m = 3; S.k = 16; S.u = 1; S.ks = 1; const K = 4.2, n = 3, tw = P3 / 2 + P3 / n;
   const rg = (c, y, r, a) => { const R = []; for (let i = 0; i < n; i++) { const t = a + TAU * i / n; R.push(node(c[0] * K + r * K * Math.cos(t), y * K, c[1] * K + r * K * Math.sin(t), 3)); } return R; };
   const link = (r0, r1, first, o) => {
     for (let i = 0; i < n; i++) {
@@ -424,6 +461,12 @@ function buildHuman() {
   S.view = [0.35, 0.18]; S.name = 'Stick-figure human';
 }
 
+// a few riders always stand along the line where the ground can split, so the rift has something to swallow
+function riftRiders(sc) {
+  let zm = 0; for (let i = 0; i < nN; i++) if (!isRider[i] && Math.abs(px[i]) < 3.5 * sc) zm = Math.max(zm, pz[i]);
+  const z = zm + 3.4 * sc;
+  person(0.3 * sc, 0, z, sc, PCOL[2]); person(-0.5 * sc, 0, z + 1.6 * sc, sc, PCOL[4]); car(0, 0, z + 4.6 * sc, 1.0 * sc, '#D98A1C', null, true);
+}
 const SCENES = [
   { id: 'tent', name: 'Tent camp', build: buildTent },
   { id: 'tower', name: 'Tensegrity tower', build: buildTower },
@@ -431,7 +474,7 @@ const SCENES = [
   { id: 'bridge', name: 'Suspension bridge', build: buildBridge },
   { id: 'village', name: 'Village', build: buildVillage },
   { id: 'mall', name: 'Market hall', build: buildMall },
-  { id: 'room', name: 'Smash room', build: buildRoom },
+  { id: 'room', name: 'Smash room', build: buildRoom, rs: 0.2 },
   { id: 'human', name: 'Stick-figure human', build: buildHuman }];
 
 /* ===================== 3. physics ===================== */
@@ -477,7 +520,7 @@ function killMem(mi, how) {
   }
   [m.a, m.b].forEach(n => { if (--deg[n] <= 0 && !pinned[n] && !isRider[n]) alive[n] = 0; });
 }
-function killNode(i) { alive[i] = 0; adj[i].forEach(mi => { if (mem[mi].alive) { const was = mem[mi].orig; mem[mi].orig = false; if (was) cnt.alive--; killMem(mi, 'x'); } }); if (isRider[i]) { riders.forEach(r => { if (r.n === i || r.n2 === i) r.dead = true; }); } }
+function killNode(i) { alive[i] = 0; adj[i].forEach(mi => { if (mem[mi].alive) { const was = mem[mi].orig; mem[mi].orig = false; if (was) cnt.alive--; killMem(mi, 'x'); } }); if (isRider[i]) { const k = riderOf[i]; if (k >= 0) riders[k].dead = true; } }
 // slice a member at fraction t: both halves remain as free-ended stubs
 function sliceMem(mi, t, dirx, diry, dirz) {
   const m = mem[mi]; if (!m.alive || m.kind === LINK) return;
@@ -557,7 +600,8 @@ function substep(h) {
       px[b] -= wI[b] * s * dx; py[b] -= wI[b] * s * dy; pz[b] -= wI[b] * s * dz;
     }
   }
-  if (riders.length) collidePanels(h);
+  for (let k = 0; k < upList.length; k++) { const R = upList[k]; if (!alive[R.n] || !alive[R.h]) continue; px[R.h] += (px[R.n] - px[R.h]) * 0.5; pz[R.h] += (pz[R.n] - pz[R.h]) * 0.5; }
+  if (riders.length) { collidePanels(h); collideRiders(h); }
   if (balls.length) collideBalls(h);
   // ground
   for (let i = 0; i < nN; i++) {
@@ -578,7 +622,10 @@ function substep(h) {
     let x = px[i], y = py[i], z = pz[i];
     if (x !== x || y !== y || z !== z || y < -S.pit - 6 || y > 900 + S.size * 8 || Math.abs(x) > 400 + S.size * 8 || Math.abs(z) > 400 + S.size * 8) { killNode(i); continue; }
     vx[i] = (x - qx[i]) * ih; vy[i] = (y - qy[i]) * ih; vz[i] = (z - qz[i]) * ih;
-    if (cont[i]) { const f = 1 - fric[i]; vx[i] *= f; vz[i] *= f; }
+    if (cont[i]) {
+      if (chx[i] !== 0 || chz[i] !== 0) { const hx = chx[i], hz = chz[i], vf = vx[i] * hx + vz[i] * hz, lx = vx[i] - vf * hx, lz = vz[i] - vf * hz; vx[i] = vf * 0.9994 * hx + lx * 0.996; vz[i] = vf * 0.9994 * hz + lz * 0.996; }
+      else { const f = 1 - fric[i]; vx[i] *= f; vz[i] *= f; }
+    }
   }
   dampMembers(h);
 }
@@ -595,7 +642,7 @@ function dampMembers(h) {
 function collidePanels(h) {
   for (let ri = 0; ri < riders.length; ri++) {
     const R = riders[ri]; if (R.dead) continue;
-    const ns = R.t === 'c' ? [R.n, R.n2] : [R.n];
+    const ns = R.ns;
     for (let k = 0; k < ns.length; k++) {
       const i = ns[k]; if (!alive[i]) continue;
       const x = px[i], z = pz[i], r = nr[i];
@@ -622,13 +669,55 @@ function collidePanels(h) {
     }
   }
 }
+// riders push each other (spheres) and bounce off wall and roof fabric (two-sided triangles)
+function collideRiders(h) {
+  for (let a = 0; a < nRN; a++) {
+    const i = RN[a]; if (!alive[i]) continue; const ri = riderOf[i];
+    for (let b = a + 1; b < nRN; b++) {
+      const j = RN[b]; if (!alive[j] || riderOf[j] === ri) continue;
+      const rr = nr[i] + nr[j], dx = px[i] - px[j]; if (dx > rr || dx < -rr) continue;
+      const dy = py[i] - py[j]; if (dy > rr || dy < -rr) continue;
+      const dz = pz[i] - pz[j]; if (dz > rr || dz < -rr) continue;
+      const d2 = dx * dx + dy * dy + dz * dz; if (d2 >= rr * rr || d2 < 1e-12) continue;
+      const d = Math.sqrt(d2), w = wI[i] + wI[j]; if (!w) continue; const k = (rr - d) / (d * w);
+      px[i] += dx * k * wI[i]; py[i] += dy * k * wI[i]; pz[i] += dz * k * wI[i]; px[j] -= dx * k * wI[j]; py[j] -= dy * k * wI[j]; pz[j] -= dz * k * wI[j];
+    }
+  }
+  if (window.__nowall) return;
+  for (let pi = 0; pi < panels.length; pi++) {
+    const P = panels[pi]; if (P.floor || !P.ok) continue;
+    const n = P.n, A = n[0], c2 = n[2 % n.length], cx = (px[A] + px[c2]) * 0.5, cy = (py[A] + py[c2]) * 0.5, cz = (pz[A] + pz[c2]) * 0.5, rad = Math.hypot(px[A] - px[c2], py[A] - py[c2], pz[A] - pz[c2]) * 0.6 + 0.2;
+    for (let a = 0; a < nRN; a++) {
+      const i = RN[a]; if (!alive[i]) continue; const r = nr[i];
+      if (Math.abs(px[i] - cx) > rad + r || Math.abs(py[i] - cy) > rad + r || Math.abs(pz[i] - cz) > rad + r) continue;
+      for (let t = 0; t < n.length - 2; t++) {
+        const B = n[t + 1], C = n[t + 2];
+        const e1x = px[B] - px[A], e1y = py[B] - py[A], e1z = pz[B] - pz[A], e2x = px[C] - px[A], e2y = py[C] - py[A], e2z = pz[C] - pz[A];
+        let nx = e1y * e2z - e1z * e2y, ny = e1z * e2x - e1x * e2z, nz = e1x * e2y - e1y * e2x; const nl = Math.hypot(nx, ny, nz); if (nl < 1e-9) continue; nx /= nl; ny /= nl; nz /= nl;
+        const rx = px[i] - px[A], ry = py[i] - py[A], rz = pz[i] - pz[A], dist = rx * nx + ry * ny + rz * nz; if (dist >= r || dist <= -r) continue;
+        const qx0 = rx - dist * nx, qy0 = ry - dist * ny, qz0 = rz - dist * nz;
+        const d00 = e1x * e1x + e1y * e1y + e1z * e1z, d01 = e1x * e2x + e1y * e2y + e1z * e2z, d11 = e2x * e2x + e2y * e2y + e2z * e2z, d20 = qx0 * e1x + qy0 * e1y + qz0 * e1z, d21 = qx0 * e2x + qy0 * e2y + qz0 * e2z;
+        const den = d00 * d11 - d01 * d01; if (Math.abs(den) < 1e-12) continue;
+        const l2 = (d11 * d20 - d01 * d21) / den, l3 = (d00 * d21 - d01 * d20) / den, l1 = 1 - l2 - l3, mg = -0.12;
+        if (l1 < mg || l2 < mg || l3 < mg) continue;
+        const pd = (qx[i] - px[A]) * nx + (qy[i] - py[A]) * ny + (qz[i] - pz[A]) * nz, sg = pd >= 0 ? 1 : -1, pen = r - sg * dist;
+        const wa = wI[A] * l1 * l1 + wI[B] * l2 * l2 + wI[C] * l3 * l3, ws = wI[i] + wa; if (ws === 0) continue;
+        const dl = clamp(pen * sg / ws, -0.25 * r / (wI[i] || 1), 0.25 * r / (wI[i] || 1));
+        px[i] += wI[i] * dl * nx; py[i] += wI[i] * dl * ny; pz[i] += wI[i] * dl * nz;
+        px[A] -= wI[A] * l1 * dl * nx; py[A] -= wI[A] * l1 * dl * ny; pz[A] -= wI[A] * l1 * dl * nz;
+        px[B] -= wI[B] * l2 * dl * nx; py[B] -= wI[B] * l2 * dl * ny; pz[B] -= wI[B] * l2 * dl * nz;
+        px[C] -= wI[C] * l3 * dl * nx; py[C] -= wI[C] * l3 * dl * ny; pz[C] -= wI[C] * l3 * dl * nz;
+      }
+    }
+  }
+}
 function collideBalls(h) {
   for (let bi = 0; bi < balls.length; bi++) {
     const B = balls[bi]; if (B.dead) continue;
     const r = B.r, sp = Math.hypot(B.vx, B.vy, B.vz);
     B.vy -= grav * 0.7 * h; B.x += B.vx * h; B.y += B.vy * h; B.z += B.vz * h;
     const gy = groundY(B.x);
-    if (B.y < gy + r) { B.y = gy + r; if (B.fire) { boom(B); return; } if (B.vy < 0) B.vy *= -0.32; B.vx *= 0.995; B.vz *= 0.995; }
+    if (B.y < gy + r) { B.y = gy + r; if (B.fire) { boom(B, h); return; } if (B.vy < 0) B.vy *= -0.32; B.vx *= 0.995; B.vz *= 0.995; }
     B.life -= h; if (B.life <= 0 || B.y < -S.pit - 3) { B.dead = true; continue; }
     const hitV = Math.max(sp, 1);
     for (let mi = 0; mi < mem.length; mi++) {
@@ -637,7 +726,7 @@ function collideBalls(h) {
       let t = ((B.x - px[a]) * ex + (B.y - py[a]) * ey + (B.z - pz[a]) * ez) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
       const qx_ = px[a] + ex * t, qy_ = py[a] + ey * t, qz_ = pz[a] + ez * t, dx = qx_ - B.x, dy = qy_ - B.y, dz = qz_ - B.z, d = Math.hypot(dx, dy, dz);
       if (d >= r) continue;
-      if (B.fire) { boom(B); return; }
+      if (B.fire) { boom(B, h); return; }
       const thr = m.kind >= CABLE ? 0.03 * S.size : 0.14 * S.size;
       if (hitV > thr) { killMem(mi, 'broke'); if (m.kind <= BEAM) shake = reduce ? 0 : Math.max(shake, 0.5); for (let q = 0; q < 4; q++) emit(1, qx_, qy_, qz_, rnd(-1, 1) * S.u * 4, rnd(0, 3) * S.u * 3, rnd(-1, 1) * S.u * 4, rnd(0.25, 0.5), 0.5); B.vx *= 0.985; B.vy *= 0.985; B.vz *= 0.985; continue; }
       const nx = d > 1e-6 ? dx / d : 0, ny = d > 1e-6 ? dy / d : 1, nz = d > 1e-6 ? dz / d : 0, pen = r - d;
@@ -646,21 +735,29 @@ function collideBalls(h) {
       px[a] += wI[a] * (1 - t) * dl * nx; py[a] += wI[a] * (1 - t) * dl * ny; pz[a] += wI[a] * (1 - t) * dl * nz;
       px[b] += wI[b] * t * dl * nx; py[b] += wI[b] * t * dl * ny; pz[b] += wI[b] * t * dl * nz;
     }
-    for (let i = 0; i < nN; i++) {
+    for (let i = 0, n0 = nN; i < n0; i++) {
       if (!alive[i] || pinned[i] || !isRider[i]) continue;
       const dx = px[i] - B.x, dy = py[i] - B.y, dz = pz[i] - B.z, d = Math.hypot(dx, dy, dz), rr = r + nr[i];
-      if (d < rr && d > 1e-6) { const k = (rr - d) / d; px[i] += dx * k; py[i] += dy * k; pz[i] += dz * k; vx[i] += dx / d * hitV * 0.3; vy[i] += (dy / d + 0.5) * hitV * 0.3; vz[i] += dz / d * hitV * 0.3; if (B.fire) { boom(B); return; } }
+      if (d < rr && d > 1e-6) {
+        const k = (rr - d) / d; px[i] += dx * k; py[i] += dy * k; pz[i] += dz * k;
+        const f = Math.min(hitV, VMAX * 0.8) * 0.45 * h; qx[i] -= dx / d * f; qy[i] -= (dy / d + 0.5) * f; qz[i] -= dz / d * f;
+        if (B.fire) { boom(B, h); return; }
+        const R = riders[riderOf[i]];
+        if (R && !R.dead) { if (R.t === 'p') knock(R); else if (R.t === 'c' && hitV > 0.4 * S.size) splitCar(R, B.vx * 0.15, B.vy * 0.15, B.vz * 0.15); }
+        B.vx *= 0.97; B.vy *= 0.97; B.vz *= 0.97;
+      }
     }
   }
 }
-function boom(B) {
+function boom(B, h) {
   B.dead = true;
   const R = 0.3 * S.size, sp = Math.min(VMAX, 1.4 * S.size);
   for (let i = 0; i < nN; i++) {
     if (!alive[i] || pinned[i]) continue;
     const dx = px[i] - B.x, dy = py[i] - B.y, dz = pz[i] - B.z, d = Math.hypot(dx, dy, dz);
-    if (d < R && d > 1e-6) { const k = (1 - d / R) ** 1.5 * sp / d; vx[i] += dx * k; vy[i] += (dy + 0.4 * d) * k; vz[i] += dz * k; qx[i] = px[i]; }
+    if (d < R && d > 1e-6) { const k = (1 - d / R) ** 1.5 * sp / d; vx[i] += dx * k; vy[i] += (dy + 0.4 * d) * k; vz[i] += dz * k; if (isRider[i]) { qx[i] = px[i] - vx[i] * h; qy[i] = py[i] - vy[i] * h; qz[i] = pz[i] - vz[i] * h; } else qx[i] = px[i]; }
   }
+  for (const Rd of riders.slice()) { if (Rd.dead || Rd.t === 'h') continue; const i = Rd.n, d = Math.hypot(px[i] - B.x, py[i] - B.y, pz[i] - B.z); if (Rd.t === 'p' && d < R * 0.8) knock(Rd); else if (Rd.t === 'c' && d < R * 0.3) splitCar(Rd, 0, 0, 0); }
   for (let mi = 0; mi < mem.length; mi++) {
     const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
     const cx = (px[m.a] + px[m.b]) / 2 - B.x, cy = (py[m.a] + py[m.b]) / 2 - B.y, cz = (pz[m.a] + pz[m.b]) / 2 - B.z, d = Math.hypot(cx, cy, cz);
@@ -733,33 +830,96 @@ function throwBall(o, d, fire) {
   if (balls.length > 6) balls.shift();
 }
 
-function ridersStep(dt) {
-  for (let ri = 0; ri < riders.length; ri++) {
-    const R = riders[ri]; if (R.dead) continue;
-    if (R.t === 'p') {
-      const i = R.n; if (!alive[i]) { R.dead = true; continue; }
-      if (cont[i]) { R.ang *= Math.exp(-9 * dt); R.spin = 0; R.was = true; }
-      else { if (R.was) { R.spin = (Math.random() < 0.5 ? -1 : 1) * rnd(2, 5); R.was = false; } R.ang += R.spin * dt; }
-    } else {
-      if (!alive[R.n] || !alive[R.n2]) { R.dead = true; continue; }
-      const d = R.drive;
-      if (d && cont[R.n] && cont[R.n2]) {
-        const v0 = 3.2 * Math.sqrt(R.s);
-        for (const n of [R.n, R.n2]) { vx[n] += (R.ux * v0 - vx[n]) * 0.25; vz[n] += (R.z0 - pz[n]) * 6 * dt; }
-        const x = (px[R.n] + px[R.n2]) / 2;
-        if ((R.ux > 0 && x > d.lim) || (R.ux < 0 && x < -d.lim)) {
-          R.ux = -R.ux; const z = d.zalt; d.zalt = R.z0; R.z0 = z;
-          for (const n of [R.n, R.n2]) { pz[n] = qz[n] = z; vx[n] *= 0.2; }
-        }
-      }
+function refreshRiders() {
+  nRN = 0; upList.length = 0;
+  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; for (let k = 0; k < R.ns.length; k++) if (alive[R.ns[k]]) RN[nRN++] = R.ns[k]; if (R.t === 'p' && R.st) upList.push(R); }
+}
+function syncRiders() { for (const R of riders) if (R.t === 'p') { R.lx = px[R.n]; R.ly = py[R.n]; R.lz = pz[R.n]; R.air = 0; } }
+// fast members (falling struts and beams) hit riders: the rider is carried along and people are knocked over
+const spdN = new Float32Array(NMAX);
+function memberHits() {
+  if (!nRN) return;
+  for (let i = 0; i < nN; i++) spdN[i] = alive[i] ? Math.abs(vx[i]) + Math.abs(vy[i]) + Math.abs(vz[i]) : 0;
+  const thr = 4 + 0.15 * S.size;
+  for (let mi = 0; mi < mem.length; mi++) {
+    const m = mem[mi]; if (!m.alive || m.kind > BEAM || m.hid) continue;
+    const a = m.a, b = m.b; if (spdN[a] < thr && spdN[b] < thr) continue;
+    const ex = px[b] - px[a], ey = py[b] - py[a], ez = pz[b] - pz[a], L2 = ex * ex + ey * ey + ez * ez + 1e-9;
+    for (let k = 0; k < nRN; k++) {
+      const i = RN[k]; if (!alive[i] || i === a || i === b) continue;
+      let t = ((px[i] - px[a]) * ex + (py[i] - py[a]) * ey + (pz[i] - pz[a]) * ez) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const dx = px[i] - (px[a] + ex * t), dy = py[i] - (py[a] + ey * t), dz = pz[i] - (pz[a] + ez * t), rr = nr[i] * 0.6 + m.th * 0.5;
+      if (dx * dx + dy * dy + dz * dz > rr * rr) continue;
+      const mvx = vx[a] * (1 - t) + vx[b] * t, mvy = vy[a] * (1 - t) + vy[b] * t, mvz = vz[a] * (1 - t) + vz[b] * t;
+      if (Math.abs(mvx - vx[i]) + Math.abs(mvy - vy[i]) + Math.abs(mvz - vz[i]) < thr) continue;
+      const R = riders[riderOf[i]]; if (!R || R.dead) continue;
+      for (const n of R.ns) { vx[n] += (mvx - vx[n]) * 0.6; vy[n] += (mvy - vy[n]) * 0.6 + 1; vz[n] += (mvz - vz[n]) * 0.6; }
+      vx[a] *= 0.92; vy[a] *= 0.92; vz[a] *= 0.92; vx[b] *= 0.92; vy[b] *= 0.92; vz[b] *= 0.92;
+      if (R.t === 'p') knock(R);
     }
   }
+}
+function ridersStep(dt) {
+  const quakeOn = Q.kind && Q.kind !== 'rift' && Q.env > 0.3, gs = gust ? gust.env * gust.peak : 0;
+  for (let ri = 0; ri < riders.length; ri++) {
+    const R = riders[ri]; if (R.dead) continue;
+    let ok = true; for (let k = 0; k < R.ns.length; k++) if (!alive[R.ns[k]]) ok = false;
+    if (!ok) { R.dead = true; continue; }
+    if (R.t === 'p') {
+      const i = R.n, spd = Math.hypot(px[i] - R.lx, pz[i] - R.lz) / dt, rise = (py[i] - R.ly) / dt; R.lx = px[i]; R.ly = py[i]; R.lz = pz[i];
+      if (py[i] < -1) R.fell = true;
+      if (!R.st || grace) continue;
+      if (cont[i]) R.air = 0; else R.air += dt;
+      let fall = R.air > 0.3;
+      if (!quakeOn && R.run <= 0 && (spd > 4.5 || rise > 5)) fall = true;
+      if (quakeOn && cont[i]) { R.tq += dt * Q.env; if (R.tq > R.tp) fall = true; }
+      if (gs > 8 && Math.random() < dt * 0.8 * gs / 15) fall = true;
+      // fire nearby: run away, or get flung clear when it is right beside them
+      let near = 1e9, nx = 0, nz = 0, ny = 0;
+      for (let k = 0; k < burning.length; k++) { const m = mem[burning[k]]; if (!m.alive) continue; const mx = (px[m.a] + px[m.b]) * 0.5 - px[i], my = (py[m.a] + py[m.b]) * 0.5 - py[i], mz = (pz[m.a] + pz[m.b]) * 0.5 - pz[i], d = Math.hypot(mx, my, mz); if (d < near) { near = d; nx = mx; ny = my; nz = mz; } }
+      const rad = 3.6 * R.s + 1;
+      if (near < rad && !fall) {
+        let dx = -nx, dz = -nz; const dl = Math.hypot(dx, dz); if (dl < 0.05) { const a = rnd(0, TAU); dx = Math.cos(a); dz = Math.sin(a); } else { dx /= dl; dz /= dl; }
+        R.run = 0.5; fric[R.n] = 0.03;
+        const sp = 3.4 * Math.sqrt(R.s) + 0.4;
+        for (const n of R.ns) { vx[n] += (dx * sp - vx[n]) * 0.4; vz[n] += (dz * sp - vz[n]) * 0.4; }
+        if (near < 1.3 * R.s + 0.3) knock(R, dx * sp * 1.4, 3.2 * Math.sqrt(R.s) + 1, dz * sp * 1.4);
+      } else if (R.run > 0) { R.run -= dt; if (R.run <= 0 && R.st) fric[R.n] = 0.3; }
+      if (fall) knock(R);
+    } else if (R.t === 'c') {
+      const A = R.n, B = R.n2, C = R.n3;
+      let ux = px[A] - px[B], uy = py[A] - py[B], uz = pz[A] - pz[B]; const l = Math.hypot(ux, uy, uz) || 1; ux /= l; uy /= l; uz /= l;
+      let rx = px[C] - (px[A] + px[B]) / 2, ry = py[C] - (py[A] + py[B]) / 2, rz = pz[C] - (pz[A] + pz[B]) / 2; const dd = rx * ux + ry * uy + rz * uz; rx -= dd * ux; ry -= dd * uy; rz -= dd * uz;
+      R.upy = ry / (Math.hypot(rx, ry, rz) || 1); const upright = R.upy > 0.55;
+      if (py[A] < -1) R.fell = true;
+      if (upright && cont[A] && cont[B]) { const hl = Math.hypot(ux, uz) || 1; chx[A] = chx[B] = ux / hl; chz[A] = chz[B] = uz / hl; } else { chx[A] = chx[B] = chz[A] = chz[B] = 0; }
+      fric[A] = fric[B] = upright ? 0.004 : 0.25;
+      if (!upright) R.drive = null;
+      const d = R.drive;
+      if (d && upright && cont[A] && cont[B] && !grace) {
+        const v0 = 3.2 * Math.sqrt(R.s);
+        for (const n of [A, B]) { vx[n] += (R.ux * v0 - vx[n]) * 0.25; vz[n] += (R.z0 - pz[n]) * 6 * dt; }
+        const x = (px[A] + px[B]) / 2;
+        if ((R.ux > 0 && x > d.lim) || (R.ux < 0 && x < -d.lim)) {
+          R.ux = -R.ux; const z = d.zalt; d.zalt = R.z0; R.z0 = z;
+          for (const n of R.ns) { pz[n] = qz[n] = z; vx[n] *= 0.2; }
+        }
+      }
+    } else {
+      const u = R.up; let ux = px[R.n] - px[R.n2], uy = py[R.n] - py[R.n2], uz = pz[R.n] - pz[R.n2]; const l = Math.hypot(ux, uy, uz) || 1; ux /= l; uy /= l; uz /= l;
+      let dd = u[0] * ux + u[1] * uy + u[2] * uz, ax = u[0] - dd * ux, ay = u[1] - dd * uy, az = u[2] - dd * uz, al = Math.hypot(ax, ay, az);
+      if (al < 0.2) { ax = -ux * uy; ay = 1 - uy * uy; az = -uz * uy; al = Math.hypot(ax, ay, az) || 1; }
+      R.up = [ax / al, ay / al, az / al]; if (py[R.n] < -1) R.fell = true;
+    }
+  }
+  memberHits();
 }
 
 function stepFrame() {
   const t0 = performance.now();
   const dt = (1 / 60) * timeScale, sub = FR.sub, h = dt / sub;
   for (let i = 0; i < nN; i++) cont[i] = 0;
+  refreshRiders();
   for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; let ok = true; for (let k = 0; k < P.ms.length; k++) if (!mem[P.ms[k]].alive) { ok = false; break; } if (ok) for (let k = 0; k < P.n.length; k++) if (!alive[P.n[k]]) { ok = false; break; } P.ok = ok; }
   for (let s = 0; s < sub; s++) { substep(h); simT += h; }
   // tension, strain and breaking
@@ -801,7 +961,7 @@ function loadScene(ix, keep) {
   sceneIx = ix; const sc = SCENES[ix];
   resetWorld();
   S = { m: 2, k: 1, ks: 0.2, u: 1, view: [0.5, 0.3], name: sc.name, id: sc.id, size: 10, pit: 6 };
-  sc.build();
+  sc.build(); riftRiders(sc.rs || 1);
   // bounding box of live nodes
   let x0 = 1e9, x1 = -1e9, y1 = 0, z0 = 1e9, z1 = -1e9;
   for (let i = 0; i < nN; i++) { x0 = Math.min(x0, px[i]); x1 = Math.max(x1, px[i]); y1 = Math.max(y1, py[i]); z0 = Math.min(z0, pz[i]); z1 = Math.max(z1, pz[i]); }
@@ -815,7 +975,7 @@ function loadScene(ix, keep) {
   grace = true; const ts = timeScale; timeScale = 1;
   for (let f = 0; f < 80; f++) stepFrame();
   for (let i = 0; i < nN; i++) { vx[i] *= 0.2; vy[i] *= 0.2; vz[i] *= 0.2; }
-  timeScale = ts; grace = false; simT = 0; cnt.peak = 0; pc = 0; rings = [];
+  syncRiders(); timeScale = ts; grace = false; simT = 0; cnt.peak = 0; pc = 0; rings = [];
   for (let k = 0; k < 6; k++) stepFrame();
   cnt.peak = 0; simT = 0;
   if (!keep) cam.reset(true);
@@ -916,7 +1076,7 @@ function drawShadows() {
     ctx.lineWidth = pass === 0 ? Math.max(1.5, 0.1 * S.u * cam.f / cam.dist) : 1; ctx.stroke();
   }
   ctx.fillStyle = 'rgba(20,40,80,.14)';
-  for (const R of riders) { if (R.dead) continue; const i = R.n; const k = pr(px[i] + py[i] * 0.32, 0, pz[i] + py[i] * 0.18); if (PZ < NEAR) continue; ctx.beginPath(); ctx.ellipse(PX, PY, R.s * (R.t === 'c' ? 1.5 : 0.35) * k, R.s * (R.t === 'c' ? 0.6 : 0.14) * k, 0, 0, TAU); ctx.fill(); }
+  for (const R of riders) { if (R.dead) continue; const i = R.n; const k = pr(px[i] + py[i] * 0.32, 0, pz[i] + py[i] * 0.18); if (PZ < NEAR) continue; ctx.beginPath(); ctx.ellipse(PX, PY, R.s * (R.t === 'c' ? 1.5 : R.t === 'h' ? 0.9 : 0.35) * k, R.s * (R.t === 'c' ? 0.6 : R.t === 'h' ? 0.45 : 0.14) * k, 0, 0, TAU); ctx.fill(); }
 }
 function drawMember(m) {
   const a = m.a, b = m.b, az = sz[a], bz = sz[b]; if (az < NEAR || bz < NEAR) return;
@@ -944,38 +1104,42 @@ function drawPanel(P) {
   if (bn) { ctx.fillStyle = `rgba(255,120,30,${0.25 + 0.15 * Math.sin(simT * 14)})`; ctx.fill(); }
 }
 function drawPerson(R) {
-  const i = R.n; if (!alive[i]) return;
-  const s = R.s, ca = Math.cos(R.ang), sa = Math.sin(R.ang), x = px[i], y = py[i], z = pz[i];
-  const sdx = cam.rx * ca - cam.ux * sa, sdy = -cam.uy * sa, sdz = cam.rz * ca - cam.uz * sa, upx = cam.ux * ca + cam.rx * sa, upy = cam.uy * ca, upz = cam.uz * ca + cam.rz * sa;
-  const k = pr(x, y, z); if (PZ < NEAR) return;
-  const cx = PX, cy = PY, u = s * k;
-  const P = (a, b) => [cx + (sdx * a + upx * b) * s * k * 0 , 0];
-  // screen-space axes
-  const ex = [(sdx * cam.rx + sdz * cam.rz), -(sdx * cam.ux + sdy * cam.uy + sdz * cam.uz)], ey = [(upx * cam.rx + upz * cam.rz), -(upx * cam.ux + upy * cam.uy + upz * cam.uz)];
-  const at = (a, b) => [cx + (ex[0] * a + ey[0] * b) * u, cy + (ex[1] * a + ey[1] * b) * u];
+  const hip = R.n, hd = R.h; if (!alive[hip] || !alive[hd]) return;
+  const s = R.s; let dx = px[hd] - px[hip], dy = py[hd] - py[hip], dz = pz[hd] - pz[hip]; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
+  let ex = dy * cam.fz - dz * cam.fy, ey = dz * cam.fx - dx * cam.fz, ez = dx * cam.fy - dy * cam.fx; const el = Math.hypot(ex, ey, ez);
+  if (el < 1e-3) { ex = cam.rx; ey = 0; ez = cam.rz; } else { ex /= el; ey /= el; ez /= el; }
+  const hx = px[hip], hy = py[hip], hz = pz[hip], u = s * pr(hx, hy, hz); if (PZ < NEAR) return;
+  const P = (a, c) => { pr(hx + (dx * a + ex * c) * s, hy + (dy * a + ey * c) * s, hz + (dz * a + ez * c) * s); return [PX, PY]; };
   const seg = (p, q, w, c) => { ctx.strokeStyle = c; ctx.lineWidth = Math.max(1, w * u); ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); };
-  const hip = at(0, 0), neck = at(0, 0.62), head = at(0, 0.86);
-  seg(hip, at(-0.15, -0.5), 0.13, '#27364F'); seg(hip, at(0.15, -0.5), 0.13, '#27364F');
-  seg(hip, neck, 0.3, R.col);
-  const arm = Math.sin(simT * 0 + i) * 0.1;
-  seg(at(0, 0.52), at(-0.34, 0.12 + arm), 0.09, R.col); seg(at(0, 0.52), at(0.34, 0.12 - arm), 0.09, R.col);
+  const air = R.st === 0 && !cont[hip], H = P(0, 0), neck = P(0.62, 0), head = P(0.86, 0);
+  seg(H, P(-0.5, -0.15), 0.13, '#27364F'); seg(H, P(-0.5, 0.15), 0.13, '#27364F');
+  seg(H, neck, 0.3, R.col);
+  const sh = P(0.52, 0); seg(sh, air ? P(0.95, -0.34) : P(0.12, -0.34), 0.09, R.col); seg(sh, air ? P(0.95, 0.34) : P(0.12, 0.34), 0.09, R.col);
   ctx.fillStyle = '#F2C9A5'; ctx.beginPath(); ctx.arc(head[0], head[1], 0.2 * u, 0, TAU); ctx.fill();
-  ctx.fillStyle = '#3B2A22'; ctx.beginPath(); ctx.arc(head[0], head[1], 0.2 * u, Math.PI * 1.05 + R.ang * 0, Math.PI * 1.95); ctx.fill();
+  const ang = Math.atan2(head[1] - H[1], head[0] - H[0]); ctx.fillStyle = '#3B2A22'; ctx.beginPath(); ctx.arc(head[0], head[1], 0.2 * u, ang - 1.0, ang + 1.0); ctx.fill();
 }
 const LDIR = (() => { const v = [0.4, 0.8, 0.45], l = Math.hypot(...v); return v.map(a => a / l); })();
 function drawCar(R) {
-  const a = R.n, b = R.n2; if (!alive[a] || !alive[b]) return;
-  let ux = px[a] - px[b], uy = py[a] - py[b], uz = pz[a] - pz[b]; const L = Math.hypot(ux, uy, uz) || 1; ux /= L; uy /= L; uz /= L;
-  let sxv = uz, syv = 0, szv = -ux; let sl = Math.hypot(sxv, szv); if (sl < 1e-4) { sxv = 0; szv = 1; sl = 1; } sxv /= sl; szv /= sl;
-  const vx_ = syv * uz - szv * uy, vy_ = szv * ux - sxv * uz, vz_ = sxv * uy - syv * ux; // up = side x u
-  let uvx = vx_, uvy = vy_, uvz = vz_; if (uvy < 0) { uvx = -uvx; uvy = -uvy; uvz = -uvz; sxv = -sxv; szv = -szv; }
-  const cx = (px[a] + px[b]) / 2, cy = (py[a] + py[b]) / 2, cz = (pz[a] + pz[b]) / 2, s = R.s;
+  let cx, cy, cz, ux, uy, uz, up, parts, wheels;
+  if (R.t === 'c') {
+    const a = R.n, b = R.n2, c = R.n3; if (!alive[a] || !alive[b] || !alive[c]) return;
+    ux = px[a] - px[b]; uy = py[a] - py[b]; uz = pz[a] - pz[b]; const L = Math.hypot(ux, uy, uz) || 1; ux /= L; uy /= L; uz /= L;
+    cx = (px[a] + px[b]) / 2; cy = (py[a] + py[b]) / 2; cz = (pz[a] + pz[b]) / 2;
+    let rx = px[c] - cx, ry = py[c] - cy, rz = pz[c] - cz; const dd = rx * ux + ry * uy + rz * uz; rx -= dd * ux; ry -= dd * uy; rz -= dd * uz; const rl = Math.hypot(rx, ry, rz) || 1; up = [rx / rl, ry / rl, rz / rl];
+    parts = [[-1.6, 1.6, -0.1, 0.42, false], [-0.95, 0.55, 0.42, 0.85, true]]; wheels = [1.15, -1.15];
+  } else {
+    if (!alive[R.n] || !alive[R.n2]) return;
+    ux = px[R.n] - px[R.n2]; uy = py[R.n] - py[R.n2]; uz = pz[R.n] - pz[R.n2]; const L = Math.hypot(ux, uy, uz) || 1; ux /= L; uy /= L; uz /= L; up = R.up;
+    cx = px[R.n]; cy = py[R.n]; cz = pz[R.n];
+    parts = R.end > 0 ? [[-1.15, 0.45, -0.1, 0.42, false], [-1.15, -0.6, 0.42, 0.85, true]] : [[-1.15, 0.45, -0.1, 0.42, false], [-1.15, -0.2, 0.42, 0.85, true]]; wheels = [0];
+  }
+  let sxv = uy * up[2] - uz * up[1], syv = uz * up[0] - ux * up[2], szv = ux * up[1] - uy * up[0]; const sl = Math.hypot(sxv, syv, szv) || 1; sxv /= sl; syv /= sl; szv /= sl;
+  const uvx = up[0], uvy = up[1], uvz = up[2], s = R.s;
   if (!R.rgb) R.rgb = hex(R.col);
-  const box = (ul, ur, sl_, sr, vb, vt, col, win) => {
-    const C = [];
-    for (const A of [ul, ur]) for (const B of [sl_, sr]) for (const Cc of [vb, vt]) C.push([cx + ux * A * s + sxv * B * s + uvx * Cc * s, cy + uy * A * s + uvy * Cc * s, cz + uz * A * s + szv * B * s + uvz * Cc * s]);
-    // C index = (A?4:0)+(B?2:0)+(Cc?1:0)
-    const faces = [[[0, 1, 3, 2], [-ux, -uy, -uz]], [[4, 6, 7, 5], [ux, uy, uz]], [[0, 4, 5, 1], [-sxv, 0, -szv]], [[2, 3, 7, 6], [sxv, 0, szv]], [[0, 2, 6, 4], [-uvx, -uvy, -uvz]], [[1, 5, 7, 3], [uvx, uvy, uvz]]];
+  const box = (ul, ur, vb, vt, win) => {
+    const sl_ = -0.62, sr = 0.62, C = [], col = R.rgb;
+    for (const A of [ul, ur]) for (const B of [sl_, sr]) for (const Cc of [vb, vt]) C.push([cx + ux * A * s + sxv * B * s + uvx * Cc * s, cy + uy * A * s + syv * B * s + uvy * Cc * s, cz + uz * A * s + szv * B * s + uvz * Cc * s]);
+    const faces = [[[0, 1, 3, 2], [-ux, -uy, -uz]], [[4, 6, 7, 5], [ux, uy, uz]], [[0, 4, 5, 1], [-sxv, -syv, -szv]], [[2, 3, 7, 6], [sxv, syv, szv]], [[0, 2, 6, 4], [-uvx, -uvy, -uvz]], [[1, 5, 7, 3], [uvx, uvy, uvz]]];
     for (const [idx, nrm] of faces) {
       const c0 = C[idx[0]], c2 = C[idx[2]], mx = (c0[0] + c2[0]) / 2 - cam.x, my = (c0[1] + c2[1]) / 2 - cam.y, mz = (c0[2] + c2[2]) / 2 - cam.z;
       if (mx * nrm[0] + my * nrm[1] + mz * nrm[2] > 0) continue;
@@ -987,13 +1151,11 @@ function drawCar(R) {
     }
   };
   ctx.lineJoin = 'round';
-  // wheels
-  for (const A of [1.15, -1.15]) for (const B of [-0.72, 0.72]) {
-    const k = pr(cx + ux * A * s + sxv * B * s - uvx * 0.1 * s, cy + uy * A * s - uvy * 0.1 * s, cz + uz * A * s + szv * B * s - uvz * 0.1 * s);
+  for (const A of wheels) for (const B of [-0.72, 0.72]) {
+    const k = pr(cx + ux * A * s + sxv * B * s - uvx * 0.1 * s, cy + uy * A * s + syv * B * s - uvy * 0.1 * s, cz + uz * A * s + szv * B * s - uvz * 0.1 * s);
     if (PZ < NEAR) continue; ctx.fillStyle = '#1F2937'; ctx.beginPath(); ctx.arc(PX, PY, 0.3 * s * k, 0, TAU); ctx.fill();
   }
-  box(-1.6, 1.6, -0.62, 0.62, -0.1, 0.42, R.rgb, false);
-  box(-0.95, 0.55, -0.55, 0.55, 0.42, 0.85, R.rgb, true);
+  for (const p of parts) box(p[0], p[1], p[2], p[3], p[4]);
 }
 function drawBall(B) {
   const k = pr(B.x, B.y, B.z); if (PZ < NEAR) return; const r = B.r * k;
@@ -1041,7 +1203,7 @@ function render() {
   const items = [];
   for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (!m.alive || m.hid || m.kind === LINK) continue; const d = (sz[m.a] + sz[m.b]) * 0.5; items.push([d, 0, mi]); }
   for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; if (!P.ok) continue; let d = 0; for (let k = 0; k < P.n.length; k++) d += sz[P.n[k]]; items.push([d / P.n.length + 0.3 * S.u, 1, pi]); }
-  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; items.push([R.t === 'p' ? sz[R.n] : (sz[R.n] + sz[R.n2]) * 0.5, 2, ri]); }
+  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; items.push([(sz[R.n] + sz[R.ns[1]]) * 0.5, 2, ri]); }
   for (let bi = 0; bi < balls.length; bi++) { const B = balls[bi]; pr(B.x, B.y, B.z); items.push([PZ, 3, bi]); }
   for (let ti = 0; ti < tornadoes.length; ti++) { const T = tornadoes[ti]; pr(T.x, T.h * 0.3, T.z); items.push([PZ, 4, ti]); }
   for (let i = 0; i < nN; i++) if (glow[i] && alive[i]) items.push([sz[i], 5, i]);
@@ -1089,7 +1251,7 @@ function drawHand(x, y, down) {
 /* ===================== 6. input and interface ===================== */
 const TOOLS = [
   ['pluck', 'Pluck', 'Drag a joint to pull it. Drag empty space to turn the view.'],
-  ['cut', 'Cut cable', 'Click or sweep across cables to cut them.'],
+  ['cut', 'Cut cable', 'Click or sweep across cables to cut them. A car is snapped in two, a person is knocked over.'],
   ['strut', 'Break strut', 'Click or sweep across struts and beams to break them.'],
   ['sword', 'Samurai sword', 'Drag a line across the scene. Everything it crosses is sliced in two.'],
   ['fire', 'Fire', 'Click a member to set it alight. Fire spreads along the structure.'],
@@ -1099,8 +1261,8 @@ const TOOLS = [
   ['wind', 'Wind gust', 'Click to blow a gust across the scene.'],
   ['tornado', 'Tornado', 'Press and hold to steer a tornado with the pointer.']];
 const ACTS = [
-  ['quake-side', 'Earthquake: side to side'], ['quake-up', 'Earthquake: up and down'], ['quake-rift', 'Earthquake: ground rift'], ['quake-roll', 'Earthquake: rolling wave'],
-  ['tornado-across', 'Tornado across'], ['inferno', 'Set everything on fire']];
+  ['quake-side', 'Quake: side', 'Earthquake, side to side'], ['quake-up', 'Quake: up', 'Earthquake, up and down'], ['quake-rift', 'Quake: rift', 'Earthquake, the ground splits'], ['quake-roll', 'Quake: wave', 'Earthquake, a rolling wave'],
+  ['tornado-across', 'Tornado across', 'A tornado crosses the scene'], ['inferno', 'Set everything on fire', 'Set everything on fire']];
 let tool = 'pluck', msgTimer = 0;
 const msgEl = $('fun-msg').firstElementChild;
 function say(t, ms) { msgEl.textContent = t; clearTimeout(msgTimer); if (t) msgTimer = setTimeout(() => { msgEl.textContent = ''; }, ms || 6000); }
@@ -1150,6 +1312,24 @@ function hoverPick(mx, my) {
   else if (tool === 'strut') { const m = pickMember(mx, my, r, isStr); if (m >= 0) hoverInfo = { m }; }
   else if (tool === 'fire') { const m = pickMember(mx, my, r + 10); if (m >= 0) hoverInfo = { m }; }
 }
+// riders on screen: nearest toy person or car to a point, and slicing them with the sword
+function riderSegs(R) {
+  const o = [];
+  if (R.t === 'p') o.push([R.n, R.h]); else if (R.t === 'c') o.push([R.n, R.n2], [R.n, R.n3], [R.n2, R.n3]); else o.push([R.n, R.n2]);
+  return o;
+}
+function pickRider(mx, my, maxd) {
+  let best = null, bd = maxd;
+  for (const R of riders) {
+    if (R.dead) continue;
+    for (const [a, b] of riderSegs(R)) { if (!alive[a] || !alive[b] || sz[a] < NEAR || sz[b] < NEAR) continue; const d = segDist(mx, my, sx[a], sy[a], sx[b], sy[b]) - R.s * 0.3 * cam.f / sz[a]; if (d < bd) { bd = d; best = R; } }
+  }
+  return best;
+}
+function hitRider(R, dx, dy, dz) {
+  if (R.t === 'p') knock(R, dx * 0.6, 2.5 * Math.sqrt(R.s) + 1, dz * 0.6); else if (R.t === 'c') splitCar(R, dx * 0.2, dy * 0.2, dz * 0.2);
+  else for (const n of R.ns) { vx[n] += dx * 0.4; vy[n] += 2; vz[n] += dz * 0.4; }
+}
 function segInter(ax, ay, bx, by, cx, cy, dx, dy) { // returns [t along ab, s along cd] or null
   const r = [bx - ax, by - ay], s = [dx - cx, dy - cy], den = r[0] * s[1] - r[1] * s[0]; if (Math.abs(den) < 1e-9) return null;
   const t = ((cx - ax) * s[1] - (cy - ay) * s[0]) / den, u = ((cx - ax) * r[1] - (cy - ay) * r[0]) / den;
@@ -1164,6 +1344,11 @@ function slashSeg(x0, y0, x1, y1) {
     const s = I[1], zi = 1 / ((1 - s) / za + s / zb), t = clamp((zi - za) / (zb - za), 0.03, 0.97);
     const dx = x1 - x0, dy = y1 - y0, l = Math.hypot(dx, dy) || 1;
     sliceMem(mi, t, (cam.rx * dx - cam.ux * dy) / l, -(cam.uy * dy) / l, (cam.rz * dx - cam.uz * dy) / l); hit++;
+  }
+  const sdx = x1 - x0, sdy = y1 - y0, sl = Math.hypot(sdx, sdy) || 1, wx = (cam.rx * sdx - cam.ux * sdy) / sl, wy = -(cam.uy * sdy) / sl, wz = (cam.rz * sdx - cam.uz * sdy) / sl, kk = 0.25 * S.size;
+  for (const R of riders.slice()) {
+    if (R.dead) continue;
+    for (const [a, b] of riderSegs(R)) { if (!alive[a] || !alive[b] || sz[a] < NEAR || sz[b] < NEAR) continue; if (segInter(x0, y0, x1, y1, sx[a], sy[a], sx[b], sy[b])) { hitRider(R, wx * kk, wy * kk, wz * kk); hit++; break; } }
   }
   return hit;
 }
@@ -1206,6 +1391,8 @@ cv.addEventListener('pointerdown', e => {
   e.preventDefault();
 });
 function paintHit(x, y, first) {
+  const R = pickRider(x, y, coarse ? 14 : 8);
+  if (R) { hitRider(R, rnd(-1, 1) * S.size * 0.2, 0, rnd(-1, 1) * S.size * 0.2); mode = 'paint'; hoverInfo = null; return true; }
   const m = pickMember(x, y, coarse ? 30 : 20, tool === 'cut' ? isCab : isStr);
   if (m >= 0) {
     const mm = mem[m]; killMem(m, 'cut'); mode = 'paint';
@@ -1270,12 +1457,14 @@ cv.addEventListener('keydown', e => {
 $('fun-zin').addEventListener('click', () => { cam.zoom = clamp(cam.zoom * 0.8, 0.12, 3.5); });
 $('fun-zout').addEventListener('click', () => { cam.zoom = clamp(cam.zoom / 0.8, 0.12, 3.5); });
 function mk(parent, cls, text, attrs) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chipbtn' + (cls ? ' ' + cls : ''); b.textContent = text; for (const k in attrs) b.setAttribute(k, attrs[k]); parent.appendChild(b); return b; }
-const sceneBtns = [], toolBtns = {};
-SCENES.forEach((sc, i) => { const b = mk($('fun-scenes'), '', sc.name, { 'aria-pressed': i === 0 ? 'true' : 'false' }); b.addEventListener('click', () => { chooseScene(i); }); sceneBtns.push(b); });
-TOOLS.forEach(([id, label, hint]) => { const b = mk($('fun-tools'), '', label, { 'aria-pressed': id === tool ? 'true' : 'false' }); b.addEventListener('click', () => setTool(id)); toolBtns[id] = b; });
-ACTS.forEach(([id, label]) => { const b = mk($('fun-acts'), id === 'inferno' ? 'hot wide' : id === 'tornado-across' ? '' : '', label, {}); b.addEventListener('click', () => act(id)); });
+const toolBtns = {};
+const sceneSel = $('fun-scene');
+SCENES.forEach((sc, i) => { const o = document.createElement('option'); o.value = i; o.textContent = sc.name; sceneSel.appendChild(o); });
+sceneSel.addEventListener('change', () => chooseScene(+sceneSel.value));
+TOOLS.forEach(([id, label, hint]) => { const b = mk($('fun-tools'), '', label, { title: hint,  'aria-pressed': id === tool ? 'true' : 'false' }); b.addEventListener('click', () => setTool(id)); toolBtns[id] = b; });
+ACTS.forEach(([id, label, ttl]) => { const b = mk($('fun-acts'), id === 'inferno' ? 'hot' : '', label, { title: ttl }); b.addEventListener('click', () => act(id)); });
 function setTool(id) { tool = id; hoverInfo = null; for (const k in toolBtns) toolBtns[k].setAttribute('aria-pressed', k === id ? 'true' : 'false'); $('fun-stage').dataset.tool = id; say(TOOLS.find(t => t[0] === id)[2]); }
-function chooseScene(i) { sceneBtns.forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false')); loadScene(i); say(SCENES[i].name + '. Pick a tool and have a go.'); }
+function chooseScene(i) { sceneSel.value = i; loadScene(i); say(SCENES[i].name + '. Pick a tool and have a go.'); }
 function act(id) {
   if (id.startsWith('quake-')) { const k = id.slice(6); if (k === 'rift' && rift.gap > 0) { say('The ground is already split. Reset to close it.'); return; } startQuake(k); say({ side: 'Earthquake: the ground shakes side to side.', up: 'Earthquake: the ground jolts up and down.', rift: 'Earthquake: the ground splits down the middle.', roll: 'Earthquake: a rolling wave crosses the ground.' }[k]); }
   else if (id === 'tornado-across') { tornadoAcross(); say('A tornado is crossing the scene.'); }
@@ -1328,7 +1517,7 @@ function loop(ts) {
 }
 function statsNow() {
   let nan = 0, maxv = 0, an = 0; for (let i = 0; i < nN; i++) { if (!alive[i]) continue; an++; if (!isFinite(px[i] + py[i] + pz[i])) nan++; maxv = Math.max(maxv, Math.hypot(vx[i], vy[i], vz[i])); }
-  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, riders: riders.filter(r => !r.dead).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1) };
+  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, riders: riders.filter(r => !r.dead).length, people: riders.filter(r => r.t === 'p' && !r.dead).length, standingPeople: riders.filter(r => r.t === 'p' && !r.dead && r.st).length, carBodies: riders.filter(r => r.t !== 'p' && !r.dead).length, fellIn: riders.filter(r => r.fell).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1) };
 }
 window.funRoom = {
   scenes: SCENES.map(s => s.id), tools: TOOLS.map(t => t[0]),
@@ -1338,6 +1527,7 @@ window.funRoom = {
   deadMem: () => mem.map((m, i) => [i, m.alive, m.kind, +m.st.toFixed(3), +m.L0.toFixed(1), m.orig]).filter(a => !a[1] && a[5]),
   fast: v => { const r = []; for (let i = 0; i < nN; i++) if (alive[i] && Math.hypot(vx[i], vy[i], vz[i]) > v) r.push([i, isRider[i], +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), +Math.hypot(vx[i], vy[i], vz[i]).toFixed(1)]); return r; },
   dead: () => { const r = []; for (let i = 0; i < nN; i++) if (!alive[i]) r.push([i, +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), deg[i]]); return r; },
+  riders: () => riders.map(R => ({ id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
   render, paused: p => { paused = p; }
 };
 resize();

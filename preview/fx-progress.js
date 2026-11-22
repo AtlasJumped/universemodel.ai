@@ -51,14 +51,14 @@
   // ---- DOM ----
   const css = document.createElement('style');
   css.textContent = `
-.hmr-track{position:absolute;left:0;right:0;top:62px;height:4px;z-index:3;pointer-events:none}
+.hmr-track{position:absolute;left:0;right:0;top:62px;height:4px;z-index:1;pointer-events:none}
 .hmr-rail{position:absolute;inset:0;background:rgba(11,37,69,.07)}
 .hmr-fill{position:absolute;left:0;top:0;bottom:0;width:0;overflow:hidden;transition:width .9s cubic-bezier(.22,.8,.3,1);border-radius:0 2px 2px 0}
-.hmr-fill i{position:absolute;left:0;top:0;bottom:0;display:block;background:linear-gradient(90deg,#F2A93B 0%,#E9B955 22%,#5B9BE6 70%,#1D5FD1 100%)}
+.hmr-fill i{position:absolute;left:0;top:0;bottom:0;display:block;background:#F2A93B;box-shadow:inset 0 1px 0 rgba(255,236,190,.55)}
 .hmr-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.95) 50%,transparent 70%) no-repeat;background-size:60% 100%;background-position:-80% 0;opacity:0}
 .hmr-fill.shim::after{animation:hmrshim .9s ease-out both}
 @keyframes hmrshim{0%{opacity:1;background-position:-80% 0}100%{opacity:1;background-position:180% 0}}
-.hmr-done .hmr-fill i{background:linear-gradient(90deg,#F2A93B,#F7C566 50%,#F2A93B)}
+.hmr-done .hmr-fill i{background:#F2A93B}
 .hmr-track.pulse{animation:hmrpulse .9s ease-out 1}
 @keyframes hmrpulse{0%{transform:scaleY(1);filter:none}40%{transform:scaleY(2);filter:drop-shadow(0 0 6px rgba(242,169,59,.9))}100%{transform:scaleY(1);filter:none}}
 .hmr-lead{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;opacity:0;transition:left .9s cubic-bezier(.22,.8,.3,1),opacity .3s;
@@ -66,13 +66,13 @@
 .hmr-lead::before,.hmr-lead::after{content:"";position:absolute;left:50%;top:50%;background:#F2A93B;border-radius:1px;opacity:.85}
 .hmr-lead::before{width:13px;height:1px;margin:-.5px 0 0 -6.5px}.hmr-lead::after{width:1px;height:13px;margin:-6.5px 0 0 -.5px}
 .hmr-on .hmr-lead{opacity:1}
-.hmr-hit{position:absolute;left:0;right:0;top:-6px;height:10px;padding:0;margin:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;z-index:2}
+.hmr-hit{position:absolute;left:0;right:0;top:-6px;height:10px;padding:0;margin:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;z-index:1}
 .hmr-hit:focus-visible{outline:2px solid #1D5FD1;outline-offset:1px;border-radius:2px}
-.hmr-label{position:absolute;right:max(16px,calc((100vw - 1440px)/2 + 16px));top:72px;z-index:4;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid rgba(11,37,69,.12);
+.hmr-label{position:absolute;right:max(16px,calc((100vw - 1440px)/2 + 16px));top:72px;z-index:1;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid rgba(11,37,69,.12);
   box-shadow:0 2px 10px rgba(11,37,69,.1);font-family:inherit;font-size:12px;font-weight:500;line-height:1.3;color:#0B2545;letter-spacing:.01em;opacity:0;transform:translateY(-3px);transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
 .hmr-label.on{opacity:1;transform:none}
 .hmr-label b{font-weight:700;color:#1D5FD1}
-.hmr-pop{position:absolute;right:max(12px,calc((100vw - 1440px)/2 + 12px));top:72px;z-index:5;width:min(344px,calc(100vw - 24px));max-height:calc(100vh - 100px);overflow:auto;background:#fff;color:#0B2545;border:1px solid rgba(11,37,69,.12);
+.hmr-pop{position:absolute;right:max(12px,calc((100vw - 1440px)/2 + 12px));top:72px;z-index:2;width:min(344px,calc(100vw - 24px));max-height:calc(100vh - 100px);overflow:auto;background:#fff;color:#0B2545;border:1px solid rgba(11,37,69,.12);
   border-radius:12px;box-shadow:0 14px 40px rgba(11,37,69,.18);padding:14px 14px 12px;font-family:inherit;font-size:13px;line-height:1.4;text-align:left}
 .hmr-pop[hidden]{display:none}
 .hmr-pop h2{margin:0;padding:0;font-family:inherit;font-size:14px;font-weight:700;line-height:1.2;color:#0B2545;letter-spacing:0;text-transform:none}
@@ -93,6 +93,9 @@
 .hmr-pop .ctl button:hover{background:#EEF3FB}
 .hmr-pop .ctl .sp{flex:1}
 .hmr-pop a:focus-visible,.hmr-pop button:focus-visible{outline:2px solid #1D5FD1;outline-offset:1px}
+.site-head:has(.grp:hover,.grp:focus-within,.nav.open) .hmr-hit,.site-head:has(.grp:hover,.grp:focus-within,.nav.open) .hmr-label{pointer-events:none!important}
+.site-head:has(.grp:hover,.grp:focus-within,.nav.open) .hmr-label{opacity:0!important}
+.site-head:has(.grp:hover,.grp:focus-within,.nav.open) .hmr-pop{display:none!important}
 .hmr-cv{position:fixed;left:0;top:0;width:100%;height:160px;pointer-events:none;z-index:70}
 .hmr-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.hmr-fill,.hmr-lead,.hmr-label{transition:none}.hmr-fill.shim::after,.hmr-track.pulse{animation:none}}
