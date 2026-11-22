@@ -502,7 +502,7 @@ const FX_PATCHES = [
   }
   let headSkyOK = false;
   function drawKept(now) {
-    const K = keptCons; if (!K || !c) return; const off = -(scrollY - K.sy0), hb = hdrBottom(), t = now / 1000, f = 0.7;
+    const K = keptCons; if (!K || !c) return; const off = 0, hb = hdrBottom(), t = now / 1000, f = 0.7 - 0.38 * clamp(Math.abs(scrollY - K.sy0) / 320, 0, 1);   // pinned to the screen, fainter once the page has scrolled under it
     c.save(); c.beginPath(); c.rect(0, hb, W, H - hb); c.clip(); c.lineWidth = 1.2; c.lineCap = 'round'; c.strokeStyle = `rgba(${K.lineC[0]},${K.lineC[1]},${K.lineC[2]},${(K.dark ? 0.7 : 0.62) * f})`;
     for (const sg of K.segs) { if (Math.max(sg.A.y, sg.B.y) + off < hb - 4 || Math.min(sg.A.y, sg.B.y) + off > H + 4) continue; c.beginPath(); c.moveTo(sg.A.x, sg.A.y + off); c.lineTo(sg.B.x, sg.B.y + off); c.stroke(); }
     for (const q of K.stars) { const y = q.P.y + off; if (y < hb - 6 || y > H + 6) continue; spark(c, q.P.x, y, q.big ? 3 : 2.2, f * (0.8 + 0.2 * Math.sin(t * 2.2 + q.P.x)), K.dark ? (q.big ? [255, 244, 214] : [225, 236, 255]) : (q.big ? GOLD : [29, 95, 209]), true); }

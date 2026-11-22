@@ -1214,7 +1214,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           TG.step(S, sdt, speed < 1 ? 12 : 20, 0.7);
           if (S.balloon !== undefined && !S.fire && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.fireStep(S, sdt, reduce ? 0.5 : 0);
-          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > Math.max(0.4, S.fire.last - 0.5))) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
+          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > Math.max(0.2, S.fire.last - 0.5 - S.fire.v))) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
           if (!S.fire) burningList = [];
           if (S.fire && !reduce && burningList.length) {
             smoke = smoke.filter(m => now - m.t0 < 1700); smoke.forEach(m => { m.y += cam.R * 0.22 * sdt; m.x += m.vx * sdt; });
