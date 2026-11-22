@@ -95,10 +95,11 @@ const FX_PATCHES = [
     if (cv) return;
     cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); cv.dataset.fxDemo = '1';
     cv.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:15';
-    document.body.appendChild(cv); c = cv.getContext('2d'); fit(); addEventListener('resize', fit);
+    document.body.appendChild(cv); c = cv.getContext('2d'); fit(); addEventListener('resize', () => { fit(); keptCons = null; });
   }
   function dropCanvas() { if (!cv) return; removeEventListener('resize', fit); cv.remove(); cv = null; c = null; }
-  function idleCheck() { if (!running.length && !pending.length && !skies.length) { if (raf) cancelAnimationFrame(raf); raf = 0; dropCanvas(); } }
+  function idleCheck() { if (!running.length && !pending.length && !skies.length && !keptCons) { if (raf) cancelAnimationFrame(raf); raf = 0; dropCanvas(); } }
+  let keptCons = null;   // the page-load constellation stays drawn (owner, 2026-11-22)
   function kick() { ensureCanvas(); if (!raf) { lastDraw = 0; raf = requestAnimationFrame(tick); } }
   const cvOK = () => !document.querySelector('canvas[data-page-fire]');
 
@@ -130,7 +131,7 @@ const FX_PATCHES = [
     if (!c) { idleCheck(); return; }
     if (!cvOK()) { stopAll(); return; }
     c.clearRect(0, 0, W, H);
-    drawSkies(dt, now);
+    drawSkies(dt, now); drawKept(now);
     for (const fx of running.slice()) {
       if (fx.ended) continue;
       if (fx.lane === 'fairy') { if (!fx.hurrying && fx.t > 2.6 && (fx.wantHurry || (() => { const r = fx.sec.getBoundingClientRect(); return r.bottom < H * 0.04 || r.top > H * 0.99; })())) hurry(fx); }   // the fairy stays at least 2.6 s
@@ -157,7 +158,7 @@ const FX_PATCHES = [
     }
     return false;
   }
-  function stopAll() { running.slice().forEach(finish); pending.length = 0; skies.length = 0; idleCheck(); }
+  function stopAll() { running.slice().forEach(finish); pending.length = 0; skies.length = 0; keptCons = null; idleCheck(); }
   document.addEventListener('visibilitychange', () => { if (document.hidden) { stopAll(); clearTimeout(cometT); } else if (!REDUCE && cometT !== -1) { scheduleComet(false); } });
   addEventListener('pagehide', () => { stopAll(); clearTimeout(cometT); });
 
@@ -500,6 +501,13 @@ const FX_PATCHES = [
     return { pos, segs: SKYLINES.filter(([a, b]) => a.c === name && pos.has(a) && pos.has(b)) };
   }
   let headSkyOK = false;
+  function drawKept(now) {
+    const K = keptCons; if (!K || !c) return; const off = -(scrollY - K.sy0), hb = hdrBottom(), t = now / 1000, f = 0.7;
+    c.save(); c.beginPath(); c.rect(0, hb, W, H - hb); c.clip(); c.lineWidth = 1.2; c.lineCap = 'round'; c.strokeStyle = `rgba(${K.lineC[0]},${K.lineC[1]},${K.lineC[2]},${(K.dark ? 0.7 : 0.62) * f})`;
+    for (const sg of K.segs) { if (Math.max(sg.A.y, sg.B.y) + off < hb - 4 || Math.min(sg.A.y, sg.B.y) + off > H + 4) continue; c.beginPath(); c.moveTo(sg.A.x, sg.A.y + off); c.lineTo(sg.B.x, sg.B.y + off); c.stroke(); }
+    for (const q of K.stars) { const y = q.P.y + off; if (y < hb - 6 || y > H + 6) continue; spark(c, q.P.x, y, q.big ? 3 : 2.2, f * (0.8 + 0.2 * Math.sin(t * 2.2 + q.P.x)), K.dark ? (q.big ? [255, 244, 214] : [225, 236, 255]) : (q.big ? GOLD : [29, 95, 209]), true); }
+    c.restore();
+  }
   def('constellation', 'Constellation on page load', 'x', null, 6, X => {
     const sec = targets[0] ? targets[0].sec : X.sec, r = sec.getBoundingClientRect(), hb = hdrBottom(), top = Math.max(r.top, hb) + 12, bot = Math.min(r.bottom, H - 20) - 8, left = 20, right = W - 20; if (bot - top < 70) return null;
     const rects = textRects(sec, 3); let nb = 0;   // plus every box with its own border or fill (callouts, panels), so no line crosses one
@@ -525,7 +533,7 @@ const FX_PATCHES = [
     const holdEnd = ts + 1.3, fadeLen = 0.8, sy0 = scrollY, sw = new Swarm(50), lineC = dark ? [175, 205, 250] : [60, 105, 200]; let popped = new Set(), settled = false;
     X.guard(() => { headSkyOK = true; });
     return { label: 'Constellation: ' + name.replace(/ \(.*/, ''), frame(c, t, dt) {
-      const off = -(scrollY - sy0), fade = 1 - clamp((t - holdEnd) / fadeLen, 0, 1);
+      const off = -(scrollY - sy0), fade = 1 - 0.3 * clamp((t - holdEnd) / fadeLen, 0, 1);
       if (t > holdEnd - 0.4 && !settled) { settled = true; headSkyOK = true; forceDraw = true; }
       c.lineWidth = 1.2; c.lineCap = 'round';
       for (const sg of segs) { const u = clamp((t - sg.t) / d, 0, 1); if (u <= 0) continue; const e = easeO(u), x = lerp(sg.A.x, sg.B.x, e), y = lerp(sg.A.y, sg.B.y, e) + off;
@@ -534,7 +542,7 @@ const FX_PATCHES = [
       shown.forEach((ta, k) => { const u = (t - ta) / 0.25; if (u <= 0) return; const P = best.P.get(k), a = Math.min(1, u) * fade, tw = 0.8 + 0.2 * Math.sin(t * 5 + P.x), big = k.mag < 2.2;
         if (u < 1) glow(c, P.x, P.y + off, 18 * (1 - u) + 6, 0.5 * (1 - u), GOLD); if (!popped.has(k)) { popped.add(k); for (let i = 0; i < 4; i++) { const an = rnd(0, 6.28); sw.add({ x: P.x, y: P.y + off, vx: Math.cos(an) * 0.9, vy: Math.sin(an) * 0.9, life: 0.5, r: 1, col: GOLD, drag: 0.9 }); } }
         spark(c, P.x, P.y + off, big ? 3 : 2.2, a * tw, dark ? (big ? [255, 244, 214] : [225, 236, 255]) : (big ? GOLD : [29, 95, 209]), true); });
-      sw.step(dt); sw.draw(c, fade); return t > holdEnd + fadeLen;
+      sw.step(dt); sw.draw(c, fade); if (t > holdEnd + fadeLen) { keptCons = { segs, stars: [...shown.keys()].map(k => ({ P: best.P.get(k), big: k.mag < 2.2 })), sy0, lineC, dark }; return true; } return false;
     } };
   });
 
@@ -802,7 +810,7 @@ const FX_PATCHES = [
   // automatic on scroll: the background sky, and the card sparkle-in once per group of cards (never while the load constellation or a comet runs)
   function check() {
     if (!targets.length || REDUCE || !enabled || document.hidden || !cvOK()) return; const hb = hdrBottom(), now = performance.now();
-    for (const tg of skyTargets) { if (tg === targets[0] && !headSkyOK) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) skyNow(tg); }
+    for (const tg of skyTargets) { if (tg === targets[0] && (!headSkyOK || keptCons)) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) skyNow(tg); }
     if (now - lastScroll < 250 || laneBusy('x') || pending.length) return;
     for (const tg of targets) { if (tg.nextup || !tg.safe || tg.nitems < 2 || !freshCards(tg.sec).length) continue; if (tg === targets[0] && !headSkyOK) continue; const r = tg.sec.getBoundingClientRect(); if (r.top > H - 30 || r.bottom < hb + 20) continue;
       if (startFx(DEF.cardin, tg, { quiet: true })) break; }
