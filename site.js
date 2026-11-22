@@ -856,11 +856,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
         o.sl.push({ x: j * sw, w: sw, ts, L, ph: Math.random() * 6.283, hh: Math.random() < 0.25 ? rnd(1.3, 1.9) : rnd(0.5, 1.1), cr: false }); }
       T.push(o); return o;
     };
-    add(sr, 0.3, true, false);
-    add(labRect, 2.1, true, false);
-    const t1 = 2.9, t2 = 5.0;
+    add(sr, 0.15, true, false);
+    add(labRect, 1.05, true, false);
+    const t1 = 1.45, t2 = 2.5;   // the jump to the page text takes half the time it did (owner, 2026-11-22)
     picks.forEach((p, i) => add(p.r, t1 + (picks.length > 1 ? i / (picks.length - 1) : 0) * (t2 - t1) + rnd(-0.12, 0.12), Math.random() < 0.55, true));
-    const lastArr = T[T.length - 1].arr, fArr = Math.max(5.3, lastArr + 0.7);
+    const lastArr = T[T.length - 1].arr, fArr = Math.max(2.65, lastArr + 0.35);
     const FB = add(fr, fArr, true, false);
     const hc = { x: fr.left + fr.width / 2 + sx, y: fr.top + fr.height / 2 + sy }, HR = clamp(Math.max(fr.height * 0.85, 20) * (1 + 0.45 * I), 20, coarse ? 30 : 40);
     const T_HOLE = fArr + 0.6, ph = [0, 1, 2, 3, 4].map(() => Math.random() * 6.283), N = 28;
@@ -1214,7 +1214,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
           TG.step(S, sdt, speed < 1 ? 12 : 20, 0.7);
           if (S.balloon !== undefined && !S.fire && S.x[3 * S.balloon + 1] > cam.c[1] + cam.R * 3.2) { TG.reset(S); cuts = removed = 0; status.textContent = 'The balloon floated away. It has been brought back.'; }
           TG.fireStep(S, sdt, reduce ? 0.5 : 0);
-          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > Math.min(3, Math.max(0.4, S.fire.last - 0.5)))) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
+          if (S.fire && !S.fire.pf && !reduce && (S.fire.over || S.fire.F > Math.min(1.5, Math.max(0.4, S.fire.last - 0.5)))) { S.fire.pf = 1; pageFire(stage, box, spinBtn); }
           if (!S.fire) burningList = [];
           if (S.fire && !reduce && burningList.length) {
             smoke = smoke.filter(m => now - m.t0 < 1700); smoke.forEach(m => { m.y += cam.R * 0.22 * sdt; m.x += m.vx * sdt; });
