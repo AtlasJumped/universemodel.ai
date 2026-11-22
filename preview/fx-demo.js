@@ -55,6 +55,7 @@ const FX_PATCHES = [
   const pickCol = () => COLS[Math.floor(Math.random() * COLS.length)];
   const pickBright = () => BRIGHT[Math.floor(Math.random() * BRIGHT.length)];
   const page = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+  const parseRGB = s => { const m = /rgba?\(([^)]+)\)/.exec(s || ''); if (!m) return [14, 58, 117]; const p = m[1].split(',').map(parseFloat); return [p[0], p[1], p[2]]; };
   const hash = s => { let h = 7; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
   const hdrBottom = () => { const h = document.querySelector('.site-head'); return h ? Math.max(0, h.getBoundingClientRect().bottom) : 0; };
 
@@ -437,6 +438,78 @@ const FX_PATCHES = [
   def('danger', 'Danger: flames, then the fairy', 'fairy', null, 11, X => makeFairy(X, 'extinguish'));
   def('flip', 'Card flip-sparkle', 'fairy', 'cards', 8, X => makeFairy(X, 'flip'));
 
+  function wrapLetters(X, h) {
+    if (!h) return null;
+    const b0 = h.getBoundingClientRect(), sh0 = document.documentElement.scrollHeight, label0 = h.getAttribute('aria-label');
+    const swaps = []; let done = false;
+    const restore = () => { if (done) return; done = true; for (const s of swaps) { if (s.wrap.parentNode) s.wrap.parentNode.replaceChild(s.node, s.wrap); } if (label0 === null) h.removeAttribute('aria-label'); else h.setAttribute('aria-label', label0); };
+    X.guard(restore);
+    const nodes = [], tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT); while (tw.nextNode()) nodes.push(tw.currentNode);
+    h.setAttribute('aria-label', (h.textContent || '').replace(/\s+/g, ' ').trim());
+    const letters = [];
+    for (const n of nodes) {
+      if (!/\S/.test(n.nodeValue)) continue;
+      const wrap = document.createElement('span'); wrap.setAttribute('aria-hidden', 'true');
+      for (const tok of n.nodeValue.split(/(\s+)/)) {
+        if (!tok) continue;
+        if (/^\s+$/.test(tok)) { wrap.appendChild(document.createTextNode(tok)); continue; }
+        const wd = document.createElement('span'); wd.style.whiteSpace = 'nowrap';
+        for (const ch of tok) { const s = document.createElement('span'); s.style.display = 'inline-block'; s.textContent = ch; wd.appendChild(s); letters.push({ el: s, ch }); }
+        wrap.appendChild(wd);
+      }
+      n.parentNode.replaceChild(wrap, n); swaps.push({ node: n, wrap });
+    }
+    const b1 = h.getBoundingClientRect();
+    if (!letters.length || Math.abs(b1.height - b0.height) > 0.5 || Math.abs(b1.width - b0.width) > 0.5 || Math.abs(document.documentElement.scrollHeight - sh0) > 1) { restore(); return null; }
+    const sx = scrollX, sy = scrollY;
+    letters.forEach((l, i) => { const r = l.el.getBoundingClientRect(); l.i = i; l.x = r.left + sx; l.y = r.top + sy; l.w = r.width; l.h = r.height; l.cx = l.x + l.w / 2; l.cy = l.y + l.h / 2; });
+    const cs = getComputedStyle(h), col = parseRGB(cs.color);
+    return { L: letters, col, n: letters.length, box: { x: b1.left + sx, y: b1.top + sy, w: b1.width, h: b1.height } };
+  }
+
+  // ===== Thought forming: the page title (h1) assembles out of scattered sparkles, on page load only
+  const pageH1 = () => { const t = targets[0]; return t && t.sec.querySelector('h1') || document.querySelector('main h1'); };
+  def('thought', 'Title forming from sparkles (page title)', 'title', null, 3.2, X => {
+    const h1 = pageH1(); if (!h1) return null; const hr = h1.getBoundingClientRect(); if (hr.bottom < hdrBottom() + 4 || hr.top > H * 0.95 || hr.width < 20) return null;
+    X.head = h1; const w = wrapLetters(X, h1); if (!w) return null; const L = w.L, n = L.length, sw = new Swarm(80), stag = Math.min(0.03, 0.9 / n), t1 = 0.15;
+    L.forEach(l => { l.sx = rnd(-0.1, 1.1) * W; l.sy = Math.random() < 0.5 ? rnd(hdrBottom(), hdrBottom() + 40) : rnd(H * 0.7, H); l.ph = rnd(0, 6.28); l.el.style.opacity = '0'; });
+    return { label: 'Thought forming: the title', frame(c, t, dt) {
+      const sx = scrollX, sy = scrollY;
+      for (const l of L) { const x = l.cx - sx, y = l.cy - sy, ta = t1 + 0.5 + l.i * stag, u = (t - ta) / 0.4; let op = u >= 1 ? 1 : u > 0 ? easeO(u) : 0;
+        const fu = (t - (ta - 0.5)) / 0.5; if (fu > 0 && fu < 1) { const m = easeIO(fu); spark(c, lerp(l.sx, x, m), lerp(l.sy, y, m) + Math.sin(fu * 9 + l.ph) * 12 * (1 - fu), 2.3, 0.4 + 0.6 * m, COLS[l.i % 6], l.i % 2 === 0); }
+        if (u > 0 && u < 0.3 && !l.pop) { l.pop = 1; glow(c, x, y, 26, 0.8, GOLD); for (let k = 0; k < 3; k++) { const a = rnd(0, 6.28); sw.add({ x, y, vx: Math.cos(a), vy: Math.sin(a), life: 0.5, r: 1.2, col: GOLD, drag: 0.9 }); } }
+        if (u > 0 && u < 0.5) glow(c, x, y, 24 * (1 - u * 2), 0.7 * (1 - u * 2), GOLD);
+        l.el.style.opacity = op >= 1 ? '' : String(op); }
+      const nx = clamp(Math.floor((t - t1 - 0.5) / stag), -1, n - 1) + 1; if (t > t1 + 0.3 && nx <= n && t < t1 + 0.5 + n * stag + 0.5) { const l = L[Math.min(nx, n - 1)], cx = nx >= n ? l.x + l.w : l.x; if (Math.floor(t * 5) % 2 === 0) { c.fillStyle = 'rgba(242,169,59,.9)'; c.fillRect(cx - sx - 1, l.y - sy + l.h * 0.12, 2, l.h * 0.76); glow(c, cx - sx, l.cy - sy, 10, 0.5, GOLD); } }
+      sw.step(dt); sw.draw(c); return t > t1 + 0.5 + n * stag + 0.6;
+    } };
+  }, { stay: true });
+
+  // ===== Constellation across the page head: points anchored to the head's real elements and to empty space, thin faint lines, ~2.5 s
+  def('constellation', 'Constellation across the page head', 'x', null, 3, X => {
+    const sec = targets[0] ? targets[0].sec : X.sec, r = sec.getBoundingClientRect(), hb = hdrBottom(), top = Math.max(r.top, hb) + 14, bot = Math.min(r.bottom, H - 24) - 8, left = 24, right = W - 24; if (bot - top < 60) return null;
+    const rects = textRects(sec, 4).map(q => ({ l: q.l, t: q.t, r: q.r, b: q.b })), pts = [], ok = (x, y) => x > left && x < right && y > top && y < bot;
+    const add = (x, y, big) => { if (ok(x, y) && !pts.some(q => Math.hypot(q.x - x, q.y - y) < 46)) pts.push({ x, y, big, ph: rnd(0, 6.28) }); };
+    // corners of the head's real elements, set just outside them
+    const els = [...sec.querySelectorAll('h1,.eyebrow,.lede,.btn,.card,figure,img,.stage-cap,p')].slice(0, 14);
+    els.forEach((e, i) => { const b = e.matches('h1,.eyebrow,.lede,p') ? tbox(e) : e.getBoundingClientRect(); if (b.width < 20 || b.height < 8) return; const m = 9, k = i % 4;
+      if (k === 0 || k === 2) add(b.left - m, b.top - m, i < 3); if (k === 1 || k === 2) add(b.right + m, b.top - m, false); if (k === 3 || k === 0) add(b.right + m, b.bottom + m, false); if (k === 1 || k === 3) add(b.left - m, b.bottom + m, false); });
+    // empty space, especially on the right, so the figure spans the whole width of the head
+    const third = k => pts.filter(q => q.x > left + (right - left) * k / 3 && q.x <= left + (right - left) * (k + 1) / 3).length;
+    for (let g = 0; g < 400 && pts.length < 13; g++) { const x = rnd(left, right), y = rnd(top, bot); const k = Math.min(2, Math.floor((x - left) / ((right - left) / 3))); if (third(k) >= 5) continue; if (!hit(x, y, rects, 6)) add(x, y, false); }
+    for (let k = 0; k < 3; k++) for (let g = 0; g < 200 && third(k) < 2; g++) { const x = rnd(left + (right - left) * k / 3, left + (right - left) * (k + 1) / 3), y = rnd(top, bot); if (!hit(x, y, rects, 6)) add(x, y, false); }
+    if (pts.length < 5) return null; pts.sort((a, b) => a.x - b.x);
+    const links = []; for (let i = 0; i + 1 < pts.length; i++) links.push([i, i + 1]); for (let i = 0; i + 2 < pts.length; i += 3) links.push([i, i + 2]);
+    const sy0 = scrollY, dur = 2.5, sw = new Swarm(40);
+    return { frame(c, t, dt) {
+      const off = -(scrollY - sy0), fade = 1 - clamp((t - 1.9) / 0.6, 0, 1), appear = i => clamp((t - i * 0.12) / 0.3, 0, 1);
+      c.lineWidth = 0.8; c.lineCap = 'round';
+      links.forEach(([a, b], li) => { const A = pts[a], B = pts[b], u = clamp((t - 0.35 - li * 0.1) / 0.5, 0, 1); if (u <= 0) return; c.strokeStyle = `rgba(80,120,200,${0.4 * fade})`; c.beginPath(); c.moveTo(A.x, A.y + off); c.lineTo(lerp(A.x, B.x, u), lerp(A.y, B.y, u) + off); c.stroke(); });
+      pts.forEach((q, i) => { const a = appear(i) * fade; if (a <= 0.02) return; const tw = 0.75 + 0.25 * Math.sin(t * 6 + q.ph); spark(c, q.x, q.y + off, q.big ? 2.6 : 2, a * tw, i % 3 === 0 ? GOLD : [91, 155, 230], true); if (appear(i) < 1 && Math.random() < dt * 30) sw.add({ x: q.x, y: q.y + off, vx: rnd(-0.5, 0.5), vy: rnd(-0.5, 0.5), life: 0.5, r: 1, col: GOLD, drag: 0.93 }); });
+      sw.step(dt); sw.draw(c); return t > dur;
+    } };
+  });
+
   // ===== Sparkle rain over the section's cards
   def('rain', 'Sparkle rain', 'x', null, 5.4, X => {
     let items = X.items(COARSE ? 4 : 6).filter(e => e.getBoundingClientRect().top > hdrBottom() + 14);
@@ -681,7 +754,7 @@ const FX_PATCHES = [
     let cand = -1;
     for (let i = 0; i < targets.length; i++) {
       const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (tg.firedF) continue;
-      if (tg.isHead) { if ((scrollY > 6 || performance.now() - t0 > 2600) && i === 0) { if (r.bottom > H * 0.2 && r.top < H) cand = i; else tg.firedF = true; } }
+      if (tg.isHead) { if ((scrollY > 6 || performance.now() - t0 > 4600) && i === 0) { if (r.bottom > H * 0.2 && r.top < H) cand = i; else tg.firedF = true; } }
       else if (r.top <= H * 0.40 && r.bottom > H * 0.18) cand = i;
     }
     // at the very bottom of the page the last sections cannot reach the upper part of the window: the one resting in view gets its fairy
@@ -705,6 +778,7 @@ const FX_PATCHES = [
     if (!cvOK()) { say('The page fire is running. Try again in a moment.', 2200); return false; }
     if (d.id === 'nightsky') { const nt = skyTargets.find(s => { const r = s.sky.getBoundingClientRect(); return r.bottom > hdrBottom() + 8 && r.top < H - 8; }); return skyNow(nt || Object.assign({}, tg, { sky: tg.sec, navyIdx: tg.i || 0, navy: false })); }
     if ((d.need === 'cards' && !(tg.safe && tg.nitems >= 2)) || (d.need === 'bold' && !tg.nbold)) { say(d.need === 'cards' && !tg.safe ? 'This section holds a form or a toy, so card effects are skipped here.' : 'This section has nothing for that effect.', 2200); return false; }
+    if (d.id === 'thought' && !startFx(d, targets[0] || tg, {})) { say('The page title is not in view. Scroll to the top first.', 2200); return false; } else if (d.id === 'thought') return true;
     const old = running.find(f => f.lane === d.lane); if (old) finish(old);
     const ok = startFx(d, tg, dance ? { dance } : {}); if (!ok) say('Nothing to show here. Try another section.', 2000); return ok;
   }
@@ -733,7 +807,9 @@ const FX_PATCHES = [
   function init() {
     buildUI(); if (REDUCE) return; collect();
     let ticking = false; addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; check(); }); }, { passive: true });
-    start(); setTimeout(check, 2700);
+    start(); setTimeout(check, 4700);
+    // page load: the title forms from sparkles (with the icicles under the menu), then the constellation across the page head
+    if (enabled && cvOK() && !document.hidden) { startFx(DEF.thought, targets[0], {}); setTimeout(() => { if (enabled && !document.hidden && cvOK() && scrollY < 250 && targets[0]) startFx(DEF.constellation, targets[0], {}); }, 1900); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
