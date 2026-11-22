@@ -1,4 +1,4 @@
-// Universe Model PREVIEW ONLY: effects demo, second pass (owner request 2026-11-21j). Not part of the live site.
+// Universe Model PREVIEW ONLY: effects demo, third pass: the night sky. Not part of the live site.
 // The persona is the HMR fairy: one dense bright ball with a fine trail, in every section, dancing 2 to 4 seconds and leaving, always
 // entering from the side it last left by (kept in sessionStorage across pages). Nothing here touches a heading or any text:
 // every effect is drawn as sparkles on one fixed overlay canvas under the sticky header; the card effects use transform only
@@ -118,7 +118,7 @@ const FX_PATCHES = [
     if (!inst) { for (let i = fx.ends.length - 1; i >= 0; i--) { try { fx.ends[i](); } catch (e) {} } idleCheck(); return false; }
     fx.inst = inst; running.push(fx);
     fx.hard = setTimeout(() => finish(fx), (def.dur + 4) * 1000);
-    kick(); say(inst.label || def.label);
+    kick(); if (!fx.opt.quiet) say(inst.label || def.label);
     return true;
   }
   function tick(now) {
@@ -132,7 +132,7 @@ const FX_PATCHES = [
     for (const fx of running.slice()) {
       if (fx.ended) continue;
       if (fx.lane === 'fairy') { if (!fx.hurrying && fx.t > 2.6 && (fx.wantHurry || (() => { const r = fx.sec.getBoundingClientRect(); return r.bottom < H * 0.04 || r.top > H * 0.99; })())) hurry(fx); }   // the fairy stays at least 2.6 s
-      else if (!fx.hurrying) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.6 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
+      else if (!fx.hurrying && !fx.def.free) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.6 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
       if (fx.hurrying) fx.rate += (6 - fx.rate) * Math.min(1, dt * 8);
       fx.t += dt * fx.rate;
       let fin = false;
@@ -156,8 +156,8 @@ const FX_PATCHES = [
     return false;
   }
   function stopAll() { running.slice().forEach(finish); pending.length = 0; skies.length = 0; idleCheck(); }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stopAll(); });
-  addEventListener('pagehide', stopAll);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { stopAll(); clearTimeout(cometT); } else if (!REDUCE && cometT !== -1) { scheduleComet(false); } });
+  addEventListener('pagehide', () => { stopAll(); clearTimeout(cometT); });
 
   // ---------------------------------------------------------------- drawing helpers (the look of fx-stars.js)
   const SP = {};
@@ -448,8 +448,7 @@ const FX_PATCHES = [
     };
   }
   def('fairy', 'The HMR fairy', 'fairy', null, 9, X => makeFairy(X));
-  def('danger', 'Danger: flames, then the fairy', 'fairy', null, 11, X => makeFairy(X, 'extinguish'));
-  def('flip', 'Card flip-sparkle', 'fairy', 'cards', 8, X => makeFairy(X, 'flip'));
+  def('flip', 'Card tilt', 'fairy', 'cards', 8, X => makeFairy(X, 'flip'));
 
   function wrapLetters(X, h) {
     if (!h) return null;
@@ -482,48 +481,77 @@ const FX_PATCHES = [
 
   // ===== Thought forming: the page title (h1) assembles out of scattered sparkles, on page load only
   const pageH1 = () => { const t = targets[0]; return t && t.sec.querySelector('h1') || document.querySelector('main h1'); };
-  def('thought', 'Title forming from sparkles (page title)', 'title', null, 3.2, X => {
-    const h1 = pageH1(); if (!h1) return null; const hr = h1.getBoundingClientRect(); if (hr.bottom < hdrBottom() + 4 || hr.top > H * 0.95 || hr.width < 20) return null;
-    X.head = h1; const w = wrapLetters(X, h1); if (!w) return null; const L = w.L, n = L.length, sw = new Swarm(80), stag = Math.min(0.03, 0.9 / n), t1 = 0.15;
-    L.forEach(l => { l.sx = rnd(-0.1, 1.1) * W; l.sy = Math.random() < 0.5 ? rnd(hdrBottom(), hdrBottom() + 40) : rnd(H * 0.7, H); l.ph = rnd(0, 6.28); l.el.style.opacity = '0'; });
-    return { label: 'Thought forming: the title', frame(c, t, dt) {
-      const sx = scrollX, sy = scrollY;
-      for (const l of L) { const x = l.cx - sx, y = l.cy - sy, ta = t1 + 0.5 + l.i * stag, u = (t - ta) / 0.4; let op = u >= 1 ? 1 : u > 0 ? easeO(u) : 0;
-        const fu = (t - (ta - 0.5)) / 0.5; if (fu > 0 && fu < 1) { const m = easeIO(fu); spark(c, lerp(l.sx, x, m), lerp(l.sy, y, m) + Math.sin(fu * 9 + l.ph) * 12 * (1 - fu), 2.3, 0.4 + 0.6 * m, COLS[l.i % 6], l.i % 2 === 0); }
-        if (u > 0 && u < 0.3 && !l.pop) { l.pop = 1; glow(c, x, y, 26, 0.8, GOLD); for (let k = 0; k < 3; k++) { const a = rnd(0, 6.28); sw.add({ x, y, vx: Math.cos(a), vy: Math.sin(a), life: 0.5, r: 1.2, col: GOLD, drag: 0.9 }); } }
-        if (u > 0 && u < 0.5) glow(c, x, y, 24 * (1 - u * 2), 0.7 * (1 - u * 2), GOLD);
-        l.el.style.opacity = op >= 1 ? '' : String(op); }
-      const nx = clamp(Math.floor((t - t1 - 0.5) / stag), -1, n - 1) + 1; if (t > t1 + 0.3 && nx <= n && t < t1 + 0.5 + n * stag + 0.5) { const l = L[Math.min(nx, n - 1)], cx = nx >= n ? l.x + l.w : l.x; if (Math.floor(t * 5) % 2 === 0) { c.fillStyle = 'rgba(242,169,59,.9)'; c.fillRect(cx - sx - 1, l.y - sy + l.h * 0.12, 2, l.h * 0.76); glow(c, cx - sx, l.cy - sy, 10, 0.5, GOLD); } }
-      sw.step(dt); sw.draw(c); return t > t1 + 0.5 + n * stag + 0.6;
-    } };
-  }, { stay: true });
 
-  // ===== Constellation across the page head: points anchored to the head's real elements and to empty space, thin faint lines, ~2.5 s
-  def('constellation', 'Constellation across the page head', 'x', null, 3, X => {
-    const sec = targets[0] ? targets[0].sec : X.sec, r = sec.getBoundingClientRect(), hb = hdrBottom(), top = Math.max(r.top, hb) + 14, bot = Math.min(r.bottom, H - 24) - 8, left = 24, right = W - 24; if (bot - top < 60) return null;
-    const rects = textRects(sec, 4).map(q => ({ l: q.l, t: q.t, r: q.r, b: q.b })), pts = [], ok = (x, y) => x > left && x < right && y > top && y < bot;
-    const add = (x, y, big) => { if (ok(x, y) && !pts.some(q => Math.hypot(q.x - x, q.y - y) < 46)) pts.push({ x, y, big, ph: rnd(0, 6.28) }); };
-    // corners of the head's real elements, set just outside them
-    const els = [...sec.querySelectorAll('h1,.eyebrow,.lede,.btn,.card,figure,img,.stage-cap,p')].slice(0, 14);
-    els.forEach((e, i) => { const b = e.matches('h1,.eyebrow,.lede,p') ? tbox(e) : e.getBoundingClientRect(); if (b.width < 20 || b.height < 8) return; const m = 9, k = i % 4;
-      if (k === 0 || k === 2) add(b.left - m, b.top - m, i < 3); if (k === 1 || k === 2) add(b.right + m, b.top - m, false); if (k === 3 || k === 0) add(b.right + m, b.bottom + m, false); if (k === 1 || k === 3) add(b.left - m, b.bottom + m, false); });
-    // empty space, especially on the right, so the figure spans the whole width of the head
-    const third = k => pts.filter(q => q.x > left + (right - left) * k / 3 && q.x <= left + (right - left) * (k + 1) / 3).length;
-    for (let g = 0; g < 400 && pts.length < 13; g++) { const x = rnd(left, right), y = rnd(top, bot); const k = Math.min(2, Math.floor((x - left) / ((right - left) / 3))); if (third(k) >= 5) continue; if (!hit(x, y, rects, 6)) add(x, y, false); }
-    for (let k = 0; k < 3; k++) for (let g = 0; g < 200 && third(k) < 2; g++) { const x = rnd(left + (right - left) * k / 3, left + (right - left) * (k + 1) / 3), y = rnd(top, bot); if (!hit(x, y, rects, 6)) add(x, y, false); }
-    if (pts.length < 5) return null; pts.sort((a, b) => a.x - b.x);
-    // lines only through empty space: a link that would cross text or a box is left out
-    const clear = (A, B) => { for (let k = 1; k < 16; k++) if (hit(lerp(A.x, B.x, k / 16), lerp(A.y, B.y, k / 16), rects, 2)) return false; return true; };
-    const links = []; for (let i = 0; i < pts.length; i++) for (const d of [1, 2, 3]) { const j = i + d; if (j < pts.length && Math.hypot(pts[j].x - pts[i].x, pts[j].y - pts[i].y) < 460 && clear(pts[i], pts[j]) && (d === 1 || links.filter(l => l[0] === i || l[1] === i).length < 2)) links.push([i, j]); }
-    const sy0 = scrollY, dur = 2.5, sw = new Swarm(40);
-    return { frame(c, t, dt) {
-      const off = -(scrollY - sy0), fade = 1 - clamp((t - 1.9) / 0.6, 0, 1), appear = i => clamp((t - i * 0.12) / 0.3, 0, 1);
-      c.lineWidth = 0.8; c.lineCap = 'round';
-      links.forEach(([a, b], li) => { const A = pts[a], B = pts[b], u = clamp((t - 0.35 - li * 0.1) / 0.5, 0, 1); if (u <= 0) return; c.strokeStyle = `rgba(80,120,200,${0.4 * fade})`; c.beginPath(); c.moveTo(A.x, A.y + off); c.lineTo(lerp(A.x, B.x, u), lerp(A.y, B.y, u) + off); c.stroke(); });
-      pts.forEach((q, i) => { const a = appear(i) * fade; if (a <= 0.02) return; const tw = 0.75 + 0.25 * Math.sin(t * 6 + q.ph); spark(c, q.x, q.y + off, q.big ? 2.6 : 2, a * tw, i % 3 === 0 ? GOLD : [91, 155, 230], true); if (appear(i) < 1 && Math.random() < dt * 30) sw.add({ x: q.x, y: q.y + off, vx: rnd(-0.5, 0.5), vy: rnd(-0.5, 0.5), life: 0.5, r: 1, col: GOLD, drag: 0.93 }); });
-      sw.step(dt); sw.draw(c); return t > dur;
+  // ===== Constellation on page load: a real constellation from the star table, scaled across the page head, drawn LINE BY LINE
+  // (stars appear one after another, each line grows from star to star), held, then it fades while the ordinary background sky comes in.
+  const CONS_ORDER = ['Orion', 'Ursa Major (Big Dipper)', 'Cassiopeia', 'Cygnus', 'Lyra', 'Leo', 'Scorpius', 'Taurus', 'Crux'];
+  const lum = p => 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2];
+  function darkAt(x, y) {
+    let e = document.elementFromPoint(clamp(x, 1, W - 1), clamp(y, 1, H - 1));
+    while (e && e !== document.documentElement) { if (e.classList && e.classList.contains('navyband')) return true; const m = /rgba?\(([^)]+)\)/.exec(getComputedStyle(e).backgroundColor); if (m) { const p = m[1].split(',').map(parseFloat); if (p.length < 4 || p[3] > 0.6) return lum(p) < 120; } e = e.parentElement; }
+    return false;
+  }
+  function consShape(name) {
+    const st = SKYSTARS.filter(q => q.c === name); if (st.length < 3) return null; const r0 = st[0].ra;
+    let mr = 0, md = 0; st.forEach(q => { mr += ((q.ra - r0 + 540) % 360) - 180; md += q.dec; }); mr = r0 + mr / st.length; md /= st.length;
+    const P = { ra: mr / 15, dec: md, span: 120 }, pos = new Map(); st.forEach(q => { const p = projectStar(q, P, 1); if (p) pos.set(q, p); });
+    return { pos, segs: SKYLINES.filter(([a, b]) => a.c === name && pos.has(a) && pos.has(b)) };
+  }
+  let headSkyOK = false;
+  def('constellation', 'Constellation on page load', 'x', null, 6, X => {
+    const sec = targets[0] ? targets[0].sec : X.sec, r = sec.getBoundingClientRect(), hb = hdrBottom(), top = Math.max(r.top, hb) + 12, bot = Math.min(r.bottom, H - 20) - 8, left = 20, right = W - 20; if (bot - top < 70) return null;
+    const rects = textRects(sec, 3), dark = darkAt(W / 2, (top + bot) / 2), clearP = (x, y) => !hit(x, y, rects, 5), h0 = X.opt.name ? Math.max(0, CONS_ORDER.indexOf(X.opt.name)) : hash(page) % CONS_ORDER.length;
+    const segOK = (A, B) => { let ok = clearP(A.x, A.y) && clearP(B.x, B.y); for (let k = 1; ok && k < 14; k++) if (!clearP(lerp(A.x, B.x, k / 14), lerp(A.y, B.y, k / 14))) ok = false; return ok; };
+    function fitOne(name) {
+      const sh = consShape(name); if (!sh) return null; let best = null, maxSpan = 0; const rotInfo = [];
+      for (let rot = 0; rot < 16; rot++) { const ca = Math.cos(rot * 0.3927), sa = Math.sin(rot * 0.3927); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; sh.pos.forEach(p => { const x = p.x * ca - p.y * sa, y = p.x * sa + p.y * ca; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+        const sp = (x1 - x0) * Math.min((right - left) / (x1 - x0 || 1), (bot - top) / (y1 - y0 || 1)) / (right - left); rotInfo[rot] = sp; maxSpan = Math.max(maxSpan, sp); }
+      for (let rot = 0; rot < 16; rot++) { if (rotInfo[rot] < Math.min(0.85, maxSpan * 0.97)) continue; const ca = Math.cos(rot * 0.3927), sa = Math.sin(rot * 0.3927), pr = new Map(); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+        sh.pos.forEach((p, k) => { const q = { x: p.x * ca - p.y * sa, y: p.x * sa + p.y * ca }; pr.set(k, q); x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); });
+        const bw = Math.max(1, x1 - x0), bh = Math.max(1, y1 - y0), s2 = Math.min((right - left) / bw, (bot - top) / bh), sx = (right - left) - bw * s2, sy = (bot - top) - bh * s2;
+        for (let gx = 0; gx <= 6; gx++) for (let gy = 0; gy <= 10; gy++) { const ox = left + sx * gx / 6 - x0 * s2, oy = top + sy * gy / 10 - y0 * s2, P = new Map(); pr.forEach((q, k) => P.set(k, { x: ox + q.x * s2, y: oy + q.y * s2 }));
+          let n = 0; for (const [a, b] of sh.segs) if (segOK(P.get(a), P.get(b))) n++; const sc = n + 2.5 * (bw * s2) / (right - left) + Math.random() * 0.2; if (!best || sc > best.sc) best = { sc, n, P, sh, name }; } }
+      return best;
+    }
+    let pick = null; for (let k = 0; k < CONS_ORDER.length; k++) { const f = fitOne(CONS_ORDER[(h0 + k) % CONS_ORDER.length]); if (f && (!pick || f.n > pick.n)) pick = f; if (pick && pick.n >= 4 && (k === 0 || X.opt.name)) break; if (pick && pick.n >= 5) break; }
+    if (!pick) return null; const name = pick.name, best = pick, sh = pick.sh;
+    const segs = []; for (const [a, b] of sh.segs) { const A = best.P.get(a), B = best.P.get(b); if (segOK(A, B)) segs.push({ a, b, A, B }); }
+    if (segs.length < 2) return null;
+    const d = segs.length > 10 ? 0.15 : 0.2, t0 = 0.15, shown = new Map(); let ts = t0; segs.forEach(sg => { sg.t = ts; ts += d; if (!shown.has(sg.a)) shown.set(sg.a, sg.t); if (!shown.has(sg.b)) shown.set(sg.b, sg.t + d); });
+    const holdEnd = ts + 1.3, fadeLen = 0.8, sy0 = scrollY, sw = new Swarm(50), lineC = dark ? [175, 205, 250] : [60, 105, 200]; let popped = new Set(), settled = false;
+    X.guard(() => { headSkyOK = true; });
+    return { label: 'Constellation: ' + name.replace(/ \(.*/, ''), frame(c, t, dt) {
+      const off = -(scrollY - sy0), fade = 1 - clamp((t - holdEnd) / fadeLen, 0, 1);
+      if (t > holdEnd - 0.4 && !settled) { settled = true; headSkyOK = true; forceDraw = true; }
+      c.lineWidth = 1.2; c.lineCap = 'round';
+      for (const sg of segs) { const u = clamp((t - sg.t) / d, 0, 1); if (u <= 0) continue; const e = easeO(u), x = lerp(sg.A.x, sg.B.x, e), y = lerp(sg.A.y, sg.B.y, e) + off;
+        c.strokeStyle = `rgba(${lineC[0]},${lineC[1]},${lineC[2]},${(dark ? 0.7 : 0.62) * fade})`; c.beginPath(); c.moveTo(sg.A.x, sg.A.y + off); c.lineTo(x, y); c.stroke();
+        if (u < 1) { glow(c, x, y, 9, 0.7 * fade, GOLD); if (Math.random() < dt * 40) sw.add({ x, y, vx: rnd(-0.4, 0.4), vy: rnd(-0.4, 0.4), life: 0.35, r: 0.9, col: GOLD, drag: 0.92 }); } }
+      shown.forEach((ta, k) => { const u = (t - ta) / 0.25; if (u <= 0) return; const P = best.P.get(k), a = Math.min(1, u) * fade, tw = 0.8 + 0.2 * Math.sin(t * 5 + P.x), big = k.mag < 2.2;
+        if (u < 1) glow(c, P.x, P.y + off, 18 * (1 - u) + 6, 0.5 * (1 - u), GOLD); if (!popped.has(k)) { popped.add(k); for (let i = 0; i < 4; i++) { const an = rnd(0, 6.28); sw.add({ x: P.x, y: P.y + off, vx: Math.cos(an) * 0.9, vy: Math.sin(an) * 0.9, life: 0.5, r: 1, col: GOLD, drag: 0.9 }); } }
+        spark(c, P.x, P.y + off, big ? 3 : 2.2, a * tw, dark ? (big ? [255, 244, 214] : [225, 236, 255]) : (big ? GOLD : [29, 95, 209]), true); });
+      sw.step(dt); sw.draw(c, fade); return t > holdEnd + fadeLen;
     } };
   });
+
+  // ===== A comet: a small bright sparkle head and a long fine tail of tiny sparkles on a shallow diagonal. Touches nothing on the page.
+  def('comet', 'Comet', 'x', null, 2.4, X => {
+    const dir = Math.random() < 0.5 ? 1 : -1, sgn = Math.random() < 0.5 ? 1 : -1, hb = hdrBottom(), L = Math.min(560, W * 0.42), tn = Math.tan(rnd(0.12, 0.3)), half = W / 2 * tn;
+    const lo = hb + 30 + half, hi = Math.max(lo + 10, H * 0.66), ym = rnd(lo, hi), dur = rnd(1.2, 2.0), span = W + L + 80, N = COARSE ? 24 : 42;
+    const ux = dir / Math.hypot(1, tn), uy = dir * sgn * tn / Math.hypot(1, tn), jit = []; for (let k = 0; k < N; k++) jit.push({ a: rnd(-1.8, 1.8), s: rnd(-0.02, 0.02), ph: rnd(0, 6.28), col: BRIGHT[k % 6] });
+    let dk = 0, dkT = 0, fr = 0;
+    return { label: 'A comet', frame(c, t, dt) {
+      const u = t / dur; if (u >= 1) return true; const tr = u * span, hx = dir > 0 ? -40 + tr : W + 40 - tr, hy = ym + sgn * (hx - W / 2) * tn;
+      if (fr++ % 6 === 0 && hx > 0 && hx < W) dkT = darkAt(hx, hy) ? 1 : 0; dk += (dkT - dk) * Math.min(1, dt * 5);
+      const m = lerp(0.55, 1, dk), hc = dk > 0.5 ? WHITE : GOLD, tx = hx - ux * L, ty = hy - uy * L;
+      c.save(); c.beginPath(); c.rect(0, hdrBottom(), W, H); c.clip();
+      const g = c.createLinearGradient(hx, hy, tx, ty); g.addColorStop(0, `rgba(${hc[0]},${hc[1]},${hc[2]},${0.5 * m})`); g.addColorStop(1, `rgba(${hc[0]},${hc[1]},${hc[2]},0)`);
+      c.strokeStyle = g; c.lineWidth = 0.9; c.lineCap = 'round'; c.beginPath(); c.moveTo(hx, hy); c.lineTo(tx, ty); c.stroke();
+      for (let k = 0; k < N; k++) { const q = jit[k], s = (k + 1) / N, d = s * L, x = hx - ux * d + -uy * q.a * (0.4 + s), y = hy - uy * d + ux * q.a * (0.4 + s), al = Math.pow(1 - s, 1.5) * m * (0.7 + 0.3 * Math.sin(t * 14 + q.ph)), col = dk > 0.5 ? (k % 3 === 0 ? WHITE : [160, 200, 255]) : q.col;
+        spark(c, x, y, 0.6 + (1 - s) * 1.1, al, col, k % 6 === 0); }
+      glow(c, hx, hy, 13, 0.7 * m, hc); spark(c, hx, hy, 2.8, m, hc, true); c.restore(); return false;
+    } };
+  }, { free: true });
 
   // ===== Sparkle rain over the section's cards
   def('rain', 'Sparkle rain', 'x', null, 5.4, X => {
@@ -623,8 +651,7 @@ const FX_PATCHES = [
       sw.step(dt); sw.draw(c, 1); return t > 3.4 && !sw.p.length;
     } };
   }
-  def('steamcard', 'Steam from a card', 'x', null, 4.2, X => steam(X, false));
-  def('steambold', 'Steam on bold', 'x', 'bold', 4.2, X => steam(X, true));
+  def('steam', 'Steam', 'x', null, 4.2, X => { const b = X.tg.nbold > 0 && Math.random() < 0.5; return steam(X, b) || steam(X, !b); });
 
   // ===== Card sparkle-in: a sparkle lands on each card's top-left corner in turn, and the card lifts 4 px and settles
   def('cardin', 'Card sparkle-in', 'x', 'cards', 4.8, X => {
@@ -734,11 +761,11 @@ const FX_PATCHES = [
       c.restore();
     }
   }
-  def('nightsky', 'Night sky (bright, on this section)', 'sky', null, 8, X => null);   // played through play(): see skyNow()
+  def('nightsky', 'Background sky', 'sky', null, 8, X => null);   // played through play(): see skyNow()
   function skyNow(tg) {
     if (REDUCE || !cvOK()) return false; if (!tg.forced && skies.some(s => s.tg.sky === tg.sky && s.dir > 0)) return true;
     ensureCanvas(); if (tg.forced) { skies.forEach(s => { if (s.tg.sky === tg.sec) s.a = 0; s.dir = s.tg.sky === tg.sec ? -1 : s.dir; }); }
-    skies.push({ tg: tg.forced ? { sec: tg.sec, sky: tg.sec, navyIdx: tg.navyIdx, dark: true } : tg, a: 0, dir: 1, layout: null, until: tg.forced ? performance.now() + 7000 : 0 }); kick(); if (tg.forced) say('Night sky: real constellations'); return true;
+    skies.push({ tg: tg.forced ? { sec: tg.sec, sky: tg.sec, navyIdx: tg.navyIdx, dark: !!tg.dark } : tg, a: 0, dir: 1, layout: null, until: tg.forced ? performance.now() + 7000 : 0 }); kick(); if (tg.forced) say('Background sky'); return true;
   }
 
   // ---------------------------------------------------------------- sections: classification, the plan, triggers
@@ -760,32 +787,23 @@ const FX_PATCHES = [
     // navy rectangles (the dark blue sections, and the navy next-page cards) for the night sky
     // the background sky: every section except the 'In short / Next' block (kept regular blue); dark blue sections get the bright night sky
     targets.forEach((tg, i) => { if (tg.nextup) return; tg.sky = tg.sec; tg.navyIdx = i; tg.dark = tg.navy; skyTargets.push(tg); });
-    // the plan: on scroll only the fairy and the night sky run by themselves, plus the fire-then-sparkles effect on at most ONE section per page,
-    // and only where the heading or eyebrow itself is about something really bad. Every other effect lives in the demo panel only.
-    const STRONG = /\b(harm\w*|kill\w*|death|deaths|dead|die[sd]?|burn\w*|poison\w*|trauma\w*|abus\w*|punish\w*|violen\w*|injur\w*|disease\w*|suffer\w*|torture\w*|murder\w*|crisis|danger\w*)\b/i;
-    let pickI = -1, pickScore = 0;
-    targets.forEach((tg, i) => { if (tg.isHead || tg.nextup || !(tg.eyebrow || tg.nitems)) return; const sc = (tg.head && STRONG.test(tg.head.textContent) ? 2 : 0) + (tg.eyebrow && STRONG.test(tg.eyebrow.textContent) ? 1 : 0); if (sc > pickScore) { pickScore = sc; pickI = i; } });
-    if (pickI >= 0) targets[pickI].x = 'danger';
   }
 
   let t0 = performance.now(), iv = 0;
-  function fireFairy(tg) {
-    tg.firedF = true; if (!enabled || REDUCE || document.hidden || !cvOK()) return;
-    launch([tg.x === 'danger' ? 'danger' : 'fairy', 'fairy'], tg, {});
-  }
+  let lastScroll = 0, cometT = 0;
+  // automatic on scroll: the background sky, and the card sparkle-in once per group of cards (never while the load constellation or a comet runs)
   function check() {
-    if (!targets.length || REDUCE) return; const hb = hdrBottom();
-    let cand = -1;
-    for (let i = 0; i < targets.length; i++) {
-      const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (tg.firedF) continue;
-      if (tg.isHead) { if ((scrollY > 6 || performance.now() - t0 > 4600) && i === 0) { if (r.bottom > H * 0.2 && r.top < H) cand = i; else tg.firedF = true; } }
-      else if (r.top <= H * 0.40 && r.bottom > H * 0.18) cand = i;
-    }
-    // at the very bottom of the page the last sections cannot reach the upper part of the window: the one resting in view gets its fairy
-    if (cand < 0 && scrollY + H >= document.documentElement.scrollHeight - 6) for (let i = targets.length - 1; i >= 0; i--) { const tg = targets[i], r = tg.sec.getBoundingClientRect(); if (!tg.firedF && r.top < H * 0.9 && r.bottom > H * 0.15) { cand = i; break; } }
-    if (cand >= 0) { for (let j = 0; j < cand; j++) targets[j].firedF = true; fireFairy(targets[cand]); }   // fast scrolling: only the section that comes to rest
-    for (const tg of skyTargets) { if (tg === targets[0] && performance.now() - t0 < 5200) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) { if (enabled && !document.hidden && cvOK()) skyNow(tg); } }
-    if (targets.every(t => t.firedF) && !skyTargets.length) { clearInterval(iv); iv = 0; }
+    if (!targets.length || REDUCE || !enabled || document.hidden || !cvOK()) return; const hb = hdrBottom(), now = performance.now();
+    for (const tg of skyTargets) { if (tg === targets[0] && !headSkyOK) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) skyNow(tg); }
+    if (now - lastScroll < 250 || laneBusy('x') || pending.length) return;
+    for (const tg of targets) { if (tg.firedC || tg.nextup || !tg.safe || tg.nitems < 2) continue; if (tg === targets[0] && !headSkyOK) continue; const r = tg.sec.getBoundingClientRect(); if (r.top > H * 0.72 || r.bottom < hb + 60) continue;
+      if (startFx(DEF.cardin, tg, { quiet: true })) { tg.firedC = true; break; } }
+  }
+  // a comet every 20 to 45 s (the first within 6 to 12 s), only while the page is visible, still, and nothing else of ours is running
+  function scheduleComet(first) { clearTimeout(cometT); cometT = setTimeout(tryComet, first ? rnd(6000, 12000) : rnd(20000, 45000)); }
+  function tryComet() {
+    if (REDUCE) return; if (!enabled || document.hidden || !cvOK() || performance.now() - lastScroll < 1500 || laneBusy('x') || pending.length) { cometT = setTimeout(tryComet, 1500); return; }
+    if (startFx(DEF.comet, currentTarget() || targets[0], { quiet: true })) scheduleComet(false); else cometT = setTimeout(tryComet, 3000);
   }
   const start = () => { if (!iv) iv = setInterval(check, 400); };
 
@@ -800,19 +818,21 @@ const FX_PATCHES = [
   function play(name, sec, dance) {
     if (REDUCE) return false; const d = DEF[name] || Object.values(DEF).find(x => x.label === name); if (!d) return false; const tg = resolveTarget(sec); if (!tg) return false;
     if (!cvOK()) { say('The page fire is running. Try again in a moment.', 2200); return false; }
-    if (d.id === 'nightsky') return skyNow({ sec: tg.sec, navyIdx: tg.i || 0, forced: true });
+    if (d.id === 'nightsky') return skyNow({ sec: tg.sec, navyIdx: tg.i || 0, forced: true, dark: tg.navy });
     if ((d.need === 'cards' && !(tg.safe && tg.nitems >= 2)) || (d.need === 'bold' && !tg.nbold)) { say(d.need === 'cards' && !tg.safe ? 'This section holds a form or a toy, so card effects are skipped here.' : 'This section has nothing for that effect.', 2200); return false; }
-    if (d.id === 'thought' && !startFx(d, targets[0] || tg, {})) { say('The page title is not in view. Scroll to the top first.', 2200); return false; } else if (d.id === 'thought') return true;
     const old = running.find(f => f.lane === d.lane); if (old) finish(old);
     const ok = startFx(d, tg, dance ? { dance } : {}); if (!ok) say('Nothing to show here. Try another section.', 2000); return ok;
   }
-  function replayAll() { stopAll(); targets.forEach(t => { t.firedF = false; t.firedX = false; }); try { scrollTo({ top: 0, behavior: 'auto' }); } catch (e) { scrollTo(0, 0); } t0 = performance.now(); say('Replaying. Scroll down to see each one.', 2500); start(); }
+  function replayAll() { stopAll(); targets.forEach(t => { t.firedC = false; }); headSkyOK = false; try { scrollTo({ top: 0, behavior: 'auto' }); } catch (e) { scrollTo(0, 0); } t0 = performance.now(); say('Replaying. Scroll down to see each one.', 2500); start(); if (!startFx(DEF.constellation, targets[0], { quiet: true })) headSkyOK = true; }
 
   function buildUI() {
     document.body.appendChild(pill); document.body.appendChild(label);
     if (REDUCE) { pill.classList.add('off'); pill.innerHTML = '<i aria-hidden="true"></i><b style="font-weight:600">Effects are off (reduced motion setting)</b>'; pill.setAttribute('aria-disabled', 'true'); return; }
-    panel.innerHTML = '<h4>Effects demo</h4><p class="fxd-pass">Second pass: fairy in every section, sparkle effects only.</p><label class="fxd-sw"><input type="checkbox" class="fxd-on"> <span>Effects on as I scroll</span></label>';
-    ORDER.forEach(id => { const row = document.createElement('div'); row.className = 'fxd-row'; row.innerHTML = '<span></span><button type="button">play</button>'; row.firstChild.textContent = DEF[id].label; row.lastChild.setAttribute('aria-label', 'Play ' + DEF[id].label); row.lastChild.addEventListener('click', () => play(id)); panel.appendChild(row); });
+    panel.innerHTML = '<h4>Effects demo</h4><p class="fxd-pass">Third pass: the night sky.</p><label class="fxd-sw"><input type="checkbox" class="fxd-on"> <span>Effects on as I scroll</span></label><h4>Automatic</h4>';
+    const row = id => { const r = document.createElement('div'); r.className = 'fxd-row'; r.innerHTML = '<span></span><button type="button">play</button>'; r.firstChild.textContent = DEF[id].label; r.lastChild.setAttribute('aria-label', 'Play ' + DEF[id].label); r.lastChild.addEventListener('click', () => play(id)); panel.appendChild(r); };
+    ['nightsky', 'constellation', 'cardin', 'comet'].forEach(row);
+    const h2 = document.createElement('h4'); h2.textContent = 'Not in use (try them here)'; h2.style.marginTop = '10px'; panel.appendChild(h2);
+    ['fairy', 'rain', 'burst', 'galaxy', 'tornado', 'border', 'steam', 'twinkle', 'flip', 'boldtw'].forEach(row);
     const all = document.createElement('button'); all.type = 'button'; all.className = 'fxd-all'; all.textContent = 'Replay all on this page'; all.addEventListener('click', replayAll); panel.appendChild(all);
     document.body.appendChild(panel);
     const sw = panel.querySelector('.fxd-on'); sw.checked = enabled; sw.addEventListener('change', () => { enabled = sw.checked; store.set('fxdemo-off', enabled ? '0' : '1'); if (!enabled) stopAll(); say(enabled ? 'Effects on' : 'Effects off'); });
@@ -823,7 +843,7 @@ const FX_PATCHES = [
 
   window.fxDemo = {
     list: () => ORDER.map(id => DEF[id].label), ids: () => ORDER.slice(), play, running: () => running.map(f => f.def.id), errors: () => errors.slice(),
-    plan: () => targets.map(t => ({ i: t.i, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, mood: t.mood, extra: t.x, auto: t.x ? 'danger' : null, navy: t.navy, safe: t.safe, cards: t.nitems, bolds: t.nbold })),
+    plan: () => targets.map(t => ({ i: t.i, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, mood: t.mood, navy: t.navy, safe: t.safe, cards: t.nitems, bolds: t.nbold })),
     fairyLog: () => { try { return JSON.parse(store.get('fxdemo-log') || '[]'); } catch (e) { return fairyLogArr.slice(); } },
     skies: () => skies.map(s => ({ patch: s.layout && s.layout.patch, a: +s.a.toFixed(2), stars: s.layout ? s.layout.stars.length : 0, named: s.layout ? [...new Set(s.layout.stars.filter(q => q.s.c !== 'Singles').map(q => q.s.c))] : [], dust: s.layout ? s.layout.dust.length : 0 })),
     stars: () => FX_STAR_TABLE, stop: stopAll, pos: () => { const f = running.find(r => r.inst && r.inst.pos); return f ? f.inst.pos() : null; }
@@ -831,11 +851,12 @@ const FX_PATCHES = [
   function init() {
     buildUI(); if (REDUCE) return; collect();
     let ticking = false; addEventListener('scroll', () => { forceDraw = true; if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; check(); }); }, { passive: true });
-    start(); setTimeout(check, 4700);
-    // page load: the title forms from sparkles (with the icicles under the menu), then the constellation across the page head
-    const open = () => { if (!enabled || !cvOK()) return; startFx(DEF.thought, targets[0], {}); setTimeout(() => { if (enabled && !document.hidden && cvOK() && scrollY < 250 && targets[0]) startFx(DEF.constellation, targets[0], {}); }, 1900); };
-    const go = () => { if (document.hidden) { const once = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', once); open(); } }; document.addEventListener('visibilitychange', once); } else open(); };
-    if (document.fonts && document.fonts.status === 'loading') Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 700))]).then(go); else go();
+    addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
+    start(); setTimeout(() => { headSkyOK = true; check(); }, 7000);
+    // page load, right away: the constellation drawn line by line across the page head, then the ordinary background sky; the first comet 6 to 12 s in
+    const open = () => { if (!enabled || !cvOK()) { headSkyOK = true; return; } if (scrollY > 250 || !startFx(DEF.constellation, targets[0], { quiet: true })) headSkyOK = true; };
+    if (document.hidden) { const once = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', once); open(); } }; document.addEventListener('visibilitychange', once); } else open();
+    scheduleComet(true);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

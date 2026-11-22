@@ -1,6 +1,6 @@
 // HMR progress tracker (preview only). A thin bar on the bottom edge of the sticky header showing how much of the site a
 // visitor has explored on this device. It measures exploration (pages reached the end of, with a little time spent), not
-// knowledge. Stored only in localStorage; nothing is sent anywhere. Celebrations escalate: page, 25%, 50%, 75%, 100%. Every page arrival opens with sparkle icicles under the header.
+// knowledge. Stored only in localStorage; nothing is sent anywhere. Celebrations escalate: page, 25%, 50%, 75%, 100%.
 // There is no way to hide the bar (owner, 2026-11-21): the popover has Reset and Close, and Close only closes the popover.
 (() => {
   'use strict';
@@ -160,16 +160,16 @@
   const GOLDS = [[242, 169, 59], [247, 197, 102], [255, 226, 160], [242, 169, 59], [91, 155, 230], [255, 255, 255]];
   let BAR_Y = 64, MAXY = 160; // measured from the header at the start of each celebration (about 100 px below the bar)
   let busy = false, queued = null;
-  const LEVEL = { read: 0, 25: 1, 50: 2, 75: 3, 100: 4, icicles: -1 };
+  const LEVEL = { read: 0, 25: 1, 50: 2, 75: 3, 100: 4 };
 
   function celebrate(kind) {
     kind = String(kind);
     if (!(kind in LEVEL)) return false;
     if (document.querySelector('canvas[data-page-fire]')) return false; // never over the site's page fire
     if (still) { // reduced motion: no particles; the bar has already updated, so just show the label
-      if (kind !== 'icicles') { showLabel(kind === '100' ? 3000 : 2000); if (kind === '100') { track.classList.remove('pulse'); } } return true; }
-    if (busy) { if (kind !== 'icicles' && kind !== 'read') queued = kind; return false; }
-    busy = true; if (kind !== 'icicles') showLabel(kind === '100' ? 3200 : 2000);
+      showLabel(kind === '100' ? 3000 : 2000); if (kind === '100') { track.classList.remove('pulse'); } return true; }
+    if (busy) { if (kind !== 'read') queued = kind; return false; }
+    busy = true; showLabel(kind === '100' ? 3200 : 2000);
     run(kind); return true;
   }
 
@@ -177,48 +177,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden && stopper) stopper(); });
   addEventListener('pagehide', () => { if (stopper) stopper(); });
 
-  // Page arrival (every page load): along the header's lower edge, side by side in steps of about 1 cm (38 px), each a downward
-  // triangle filled with falling sparkles (the soft dots and fine crosses of the pointer trail): dense and bright at the top, thinning
-  // to single sparkles at the tip. It forms left to right in about 0.4 s, rains for about 2 s, then fades. No lines, never more than
-  // 110 px below the header.
-  function icicles() {
-    const w = innerWidth, dpr = Math.min(1.5, devicePixelRatio || 1), coarse = matchMedia('(pointer: coarse)').matches;
-    BAR_Y = Math.round(head.getBoundingClientRect().bottom); MAXY = Math.min(innerHeight, BAR_Y + 110);
-    const cv = document.createElement('canvas'); cv.className = 'hmr-cv'; cv.setAttribute('aria-hidden', 'true');
-    cv.style.height = MAXY + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(MAXY * dpr); document.body.appendChild(cv);
-    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const PAL = [[91, 155, 230], [242, 169, 59], [109, 74, 255], [29, 95, 209], [255, 190, 70], [214, 120, 210], [91, 155, 230]], SP = {};
-    const sprite = col => { const k = col.join(','); if (SP[k]) return SP[k]; const s = document.createElement('canvas'); s.width = s.height = 32; const g = s.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
-      gr.addColorStop(0, `rgba(${k},0.95)`); gr.addColorStop(0.35, `rgba(${k},0.4)`); gr.addColorStop(1, `rgba(${k},0)`); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return (SP[k] = s); };
-    const SW = 38, n = Math.ceil(w / SW), MAX = coarse ? 280 : 640, DUR = 2.45, RAIN = 2.0, ice = [], parts = [];
-    for (let i = 0; i < n; i++) { const L = 50 + Math.random() * 50 + (i % 5 === 2 ? 4 : 0); ice.push({ cx: i * SW + SW / 2, L: Math.min(100, L), t0: (i / n) * 0.4, acc: Math.random() }); }
-    let t0 = performance.now(), last = t0, lastDraw = 0, ended = false, rid = 0;
-    function frame(now) {
-      if (ended) return; rid = requestAnimationFrame(frame);
-      if (coarse && now - lastDraw < 32) return; lastDraw = now;
-      const dt = Math.min(0.05, (now - last) / 1000), t = (now - t0) / 1000; last = now;
-      if (t > DUR) return finish();
-      const fade = t < RAIN ? 1 : Math.max(0, 1 - (t - RAIN) / (DUR - RAIN));
-      c.clearRect(0, 0, w, MAXY);
-      // emit: more at the top of each triangle, each particle falls inside the cone and ends somewhere along it (few reach the tip)
-      if (t < RAIN) for (const q of ice) { if (t < q.t0) continue; const grow = Math.min(1, (t - q.t0) / 0.3), L = q.L * (1 - Math.pow(1 - grow, 3)); q.acc += dt * (coarse ? 13 : 16) * (L / 75); 
-        while (q.acc >= 1 && parts.length < MAX) { q.acc--; parts.push({ cx: q.cx, u: Math.random() + Math.random() - 1, d: Math.random() * 6, dEnd: L * (0.4 + 0.6 * Math.pow(Math.random(), 0.9)), L: q.L, v: 70 + Math.random() * 55, col: PAL[Math.floor(Math.random() * PAL.length)], r: 0.8 + Math.random() * 1.5, cross: Math.random() < 0.3, ph: Math.random() * 6.28, age: 0 }); } q.acc = Math.min(q.acc, 1.5); }
-      for (let i = parts.length - 1; i >= 0; i--) {
-        const p = parts[i]; p.d += p.v * dt; p.age += dt; if (p.d >= p.dEnd || BAR_Y + p.d > MAXY - 3) { parts.splice(i, 1); continue; }
-        const f = p.d / p.L, half = (SW / 2) * (1 - f) * 0.92, x = p.cx + p.u * half + Math.sin(p.age * 5 + p.ph) * 0.8, y = BAR_Y + p.d;
-        const a = Math.min(1, p.age * 8) * (1 - Math.pow(f, 1.3) * 0.55) * (0.7 + 0.3 * Math.sin(p.age * 14 + p.ph)) * fade * (1 - Math.max(0, (p.d - p.dEnd * 0.8) / (p.dEnd * 0.2 + 1)));
-        if (a <= 0.02) continue; const R = p.r * (1.1 - 0.5 * f);
-        c.globalAlpha = Math.min(1, a); c.drawImage(sprite(p.col), x - R * 4, y - R * 4, R * 8, R * 8); c.globalAlpha = 1;
-        if (p.cross) { c.strokeStyle = `rgba(${p.col[0]},${p.col[1]},${p.col[2]},${Math.min(1, a)})`; c.lineWidth = 1; c.beginPath(); c.moveTo(x - R * 3, y); c.lineTo(x + R * 3, y); c.moveTo(x, y - R * 3); c.lineTo(x, y + R * 3); c.stroke(); }
-      }
-    }
-    function finish() { if (ended) return; ended = true; cancelAnimationFrame(rid); clearTimeout(hard); if (stopper === finish) stopper = null; cv.remove(); busy = false; }
-    const hard = setTimeout(finish, (DUR + 2.5) * 1000); stopper = finish;
-    rid = requestAnimationFrame(frame);
-  }
-
   function run(kind) {
-    if (kind === 'icicles') return icicles();
     const lv = LEVEL[kind], w = innerWidth, dpr = Math.min(2, devicePixelRatio || 1);
     BAR_Y = Math.round(head.getBoundingClientRect().bottom - 2); MAXY = Math.min(innerHeight, BAR_Y + 100);
     const cv = document.createElement('canvas'); cv.className = 'hmr-cv'; cv.setAttribute('aria-hidden', 'true');
@@ -334,7 +293,4 @@
 
   // ---- start ----
   scrollCalc(); render();
-  // every page load: icicles under the header (skipped for reduced motion, a hidden tab, or while the page fire runs)
-  const arrive = () => { if (document.hidden) { const once = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', once); celebrate('icicles'); } }; document.addEventListener('visibilitychange', once); } else celebrate('icicles'); };
-  setTimeout(arrive, 250);
 })();

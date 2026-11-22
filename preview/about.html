@@ -41,7 +41,6 @@
 .ab-big p{max-width:none}
 .ab-hyp{display:inline-block;font:600 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#0B2545;background:#9CC3F5;border-radius:6px;padding:5px 7px;margin-bottom:10px}
 .ab-shuf{margin-top:22px;background:#fff;position:relative}
-#ab-fx{position:absolute;left:0;top:0;width:100%;height:70px;pointer-events:none;border-radius:inherit}
 .ab-foot-r{margin-left:auto;display:flex;align-items:center;gap:12px}
 .ab-bind{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:26px;align-items:start;margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line)}
 .ab-bind figure{margin:0}
@@ -152,8 +151,7 @@
       <p class="small muted" style="margin:14px 0 0;max-width:none">None of these people is careless. Each is following a model of what is real, and the verdict comes from the model. That is why a value system is only as good as the model under it, and why a partial model can lead sincere people to the wrong conclusions and cause them to act against their own true values.</p>
       </div>
       <p id="ab-close" style="margin:20px 0 0;max-width:none;font-weight:600;color:var(--navy)" hidden></p>
-      <div class="ab-foot"><button type="button" class="btn primary" id="ab-next">Show another</button><span class="ab-foot-r"><span class="small muted" id="ab-count"></span><button type="button" class="btn" id="ab-prev">Go back</button></span></div>
-      <canvas id="ab-fx" aria-hidden="true"></canvas>
+      <div class="ab-foot"><button type="button" class="btn primary" id="ab-next">Show another</button><span class="small muted" id="ab-count" style="margin-left:14px"></span><span class="ab-foot-r"><button type="button" class="btn" id="ab-prev">Go back</button></span></div>
     </div>
     </div>
   </div>
@@ -374,67 +372,66 @@
      "Whether a cow may be eaten depends on where you live.",
      "In much of the world it is an ordinary meal. The cow is seen as an animal raised for food, like any other. Eating it needs no more thought than any other meal.",
      "For most Hindus the cow is sacred, and most Indian states restrict or ban its slaughter. Here the animal holds a place above food, and the law follows that view.",
-     "", "Same animal, same meal, opposite verdicts. What is on the plate depends on what the eater believes a cow is."],
+     "<b>In HMR,</b> every animal is an instance of Universal Intelligence. The question a shared model asks is not which species may be eaten. It is what the animal experiences in its life and in its death.", "Same animal, same meal, opposite verdicts. What is on the plate depends on what the eater believes a cow is."],
     // PICTURE (case 6): a public-domain painting of pigs
     ["Eating pork",
      "The same meat is a staple in one place and forbidden in another.",
      "A staple from China to Spain. There the pig is simply a source of food, and no rule of faith stands between it and the table.",
      "Forbidden in Judaism and in Islam. For believers the rule is part of a faith's view of what may be eaten, and keeping it is part of living rightly.",
-     "", "The meat is the same in both places. What differs is the model of what a person may eat, and why."],
+     "<b>In HMR,</b> a rule about one animal is a partial answer. Every animal is an instance of Universal Intelligence, so the same care is owed to each, whatever its species.", "The meat is the same in both places. What differs is the model of what a person may eat, and why."],
     // PICTURE (case 7): a public-domain painting of a moneylender
     ["Charging interest on a loan",
      "A lender asks for more back than was lent.",
      "The foundation of modern banking. On this view, money lent is money put to work, and a lender who waits is owed a return for it.",
      "Forbidden as riba in Islamic law, and condemned as usury by the medieval Christian church. On that view, earning from a loan alone takes advantage of a borrower in need.",
-     "", "One model sees a fair return for waiting, the other sees a wrong done to the borrower. The loan is the same. The model of what money is for is not."],
+     "<b>In HMR,</b> the test for any exchange is the same: whether it serves the wellbeing of everyone in it, or takes from one person to feed another.", "One model sees a fair return for waiting, the other sees a wrong done to the borrower. The loan is the same. The model of what money is for is not."],
     // PICTURE (case 8): a public-domain insect illustration
     ["Killing an insect",
      "An insect is in the way, and a person can crush it or step around it.",
      "Elsewhere it is pest control, done without a thought. An insect is seen as a nuisance, and its life weighs little against a person's comfort.",
      "Jain monks sweep the path ahead of them so as not to crush one. Doing no harm is their first vow, and it reaches even the smallest creature.",
-     "", "Whether a small life counts depends on what a person believes a living thing is."],
+     "<b>In HMR,</b> an insect is also an instance of Universal Intelligence. That does not settle every case, and it does rule out killing without a thought.", "Whether a small life counts depends on what a person believes a living thing is."],
     // PICTURE (case 9): a public-domain engraving of an early blood transfusion
     ["Accepting a blood transfusion",
      "A patient is bleeding badly, and a transfusion would save their life.",
      "To a doctor it is ordinary care that saves a life. The aim is to keep the patient alive, and a transfusion does that.",
      "To a Jehovah's Witness it breaks a command of God, even when life depends on it. For them, faithfulness to God comes first.",
-     "", "Both sides want what is good for the patient. They differ on what a person is, and so on what it means to save one."],
+     "<b>In HMR,</b> the body is what a person lives through, and caring for it is part of what a life is for. A shared model would give the doctor and the patient the same starting point.", "Both sides want what is good for the patient. They differ on what a person is, and so on what it means to save one."],
     // PICTURE (case 10): a public-domain painting of a doctor at a bedside
     ["Helping a dying person to die",
      "A person in great suffering asks a doctor to help them die.",
      "A legal medical act in the Netherlands, Belgium, Canada, and elsewhere, where it is seen as mercy. A person in great suffering is helped to end it, at their own request.",
      "A crime in most countries, and a grave wrong in many faiths. There, a life is not ours to end, and a doctor's duty is to preserve it.",
-     "", "The same request meets mercy in one model and a crime in another. The difference is what a life is, and who it belongs to."],
+     "<b>In HMR,</b> suffering is a signal that something is wrong, and relieving it matters. What death is, and what follows it, is one of the answers HMR is still working out (<a href='answers.html#death'>see The Answers</a>).", "The same request meets mercy in one model and a crime in another. The difference is what a life is, and who it belongs to."],
     // PICTURE (case 11): a public-domain painting of a duel
     ["Fighting a duel over an insult",
      "Two men settle an insult with weapons, and one may die.",
      "For a gentleman in Europe or America two centuries ago, refusing was the disgrace. Honor was worth more than safety, and a man defended it in person.",
      "Today it is a crime, and the survivor is a killer. An insult is now seen as too small a reason to take a life.",
-     "", "Honor was real to the men who fought. A model that ranks reputation above life gives a different verdict than one that does not."],
+     "<b>In HMR,</b> each person is the same intelligence in another body. An insult cannot be worth a life, because the life at stake is, in the end, one's own.", "Honor was real to the men who fought. A model that ranks reputation above life gives a different verdict than one that does not."],
     // PICTURE (case 12): a map of countries (public domain) showing where striking children is against the law
     ["Striking a child to correct them",
      "A parent hits a child to teach them a lesson.",
      "Elsewhere it is a parent's right, and to many a parent's duty. Parents who do it believe it teaches a child right from wrong.",
      "Against the law in more than 60 countries, beginning with Sweden in 1979. There, a child is seen as a person with a right not to be hit.",
-     "", "The parent who strikes and the parent who will not both act out of care. They hold different models of what a child is, and of what teaches."],
+     "<b>In HMR,</b> a child's body and a child's model of reality are both still forming, and a blow lands on both. How a child is treated shapes the adult they become (<a href='kids.html'>Do you have kids?</a>).", "The parent who strikes and the parent who will not both act out of care. They hold different models of what a child is, and of what teaches."],
     // PICTURE (case 13): a public-domain painting of wine, such as a Bacchus or a Last Supper
     ["Drinking wine",
      "The same drink is a sacrament in one place and a sin in another.",
      "Sacred in the Christian Eucharist, and ordinary at dinner in much of the world. In both uses it is welcome, as a holy sign or as part of a meal.",
      "Forbidden in Islam. Believers who avoid it do so as an act of obedience.",
-     "", "One drink, three meanings: sacred, ordinary, and forbidden. What it is depends on the model it is seen through."],
+     "<b>In HMR,</b> the question about any substance is what it does to the body and to a person's picture of reality. A shared model would ask that, and not whether a tradition allows it.", "One drink, three meanings: sacred, ordinary, and forbidden. What it is depends on the model it is seen through."],
     // PICTURE (case 14): a public-domain map of countries where a second spouse is lawful
     ["Marrying a second spouse",
      "A married person takes a second husband or wife.",
      "Lawful in dozens of countries in Africa and Asia. There, a second marriage is a recognized form of family.",
      "The crime of bigamy across Europe and the Americas. There, marriage is held to be between two people only.",
-     "", "Each law protects what its society takes marriage to be. The act is the same. The model of the family is not."]
+     "<b>In HMR,</b> the test is truthfulness and the wellbeing of every person involved. A shared model would judge the arrangement by that, and not by custom.", "Each law protects what its society takes marriage to be. The act is the same. The model of the family is not."]
   ];
   var box = document.getElementById('same-act'), act = document.getElementById('ab-act'); if (!box || !act) return;
   var sum = document.getElementById('ab-sum'), a = document.getElementById('ab-a'), b = document.getElementById('ab-b'),
       h = document.getElementById('ab-hmr'), x0 = document.getElementById('ab-x0'), n = document.getElementById('ab-count'), i = 0;
-  var prev = document.getElementById('ab-prev'), cl = document.getElementById('ab-close'), cl1 = document.getElementById('ab-close1'),
-      cv = document.getElementById('ab-fx'), calm = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var prev = document.getElementById('ab-prev'), cl = document.getElementById('ab-close'), cl1 = document.getElementById('ab-close1');
   function show() {
     var c = C[i];
     act.textContent = c[0]; sum.innerHTML = c[1]; b.innerHTML = c[2]; a.innerHTML = c[3];
@@ -444,39 +441,9 @@
     cl.innerHTML = c[5] || ''; cl.hidden = (i === 0 || !c[5]);
     n.textContent = (i + 1) + ' of ' + C.length;
   }
-  // One small sparkle sweep along the top edge of the block, the same for every change. Absolutely positioned, so the height never changes.
-  var raf = 0, COLS = ['#1D5FD1', '#5B9BE6', '#6D4AFF', '#F2A93B', '#D678D2', '#F2A93B'];
-  function sparkle() {
-    if (!cv || calm() || !cv.getContext) return;
-    var w = box.clientWidth, H = 70, d = Math.min(window.devicePixelRatio || 1, 2), c = cv.getContext('2d');
-    cv.width = Math.round(w * d); cv.height = Math.round(H * d); c.setTransform(d, 0, 0, d, 0, 0);
-    var P = [], k, T = 700;
-    for (k = 0; k < 26; k++) {
-      var hex = COLS[k % COLS.length];
-      P.push({ x0: Math.random() * w, off: Math.random() * 0.45, y: 6 + Math.random() * 34, R: 1.6 + Math.random() * 2.2,
-               star: Math.random() < 0.45, rgb: [parseInt(hex.substr(1, 2), 16), parseInt(hex.substr(3, 2), 16), parseInt(hex.substr(5, 2), 16)] });
-    }
-    cancelAnimationFrame(raf);
-    var t0 = performance.now();
-    (function frame(now) {
-      var t = Math.min(1, (now - t0) / T);
-      c.clearRect(0, 0, w, H);
-      for (var j = 0; j < P.length; j++) {
-        var p = P[j], u = (t - p.off) / 0.55; if (u <= 0 || u >= 1) continue;
-        var a = Math.sin(u * Math.PI), x, y = p.y + Math.sin(u * 6 + j) * 3,
-            R = p.R * (0.6 + 0.6 * a), r = p.rgb[0], g = p.rgb[1], bl = p.rgb[2];
-        x = (u * 0.7 + (p.x0 / w) * 0.3) * w;
-        var gr = c.createRadialGradient(x, y, 0, x, y, R * 4);
-        gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + bl + ',' + (0.85 * a) + ')'); gr.addColorStop(0.35, 'rgba(' + r + ',' + g + ',' + bl + ',' + (0.35 * a) + ')'); gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + bl + ',0)');
-        c.fillStyle = gr; c.beginPath(); c.arc(x, y, R * 4, 0, 6.283); c.fill();
-        if (p.star) { c.strokeStyle = 'rgba(' + r + ',' + g + ',' + bl + ',' + a + ')'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(x - R * 3.2, y); c.lineTo(x + R * 3.2, y); c.moveTo(x, y - R * 3.2); c.lineTo(x, y + R * 3.2); c.stroke(); }
-      }
-      if (t < 1) raf = requestAnimationFrame(frame); else c.clearRect(0, 0, w, H);
-    })(t0);
-  }
   function go(step) {
-    i = (i + step + C.length) % C.length; show(); sparkle();
-    box.scrollIntoView({ behavior: calm() ? 'auto' : 'smooth', block: 'start' });
+    i = (i + step + C.length) % C.length; show();
+    box.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
   document.getElementById('ab-next').addEventListener('click', function () { go(1); });
   prev.addEventListener('click', function () { go(-1); });
