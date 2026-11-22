@@ -225,7 +225,7 @@ function buildTent() {
   const big = ridgeTent(0, -9, 0.05, 1.9, '#D9553E');
   const b1 = bellTent(-4, 6, 1.0, '#7FB069', 7), b2 = bellTent(5, -1, 1.15, '#B565A7', 8); bellTent(-12, 8, 0.9, '#E5C546', 6);
   // a flag pole in the middle, guyed, with slack bunting to three tents
-  const fb = node(0, 0.02, 2, 3), ft = node(0, 8.5, 2, 3); strut(fb, ft, { ts: 0.7 });
+  const fb = node(0, 0.02, 2, 3, true), ft = node(0, 8.5, 2, 3); strut(fb, ft, { ts: 0.7 });
   for (let i = 0; i < 4; i++) { const a = TAU * i / 4 + 0.4, st = node(5.2 * Math.cos(a), 0.02, 2 + 5.2 * Math.sin(a), 1, true); cable(ft, st, { pre: 0.96 }); }
   [b1, b2, big.t1].forEach(t => cable(ft, t, { pre: 1.05, ts: 0.5 }));
   const f1 = node(1.7, 8.1, 2, 0.4, false, { drag: 1.2 }), f2 = node(1.7, 7.2, 2, 0.4, false, { drag: 1.2 });
@@ -379,7 +379,7 @@ function buildMall() {
   for (let i = 0; i <= nx; i++) { G[i] = []; for (let j = 0; j <= nz; j++) {
     const high = (i + j) % 2 === 0, x = -nx * bw / 2 + i * bw, z = -nz * bd / 2 + j * bd;
     G[i][j] = node(x, high ? hi : lo, z, 6);
-    if (high) { const b = node(x, 0.02, z, 6); strut(b, G[i][j], { ts: 1.5 }); }
+    if (high) { const b = node(x, 0.02, z, 6, true); strut(b, G[i][j], { ts: 1.5 }); }
     else { const st = node(x, 0.02, z, 1, true); cable(G[i][j], st, { pre: 0.96, ts: 1.1 }); }
   } }
   for (let i = 0; i <= nx; i++) for (let j = 0; j <= nz; j++) {
@@ -463,9 +463,9 @@ function buildHuman() {
 
 // a few riders always stand along the line where the ground can split, so the rift has something to swallow
 function riftRiders(sc) {
-  let zm = 0; for (let i = 0; i < nN; i++) if (!isRider[i] && Math.abs(px[i]) < 3.5 * sc) zm = Math.max(zm, pz[i]);
-  const z = zm + 3.4 * sc;
-  person(0.3 * sc, 0, z, sc, PCOL[2]); person(-0.5 * sc, 0, z + 1.6 * sc, sc, PCOL[4]); car(0, 0, z + 4.6 * sc, 1.0 * sc, '#D98A1C', null, true);
+  let zm = 0; for (let i = 0; i < nN; i++) if (!isRider[i] && Math.abs(px[i]) < 3.5 * sc) zm = Math.min(zm, pz[i]);
+  const z = zm - 3.4 * sc;
+  person(0.3 * sc, 0, z, sc, PCOL[2]); person(-0.5 * sc, 0, z - 1.6 * sc, sc, PCOL[4]); car(0, 0, z - 4.6 * sc, 1.0 * sc, '#D98A1C', null, true);
 }
 const SCENES = [
   { id: 'tent', name: 'Tent camp', build: buildTent },
@@ -1527,7 +1527,7 @@ window.funRoom = {
   deadMem: () => mem.map((m, i) => [i, m.alive, m.kind, +m.st.toFixed(3), +m.L0.toFixed(1), m.orig]).filter(a => !a[1] && a[5]),
   fast: v => { const r = []; for (let i = 0; i < nN; i++) if (alive[i] && Math.hypot(vx[i], vy[i], vz[i]) > v) r.push([i, isRider[i], +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), +Math.hypot(vx[i], vy[i], vz[i]).toFixed(1)]); return r; },
   dead: () => { const r = []; for (let i = 0; i < nN; i++) if (!alive[i]) r.push([i, +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), deg[i]]); return r; },
-  riders: () => riders.map(R => ({ id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
+  riders: () => riders.map(R => ({ id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, air: R.air, tq: R.tq, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
   render, paused: p => { paused = p; }
 };
 resize();
