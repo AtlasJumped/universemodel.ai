@@ -1,6 +1,7 @@
 // HMR progress tracker (preview only). A thin bar on the bottom edge of the sticky header showing how much of the site a
 // visitor has explored on this device. It measures exploration (pages reached the end of, with a little time spent), not
-// knowledge. Stored only in localStorage; nothing is sent anywhere. Celebrations escalate: page, 25%, 50%, 75%, 100%.
+// knowledge. Stored only in localStorage; nothing is sent anywhere. Celebrations escalate: page, 25%, 50%, 75%, 100%. Every page arrival opens with sparkle icicles under the header.
+// There is no way to hide the bar (owner, 2026-11-21): the popover has Reset and Close, and Close only closes the popover.
 (() => {
   'use strict';
   const head = document.querySelector('.site-head');
@@ -24,13 +25,14 @@
 
   // ---- storage (always guarded) ----
   let mem = null;
-  const blank = () => ({ v: 1, read: {}, part: {}, hidden: false, shown: {}, greet: false });
+  const blank = () => ({ v: 1, read: {}, part: {}, shown: {} });
   function load() {
     if (mem) return mem;
     let s = null;
     try { s = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
     if (!s || typeof s !== 'object') s = blank();
     s.read = s.read && typeof s.read === 'object' ? s.read : {}; s.part = s.part && typeof s.part === 'object' ? s.part : {}; s.shown = s.shown && typeof s.shown === 'object' ? s.shown : {};
+    delete s.hidden; delete s.greet; // a stored 'hidden' state from an earlier build is ignored
     return (mem = s);
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) {} }
@@ -50,7 +52,6 @@
   const css = document.createElement('style');
   css.textContent = `
 .hmr-track{position:absolute;left:0;right:0;top:62px;height:4px;z-index:3;pointer-events:none}
-.hmr-track[hidden]{display:none}
 .hmr-rail{position:absolute;inset:0;background:rgba(11,37,69,.07)}
 .hmr-fill{position:absolute;left:0;top:0;bottom:0;width:0;overflow:hidden;transition:width .9s cubic-bezier(.22,.8,.3,1);border-radius:0 2px 2px 0}
 .hmr-fill i{position:absolute;left:0;top:0;bottom:0;display:block;background:linear-gradient(90deg,#F2A93B 0%,#E9B955 22%,#5B9BE6 70%,#1D5FD1 100%)}
@@ -92,9 +93,6 @@
 .hmr-pop .ctl button:hover{background:#EEF3FB}
 .hmr-pop .ctl .sp{flex:1}
 .hmr-pop a:focus-visible,.hmr-pop button:focus-visible{outline:2px solid #1D5FD1;outline-offset:1px}
-.hmr-show{position:absolute;right:max(16px,calc((100vw - 1440px)/2 + 16px));bottom:12px;z-index:3;background:none;border:0;padding:2px 0;font:inherit;font-size:12px;color:#4A5C75;text-decoration:underline;cursor:pointer}
-.hmr-show:hover{color:#1D5FD1}
-.hmr-show:focus-visible{outline:2px solid #1D5FD1;outline-offset:2px;border-radius:3px}
 .hmr-cv{position:fixed;left:0;top:0;width:100%;height:160px;pointer-events:none;z-index:70}
 .hmr-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.hmr-fill,.hmr-lead,.hmr-label{transition:none}.hmr-fill.shim::after,.hmr-track.pulse{animation:none}}
@@ -111,9 +109,6 @@
   head.appendChild(track); head.appendChild(label); head.appendChild(pop);
   const fill = track.querySelector('.hmr-fill'), fillI = fill.firstElementChild, lead = track.querySelector('.hmr-lead');
 
-  const foot = document.querySelector('.site-foot');
-  const showBtn = document.createElement('button'); showBtn.type = 'button'; showBtn.className = 'hmr-show'; showBtn.textContent = 'Show progress'; showBtn.hidden = true;
-  if (foot) { if (getComputedStyle(foot).position === 'static') foot.style.position = 'relative'; foot.appendChild(showBtn); }
 
   const W = () => head.getBoundingClientRect().width || innerWidth;
   const text = () => 'HMR explored: ' + pct() + '%';
@@ -130,7 +125,6 @@
     hit.setAttribute('aria-label', t + '. ' + readCount() + ' of ' + N + ' pages. Open the page list.');
     hit.setAttribute('aria-valuenow', String(pct())); hit.setAttribute('aria-valuetext', t);
     if (!pop.hidden) renderPop();
-    const hid = !!S.hidden; track.hidden = hid; showBtn.hidden = !hid; if (hid) { label.classList.remove('on'); closePop(); }
   }
   function renderPop() {
     const rc = readCount(), all = rc >= N;
@@ -138,7 +132,7 @@
     for (const p of PAGES) { const r = !!S.read[p[0]], c = p[0] === here; h += '<li class="' + (r ? 'rd ' : '') + (c ? 'cu' : '') + '"><a href="' + p[0] + '"' + (c ? ' aria-current="page"' : '') + '>' + p[1] + '<span class="hmr-sr">' + (r ? ' (explored)' : '') + '</span></a></li>'; }
     h += '</ol>';
     if (all) h += '<p class="done"><strong>You have explored all of HMR.</strong> If this resonates with you, <a href="collaborators.html">engage with us here</a>.</p>';
-    h += '<div class="ctl"><button type="button" data-a="reset">' + (confirming ? 'Confirm reset' : 'Reset') + '</button><span class="sp"></span><button type="button" data-a="hide">Hide</button></div>';
+    h += '<div class="ctl"><button type="button" data-a="reset">' + (confirming ? 'Confirm reset' : 'Reset') + '</button><span class="sp"></span><button type="button" data-a="close">Close</button></div>';
     pop.innerHTML = h;
   }
   let confirming = false, popOpener = null;
@@ -149,15 +143,14 @@
   label.addEventListener('click', e => { e.stopPropagation(); if (pop.hidden) openPop(); });
   pop.addEventListener('click', e => {
     e.stopPropagation(); const b = e.target.closest('button[data-a]'); if (!b) return;
-    if (b.dataset.a === 'hide') { S.hidden = true; save(); render(); }
+    if (b.dataset.a === 'close') closePop(true);
     else if (b.dataset.a === 'reset') { if (!confirming) { confirming = true; renderPop(); } else api.reset(); }
   });
-  showBtn.addEventListener('click', () => { S.hidden = false; save(); render(); showLabel(2000); });
   document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target) && e.target !== hit) closePop(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) { closePop(true); } });
   // label on hover / focus of the bar
   let lt = 0;
-  function showLabel(ms) { if (S.hidden || !pop.hidden) return; label.classList.add('on'); clearTimeout(lt); if (ms) lt = setTimeout(() => label.classList.remove('on'), ms); }
+  function showLabel(ms) { if (!pop.hidden) return; label.classList.add('on'); clearTimeout(lt); if (ms) lt = setTimeout(() => label.classList.remove('on'), ms); }
   const hideLabel = () => { clearTimeout(lt); lt = setTimeout(() => label.classList.remove('on'), 150); };
   hit.addEventListener('pointerenter', () => showLabel(0)); hit.addEventListener('pointerleave', hideLabel);
   hit.addEventListener('focus', () => showLabel(0)); hit.addEventListener('blur', hideLabel);
@@ -167,22 +160,75 @@
   const GOLDS = [[242, 169, 59], [247, 197, 102], [255, 226, 160], [242, 169, 59], [91, 155, 230], [255, 255, 255]];
   let BAR_Y = 64, MAXY = 160; // measured from the header at the start of each celebration (about 100 px below the bar)
   let busy = false, queued = null;
-  const LEVEL = { read: 0, 25: 1, 50: 2, 75: 3, 100: 4, hop: -1 };
+  const LEVEL = { read: 0, 25: 1, 50: 2, 75: 3, 100: 4, icicles: -1 };
 
   function celebrate(kind) {
     kind = String(kind);
     if (!(kind in LEVEL)) return false;
-    if (S.hidden) return false;
-    if (kind === 'hop') { if (still) return false; }
+    if (document.querySelector('canvas[data-page-fire]')) return false; // never over the site's page fire
     if (still) { // reduced motion: no particles; the bar has already updated, so just show the label
-      if (kind !== 'hop') { showLabel(kind === '100' ? 3000 : 2000); if (kind === '100') { track.classList.remove('pulse'); } } return true; }
-    if (busy) { if (kind !== 'hop' && kind !== 'read') queued = kind; return false; }
-    busy = true; showLabel(kind === 'hop' ? 0 : (kind === '100' ? 3200 : 2000));
-    if (kind === 'hop') label.classList.remove('on');
+      if (kind !== 'icicles') { showLabel(kind === '100' ? 3000 : 2000); if (kind === '100') { track.classList.remove('pulse'); } } return true; }
+    if (busy) { if (kind !== 'icicles' && kind !== 'read') queued = kind; return false; }
+    busy = true; if (kind !== 'icicles') showLabel(kind === '100' ? 3200 : 2000);
     run(kind); return true;
   }
 
+  let stopper = null; // ends the running celebration at once (tab hidden, page leaving)
+  document.addEventListener('visibilitychange', () => { if (document.hidden && stopper) stopper(); });
+  addEventListener('pagehide', () => { if (stopper) stopper(); });
+
+  // Page arrival (every page load): sparkles hang from the header's lower edge like shimmering icicles, thin vertical streaks of
+  // light of varying length, glinting, a few drops of sparkle falling from their tips, then everything fades. About 2.2 s, never
+  // more than 110 px below the header.
+  function icicles() {
+    const w = innerWidth, dpr = Math.min(1.5, devicePixelRatio || 1), coarse = matchMedia('(pointer: coarse)').matches;
+    BAR_Y = Math.round(head.getBoundingClientRect().bottom - 1); MAXY = Math.min(innerHeight, BAR_Y + 110);
+    const cv = document.createElement('canvas'); cv.className = 'hmr-cv'; cv.setAttribute('aria-hidden', 'true');
+    cv.style.height = MAXY + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(MAXY * dpr); document.body.appendChild(cv);
+    const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const DUR = 2300, ICE = [[255, 255, 255], [190, 220, 255], [91, 155, 230], [255, 226, 160], [214, 190, 255]], ice = [], drops = [];
+    const gap = coarse ? 13 : 15, n = Math.min(coarse ? 34 : 96, Math.max(10, Math.round(w / gap)));
+    for (let i = 0; i < n; i++) {
+      const u = (i + 0.15 + Math.random() * 0.7) / n, big = Math.random() < 0.18, L = big ? 44 + Math.random() * 26 : 10 + Math.random() * Math.random() * 40 + (Math.random() < 0.3 ? 12 : 0);
+      ice.push({ x: u * w, L: Math.min(70, L), t0: 0.05 + u * 0.25 + Math.random() * 0.25, grow: 0.35 + Math.random() * 0.3, col: ICE[Math.floor(Math.random() * ICE.length)], lw: big ? 1.7 : 1.1 + Math.random() * 0.5, ph: Math.random() * 6.28, sp: 1.6 + Math.random() * 1.4, nd: Math.random() < 0.5 ? 1 + (Math.random() < 0.4) : 0, dn: 0, nextDrop: 0.9 + Math.random() * 0.8 });
+    }
+    let t0 = performance.now(), last = t0, lastDraw = 0, ended = false, rid = 0;
+    function spark(x, y, R, a, col, plus) {
+      if (a <= 0.02) return; const g = c.createRadialGradient(x, y, 0, x, y, R * 4); g.addColorStop(0, `rgba(${col[0]},${col[1]},${col[2]},${0.95 * a})`); g.addColorStop(0.35, `rgba(${col[0]},${col[1]},${col[2]},${0.35 * a})`); g.addColorStop(1, `rgba(${col[0]},${col[1]},${col[2]},0)`);
+      c.fillStyle = g; c.beginPath(); c.arc(x, y, R * 4, 0, 6.283); c.fill();
+      if (plus) { c.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`; c.lineWidth = 1; c.beginPath(); c.moveTo(x - R * 3.4, y); c.lineTo(x + R * 3.4, y); c.moveTo(x, y - R * 3.4); c.lineTo(x, y + R * 3.4); c.stroke(); }
+    }
+    function frame(now) {
+      if (ended) return; rid = requestAnimationFrame(frame);
+      if (coarse && now - lastDraw < 32) return; lastDraw = now;
+      const dt = Math.min(0.05, (now - last) / 1000), t = (now - t0) / 1000; last = now;
+      const fade = t < 1.55 ? 1 : Math.max(0, 1 - (t - 1.55) / 0.65);
+      c.clearRect(0, 0, w, MAXY);
+      if (t > DUR / 1000) return finish();
+      // a faint wash on the header's edge so the streaks seem to hang from light
+      const wg = c.createLinearGradient(0, BAR_Y, 0, BAR_Y + 12); wg.addColorStop(0, `rgba(190,220,255,${0.28 * fade * Math.min(1, t / 0.4)})`); wg.addColorStop(1, 'rgba(190,220,255,0)'); c.fillStyle = wg; c.fillRect(0, BAR_Y, w, 12);
+      for (const q of ice) {
+        const k = Math.max(0, Math.min(1, (t - q.t0) / q.grow)), e = 1 - Math.pow(1 - k, 3); if (e <= 0) continue;
+        const len = q.L * e, tw = 0.8 + 0.2 * Math.sin(t * q.sp * 3 + q.ph), a = fade * tw, y1 = BAR_Y + len, [r, g, b] = q.col;
+        const lg = c.createLinearGradient(0, BAR_Y, 0, y1); lg.addColorStop(0, `rgba(255,255,255,${0.95 * a})`); lg.addColorStop(0.55, `rgba(${r},${g},${b},${0.7 * a})`); lg.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        c.strokeStyle = lg; c.lineWidth = q.lw; c.lineCap = 'round'; c.beginPath(); c.moveTo(q.x, BAR_Y); c.lineTo(q.x, y1); c.stroke();
+        if (len > 6) spark(q.x, y1, 1.0 + q.lw * 0.4, a * 0.9, q.col, q.L > 40);
+        // a glint travelling down the streak
+        const gp = ((t * q.sp * 0.55 + q.ph) % 1.6) / 1; if (gp < 1 && len > 14) spark(q.x, BAR_Y + gp * len, 1.1, a * Math.sin(Math.PI * gp), [255, 255, 255], gp > 0.35 && gp < 0.65);
+        // a drop of sparkle leaves the tip
+        if (e > 0.95 && q.dn < q.nd && t > q.nextDrop && t < 1.55 && drops.length < (coarse ? 14 : 34)) { q.dn++; q.nextDrop = t + 0.4 + Math.random() * 0.4; drops.push({ x: q.x + (Math.random() - 0.5) * 1.5, y: y1, vy: 0.4 + Math.random() * 0.5, age: 0, life: 0.8 + Math.random() * 0.4, r: 0.7 + Math.random() * 0.9, col: q.col }); }
+      }
+      for (let i = drops.length - 1; i >= 0; i--) { const d = drops[i]; d.age += dt; d.vy += 0.07 * dt * 60; d.y += d.vy * dt * 60; if (d.age >= d.life || d.y > MAXY - 4) { drops.splice(i, 1); continue; }
+        const u = d.age / d.life, a = Math.min(1, u * 8, (1 - u) * 1.8) * Math.max(0, Math.min(1, (MAXY - 4 - d.y) / 24)) * (0.8 + 0.2 * Math.sin(d.age * 30));
+        spark(d.x, d.y - 3, d.r * 0.7, a * 0.35, d.col, false); spark(d.x, d.y, d.r, a, d.col, d.r > 1.3); }
+    }
+    function finish() { if (ended) return; ended = true; cancelAnimationFrame(rid); clearTimeout(hard); if (stopper === finish) stopper = null; cv.remove(); busy = false; }
+    const hard = setTimeout(finish, DUR + 2500); stopper = finish;
+    rid = requestAnimationFrame(frame);
+  }
+
   function run(kind) {
+    if (kind === 'icicles') return icicles();
     const lv = LEVEL[kind], w = innerWidth, dpr = Math.min(2, devicePixelRatio || 1);
     BAR_Y = Math.round(head.getBoundingClientRect().bottom - 2); MAXY = Math.min(innerHeight, BAR_Y + 100);
     const cv = document.createElement('canvas'); cv.className = 'hmr-cv'; cv.setAttribute('aria-hidden', 'true');
@@ -190,9 +236,9 @@
     const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
     const hw = W(), ex = Math.max(4, Math.min(hw, total() / N * hw)), parts = [];
     const pal = lv >= 1 ? GOLDS : COLS;
-    const DUR = { read: 1300, 25: 1900, 50: 2300, 75: 2700, 100: 3300, hop: 900 }[kind];
+    const DUR = { read: 1300, 25: 1900, 50: 2300, 75: 2700, 100: 3300 }[kind];
     const t0 = performance.now(); let last = t0, acc = 0, ended = false;
-    fill.classList.remove('shim'); void fill.offsetWidth; if (kind !== 'hop') fill.classList.add('shim');
+    fill.classList.remove('shim'); void fill.offsetWidth; fill.classList.add('shim');
     function add(x, y, ang, sp, o) {
       if (parts.length > 420) return; o = o || {};
       parts.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, r: (o.r || 0.9) + Math.random() * (o.rr || 2.2), age: 0, life: (o.life || 700) * (0.7 + Math.random() * 0.6), g: o.g || 0.012, tw: Math.random() * 6.28,
@@ -230,16 +276,12 @@
         const gl = Math.max(0, 1 - Math.abs(t - 600) / 700) * 0.4 + (t < 3000 ? 0.08 : 0); if (gl > 0) { const g = c.createLinearGradient(0, BAR_Y - 4, 0, BAR_Y + 28); g.addColorStop(0, `rgba(242,169,59,${gl})`); g.addColorStop(1, 'rgba(242,169,59,0)'); c.fillStyle = g; c.fillRect(0, BAR_Y - 4, hw, 32); }
         if (t > 150 && !track.dataset.pl) { track.dataset.pl = 1; track.classList.remove('pulse'); void track.offsetWidth; track.classList.add('pulse'); setTimeout(() => { track.classList.remove('pulse'); delete track.dataset.pl; }, 1000); }
       }
-      if (kind === 'hop') { // a greeting: one sparkle hops from the left end to the current level
-        const q = Math.min(1, t / DUR), e = 1 - Math.pow(1 - q, 3), x = 6 + (ex - 6) * e, y = BAR_Y - Math.sin(q * Math.PI) * 18;
-        if (q < 1) { add(x, y, Math.random() * 6.28, 0.15, { life: 360, r: 0.6, rr: 1.2, star: 0.3 }); const g = c.createRadialGradient(x, y, 0, x, y, 9); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(255,215,140,.9)'); g.addColorStop(1, 'rgba(242,169,59,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, 9, 0, 6.283); c.fill();
-          c.strokeStyle = 'rgba(242,169,59,.9)'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(x - 7, y); c.lineTo(x + 7, y); c.moveTo(x, y - 7); c.lineTo(x, y + 7); c.stroke(); }
-      }
       for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(0.97, k); p.vy = p.vy * Math.pow(0.97, k) + p.g * k; p.age += dt; p.tw += 0.28 * k; if (p.age >= p.life || p.y > MAXY || p.y < -10) { parts.splice(i, 1); continue; } draw(p); }
       const total_t = DUR + (kind === '100' ? 700 : 500);
       if (t < DUR || (parts.length && t < total_t + 600)) requestAnimationFrame(frame); else finish();
     }
-    function finish() { if (ended) return; ended = true; cv.remove(); fill.classList.remove('shim'); busy = false; if (queued) { const q = queued; queued = null; setTimeout(() => celebrate(q), 250); } }
+    function finish() { if (ended) return; ended = true; clearTimeout(hard); if (stopper === finish) stopper = null; cv.remove(); fill.classList.remove('shim'); busy = false; if (queued) { const q = queued; queued = null; setTimeout(() => celebrate(q), 250); } }
+    const hard = setTimeout(finish, DUR + 3000); stopper = finish;
     requestAnimationFrame(frame);
   }
 
@@ -247,12 +289,11 @@
   function markRead(file) {
     file = norm(file); if (!PAGES.some(p => p[0] === file) || S.read[file]) return false;
     const before = readCount();
-    S.read[file] = Date.now(); delete S.part[file]; S.greet = true;
+    S.read[file] = Date.now(); delete S.part[file];
     const rc = before + 1; let kind = 'read';
     if (rc >= N && !S.shown[100]) { kind = '100'; S.shown[100] = 1; }
     else { for (let i = MILES.length - 1; i >= 0; i--) { const m = MILES[i]; if (rc / N * 100 >= m && !S.shown[m]) { kind = String(m); for (const mm of MILES) if (mm <= m) S.shown[mm] = 1; break; } } }
     save(); render();
-    if (S.hidden) return true;
     if (!celebrate(kind) && kind === 'read') showLabel(2000);
     else if (still) showLabel(2000);
     return true;
@@ -296,16 +337,13 @@
 
   // ---- public handle for review ----
   const api = window.hmrProgress = {
-    state() { return { percent: pct(), pagesRead: readCount(), total: N, current: here, tracked, partial: +cur.toFixed(3), read: Object.assign({}, S.read), part: Object.assign({}, S.part), shown: Object.assign({}, S.shown), hidden: !!S.hidden, dwellMs, label: text() }; },
+    state() { return { percent: pct(), pagesRead: readCount(), total: N, current: here, tracked, partial: +cur.toFixed(3), read: Object.assign({}, S.read), part: Object.assign({}, S.part), shown: Object.assign({}, S.shown), dwellMs, label: text() }; },
     markRead, reset, celebrate(kind) { return celebrate(kind); },
-    show() { S.hidden = false; save(); render(); }, hide() { S.hidden = true; save(); render(); },
     setDwell(ms) { dwellMs = +ms; checkRead(); }
   };
 
   // ---- start ----
   scrollCalc(); render();
-  if (!S.hidden) {
-    if (S.greet && readCount() > 0) { S.greet = false; save(); setTimeout(() => { if (celebrate('hop')) {} }, 350); }
-    else if (S.greet) { S.greet = false; save(); }
-  }
+  // every page load: icicles under the header (skipped for reduced motion, a hidden tab, or while the page fire runs)
+  setTimeout(() => { if (!document.hidden) celebrate('icicles'); }, 250);
 })();

@@ -40,7 +40,9 @@
 .ab-big h3{margin-bottom:8px}
 .ab-big p{max-width:none}
 .ab-hyp{display:inline-block;font:600 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:#0B2545;background:#9CC3F5;border-radius:6px;padding:5px 7px;margin-bottom:10px}
-.ab-shuf{margin-top:22px;background:#fff}
+.ab-shuf{margin-top:22px;background:#fff;position:relative}
+#ab-fx{position:absolute;left:0;top:0;width:100%;height:70px;pointer-events:none;border-radius:inherit}
+.ab-foot-r{margin-left:auto;display:flex;align-items:center;gap:12px}
 .ab-bind{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);gap:26px;align-items:start;margin:18px 0 0;padding-top:18px;border-top:1px solid var(--line)}
 .ab-bind figure{margin:0}
 .ab-bind img{width:100%;height:auto;border-radius:12px;display:block}
@@ -134,13 +136,25 @@
           <p><b>The first example, as an artist who went there painted it.</b> On the Columbia River and the coast north of it, a baby spent its first year strapped to a cradleboard, with a second board bound across the forehead. The soft skull grew into a long, flat slope. Look at the woman's profile: her head was shaped the same way when she was a baby. To her people it was beautiful, and it marked a free person of standing. Slaves and outsiders did not have it. Kane, who traveled there in 1847, called it a “distinguishing mark of freedom”.</p>
           <p><b>The parents who did this were not cruel.</b> They did it out of care for their child, on the best model of reality they had. To them it was right and normal. By today's standards it looks like harm done to a baby.</p>
           <p>Binding the head acts directly on how the fascia develops. Today's parents believe they are treating their children properly, as these parents did. HMR says every parent today is leaving out the most important thing they could do for their children: care of the fascia. If HMR comes to be believed, people will look back on parents who did not care for their children's fascia much as we look back on this.</p>
-          <figure><img src="../img/hx-kane-child-in-cradle.jpg" alt="Watercolour sketch by Paul Kane of an infant bound into a wooden cradle, with the forehead board raised on cords." loading="lazy" width="600" height="422"><figcaption>Kane's field sketch, 1847, labeled in his own hand “Chinook child undergoing process of flattening the head”. Public domain, via <a href="https://commons.wikimedia.org/wiki/File:Kane_Flathead_Child.jpg">Wikimedia Commons</a>.</figcaption></figure>
+          <figure><img src="../img/hx-kane-child-in-cradle.jpg" alt="Watercolor sketch by Paul Kane of an infant bound into a wooden cradle, with the forehead board raised on cords." loading="lazy" width="600" height="422"><figcaption>Kane's field sketch, 1847, labeled in his own hand “Chinook child undergoing process of flattening the head”. Public domain, via <a href="https://commons.wikimedia.org/wiki/File:Kane_Flathead_Child.jpg">Wikimedia Commons</a>.</figcaption></figure>
           <p class="small muted" style="margin-bottom:0">The oil painting is a studio composite: Kane combined his separate field sketches of a woman and of an infant, and shows the board lifted rather than pressing (<a href="https://aci-iac.ca/art-books/paul-kane/key-works/flat-head-woman-and-child">Art Canada Institute</a>). How the cradle worked, and that the custom lasted into the twentieth century: <a href="https://bodyarts.prm.ox.ac.uk/index.php/permanent-body-arts/reshaping-and-piercing/163-head-shaping-flattening.html">Pitt Rivers Museum, University of Oxford</a>.</p>
         </div>
       </div>
+      <!-- PICTURE SLOTS (owner, 2026-11-21: a picture on every case). Case 1 has its pictures above (#ab-x0).
+           Cases 2 to 14 each need one public-domain image, placed in a <figure> inside #ab-pic and shown only for that case.
+           Case 2 death penalty: US map. 3 female genital cutting: map, no people. 4 male circumcision: map, no people.
+           5 beef, 6 pork, 7 interest, 8 insect, 9 transfusion, 10 dying, 11 duel, 12 striking a child, 13 wine, 14 second spouse. -->
+      <div class="ab-bind" id="ab-pic" hidden>
+        <!-- PICTURE GOES HERE: <figure><img src="../img/..." alt="..." loading="lazy" width=".." height=".."><figcaption>Credit, public domain, via Wikimedia Commons.</figcaption></figure> -->
+      </div>
+      <div id="ab-close1">
       <p style="margin:20px 0 0;max-width:none">How a person acts depends on how they see reality. Someone who sees it differently from the people around them will act differently, and those people may judge it crazy or plainly wrong.</p>
       <p class="small muted" style="margin:14px 0 0;max-width:none">None of these people is careless. Each is following a model of what is real, and the verdict comes from the model. That is why a value system is only as good as the model under it, and why a partial model can lead sincere people to the wrong conclusions and cause them to act against their own true values.</p>
-      <div class="ab-foot"><button type="button" class="btn primary" id="ab-next">Show another</button><span class="small muted" id="ab-count"></span></div>
+      </div>
+      <p id="ab-close" style="margin:20px 0 0;max-width:none;font-weight:600;color:var(--navy)" hidden></p>
+      <div class="ab-foot"><button type="button" class="btn primary" id="ab-next">Show another</button><span class="ab-foot-r"><span class="small muted" id="ab-count"></span><button type="button" class="btn" id="ab-prev">Go back</button></span></div>
+      <canvas id="ab-fx" aria-hidden="true"></canvas>
+    </div>
     </div>
   </div>
 </section>
@@ -326,83 +340,146 @@
 
 <script>
 (function () {
-  // [title, summary, right-or-normal, wrong-by-today, optional HMR line (html)]
   var C = [
+    // [title, summary, right-or-normal, wrong-by-today, optional HMR line (html), closing line for this case]
+    // Case 1 keeps its two long closing paragraphs in the page (#ab-close1); its closing line is empty.
+    // Cases 2 to 14: each has a "PICTURE:" note for the image that will go in #ab-pic (see the comment in the HTML).
     ["Shaping a baby's head between boards",
      "On the Pacific coast of North America, a baby's soft skull was bound between boards to give it a long, flat slope.",
      "Among the Chinook of the Pacific Northwest, the Maya and many other peoples, a flattened or lengthened head was a mark of beauty and good birth, and loving parents bound their infants' heads to give it to them.",
-     "Today it is seen as harm done to a child who cannot agree to it.", ""],
+     "Today it is seen as harm done to a child who cannot agree to it.", "", ""],
+    // PICTURE (case 2): map of US states with and without the death penalty
     ["Putting a murderer to death",
      "A person has been convicted of murder, and the state must decide whether to take their life in return.",
-     "To many, it is justice carried out by law: the gravest crime meets the gravest penalty, and the public is kept safe.",
+     "To many, it is justice carried out by law: the gravest crime meets the gravest penalty, and the public is kept safe. On this view, a society answers a wrong with a penalty that matches it.",
      "To many others, the state should never kill, and the risk of killing an innocent person is too great. More than 100 countries have abolished it, and 202 people sentenced to death in the United States have since been exonerated (<a href=\"https://deathpenaltyinfo.org/state-and-federal-info/state-by-state\">Death Penalty Information Center</a>).",
-     "This one is not settled even inside a single country. In the United States, 27 states have the death penalty and 23 do not, and 4 of the 27 have paused executions. One country cannot agree with itself on whether the state may kill. In HMR, that shows humanity does not yet have a holistic model of reality."],
+     "This one is not settled even inside a single country. In the United States, 27 states have the death penalty and 23 do not, and 4 of the 27 have paused executions. One country cannot agree with itself on whether the state may kill. In HMR, that shows humanity does not yet have a holistic model of reality.",
+     "One country, one constitution, and two opposite answers about whether the state may kill. The facts are the same in every state. The model of reality behind them is not."],
+    // PICTURE (case 3): map of countries (no photographs of people)
     ["Female genital cutting",
      "In about 30 countries, girls are cut on their genitals, mostly between infancy and age 15. More than 230 million girls and women alive today have undergone it (<a href=\"https://www.who.int/news-room/fact-sheets/detail/female-genital-mutilation\">WHO</a>).",
      "Families who do it follow a social convention, and they feel the pressure to keep to the norm. They see it as preparing a girl for adulthood and marriage, and many believe their religion supports it. The parents act out of care for their daughter's place in her community.",
      "WHO finds no health benefits, only harm: severe pain, bleeding, infection, problems in childbirth, and lasting psychological effects. It calls the practice a violation of human rights, and notes that no religious text prescribes it.",
-     "HMR's view: the cut removes tissue of the fascia web, which the girl will grow with for the rest of her life."],
+     "HMR's view: the cut removes tissue of the fascia web, which the girl will grow with for the rest of her life.",
+     "Parents who act out of care and a body of evidence that finds only harm: both sit inside one picture of what a girl's body is and what it is for. Change the model and the verdict changes."],
+    // PICTURE (case 4): map (no photographs of people)
     ["Male circumcision",
      "An estimated 37 to 39 percent of men worldwide are circumcised (<a href=\"https://doi.org/10.1186/s12963-016-0073-5\">Morris et al., 2016</a>).",
      "For nearly all Muslims and Jews it is a religious practice. In parts of Africa and the Pacific it is a rite of coming of age. In the United States, where an estimated 71 percent of men are circumcised, it is mostly a hospital custom for newborns. Some medical bodies say its health benefits outweigh its risks.",
      "A growing number of people judge it wrong: a healthy part of a child's body is cut away, and the child cannot agree to it. Some medical bodies do not recommend it as routine care, and medicine remains divided on it today.",
-     "HMR's view: cutting healthy tissue changes the fascia web the child will grow with, and the child cannot agree to it."],
+     "HMR's view: cutting healthy tissue changes the fascia web the child will grow with, and the child cannot agree to it.",
+     "Even medicine is divided on this one. It shows that weighing the evidence is not enough: what counts as a benefit or a harm depends on the model of the body behind it."],
+    // PICTURE (case 5): a cow, as the Hindu sacred cow, or a public-domain painting of cattle
     ["Eating beef",
      "Whether a cow may be eaten depends on where you live.",
-     "In much of the world it is an ordinary meal.",
-     "For most Hindus the cow is sacred, and most Indian states restrict or ban its slaughter.", ""],
+     "In much of the world it is an ordinary meal. The cow is seen as an animal raised for food, like any other. Eating it needs no more thought than any other meal.",
+     "For most Hindus the cow is sacred, and most Indian states restrict or ban its slaughter. Here the animal holds a place above food, and the law follows that view.",
+     "", "Same animal, same meal, opposite verdicts. What is on the plate depends on what the eater believes a cow is."],
+    // PICTURE (case 6): a public-domain painting of pigs
     ["Eating pork",
      "The same meat is a staple in one place and forbidden in another.",
-     "A staple from China to Spain.",
-     "Forbidden in Judaism and in Islam.", ""],
+     "A staple from China to Spain. There the pig is simply a source of food, and no rule of faith stands between it and the table.",
+     "Forbidden in Judaism and in Islam. For believers the rule is part of a faith's view of what may be eaten, and keeping it is part of living rightly.",
+     "", "The meat is the same in both places. What differs is the model of what a person may eat, and why."],
+    // PICTURE (case 7): a public-domain painting of a moneylender
     ["Charging interest on a loan",
      "A lender asks for more back than was lent.",
-     "The foundation of modern banking.",
-     "Forbidden as riba in Islamic law, and condemned as usury by the medieval Christian church.", ""],
+     "The foundation of modern banking. On this view, money lent is money put to work, and a lender who waits is owed a return for it.",
+     "Forbidden as riba in Islamic law, and condemned as usury by the medieval Christian church. On that view, earning from a loan alone takes advantage of a borrower in need.",
+     "", "One model sees a fair return for waiting, the other sees a wrong done to the borrower. The loan is the same. The model of what money is for is not."],
+    // PICTURE (case 8): a public-domain insect illustration
     ["Killing an insect",
      "An insect is in the way, and a person can crush it or step around it.",
-     "Elsewhere it is pest control, done without a thought.",
-     "Jain monks sweep the path ahead of them so as not to crush one. Doing no harm is their first vow.", ""],
+     "Elsewhere it is pest control, done without a thought. An insect is seen as a nuisance, and its life weighs little against a person's comfort.",
+     "Jain monks sweep the path ahead of them so as not to crush one. Doing no harm is their first vow, and it reaches even the smallest creature.",
+     "", "Whether a small life counts depends on what a person believes a living thing is."],
+    // PICTURE (case 9): a public-domain engraving of an early blood transfusion
     ["Accepting a blood transfusion",
      "A patient is bleeding badly, and a transfusion would save their life.",
-     "To a doctor it is ordinary care that saves a life.",
-     "To a Jehovah's Witness it breaks a command of God, even when life depends on it.", ""],
+     "To a doctor it is ordinary care that saves a life. The aim is to keep the patient alive, and a transfusion does that.",
+     "To a Jehovah's Witness it breaks a command of God, even when life depends on it. For them, faithfulness to God comes first.",
+     "", "Both sides want what is good for the patient. They differ on what a person is, and so on what it means to save one."],
+    // PICTURE (case 10): a public-domain painting of a doctor at a bedside
     ["Helping a dying person to die",
      "A person in great suffering asks a doctor to help them die.",
-     "A legal medical act in the Netherlands, Belgium, Canada, and elsewhere, where it is seen as mercy.",
-     "A crime in most countries, and a grave wrong in many faiths.", ""],
+     "A legal medical act in the Netherlands, Belgium, Canada, and elsewhere, where it is seen as mercy. A person in great suffering is helped to end it, at their own request.",
+     "A crime in most countries, and a grave wrong in many faiths. There, a life is not ours to end, and a doctor's duty is to preserve it.",
+     "", "The same request meets mercy in one model and a crime in another. The difference is what a life is, and who it belongs to."],
+    // PICTURE (case 11): a public-domain painting of a duel
     ["Fighting a duel over an insult",
      "Two men settle an insult with weapons, and one may die.",
-     "For a gentleman in Europe or America two centuries ago, refusing was the disgrace.",
-     "Today it is a crime, and the survivor is a killer.", ""],
+     "For a gentleman in Europe or America two centuries ago, refusing was the disgrace. Honor was worth more than safety, and a man defended it in person.",
+     "Today it is a crime, and the survivor is a killer. An insult is now seen as too small a reason to take a life.",
+     "", "Honor was real to the men who fought. A model that ranks reputation above life gives a different verdict than one that does not."],
+    // PICTURE (case 12): a map of countries (public domain) showing where striking children is against the law
     ["Striking a child to correct them",
      "A parent hits a child to teach them a lesson.",
-     "Elsewhere it is a parent's right, and to many a parent's duty.",
-     "Against the law in more than 60 countries, beginning with Sweden in 1979.", ""],
+     "Elsewhere it is a parent's right, and to many a parent's duty. Parents who do it believe it teaches a child right from wrong.",
+     "Against the law in more than 60 countries, beginning with Sweden in 1979. There, a child is seen as a person with a right not to be hit.",
+     "", "The parent who strikes and the parent who will not both act out of care. They hold different models of what a child is, and of what teaches."],
+    // PICTURE (case 13): a public-domain painting of wine, such as a Bacchus or a Last Supper
     ["Drinking wine",
      "The same drink is a sacrament in one place and a sin in another.",
-     "Sacred in the Christian Eucharist, and ordinary at dinner in much of the world.",
-     "Forbidden in Islam.", ""],
+     "Sacred in the Christian Eucharist, and ordinary at dinner in much of the world. In both uses it is welcome, as a holy sign or as part of a meal.",
+     "Forbidden in Islam. Believers who avoid it do so as an act of obedience.",
+     "", "One drink, three meanings: sacred, ordinary, and forbidden. What it is depends on the model it is seen through."],
+    // PICTURE (case 14): a public-domain map of countries where a second spouse is lawful
     ["Marrying a second spouse",
      "A married person takes a second husband or wife.",
-     "Lawful in dozens of countries in Africa and Asia.",
-     "The crime of bigamy across Europe and the Americas.", ""]
+     "Lawful in dozens of countries in Africa and Asia. There, a second marriage is a recognized form of family.",
+     "The crime of bigamy across Europe and the Americas. There, marriage is held to be between two people only.",
+     "", "Each law protects what its society takes marriage to be. The act is the same. The model of the family is not."]
   ];
   var box = document.getElementById('same-act'), act = document.getElementById('ab-act'); if (!box || !act) return;
   var sum = document.getElementById('ab-sum'), a = document.getElementById('ab-a'), b = document.getElementById('ab-b'),
       h = document.getElementById('ab-hmr'), x0 = document.getElementById('ab-x0'), n = document.getElementById('ab-count'), i = 0;
+  var prev = document.getElementById('ab-prev'), cl = document.getElementById('ab-close'), cl1 = document.getElementById('ab-close1'),
+      cv = document.getElementById('ab-fx'), calm = function () { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
   function show() {
     var c = C[i];
     act.textContent = c[0]; sum.innerHTML = c[1]; b.innerHTML = c[2]; a.innerHTML = c[3];
     h.innerHTML = c[4]; h.hidden = !c[4];
     x0.hidden = (i !== 0);
+    cl1.hidden = (i !== 0);
+    cl.innerHTML = c[5] || ''; cl.hidden = (i === 0 || !c[5]);
     n.textContent = (i + 1) + ' of ' + C.length;
   }
-  document.getElementById('ab-next').addEventListener('click', function () {
-    i = (i + 1) % C.length; show();
-    var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    box.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
-  });
+  // One small sparkle sweep along the top edge of the block, the same for every change. Absolutely positioned, so the height never changes.
+  var raf = 0, COLS = ['#1D5FD1', '#5B9BE6', '#6D4AFF', '#F2A93B', '#D678D2', '#F2A93B'];
+  function sparkle() {
+    if (!cv || calm() || !cv.getContext) return;
+    var w = box.clientWidth, H = 70, d = Math.min(window.devicePixelRatio || 1, 2), c = cv.getContext('2d');
+    cv.width = Math.round(w * d); cv.height = Math.round(H * d); c.setTransform(d, 0, 0, d, 0, 0);
+    var P = [], k, T = 700;
+    for (k = 0; k < 26; k++) {
+      var hex = COLS[k % COLS.length];
+      P.push({ x0: Math.random() * w, off: Math.random() * 0.45, y: 6 + Math.random() * 34, R: 1.6 + Math.random() * 2.2,
+               star: Math.random() < 0.45, rgb: [parseInt(hex.substr(1, 2), 16), parseInt(hex.substr(3, 2), 16), parseInt(hex.substr(5, 2), 16)] });
+    }
+    cancelAnimationFrame(raf);
+    var t0 = performance.now();
+    (function frame(now) {
+      var t = Math.min(1, (now - t0) / T);
+      c.clearRect(0, 0, w, H);
+      for (var j = 0; j < P.length; j++) {
+        var p = P[j], u = (t - p.off) / 0.55; if (u <= 0 || u >= 1) continue;
+        var a = Math.sin(u * Math.PI), x, y = p.y + Math.sin(u * 6 + j) * 3,
+            R = p.R * (0.6 + 0.6 * a), r = p.rgb[0], g = p.rgb[1], bl = p.rgb[2];
+        x = (u * 0.7 + (p.x0 / w) * 0.3) * w;
+        var gr = c.createRadialGradient(x, y, 0, x, y, R * 4);
+        gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + bl + ',' + (0.85 * a) + ')'); gr.addColorStop(0.35, 'rgba(' + r + ',' + g + ',' + bl + ',' + (0.35 * a) + ')'); gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + bl + ',0)');
+        c.fillStyle = gr; c.beginPath(); c.arc(x, y, R * 4, 0, 6.283); c.fill();
+        if (p.star) { c.strokeStyle = 'rgba(' + r + ',' + g + ',' + bl + ',' + a + ')'; c.lineWidth = 1.1; c.beginPath(); c.moveTo(x - R * 3.2, y); c.lineTo(x + R * 3.2, y); c.moveTo(x, y - R * 3.2); c.lineTo(x, y + R * 3.2); c.stroke(); }
+      }
+      if (t < 1) raf = requestAnimationFrame(frame); else c.clearRect(0, 0, w, H);
+    })(t0);
+  }
+  function go(step) {
+    i = (i + step + C.length) % C.length; show(); sparkle();
+    box.scrollIntoView({ behavior: calm() ? 'auto' : 'smooth', block: 'start' });
+  }
+  document.getElementById('ab-next').addEventListener('click', function () { go(1); });
+  prev.addEventListener('click', function () { go(-1); });
   show();
 })();
 </script>
