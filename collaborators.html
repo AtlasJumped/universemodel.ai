@@ -195,6 +195,11 @@
         <div class="co-f"><label class="l" for="co-web">Website or profile link</label><input type="url" id="co-web" autocomplete="url"><label class="co-pub"><input type="checkbox" data-pub="co-web"> Show on site</label></div>
         <div class="co-f"><label class="l" for="co-grp">Which group fits you</label><select id="co-grp"><option value="">Choose one</option><option>Professional</option><option>Friend or family</option><option>Interested stranger</option></select><label class="co-pub"><input type="checkbox" data-pub="co-grp"> Show on site</label></div>
       </div>
+      <div class="co-f"><label class="l" for="co-edu">Education and degrees</label><input type="text" id="co-edu" placeholder="For example: BS Physics, MIT, 2012; PhD Biomechanics, Stanford, 2018"><label class="co-pub"><input type="checkbox" data-pub="co-edu"> Show on site</label></div>
+      <div class="co-two">
+        <div class="co-f"><label class="l" for="co-inst">Institutional affiliations</label><input type="text" id="co-inst" autocomplete="organization" placeholder="University, lab, society, or other institution"><label class="co-pub"><input type="checkbox" data-pub="co-inst"> Show on site</label></div>
+        <div class="co-f"><label class="l" for="co-job">Work affiliations</label><input type="text" id="co-job" autocomplete="organization-title" placeholder="Employer or practice, and your role"><label class="co-pub"><input type="checkbox" data-pub="co-job"> Show on site</label></div>
+      </div>
       <div class="co-f"><label class="l" for="co-work">What you do, and what you are good at</label><textarea id="co-work"></textarea><label class="co-pub"><input type="checkbox" data-pub="co-work"> Show on site</label></div>
       <div class="co-f"><span class="l" id="co-int-l" style="grid-column:1/-1;font:600 .93rem/1.3 var(--font);color:var(--navy)">What interests you most here</span>
         <div class="co-chips" role="group" aria-labelledby="co-int-l">
@@ -223,7 +228,7 @@
 (function () {
   var f = document.getElementById('coForm');
   if (!f) return;
-  var rows = [['co-name', 'Name'], ['co-loc', 'Location'], ['co-email', 'Email'], ['co-phone', 'Phone'], ['co-web', 'Website'], ['co-grp', 'Group'], ['co-work', 'What I do'], ['co-take', 'My take']];
+  var rows = [['co-name', 'Name'], ['co-loc', 'Location'], ['co-email', 'Email'], ['co-phone', 'Phone'], ['co-web', 'Website'], ['co-grp', 'Group'], ['co-edu', 'Education and degrees'], ['co-inst', 'Institutional affiliations'], ['co-job', 'Work affiliations'], ['co-work', 'What I do'], ['co-take', 'My take']];
   f.addEventListener('submit', function (e) {
     e.preventDefault();
     var lines = ['I would like to be listed as a collaborator on universemodel.ai.', ''];
