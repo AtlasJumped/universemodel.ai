@@ -186,7 +186,7 @@
     const cv = document.createElement('canvas'); cv.className = 'hmr-cv'; cv.setAttribute('aria-hidden', 'true');
     cv.style.height = MAXY + 'px'; cv.width = Math.round(w * dpr); cv.height = Math.round(MAXY * dpr); document.body.appendChild(cv);
     const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const DUR = 2300, ICE = [[255, 255, 255], [190, 220, 255], [91, 155, 230], [255, 226, 160], [214, 190, 255]], ice = [], drops = [];
+    const DUR = 2300, ICE = [[91, 155, 230], [120, 175, 240], [242, 169, 59], [29, 95, 209], [150, 120, 255], [91, 155, 230]], ice = [], drops = [];
     const gap = coarse ? 13 : 15, n = Math.min(coarse ? 34 : 96, Math.max(10, Math.round(w / gap)));
     for (let i = 0; i < n; i++) {
       const u = (i + 0.15 + Math.random() * 0.7) / n, big = Math.random() < 0.18, L = big ? 44 + Math.random() * 26 : 10 + Math.random() * Math.random() * 40 + (Math.random() < 0.3 ? 12 : 0);
@@ -210,7 +210,7 @@
       for (const q of ice) {
         const k = Math.max(0, Math.min(1, (t - q.t0) / q.grow)), e = 1 - Math.pow(1 - k, 3); if (e <= 0) continue;
         const len = q.L * e, tw = 0.8 + 0.2 * Math.sin(t * q.sp * 3 + q.ph), a = fade * tw, y1 = BAR_Y + len, [r, g, b] = q.col;
-        const lg = c.createLinearGradient(0, BAR_Y, 0, y1); lg.addColorStop(0, `rgba(255,255,255,${0.95 * a})`); lg.addColorStop(0.55, `rgba(${r},${g},${b},${0.7 * a})`); lg.addColorStop(1, `rgba(${r},${g},${b},0)`);
+        const lg = c.createLinearGradient(0, BAR_Y, 0, y1); lg.addColorStop(0, `rgba(${r},${g},${b},${0.55 * a})`); lg.addColorStop(0.3, `rgba(${r},${g},${b},${0.95 * a})`); lg.addColorStop(0.7, `rgba(${r},${g},${b},${0.6 * a})`); lg.addColorStop(1, `rgba(${r},${g},${b},0)`);
         c.strokeStyle = lg; c.lineWidth = q.lw; c.lineCap = 'round'; c.beginPath(); c.moveTo(q.x, BAR_Y); c.lineTo(q.x, y1); c.stroke();
         if (len > 6) spark(q.x, y1, 1.0 + q.lw * 0.4, a * 0.9, q.col, q.L > 40);
         // a glint travelling down the streak
