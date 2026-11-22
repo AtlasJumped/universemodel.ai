@@ -658,16 +658,20 @@ const FX_PATCHES = [
   def('steam', 'Steam', 'x', null, 4.2, X => { const b = X.tg.nbold > 0 && Math.random() < 0.5; return steam(X, b) || steam(X, !b); });
 
   // ===== Card sparkle-in: a sparkle lands on each card's top-left corner in turn, and the card lifts 4 px and settles
-  def('cardin', 'Card sparkle-in', 'x', 'cards', 4.8, X => {
-    const cards = safeCards(X.sec, 8); if (cards.length < 2) return null; const sw = new Swarm(60), step = 0.36, t0 = 0.2, st = [];
+  const sparkled = new WeakSet();
+  function freshCards(sec) { const hb = hdrBottom(); return cardsOf(sec).filter(e => { if (sparkled.has(e) || unsafeIn(e) || e.closest('canvas,form')) return false; const r = e.getBoundingClientRect(); return r.width > 90 && r.height > 28 && r.top < H - 30 && r.bottom > hb + 20; }).sort((a, b) => { const A = a.getBoundingClientRect(), B = b.getBoundingClientRect(); return Math.abs(A.top - B.top) > 12 ? A.top - B.top : A.left - B.left; }); }
+  def('cardin', 'Card sparkle-in', 'x', 'cards', 6, X => {
+    let cards = freshCards(X.sec).slice(0, 24); if (!cards.length) cards = safeCards(X.sec, 16); if (!cards.length) return null; cards.forEach(e => sparkled.add(e));
+    const sw = new Swarm(260), step = cards.length > 8 ? 0.11 : 0.18, t0 = 0.1, st = [], SW = 0.5;
     const anims = []; X.guard(() => anims.forEach(a => { try { a.cancel(); } catch (e) {} }));
-    cards.forEach((el, i) => { st.push({ el, t: t0 + i * step, lifted: false, down: true }); });
+    cards.forEach((el, i) => { st.push({ el, t: t0 + i * step, lifted: false, n: 0 }); });
+    const edge = (r, k) => { const P = 2 * (r.width + r.height); let d = k * P; if (d < r.width) return [r.left + d, r.top]; d -= r.width; if (d < r.height) return [r.right, r.top + d]; d -= r.height; if (d < r.width) return [r.right - d, r.bottom]; d -= r.width; return [r.left, r.bottom - d]; };
     return { frame(c, t, dt) {
-      for (const q of st) { const r = q.el.getBoundingClientRect(), tx = r.left + 7, ty = r.top + 7, u = (t - q.t) / 0.32;
-        if (u >= 0 && u < 1) { const e = u * u; spark(c, lerp(tx - 40, tx, e), lerp(ty - 52, ty, e), 1.7, 0.95, GOLD, true); }
-        if (u >= 1 && !q.lifted) { q.lifted = true; if (q.el.animate) anims.push(q.el.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-4px)', offset: 0.25 }, { transform: 'translateY(-4px)', offset: 0.66 }, { transform: 'translateY(0)' }], { duration: 880, easing: 'ease-in-out' })); for (let i = 0; i < 6; i++) { const a = rnd(0, 6.28), s = rnd(0.3, 1.4); sw.add({ x: tx, y: ty, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rnd(0.4, 0.8), r: rnd(0.8, 1.5), col: pickBright(), drag: 0.93 }); } }
-                if (u >= 1 && u < 3.2) { const a = Math.min(1, (u - 1) * 6) * (1 - clamp((u - 2.2) / 1, 0, 1)); spark(c, tx, ty, 1.5 + 0.5 * Math.sin(t * 9), a * 0.9, GOLD, true); } }
-      sw.step(dt); sw.draw(c); return t > t0 + st.length * step + 1.7;
+      for (const q of st) { const u = (t - q.t) / SW; if (u < 0 || u > 1.05) continue; const r = q.el.getBoundingClientRect();
+        if (!q.lifted) { q.lifted = true; if (q.el.animate) anims.push(q.el.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-3px)', offset: 0.3 }, { transform: 'translateY(-3px)', offset: 0.6 }, { transform: 'translateY(0)' }], { duration: 800, easing: 'ease-in-out' })); }
+        const want = Math.floor(Math.min(1, u) * 26); while (q.n < want) { q.n++; const pt = edge(r, Math.random()); sw.add({ x: pt[0] + rnd(-3, 3), y: pt[1] + rnd(-3, 3), vx: rnd(-0.12, 0.12), vy: rnd(-0.3, -0.05), life: rnd(0.6, 1.2), r: rnd(1, 2.3), col: Math.random() < 0.6 ? GOLD : pickBright(), star: true, drag: 0.98 }); if (q.n % 5 === 0) sw.add({ x: rnd(r.left + 10, r.right - 10), y: rnd(r.top + 8, r.bottom - 8), vx: 0, vy: rnd(-0.2, 0), life: rnd(0.5, 0.9), r: rnd(0.8, 1.5), col: pickBright(), star: true, drag: 0.98 }); }
+        if (u < 1) { const gx = lerp(r.left, r.right, u); spark(c, gx, r.top, 2.4, 0.95 * Math.sin(u * 3.14), GOLD, true); } }
+      sw.step(dt); sw.draw(c); return t > t0 + st.length * step + SW + 1.3;
     } };
   });
 
@@ -800,8 +804,8 @@ const FX_PATCHES = [
     if (!targets.length || REDUCE || !enabled || document.hidden || !cvOK()) return; const hb = hdrBottom(), now = performance.now();
     for (const tg of skyTargets) { if (tg === targets[0] && !headSkyOK) continue; const r = tg.sky.getBoundingClientRect(); if (r.bottom > hb + 8 && r.top < H - 8 && !skies.some(s => s.tg.sky === tg.sky)) skyNow(tg); }
     if (now - lastScroll < 250 || laneBusy('x') || pending.length) return;
-    for (const tg of targets) { if (tg.firedC || tg.nextup || !tg.safe || tg.nitems < 2) continue; if (tg === targets[0] && !headSkyOK) continue; const r = tg.sec.getBoundingClientRect(); if (r.top > H * 0.72 || r.bottom < hb + 60) continue;
-      if (startFx(DEF.cardin, tg, { quiet: true })) { tg.firedC = true; break; } }
+    for (const tg of targets) { if (tg.nextup || !tg.safe || tg.nitems < 2 || !freshCards(tg.sec).length) continue; if (tg === targets[0] && !headSkyOK) continue; const r = tg.sec.getBoundingClientRect(); if (r.top > H - 30 || r.bottom < hb + 20) continue;
+      if (startFx(DEF.cardin, tg, { quiet: true })) break; }
   }
   // a comet every 20 to 45 s (the first within 6 to 12 s), only while the page is visible, still, and nothing else of ours is running
   function scheduleComet(first) { clearTimeout(cometT); cometT = setTimeout(tryComet, first ? rnd(6000, 12000) : rnd(20000, 45000)); }

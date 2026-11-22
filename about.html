@@ -119,7 +119,7 @@
         </div>
       </div>
     </div>
-    <div class="card ab-shuf" id="same-act">
+    <div class="card ab-shuf" id="same-act" data-react="mad">
       <div class="ab-shuf-h"><span class="tag">The same act, two verdicts</span><h3 id="ab-act" aria-live="polite"></h3></div>
       <p class="ab-sum" id="ab-sum"></p>
       <div class="ab-two">
@@ -438,8 +438,10 @@
     cl1.hidden = (i !== 0);
     cl.innerHTML = c[5] || ''; cl.hidden = (i === 0 || !c[5]);
     n.textContent = (i + 1) + ' of ' + C.length;
+    box.setAttribute('data-case', i);
   }
   function go(step) {
+    if (window.hmrReact && hmrReact.resetNow) hmrReact.resetNow(box);
     i = (i + step + C.length) % C.length; show();
     box.scrollIntoView({ behavior: 'auto', block: 'start' });
   }
@@ -459,8 +461,8 @@
 </div></footer>
 <script src="site.js?v=488aea81" defer></script>
 <script src="fx-stars.js?v=5a13ce3b" defer></script>
-<script src="fx-sky.js?v=7cd41669" defer></script>
+<script src="fx-sky.js?v=4bf482f3" defer></script>
 <script src="fx-progress.js?v=024db3f8" defer></script>
-<script src="fx-react.js?v=defcd2c8" defer></script>
+<script src="fx-react.js?v=4a46652e" defer></script>
 </body>
 </html>
