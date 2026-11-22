@@ -134,7 +134,7 @@
   }
   function renderPop() {
     const rc = readCount(), all = rc >= N;
-    let h = '<h2>HMR explored: ' + pct() + '%</h2><p class="sub">' + rc + ' of ' + N + ' pages read to the end. This only measures how much of the site you have explored on this device.</p><ol>';
+    let h = '<h2>HMR explored: ' + pct() + '%</h2><p class="sub">' + rc + ' of ' + N + ' pages read to the end. This measures how much of the site you have explored on this device.</p><ol>';
     for (const p of PAGES) { const r = !!S.read[p[0]], c = p[0] === here; h += '<li class="' + (r ? 'rd ' : '') + (c ? 'cu' : '') + '"><a href="' + p[0] + '"' + (c ? ' aria-current="page"' : '') + '>' + p[1] + '<span class="hmr-sr">' + (r ? ' (explored)' : '') + '</span></a></li>'; }
     h += '</ol>';
     if (all) h += '<p class="done"><strong>You have explored all of HMR.</strong> If this resonates with you, <a href="collaborators.html">engage with us here</a>.</p>';
