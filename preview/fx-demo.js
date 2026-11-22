@@ -89,7 +89,7 @@
     c.clearRect(0, 0, W, H);
     for (const fx of running.slice()) {
       if (fx.ended) continue;
-      if (!fx.hurrying) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.45 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
+      if (!fx.hurrying) { const r = fx.sec.getBoundingClientRect(); if (Math.abs(scrollY - fx.sy0) > H * 0.6 || r.bottom < H * 0.08 || r.top > H * 0.95) hurry(fx); }
       if (fx.hurrying) fx.rate += (6 - fx.rate) * Math.min(1, dt * 8);
       fx.t += dt * fx.rate;
       let fin = false;
@@ -287,13 +287,15 @@
     let gen = script();
     function drawFairy(c, x, y, s, a, t) {
       if (a <= 0.01 || s <= 0.01) return;
-      glow(c, x, y, 26 * s, a * 0.6, [109, 74, 255]); glow(c, x, y, 19 * s, a * 0.85, [91, 155, 230]); glow(c, x, y, 15 * s, a, GOLD); glow(c, x, y, 9.5 * s, a, [255, 214, 120]);
-      for (let k = 0; k < 11; k++) { const an = t * (2.2 + k * 0.41) + k * 2.1, rr = (3 + ((k * 5) % 9)) * s * (0.85 + 0.15 * Math.sin(t * 5 + k)); const col = k % 3 === 0 ? WHITE : COLS[k % 6]; spark(c, x + Math.cos(an) * rr, y + Math.sin(an) * rr * 0.9, (0.9 + (k % 3) * 0.35) * s, a * (0.7 + 0.3 * Math.sin(t * 9 + k * 1.7)), col, k % 4 === 0); }
-      glow(c, x, y, 8 * s, a, WHITE); glow(c, x, y, 5 * s, a, WHITE); glow(c, x, y, 3 * s, a, [255, 255, 255]);
-      const gl = (0.6 + 0.4 * Math.sin(t * 8.3)) * a; cross(c, x, y, 17 * s, gl * 0.9, [255, 235, 170], 1.2);
-      c.save(); c.translate(x, y); c.rotate(0.785 + Math.sin(t * 2) * 0.3); cross(c, 0, 0, 10 * s, gl * 0.6, WHITE, 1); c.restore();
+      glow(c, x, y, 30 * s, a * 0.45, [109, 74, 255]); glow(c, x, y, 22 * s, a * 0.8, [91, 155, 230]);
+      glow(c, x, y, 18 * s, a, GOLD); glow(c, x, y, 16 * s, a, GOLD); glow(c, x, y, 12.5 * s, a, [255, 196, 80]); glow(c, x, y, 11 * s, a, [255, 214, 120]);
+      for (let k = 0; k < 13; k++) { const an = t * (2.4 + k * 0.43) * (k % 2 ? 1 : -1) + k * 2.1, rr = (5 + ((k * 5) % 8)) * s * (0.85 + 0.15 * Math.sin(t * 5 + k)); const col = k % 3 === 0 ? WHITE : k % 3 === 1 ? GOLD : COLS[k % 6]; spark(c, x + Math.cos(an) * rr, y + Math.sin(an) * rr * 0.9, (1.1 + (k % 3) * 0.45) * s, a * (0.75 + 0.25 * Math.sin(t * 9 + k * 1.7)), col, k % 4 === 0); }
+      glow(c, x, y, 9 * s, a * 0.9, WHITE); glow(c, x, y, 7 * s, a, [255, 255, 255]); glow(c, x, y, 5 * s, a, [255, 255, 255]);
+      const gl = (0.6 + 0.4 * Math.sin(t * 8.3)) * a; cross(c, x, y, 17 * s, gl * 0.85, [242, 169, 59], 1.1);
+      c.save(); c.translate(x, y); c.rotate(0.785 + Math.sin(t * 2) * 0.3); cross(c, 0, 0, 11 * s, gl * 0.7, [109, 74, 255], 1); c.restore();
     }
     return {
+      pos() { return { x: px, y: py }; },
       hurry() { if (!hurried) { hurried = true; f.occ = null; f.word = null; gen = wink(); } },
       frame(c, t, d) {
         dt = d; T = t; f.wob = f.wob || 1;
@@ -452,11 +454,11 @@
     const horiz = maxX - minX > maxY - minY, pos = rs.map(r => horiz ? (r.cx - minX) / Math.max(1, maxX - minX) : (r.cy - minY) / Math.max(1, maxY - minY)), travel = 2.4, wd = 0.7;
     return { frame(c, t, dt) {
       items.forEach((e, i) => { const u = (t - 0.2 - pos[i] * travel) / wd;
-        if (u > 0 && u < 1) { const k = Math.sin(Math.PI * u); e.style.transform = `translateY(${-9 * k}px) scale(${1 + 0.014 * k})`; const r = e.getBoundingClientRect();
+        if (u > 0 && u < 1) { const k = Math.sin(Math.PI * u); e.style.transform = `translateY(${-14 * k}px) scale(${1 + 0.022 * k})`; const r = e.getBoundingClientRect();
           if (Math.random() < dt * 40) sw.add({ x: r.left + Math.random() * r.width, y: r.top - 2, vy: -0.5, vx: rnd(-0.2, 0.2), life: rnd(0.5, 0.9), r: rnd(0.9, 1.9) }); }
         else if (u >= 1) e.style.transform = ''; });
       // a faint band travelling with the wave
-      const q = clamp((t - 0.2) / travel, 0, 1); if (q > 0 && q < 1) { const x = horiz ? lerp(minX, maxX, q) : (minX + maxX) / 2, y = horiz ? (minY + maxY) / 2 : lerp(minY, maxY, q); glow(c, x, y, 70, 0.3 * Math.sin(Math.PI * q), [91, 155, 230]); }
+      const q = clamp((t - 0.2) / travel, 0, 1); if (q > 0 && q < 1) { const x = horiz ? lerp(minX, maxX, q) : (minX + maxX) / 2, y = horiz ? (minY + maxY) / 2 : lerp(minY, maxY, q); glow(c, x, y, 110, 0.4 * Math.sin(Math.PI * q), [91, 155, 230]); glow(c, x, y, 60, 0.3 * Math.sin(Math.PI * q), [109, 74, 255]); }
       sw.step(dt); sw.draw(c); return t > 0.2 + travel + wd + 0.1;
     } };
   });
@@ -470,7 +472,7 @@
     if (nodes.length < 3) { add(X.sec, 0.1, 0.1); add(X.sec, 0.9, 0.15); add(X.sec, 0.5, 0.4); add(X.sec, 0.15, 0.6); add(X.sec, 0.85, 0.7); }
     const P = nd => { const r = nd.el.getBoundingClientRect(); return { x: r.left + nd.u * r.width, y: r.top + nd.v * Math.min(r.height, H * 0.9) }; };
     const p0 = nodes.map(P), edges = [], seen = new Set();
-    nodes.forEach((a, i) => { const ds = nodes.map((b, j) => ({ j, d: i === j ? 1e9 : Math.hypot(p0[i].x - p0[j].x, p0[i].y - p0[j].y) })).sort((x, y) => x.d - y.d); for (let k = 0; k < 2; k++) { const j = ds[k].j, key = Math.min(i, j) + '-' + Math.max(i, j); if (!seen.has(key)) { seen.add(key); edges.push({ a: i, b: j, t0: Math.max(a.t0, nodes[j].t0) + 0.2, ph: rnd(0, 6.28) }); } } });
+    nodes.forEach((a, i) => { const ds = nodes.map((b, j) => ({ j, d: i === j ? 1e9 : Math.hypot(p0[i].x - p0[j].x, p0[i].y - p0[j].y) + (nodes[j].el === a.el ? 1e5 : 0) })).sort((x, y) => x.d - y.d); for (let k = 0; k < 2; k++) { const j = ds[k].j, key = Math.min(i, j) + '-' + Math.max(i, j); if (!seen.has(key)) { seen.add(key); edges.push({ a: i, b: j, t0: Math.max(a.t0, nodes[j].t0) + 0.2, ph: rnd(0, 6.28) }); } } });
     return { frame(c, t, dt) {
       const out = 1 - clamp((t - 4.3) / 1, 0, 1), hb = hdrBottom(), pts = nodes.map(P);
       c.lineWidth = 1;
@@ -567,12 +569,12 @@
   def('magnet', 'Magnet', false, null, 5.4, X => {
     const sw = new Swarm(COARSE ? 60 : 100), N = COARSE ? 44 : 80, parts = [];
     for (let i = 0; i < N; i++) { const e = Math.floor(rnd(0, 4)); parts.push({ x: e < 2 ? rnd(0, W) : e === 2 ? -20 : W + 20, y: e === 0 ? -20 : e === 1 ? H + 20 : rnd(hdrBottom(), H), vx: 0, vy: 0, r: rnd(1.2, 2.8), col: pickCol(), star: Math.random() < 0.4, d: rnd(0, 0.9), tw: rnd(0, 6.28) }); }
-    const target = t => (ptr.x != null && performance.now() - ptr.t < 7000) ? { x: ptr.x, y: ptr.y, live: 1 } : { x: W / 2 + Math.sin(t * 0.9) * W * 0.22, y: lerp(hdrBottom(), H, 0.5) + Math.cos(t * 1.3) * H * 0.15, live: 0 };
+    const target = t => (ptr.x != null && performance.now() - ptr.t < 20000) ? { x: ptr.x, y: ptr.y, live: 1 } : { x: W / 2 + Math.sin(t * 0.9) * W * 0.22, y: lerp(hdrBottom(), H, 0.5) + Math.cos(t * 1.3) * H * 0.15, live: 0 };
     return { frame(c, t, dt) {
       const tg = target(t), k = dt * 60, rel = t > 4.3, A = clamp(t / 0.5, 0, 1) * (1 - clamp((t - 4.6) / 0.7, 0, 1));
-      for (const p of parts) { if (t < p.d) continue; const dx = tg.x - p.x, dy = tg.y - p.y, d = Math.hypot(dx, dy) + 1, f = rel ? -0.05 : 0.9 / (1 + d / 60) + 0.12;
-        p.vx += (dx / d * f + (-dy / d) * 0.5 * Math.min(1, 160 / d) * (rel ? 0 : 1)) * 0.1 * k; p.vy += (dy / d * f + (dx / d) * 0.5 * Math.min(1, 160 / d) * (rel ? 0 : 1)) * 0.1 * k;
-        const sp = Math.hypot(p.vx, p.vy), mx = 9; if (sp > mx) { p.vx *= mx / sp; p.vy *= mx / sp; } const dr = Math.pow(0.975, k); p.vx *= dr; p.vy *= dr; p.x += p.vx * k; p.y += p.vy * k;
+      for (const p of parts) { if (t < p.d) continue; const dx = tg.x - p.x, dy = tg.y - p.y, d = Math.hypot(dx, dy) + 1, f = rel ? -0.05 : (1.3 / (1 + d / 90) + 0.4) * Math.min(1, d / 90);
+        p.vx += (dx / d * f + (-dy / d) * 0.35 * Math.min(1, d / 100) * (rel ? 0 : 1)) * 0.2 * k; p.vy += (dy / d * f + (dx / d) * 0.35 * Math.min(1, d / 100) * (rel ? 0 : 1)) * 0.2 * k;
+        const sp = Math.hypot(p.vx, p.vy), mx = 9; if (sp > mx) { p.vx *= mx / sp; p.vy *= mx / sp; } const dr = Math.pow(0.962, k); p.vx *= dr; p.vy *= dr; p.x += p.vx * k; p.y += p.vy * k;
         spark(c, p.x, p.y, p.r, A * (0.75 + 0.25 * Math.sin(t * 9 + p.tw)), p.col, p.star); if (Math.random() < dt * 1.5) sw.add({ x: p.x, y: p.y, life: 0.4, r: 0.9, col: p.col, star: false, vx: -p.vx * 0.2, vy: -p.vy * 0.2 }); }
       glow(c, tg.x, tg.y, 26 * A, 0.28 * A, GOLD); sw.step(dt); sw.draw(c); return t > 5.3;
     } };
@@ -616,14 +618,14 @@
 
   // ===== 17. Galaxy
   def('galaxy', 'Galaxy', false, null, 5.6, X => {
-    const h = headOk(X.head) ? X.head : null, tb = h ? tbox(h) : null, ccx = tb ? tb.left + tb.width / 2 : W / 2, ccy = tb ? tb.top + tb.height / 2 : H / 2, R0 = Math.min(W * 0.46, H * 0.42, 340), arms = 3, per = COARSE ? 24 : 42, pts = [];
-    for (let a = 0; a < arms; a++) for (let i = 0; i < per; i++) pts.push({ a, s: (i + rnd(0, 1)) / per, j: rnd(-0.18, 0.18), r: rnd(0.9, 2.4), tw: rnd(0, 6.28), star: Math.random() < 0.3 });
+    const h = headOk(X.head) ? X.head : null, tb = h ? tbox(h) : null, ccx = W / 2, ccy = clamp(tb ? tb.top + tb.height / 2 + 60 : H / 2, hdrBottom() + 110, H - 110), R0 = Math.min(W * 0.44, 420), arms = 3, per = COARSE ? 46 : 84, pts = [];
+    for (let a = 0; a < arms; a++) for (let i = 0; i < per; i++) pts.push({ a, s: Math.pow((i + rnd(0, 1)) / per, 1.35), j: rnd(-0.22, 0.22), r: rnd(1.2, 2.8), tw: rnd(0, 6.28), star: Math.random() < 0.3 });
     const cs = scrollY;
     return { frame(c, t, dt) {
-      const grow = easeO(clamp(t / 1.5, 0, 1)), A = clamp(t / 0.5, 0, 1) * (1 - clamp((t - 4.5) / 1, 0, 1)), rot = t * 0.7, out = 1 + 0.25 * clamp((t - 4.5) / 1, 0, 1), cx = ccx, cy = ccy - (scrollY - cs);
-      glow(c, cx, cy, 50 * grow * out, 0.55 * A, [255, 214, 120]); glow(c, cx, cy, 22 * grow, 0.9 * A, WHITE);
-      for (const p of pts) { const rr = R0 * grow * out * Math.pow(p.s, 0.85) + 4, an = p.a * 6.283 / arms + 3.4 * p.s + p.j + rot * (1.1 - p.s * 0.6), x = cx + Math.cos(an) * rr, y = cy + Math.sin(an) * rr * 0.5; const col = p.s < 0.25 ? GOLD : p.s < 0.6 ? [91, 155, 230] : [109, 74, 255];
-        spark(c, x, y, p.r * (1.2 - p.s * 0.4), A * (0.5 + 0.5 * Math.sin(t * 5 + p.tw)) * (1 - p.s * 0.2), col, p.star); }
+      const grow = easeO(clamp(t / 1.5, 0, 1)), A = clamp(t / 0.5, 0, 1) * (1 - clamp((t - 4.5) / 1, 0, 1)), rot = t * 0.8, out = 1 + 0.25 * clamp((t - 4.5) / 1, 0, 1), cx = ccx, cy = ccy - (scrollY - cs);
+      glow(c, cx, cy, 70 * grow * out, 0.5 * A, [109, 74, 255]); glow(c, cx, cy, 44 * grow * out, 0.7 * A, [255, 196, 80]); glow(c, cx, cy, 24 * grow, 0.95 * A, WHITE); glow(c, cx, cy, 12 * grow, A, [255, 255, 255]);
+      for (const p of pts) { const rr = R0 * grow * out * p.s + 8, an = p.a * 6.283 / arms + 4.2 * Math.pow(p.s, 0.7) + p.j * (1.2 - p.s) + rot * (1.2 - p.s * 0.7), x = cx + Math.cos(an) * rr, y = cy + Math.sin(an) * rr * 0.46; const col = p.s < 0.2 ? GOLD : p.s < 0.5 ? [91, 155, 230] : p.s < 0.8 ? [109, 74, 255] : [214, 120, 210];
+        spark(c, x, y, p.r * (1.25 - p.s * 0.45), A * (0.65 + 0.35 * Math.sin(t * 5 + p.tw)), col, p.star); }
       return t > 5.5;
     } };
   });
@@ -709,7 +711,7 @@
     document.addEventListener('click', e => { if (panel.classList.contains('open') && !panel.contains(e.target) && !pill.contains(e.target)) { panel.classList.remove('open'); pill.setAttribute('aria-expanded', 'false'); } });
   }
 
-  window.fxDemo = { list: () => ORDER.map(id => DEF[id].label), ids: () => ORDER.slice(), play, running: () => running.map(f => f.def.id), errors: () => errors.slice(), plan: () => targets.map(t => ({ name: t.name, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, safe: t.safe })), stop: stopAll };
+  window.fxDemo = { list: () => ORDER.map(id => DEF[id].label), ids: () => ORDER.slice(), play, running: () => running.map(f => f.def.id), errors: () => errors.slice(), plan: () => targets.map(t => ({ name: t.name, head: t.head ? t.head.textContent.trim().slice(0, 40) : null, safe: t.safe })), stop: stopAll, pos: () => { const f = running.find(r => r.inst && r.inst.pos); return f ? f.inst.pos() : null; } };
   function init() {
     buildUI(); if (REDUCE) return; collect();
     let ticking = false; addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => { ticking = false; check(); }); }, { passive: true });
