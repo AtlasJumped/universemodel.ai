@@ -43,6 +43,8 @@ const SND = {
   rocket(v) { const t = ctx.currentTime; nz(t, 1.3, 'bandpass', 500, 2600, 0.9, 0.45 * v, 0.2); tn(t, 'sawtooth', 110, 330, 1.2, 0.07 * v, 0.2); },
   shot(v) { const t = ctx.currentTime; nz(t, 0.04, 'highpass', 2500, 1800, 0.7, 0.28 * v); tn(t, 'square', 900, 200, 0.05, 0.09 * v); },
   ignite(v) { const t = ctx.currentTime; nz(t, 0.09, 'highpass', 3000, 1500, 0.7, 0.14 * v); nz(t, 0.18, 'lowpass', 700, 250, 0.7, 0.12 * v); },
+  thunder(v) { const t = ctx.currentTime; nz(t, 0.06, 'highpass', 4000, 2000, 0.7, 0.5 * v); nz(t + 0.02, 1.3, 'lowpass', 1800, 70, 0.8, 0.85 * v); tn(t + 0.05, 'sine', 70, 26, 1.0, 0.55 * v); nz(t + 0.35, 0.9, 'lowpass', 500, 90, 0.8, 0.4 * v); },
+  tick(v) { const t = ctx.currentTime; tn(t, 'square', 1500, 1100, 0.025, 0.07 * v); },
   fuse(v) { const t = ctx.currentTime; nz(t, 0.35, 'highpass', 5000, 3500, 0.7, 0.16 * v, 0.02); },
   pop(v) { const t = ctx.currentTime; nz(t, 0.22, 'bandpass', 1600, 500, 0.9, 0.4 * v); for (let k = 0; k < 4; k++) nz(t + rnd(0.05, 0.3), 0.025, 'highpass', 4000, 0, 0.7, 0.2 * v); },
   splash(v) { const t = ctx.currentTime; nz(t, 0.3, 'lowpass', 2600, 500, 0.8, 0.4 * v); for (let k = 0; k < 3; k++) tn(t + rnd(0.02, 0.2), 'sine', rnd(500, 900), rnd(900, 1500), 0.07, 0.05 * v); },
@@ -54,7 +56,7 @@ const SND = {
   ufo(v) { const t = ctx.currentTime; tn(t, 'sine', 320, 150, 0.9, 0.16 * v, 0.1); tn(t, 'triangle', 480, 220, 0.9, 0.08 * v, 0.1); },
   flood(v) { const t = ctx.currentTime; nz(t, 2.6, 'lowpass', 700, 200, 0.7, 0.6 * v, 0.3); }
 };
-const MIN = { hit: 60, crack: 45, snap: 35, glass: 90, boom: 120, thud: 90, shot: 60, ignite: 140, fuse: 350, splash: 140, gasp: 500, crowd: 1800, pop: 90, cannon: 200, rocket: 300, roar: 2500, breath: 900, drone: 1500, ufo: 1500, flood: 2500 };
+const MIN = { hit: 60, crack: 45, snap: 35, glass: 90, boom: 120, thud: 90, shot: 60, ignite: 140, fuse: 350, thunder: 400, tick: 60, splash: 140, gasp: 500, crowd: 1800, pop: 90, cannon: 200, rocket: 300, roar: 2500, breath: 900, drone: 1500, ufo: 1500, flood: 2500 };
 function play(name, v) {
   if (!on || !ctx || ctx.state !== 'running' || !SND[name] || active.size > 30) return;
   const now = performance.now(); if (now - (last[name] || 0) < (MIN[name] || 50)) return; last[name] = now;

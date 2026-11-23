@@ -9,6 +9,7 @@ if (!cv) return;
 const ctx = cv.getContext('2d');
 const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+let room = false, rscale = coarse ? 0.8 : 1, flash = 0, lastFlashAt = 0;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -962,9 +963,11 @@ function collideBalls(h) {
     const r = B.r, sp = Math.hypot(B.vx, B.vy, B.vz);
     if (!B.rk) B.vy -= grav * 0.7 * h; B.x += B.vx * h; B.y += B.vy * h; B.z += B.vz * h;
     const gy = groundY(B.x);
-    if (B.y < gy + r) { B.y = gy + r; if (B.fire) { boom(B, h); return; } if (B.vy < -3 && !B.th) { B.th = 1; sfx('thud', 1); } if (B.vy < 0) B.vy *= -0.32; B.vx *= 0.995; B.vz *= 0.995; }
+    if (B.bomb) { B.fuse -= h; B.tk -= h; if (B.tk <= 0) { B.lit = !B.lit; B.tk = 0.06 + 0.2 * clamp(B.fuse / 1.6, 0, 1); if (B.lit) sfx('tick', 0.5); } if (B.fuse <= 0) { B.R = 0.26 * S.size + 2; boom(B, h); return; } if ((B.age = (B.age || 0) + h) > 0.3 && burning.length && bombNearFire(B)) { B.R = 0.26 * S.size + 2; boom(B, h); return; } }
+    if (B.rk && B.tg) steerRocket(B, h);
+    if (B.y < gy + r) { B.y = gy + r; if (B.fire) { boom(B, h); return; } if (B.vy < -3 && !B.th) { B.th = 1; sfx('thud', 1); } if (B.vy < 0) B.vy *= B.bomb ? -0.2 : -0.32; B.vx *= B.bomb ? 0.96 : 0.995; B.vz *= B.bomb ? 0.96 : 0.995; }
     B.life -= h; if (B.life <= 0 || B.y < -S.pit - 3) { B.dead = true; continue; }
-    const hitV = Math.max(sp, 1);
+    const hitV = B.bomb ? 0.5 : Math.max(sp, 1);
     if (B.rk && pc < PMAX - 6 && Math.random() < 0.8) { emit(3, B.x, B.y, B.z, rnd(-1, 1), rnd(0, 1), rnd(-1, 1), 0.7, 1.1); emit(2, B.x, B.y, B.z, rnd(-1, 1), rnd(-1, 1), rnd(-1, 1), 0.25, 1.0); }
     if (!B.fire && glassNear(B.x, B.y, B.z, r, B.vx * 0.05, B.vy * 0.05, B.vz * 0.05)) { B.vx *= 0.9; B.vy *= 0.9; B.vz *= 0.9; }
     for (let mi = 0; mi < mem.length; mi++) {
@@ -977,6 +980,7 @@ function collideBalls(h) {
       const thr = m.kind >= CABLE ? 0.03 * S.size : 0.14 * S.size;
       if (hitV > thr) { killMem(mi, 'broke'); if (m.kind <= BEAM) shake = reduce ? 0 : Math.max(shake, 0.5); for (let q = 0; q < 4; q++) emit(1, qx_, qy_, qz_, rnd(-1, 1) * S.u * 4, rnd(0, 3) * S.u * 3, rnd(-1, 1) * S.u * 4, rnd(0.25, 0.5), 0.5); B.vx *= 0.985; B.vy *= 0.985; B.vz *= 0.985; continue; }
       const nx = d > 1e-6 ? dx / d : 0, ny = d > 1e-6 ? dy / d : 1, nz = d > 1e-6 ? dz / d : 0, pen = r - d;
+      if (B.bomb) { const vn = B.vx * nx + B.vy * ny + B.vz * nz; if (vn > 0) { B.vx -= 1.2 * vn * nx; B.vy -= 1.2 * vn * ny; B.vz -= 1.2 * vn * nz; B.vx *= 0.97; B.vz *= 0.97; } }
       const wa = wI[a] * (1 - t) * (1 - t) + wI[b] * t * t; if (wa === 0) continue;
       const dl = pen / wa;
       px[a] += wI[a] * (1 - t) * dl * nx; py[a] += wI[a] * (1 - t) * dl * ny; pz[a] += wI[a] * (1 - t) * dl * nz;
@@ -995,6 +999,18 @@ function collideBalls(h) {
       }
     }
   }
+}
+function bombNearFire(B) {
+  for (let k = 0; k < burning.length; k++) { const m = mem[burning[k]]; if (!m || !m.alive) continue; const mx = (px[m.a] + px[m.b]) * 0.5 - B.x, my = (py[m.a] + py[m.b]) * 0.5 - B.y, mz = (pz[m.a] + pz[m.b]) * 0.5 - B.z; if (mx * mx + my * my + mz * mz < (B.r * 2.5) ** 2) return true; }
+  return false;
+}
+// missiles curve in: turn the velocity toward the target by at most 2 radians per second
+function steerRocket(B, h) {
+  const sp = Math.hypot(B.vx, B.vy, B.vz); if (sp < 1e-6) return;
+  const dx = B.tg[0] - B.x, dy = B.tg[1] - B.y, dz = B.tg[2] - B.z, L = Math.hypot(dx, dy, dz); if (L < 1e-6) return;
+  const ux = B.vx / sp, uy = B.vy / sp, uz = B.vz / sp, c = clamp((ux * dx + uy * dy + uz * dz) / L, -1, 1), ang = Math.acos(c); if (ang < 1e-4) return;
+  const t = Math.min(1, 2 * h / ang); let nx = ux * (1 - t) + dx / L * t, ny = uy * (1 - t) + dy / L * t, nz = uz * (1 - t) + dz / L * t; const nl = Math.hypot(nx, ny, nz) || 1;
+  B.vx = nx / nl * sp; B.vy = ny / nl * sp; B.vz = nz / nl * sp;
 }
 function boom(B, h) {
   B.dead = true; boomT = 2.5;
@@ -1168,7 +1184,7 @@ function aimPoint(x, y) {
   const n = pickNode(x, y, coarse ? 44 : 28); if (n >= 0 && py[n] > 0.2) return [px[n], py[n], pz[n]];
   const g = groundHit(x, y); return g ? [g[0], 0, g[2]] : null;
 }
-function launch(kind, tgt) {
+function launch(kind, tgt, home) {
   const sz = S.size, rx = cam.rx, rz = cam.rz, left = kind === 'cannon' ? -1 : 1, D = Math.max(sz * 1.5, 14);
   const o = [tgt[0] + rx * left * D, kind === 'cannon' ? 0.9 : 1.0, tgt[2] + rz * left * D];
   if (kind === 'cannon') {
@@ -1181,10 +1197,71 @@ function launch(kind, tgt) {
     emit(2, o[0], 1, o[2], 0, 0, 0, 0.3, 3); sfx('cannon', 1);
   } else {
     const dx = tgt[0] - o[0], dy = tgt[1] - o[1], dz = tgt[2] - o[2], L = Math.hypot(dx, dy, dz), sp = 1.9 * sz + 10;
-    balls.push({ x: o[0], y: o[1], z: o[2], vx: dx / L * sp, vy: dy / L * sp + 0.05 * sz, vz: dz / L * sp, r: Math.max(0.3 * S.u, 0.03 * sz), fire: true, rk: true, R: 0.2 * sz + 1.6, dead: false, life: 10, spin: 0 }); if (balls.length > 8) balls.shift();
+    balls.push({ x: o[0], y: o[1], z: o[2], vx: dx / L * sp, vy: dy / L * sp + 0.05 * sz, vz: dz / L * sp, r: Math.max(0.3 * S.u, 0.03 * sz), fire: true, rk: true, tg: home || tgt, R: 0.2 * sz + 1.6, dead: false, life: 10, spin: 0 }); if (balls.length > 8) balls.shift();
     props.push({ k: 'rocket', x: o[0], y: 0, z: o[2], dx: dx / Math.hypot(dx, dz), dz: dz / Math.hypot(dx, dz), t: 0, life: 2 });
     marks.push({ x: tgt[0], y: tgt[1], z: tgt[2], t: 0, life: L / sp + 0.5, k: 'rocket' }); sfx('rocket', 1);
   }
+}
+// ---- bombs: a fused ball that drops, bounces and then blows ----
+function bombsLive() { let n = 0; for (let i = 0; i < balls.length; i++) if (balls[i].bomb && !balls[i].dead) n++; return n; }
+function dropBomb(t) {
+  if (bombsLive() >= 5) return false;
+  const sz = S.size;
+  balls.push({ x: t[0], y: t[1] + 0.9 * sz, z: t[2], vx: 0, vy: 0, vz: 0, r: Math.max(0.3 * S.u, 0.03 * sz), bomb: true, fuse: 1.6, tk: 0.2, lit: false, dead: false, life: 20, spin: 0 });
+  if (balls.length > 9) balls.shift();
+  marks.push({ x: t[0], y: t[1], z: t[2], t: 0, life: 1.6, k: 'bomb' });
+  return true;
+}
+// ---- lightning: the bolt runs along struts and beams, and burns the cables and fabric it reaches ----
+const BOLTS = []; for (let i = 0; i < 3; i++) BOLTS.push({ on: false, t: 0, x: 0, y: 0, z: 0, np: 0, path: new Int32Array(40), jit: new Float32Array(64), mp: new Float32Array(3 * 14), f1: 3, f2: 7, d1x: 0, d1z: 0, d2x: 0, d2z: 0 });
+const bq = new Int32Array(48), bh = new Int8Array(48); let boltStamp = 0;
+function strikeBolt(t) {
+  const sz = S.size, x = t[0], y = t[1], z = t[2];
+  let B = null; for (let i = 0; i < 3; i++) if (!BOLTS[i].on) { B = BOLTS[i]; break; }
+  if (!B) { B = BOLTS[0]; for (let i = 1; i < 3; i++) if (BOLTS[i].t > B.t) B = BOLTS[i]; }
+  let best = -1, bd = 0.9 * Math.max(0.5, S.u), bt = 0;
+  for (let mi = 0; mi < mem.length; mi++) {
+    const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
+    const a = m.a, b = m.b, ex = px[b] - px[a], ey = py[b] - py[a], ez = pz[b] - pz[a], L2 = ex * ex + ey * ey + ez * ez + 1e-9;
+    const u = clamp(((x - px[a]) * ex + (y - py[a]) * ey + (z - pz[a]) * ez) / L2, 0, 1), d = Math.hypot(px[a] + ex * u - x, py[a] + ey * u - y, pz[a] + ez * u - z);
+    if (d < bd) { bd = d; best = mi; bt = u; }
+  }
+  B.on = true; B.t = 0; B.np = 0; B.x = x; B.y = y; B.z = z;
+  for (let i = 0; i < 64; i++) B.jit[i] = Math.random() * 2 - 1;
+  B.f1 = 2 + Math.floor(Math.random() * 3); B.f2 = 6 + Math.floor(Math.random() * 3);
+  let a1 = rnd(0, TAU), a2 = a1 + rnd(2, 4); B.d1x = Math.cos(a1); B.d1z = Math.sin(a1); B.d2x = Math.cos(a2); B.d2z = Math.sin(a2);
+  const now = performance.now(); if (!reduce && now - lastFlashAt >= 1000) { flash = 0.08; lastFlashAt = now; }
+  sfx('thunder', 1);
+  const kick = (n, k) => { if (!pinned[n] && alive[n]) vy[n] += 0.15 * sz * k; };
+  if (best < 0) {
+    boom({ x, y: Math.max(y, 0.05), z, small: true, R: 0.08 * sz + 1, dead: false }, 1 / (60 * Math.max(1, FR.sub)));
+    return false;
+  }
+  const m0 = mem[best], ex = px[m0.b] - px[m0.a], ey = py[m0.b] - py[m0.a], ez = pz[m0.b] - pz[m0.a];
+  B.x = px[m0.a] + ex * bt; B.y = py[m0.a] + ey * bt; B.z = pz[m0.a] + ez * bt;
+  killMem(best, 'burn'); boltStamp++; m0.bs = boltStamp;
+  let head = 0, tail = 0, cnt = 1;
+  const addPath = n => { if (B.np < 40) { for (let k = 0; k < B.np; k++) if (B.path[k] === n) return; B.path[B.np++] = n; } };
+  bq[tail] = m0.a; bh[tail++] = 0; bq[tail] = m0.b; bh[tail++] = 0; addPath(m0.a); addPath(m0.b); kick(m0.a, 1); kick(m0.b, 1);
+  while (head < tail && cnt < 14) {
+    const n = bq[head], h = bh[head]; head++; if (h >= 6) continue;
+    const ad = adj[n];
+    for (let k = 0; k < ad.length && cnt < 14; k++) {
+      const mi = ad[k], m = mem[mi]; if (!m.alive || m.kind === LINK || m.bs === boltStamp) continue; m.bs = boltStamp;
+      if (m.kind <= BEAM) {
+        cnt++; const o = m.a === n ? m.b : m.a; addPath(o); kick(o, 0.5 ** (h + 1));
+        if (tail < 46) { bq[tail] = o; bh[tail++] = h + 1; }
+      } else { cnt++; ignite(mi); }
+    }
+  }
+  for (const R of riders) {
+    if (R.dead) continue;
+    if (R.t === 'b') { for (let k = 0; k < B.np; k++) { const n = B.path[k]; if (Math.hypot(px[R.n] - px[n], py[R.n] - py[n], pz[R.n] - pz[n]) < 1.0) { R.hit = true; break; } } }
+    else if (R.t === 'p' && Math.hypot(px[R.n] - B.x, py[R.n] - B.y, pz[R.n] - B.z) < 0.1 * sz) knock(R);
+  }
+  for (let q = 0; q < 10; q++) emit(0, B.x, B.y, B.z, rnd(-1, 1) * sz * 0.15, rnd(0, 1) * sz * 0.2, rnd(-1, 1) * sz * 0.15, rnd(0.2, 0.5), 0.7);
+  rings.push({ x: B.x, y: Math.max(B.y, 0.05), z: B.z, t: 0, R: 0.12 * sz + 1 });
+  return true;
 }
 // ---- drone swarm ----
 function callDrones(tgt) {
@@ -1537,6 +1614,8 @@ function stepFrame() {
   droneStep(dt); dragonStep(dt); ufoStep(dt); floodStep(dt); shellStep(dt); waterStep(dt);
   for (let i = tracers.length - 1; i >= 0; i--) { tracers[i].t += dt; if (tracers[i].t > 0.12) tracers.splice(i, 1); }
   for (let i = marks.length - 1; i >= 0; i--) { marks[i].t += dt; if (marks[i].t > marks[i].life) marks.splice(i, 1); }
+  for (let i = 0; i < 3; i++) { const b = BOLTS[i]; if (b.on) { b.t += dt; if (b.t > 0.4) b.on = false; } }
+  if (flash > 0) flash = Math.max(0, flash - dt);
   for (let i = props.length - 1; i >= 0; i--) { props[i].t += dt; if (props[i].t > props[i].life) props.splice(i, 1); }
   simClock += dt; if (S.tick) S.tick(dt);
   for (let i = tornadoes.length - 1; i >= 0; i--) {
@@ -1583,7 +1662,7 @@ function loadScene(ix, keep) {
   for (const w of water) for (let k = 0; k < 8; k++) { const a = TAU * k / 8; S.pts.push(w.sh === 'rect' ? [w.x + (k % 4 < 2 ? -1 : 1) * w.rx, 0, w.z + (k % 2 ? -1 : 1) * w.rz] : [w.x + w.rx * Math.cos(a), 0, w.z + w.rz * Math.sin(a)]); }
   S.bnd = [X0 + 0.5, X1 - 0.5, Z0 + 0.5, Z1 - 0.5];
   cnt.cut = cnt.broke = cnt.burnt = 0; cnt.peak = 0; cnt.glass = 0; cnt.total = cnt.alive = mem.filter(m => m.orig).length;
-  Q.kind = null; Q.ox = Q.oy = Q.oz = 0; rift.gap = 0; tornadoes = []; gust = null; grab = null; pc = 0; rings = []; inferno = 0; simT = 0; shake = 0; streaks.length = 0; tracers.length = 0; marks.length = 0;
+  Q.kind = null; Q.ox = Q.oy = Q.oz = 0; rift.gap = 0; tornadoes = []; gust = null; grab = null; pc = 0; rings = []; inferno = 0; simT = 0; shake = 0; streaks.length = 0; tracers.length = 0; marks.length = 0; for (let i = 0; i < 3; i++) BOLTS[i].on = false; flash = 0;
   for (let i = 0; i < nN; i++) { vx[i] = vy[i] = vz[i] = 0; }
   // settle for a moment without any breaking
   grace = true; const ts = timeScale; timeScale = 1;
@@ -1594,14 +1673,15 @@ function loadScene(ix, keep) {
   for (const P of panels) if (P.glass) { let mx = 0; for (const mi of P.ms) { const m = mem[mi]; if (m.alive && m.kind <= BEAM) mx = Math.max(mx, Math.abs(m.st)); } P.thr = Math.max(0.009, 3 * mx); }
   cnt.peak = 0; simT = 0; simClock = 0; boomT = 0;
   if (S.afterLoad) S.afterLoad();
-  if (!keep) cam.reset(true);
+  if (!keep) cam.reset(true); else { cam.panX = 0; cam.panZ = 0; }
   if (armBtn) armBtn.setAttribute('aria-pressed', 'false');
   if (window.funSound) window.funSound.stopAll();
 }
 
 /* ===================== 5. camera and drawing ===================== */
 const cam = { yaw: 0.5, pitch: 0.3, dist: 30, vyaw: 0, w: 800, h: 600, dpr: 1, zoom: 1, cx: 400, cy: 300, f: 700, x: 0, y: 0, z: 0, fx: 0, fy: 0, fz: 0, rx: 1, rz: 0, ux: 0, uy: 1, uz: 0, tx: 0, ty: 0, tz: 0 };
-cam.reset = function (full) { this.yaw = S.view[0]; this.pitch = S.view[1]; this.vyaw = 0; this.zoom = 1; };
+cam.panX = 0; cam.panZ = 0;
+cam.reset = function (full) { this.yaw = S.view[0]; this.pitch = S.view[1]; this.vyaw = 0; this.zoom = 1; this.panX = 0; this.panZ = 0; };
 // frame the whole scene: fit its bounding box to the stage at the current angle and center it, so it also works from above
 cam.update = function (shk) {
   const w = this.w, h = this.h, bb = S.bb;
@@ -1609,15 +1689,33 @@ cam.update = function (shk) {
   const ox = sy * cp, oy = sp, oz = cy * cp;
   this.fx = -ox; this.fy = -oy; this.fz = -oz; this.rx = cy; this.rz = -sy; this.ux = -sp * sy; this.uy = cp; this.uz = -sp * cy;
   const s0 = Math.min(w, h * 1.2); this.f = s0 * 1.25;
-  const tx = (bb.x0 + bb.x1) / 2, ty = (bb.y0 + bb.y1) / 2, tz = (bb.z0 + bb.z1) / 2; this.tx = tx; this.ty = ty; this.tz = tz;
-  const mL = 14, mT = coarse ? 40 : 42, mB = coarse ? 44 : 48, aw = w - 2 * mL, ah = h - mT - mB, P = [];
+  const tx = (bb.x0 + bb.x1) / 2, ty = (bb.y0 + bb.y1) / 2, tz = (bb.z0 + bb.z1) / 2; this.tx0 = tx; this.tz0 = tz; this.tx = tx + this.panX; this.ty = ty; this.tz = tz + this.panZ;
+  const mL = 14, mT = room ? (coarse ? 64 : 60) : coarse ? 40 : 42, mB = room ? (coarse ? 92 : 104) : coarse ? 44 : 48, aw = w - 2 * mL, ah = h - mT - mB, P = [];
   for (const q of S.pts) { const dx = q[0] - tx, dy = q[1] - ty, dz = q[2] - tz; P.push([dx * this.rx + dz * this.rz, dx * this.ux + dy * this.uy + dz * this.uz, dx * this.fx + dy * this.fy + dz * this.fz]); }
   let zmin = 1e9; for (const p of P) zmin = Math.min(zmin, p[2]);
   const ext = D => { let a = 1e9, b = -1e9, c = 1e9, e = -1e9; for (const p of P) { const k = this.f / Math.max(0.5, D + p[2]), u = p[0] * k, v = p[1] * k; if (u < a) a = u; if (u > b) b = u; if (v < c) c = v; if (v > e) e = v; } return [a, b, c, e]; };
   let d = 60; for (let it = 0; it < 6; it++) { const q = ext(d); d = Math.max(-zmin + 1, d * Math.max((q[1] - q[0]) / aw, (q[3] - q[2]) / ah)); }
   const D = d * this.zoom, q = ext(D); this.base = d; this.dist = D;
-  this.x = tx + D * ox; this.y = ty + D * oy; this.z = tz + D * oz;
+  this.x = this.tx + D * ox; this.y = ty + D * oy; this.z = this.tz + D * oz;
   this.cx = mL + aw / 2 - (q[0] + q[1]) / 2 + (shk ? rnd(-1, 1) * shk : 0); this.cy = mT + ah / 2 + (q[2] + q[3]) / 2 + (shk ? rnd(-1, 1) * shk : 0);
+};
+// move the view across the ground by (dx, dz), kept inside the scene box grown by 1.5 sizes
+cam.shift = function (dx, dz) {
+  const bb = S.bb, g = 1.5 * S.size, tx0 = this.tx0 === undefined ? (bb.x0 + bb.x1) / 2 : this.tx0, tz0 = this.tz0 === undefined ? (bb.z0 + bb.z1) / 2 : this.tz0;
+  const nx = clamp(this.panX + dx, bb.x0 - g - tx0, bb.x1 + g - tx0), nz = clamp(this.panZ + dz, bb.z0 - g - tz0, bb.z1 + g - tz0), ax = nx - this.panX, az = nz - this.panZ;
+  this.panX = nx; this.panZ = nz; this.x += ax; this.z += az; this.tx += ax; this.tz += az;
+};
+// zoom by a factor (below 1 is closer) while the ground point under (x, y) stays under it
+cam.zoomAt = function (x, y, f) {
+  const g0 = groundHit(x, y); this.zoom = clamp(this.zoom * f, 0.12, 3.5); if (!g0) return;
+  this.update(0); const g1 = groundHit(x, y); if (g1) this.shift(g0[0] - g1[0], g0[2] - g1[2]);
+};
+// drag the world: the ground point that was under (x0, y0) follows the pointer to (x1, y1)
+cam.dragPan = function (x0, y0, x1, y1) {
+  const a = groundHit(x0, y0), b = groundHit(x1, y1); let dx, dz;
+  if (a && b) { dx = a[0] - b[0]; dz = a[2] - b[2]; const L = Math.hypot(dx, dz), mx = 0.5 * S.size; if (L > mx) { dx *= mx / L; dz *= mx / L; } }
+  else { const s = this.dist / this.f, fl = Math.hypot(this.fx, this.fz) || 1; dx = -this.rx * (x1 - x0) * s + this.fx / fl * (y1 - y0) * s; dz = -this.rz * (x1 - x0) * s + this.fz / fl * (y1 - y0) * s; }
+  this.shift(dx, dz);
 };
 let PX = 0, PY = 0, PZ = 0;
 function pr(x, y, z) {
@@ -1748,7 +1846,7 @@ function drawBull(x, y, z, R, k, a) {
   ctx.beginPath(); ctx.moveTo(PX - R * 2.3 * kk, PY); ctx.lineTo(PX + R * 2.3 * kk, PY); ctx.moveTo(PX, PY - R * 2.3 * kk * ry); ctx.lineTo(PX, PY + R * 2.3 * kk * ry); ctx.stroke();
   ctx.globalAlpha = 1;
 }
-function bullR(kind) { return kind === 'rocket' ? 0.1 * S.size + 0.9 : kind === 'meteor' ? 0.12 * S.size + 1 : 0.9 * Math.max(S.u, 0.6); }
+function bullR(kind) { return kind === 'bomb' ? 0.08 * S.size + 0.9 : kind === 'bolt' ? 0.05 * S.size + 0.6 : kind === 'rocket' ? 0.1 * S.size + 0.9 : kind === 'meteor' ? 0.12 * S.size + 1 : 0.9 * Math.max(S.u, 0.6); }
 function drawCrown(c) {
   const n = c.n;
   if (!alive[n]) { const k = pr(c.x, 0, c.z); if (PZ < NEAR) return; ctx.fillStyle = '#2B2622'; ctx.beginPath(); ctx.ellipse(PX, PY, 0.5 * k * (c.bush ? 0.6 : 0.5), 0.2 * k, 0, 0, TAU); ctx.fill(); if (c.smolder > 0) { } return; }
@@ -1940,8 +2038,37 @@ function drawCar(R) {
   }
   for (const p of parts) box(p[0], p[1], p[2], p[3], p[4]);
 }
+function drawBolts() {
+  for (let bi = 0; bi < 3; bi++) {
+    const b = BOLTS[bi]; if (!b.on) continue;
+    if (b.t < 0.4) { const a = 1 - b.t / 0.4; ctx.fillStyle = `rgba(255,240,150,${0.65 * a})`; for (let k = 0; k < b.np; k++) { const n = b.path[k]; if (alive[n] && sz[n] > NEAR) { ctx.beginPath(); ctx.arc(sx[n], sy[n], 7 + 5 * a, 0, TAU); ctx.fill(); } } }
+    if (b.t >= 0.18) continue;
+    const N = 10, top = 2.5 * S.size, amp = 0.05 * S.size, ji = reduce ? 0 : Math.floor(Math.random() * 40);
+    ctx.beginPath();
+    for (let k = 0; k <= N; k++) {
+      const f = k / N, e = k > 0 && k < N ? amp * Math.sin(Math.PI * f) * 1.4 : 0;
+      const X = b.x + b.jit[(k * 2 + ji) % 64] * e, Z = b.z + b.jit[(k * 2 + 1 + ji) % 64] * e, Y = top + (b.y - top) * f;
+      b.mp[k * 3] = X; b.mp[k * 3 + 1] = Y; b.mp[k * 3 + 2] = Z; pr(X, Y, Z); if (PZ < NEAR) continue; k === 0 ? ctx.moveTo(PX, PY) : ctx.lineTo(PX, PY);
+    }
+    for (let q = 0; q < 2; q++) {
+      const k0 = q ? b.f2 : b.f1, dx = q ? b.d2x : b.d1x, dz = q ? b.d2z : b.d1z; let X = b.mp[k0 * 3], Y = b.mp[k0 * 3 + 1], Z = b.mp[k0 * 3 + 2]; pr(X, Y, Z); ctx.moveTo(PX, PY);
+      for (let j = 1; j <= 4; j++) { X += dx * amp * 1.1 + b.jit[(j + q * 5 + ji) % 64] * amp * 0.5; Z += dz * amp * 1.1 + b.jit[(j + q * 5 + 9 + ji) % 64] * amp * 0.5; Y -= (top - b.y) / N * 0.8; if (Y < 0) Y = 0; pr(X, Y, Z); if (PZ < NEAR) break; ctx.lineTo(PX, PY); }
+    }
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(140,185,255,0.55)'; ctx.lineWidth = 9; ctx.stroke();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+  }
+}
 function drawBall(B) {
   const k = pr(B.x, B.y, B.z); if (PZ < NEAR) return; const r = B.r * k;
+  if (B.bomb) {
+    const g = ctx.createRadialGradient(PX - r * 0.35, PY - r * 0.4, r * 0.1, PX, PY, r); g.addColorStop(0, '#6B7587'); g.addColorStop(1, '#1B2029'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(PX, PY, r, 0, TAU); ctx.fill();
+    const u = clamp(B.fuse / 1.6, 0, 1), fx = PX + r * 0.55, fy = PY - r * 1.35;
+    ctx.strokeStyle = '#8A6A3A'; ctx.lineWidth = Math.max(1.5, r * 0.14); ctx.beginPath(); ctx.moveTo(PX + r * 0.25, PY - r * 0.85); ctx.quadraticCurveTo(PX + r * 0.5, PY - r * 1.15, fx, fy); ctx.stroke();
+    if (reduce) { ctx.strokeStyle = 'rgba(229,57,45,.85)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(PX, PY, r * (1.15 + 1.4 * u), 0, TAU); ctx.stroke(); }
+    else { ctx.fillStyle = B.lit ? '#FFE066' : '#FF8A2B'; ctx.beginPath(); ctx.arc(fx, fy, r * (B.lit ? 0.45 : 0.28), 0, TAU); ctx.fill(); if (B.lit) { ctx.fillStyle = 'rgba(229,57,45,.35)'; ctx.beginPath(); ctx.arc(PX, PY, r, 0, TAU); ctx.fill(); } }
+    return;
+  }
   if (B.fire) { const g = ctx.createRadialGradient(PX, PY, 0, PX, PY, r * 3); g.addColorStop(0, 'rgba(255,200,80,.9)'); g.addColorStop(0.4, 'rgba(255,110,30,.45)'); g.addColorStop(1, 'rgba(255,80,20,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(PX, PY, r * 3, 0, TAU); ctx.fill(); }
   const g = ctx.createRadialGradient(PX - r * 0.35, PY - r * 0.4, r * 0.1, PX, PY, r); if (B.fire) { g.addColorStop(0, '#FFE9A8'); g.addColorStop(1, '#C8501C'); } else { g.addColorStop(0, '#9AA5B5'); g.addColorStop(1, '#2B3240'); }
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(PX, PY, r, 0, TAU); ctx.fill();
@@ -1978,7 +2105,7 @@ function drawParticles() {
 }
 
 let slash = [], hoverInfo = null, ptrScr = null, aim = null;
-const AIMTOOLS = new Set(['cannon', 'rocket', 'meteor']);
+const AIMTOOLS = new Set(['cannon', 'rocket', 'meteor', 'bomb', 'bolt']);
 function render() {
   const w = cam.w, h = cam.h;
   ctx.setTransform(cam.dpr, 0, 0, cam.dpr, 0, 0);
@@ -2005,7 +2132,7 @@ function render() {
   for (const it of items) {
     switch (it[1]) { case 0: drawMember(mem[it[2]]); break; case 1: drawPanel(panels[it[2]]); break; case 2: { const R = riders[it[2]], dp = -py[R.n]; if (dp > 0.15 * S.u && rift.gap > 0) ctx.globalAlpha = Math.max(0.12, 1 - dp / (S.pit * 0.9)); R.t === 'p' ? drawPerson(R) : R.t === 'b' ? drawBarrel(R) : drawCar(R); ctx.globalAlpha = 1; break; } case 3: drawBall(balls[it[2]]); break; case 4: drawTornado(tornadoes[it[2]]); break; case 6: drawCrown(crowns[it[2]]); break; case 7: drawDrone(drones[it[2]]); break; case 8: drawDragon(dragons[it[2]]); break; case 9: drawUfo(ufo); break; case 5: drawLamp(it[2]); break; }
   }
-  drawProps(); drawBirds(); drawTracers(); drawParticles();
+  drawProps(); drawBirds(); drawTracers(); drawBolts(); drawParticles();
   // shock rings
   for (const r of rings) { const u = r.t / 0.8, rr = r.R * (0.15 + u), k = pr(r.x, r.y, r.z); if (PZ < NEAR) continue; ctx.strokeStyle = `rgba(255,170,70,${0.7 * (1 - u)})`; ctx.lineWidth = Math.max(1.5, 5 * (1 - u)); ctx.beginPath(); ctx.ellipse(PX, PY, rr * k, rr * k * (0.2 + 0.6 * Math.sin(cam.pitch)), 0, 0, TAU); ctx.stroke(); }
   // wind streaks
@@ -2032,6 +2159,7 @@ function render() {
     ctx.strokeStyle = `rgba(255,255,255,${u})`; ctx.lineWidth = 4.5 * u; ctx.stroke();
   }
   if (tool === 'hand' && ptrScr && ptrScr.in) drawHand(ptrScr.x, ptrScr.y, ptrScr.down);
+  if (flash > 0 && !reduce) { ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(0, 0, w, h); }
 }
 function drawHand(x, y, down) {
   const s = Math.min(cam.w, cam.h) * 0.07 * (down ? 1.1 : 1), ang = ptrScr.ang || 0;
@@ -2044,48 +2172,55 @@ function drawHand(x, y, down) {
 
 /* ===================== 6. input and interface ===================== */
 const TOOLS = [
-  ['pluck', 'Pluck', 'Drag a joint to pull it. Drag empty space to turn the view.'],
-  ['cut', 'Cut cable', 'Scalpel: poke or sweep the tip across a cable to cut it. A car is snapped in two, a person is knocked over.'],
-  ['strut', 'Break strut', 'Hammer: click or sweep across struts, beams and glass to break them.'],
-  ['sword', 'Samurai sword', 'Drag a line across the scene. Everything it crosses is sliced in two.'],
-  ['fire', 'Fire', 'Click anything to set it alight. Trees, bushes, tents, crates and barrels all burn, and fire jumps between them.'],
-  ['ball', 'Wrecking ball', 'Click to throw a heavy ball at that spot.'],
-  ['cannon', 'Cannon', 'Move the bullseye, then click: a cannonball arcs in and lands on it.'],
-  ['rocket', 'Rocket launcher', 'Move the bullseye, then click: a rocket flies in and blows up on it.'],
-  ['meteor', 'Meteor', 'Move the bullseye, then click to call a meteor down on it.'],
-  ['drones', 'Drone swarm', 'Click to send a swarm of drones. They fly in and shoot up the scenery.'],
-  ['dragons', 'Dragons', 'Click to send three dragons with riders. They sweep in and breathe fire on everything.'],
-  ['ufo', 'UFO beam', 'Press and hold: a flying saucer follows the pointer and lifts things with a tractor beam.'],
-  ['hand', 'Giant hand', 'Drag across the scene to flick and swat it.'],
-  ['wind', 'Wind gust', 'Click to blow a gust across the scene.'],
-  ['tornado', 'Tornado', 'Press and hold to steer a tornado with the pointer.']];
+  ['move', 'Move', 'Drag to move the world. Drag with Shift or the right mouse button to turn it, and scroll to zoom.', 'Move', 'Move'],
+  ['cut', 'Knife', 'Poke or sweep the blade across a cable to cut it. A car is snapped in two, a person is knocked over.', 'Blades', 'Knife'],
+  ['sword', 'Samurai sword', 'Drag a line across the scene. Everything it crosses is sliced in two.', 'Blades', 'Sword'],
+  ['strut', 'Hammer', 'Click or sweep across struts, beams and glass to break them. Each hit shoves whatever is near.', 'Blunt', 'Hammer'],
+  ['ball', 'Wrecking ball', 'Click to throw a heavy ball at that spot.', 'Blunt', 'Wrecker'],
+  ['hand', 'Giant hand', 'Drag across the scene to flick and swat it.', 'Blunt', 'Hand'],
+  ['pluck', 'Pluck', 'Drag a joint to pull it. Drag empty space to turn the view.', 'Blunt', 'Pluck'],
+  ['cannon', 'Cannonball', 'Move the bullseye, then click: a cannonball arcs in and lands on it.', 'Shots', 'Cannon'],
+  ['rocket', 'Missile', 'Move the bullseye, then click: a missile curves in and blows up on it. Press and hold for a salvo of three.', 'Shots', 'Missile'],
+  ['meteor', 'Meteor', 'Move the bullseye, then click to call a meteor down on it.', 'Shots', 'Meteor'],
+  ['bomb', 'Bomb', 'Click a spot to drop a bomb on it. The fuse ticks, then it blows. Hold and drag to lay a line of up to five.', 'Blasts', 'Bomb'],
+  ['bolt', 'Lightning', 'Click to call a lightning strike. The bolt runs along the struts and burns the cables it reaches. Hold to keep striking.', 'Blasts', 'Lightning'],
+  ['fire', 'Fire', 'Click anything to set it alight. Trees, bushes, tents, crates and barrels all burn, and fire jumps between them.', 'Blasts', 'Fire'],
+  ['drones', 'Drone swarm', 'Click to send a swarm of drones. They fly in and shoot up the scenery.', 'Summons', 'Drones'],
+  ['dragons', 'Dragons', 'Click to send three dragons with riders. They sweep in and breathe fire on everything.', 'Summons', 'Dragons'],
+  ['ufo', 'UFO beam', 'Press and hold: a flying saucer follows the pointer and lifts things with a tractor beam.', 'Summons', 'UFO'],
+  ['wind', 'Wind gust', 'Click to blow a gust across the scene.', 'Weather', 'Wind'],
+  ['tornado', 'Tornado', 'Press and hold to steer a tornado with the pointer.', 'Weather', 'Tornado']];
 const ACTS = [
   ['quake-side', 'Quake: side', 'Earthquake, side to side'], ['quake-up', 'Quake: up', 'Earthquake, up and down'], ['quake-rift', 'Quake: rift', 'Earthquake, the ground splits'], ['quake-roll', 'Quake: wave', 'Earthquake, a rolling wave'],
   ['tornado-across', 'Tornado across', 'A tornado crosses the scene'], ['flood', 'Flood', 'A wave of water sweeps across the scene'], ['arm', 'Arm the people', 'Give everyone a hammer, an axe, a bat or a torch. They smash the scenery, never each other.'], ['inferno', 'Set everything on fire', 'Set everything on fire']];
 let armBtn = null;
-let tool = 'pluck', msgTimer = 0;
+let tool = 'move', msgTimer = 0;
 const msgEl = $('fun-msg').firstElementChild;
 function say(t, ms) { msgEl.textContent = t; clearTimeout(msgTimer); if (t) msgTimer = setTimeout(() => { msgEl.textContent = ''; }, ms || 6000); }
 
 function svgCur(body, hx, hy, fb) { return `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'>${body}</svg>`)}") ${hx} ${hy},${fb || 'crosshair'}`; }
 const wo = (d, c, w) => `<path d='${d}' fill='none' stroke='#fff' stroke-width='${w + 3}' stroke-linecap='round' stroke-linejoin='round'/><path d='${d}' fill='none' stroke='${c}' stroke-width='${w}' stroke-linecap='round' stroke-linejoin='round'/>`;
-const CUR = {
-  pluck: svgCur(wo('M16 7a9 9 0 1 0 .01 0Z', '#1D5FD1', 2.6) + `<circle cx='16' cy='16' r='2.6' fill='#1D5FD1'/>`, 16, 16),
-  cut: svgCur(`<path d='M3 3 L13 17 L17 14 Z' fill='#E8EEF7' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M3 3 L13 17 L17 14 Z' fill='#E8EEF7' stroke='#5B6B82' stroke-width='1.2' stroke-linejoin='round'/><path d='M3 3 L12 15' stroke='#9FB0C8' stroke-width='1'/><path d='M15 15 L28 28' stroke='#fff' stroke-width='7' stroke-linecap='round'/><path d='M15 15 L28 28' stroke='#1D5FD1' stroke-width='4.2' stroke-linecap='round'/>`, 3, 3),
-  cannon: svgCur(wo('M16 5V27M5 16H27', '#C62828', 2.4) + `<circle cx='16' cy='16' r='7' fill='none' stroke='#C62828' stroke-width='2'/><circle cx='16' cy='16' r='2' fill='#C62828'/>`, 16, 16),
-  rocket: svgCur(wo('M16 4V28M4 16H28', '#8A3B0B', 2.4) + `<circle cx='16' cy='16' r='9' fill='none' stroke='#8A3B0B' stroke-width='2'/><circle cx='16' cy='16' r='3' fill='#F26B1D'/>`, 16, 16),
-  drones: svgCur(`<path d='M6 9L26 23M26 9L6 23' stroke='#fff' stroke-width='6' stroke-linecap='round'/><path d='M6 9L26 23M26 9L6 23' stroke='#2B3340' stroke-width='3' stroke-linecap='round'/><circle cx='16' cy='16' r='4' fill='#3A4558' stroke='#fff' stroke-width='1.5'/><circle cx='6' cy='9' r='3.4' fill='#9AA5B5'/><circle cx='26' cy='9' r='3.4' fill='#9AA5B5'/><circle cx='6' cy='23' r='3.4' fill='#9AA5B5'/><circle cx='26' cy='23' r='3.4' fill='#9AA5B5'/>`, 16, 16),
-  dragons: svgCur(`<path d='M4 22C8 10 14 8 20 12C22 9 26 8 28 9C26 12 25 13 24 15C20 20 12 24 4 22Z' fill='#2F8F5B' stroke='#fff' stroke-width='2.4' stroke-linejoin='round'/><path d='M10 14L16 4L19 13Z' fill='#1F6E43' stroke='#fff' stroke-width='1.6' stroke-linejoin='round'/><circle cx='24' cy='11' r='1.4' fill='#FFE066'/>`, 16, 16),
-  ufo: svgCur(`<ellipse cx='16' cy='14' rx='12' ry='4.5' fill='#9AA6B8' stroke='#fff' stroke-width='2'/><path d='M10 12C10 5 22 5 22 12Z' fill='#9FD6F5' stroke='#fff' stroke-width='1.6'/><path d='M11 18L6 29H26L21 18Z' fill='rgba(190,255,200,.7)'/>`, 16, 16),
-  strut: svgCur(`<path d='M12 12 L28 28' stroke='#fff' stroke-width='6.5' stroke-linecap='round'/><path d='M7 16 L16 7' stroke='#fff' stroke-width='12'/><path d='M12 12 L28 28' stroke='#8A5A0B' stroke-width='3.6' stroke-linecap='round'/><path d='M7.6 15.4 L15.4 7.6' stroke='#0E3A75' stroke-width='9'/>`, 5, 17),
-  sword: svgCur(wo('M4 28L27 5', '#C9D3E3', 3) + wo('M7 19L13 25', '#0E3A75', 3.4) + wo('M3 29L8 24', '#8A5A0B', 4), 27, 5),
-  fire: svgCur(`<path d='M16 3C18 9 24 12 24 19A8 8 0 0 1 8 19C8 15 11 13 12 9C14 11 15 8 16 3Z' fill='#F26B1D' stroke='#fff' stroke-width='2'/><path d='M16 14C17 17 20 18 20 21A4 4 0 0 1 12 21C12 19 15 18 16 14Z' fill='#FFD54A'/>`, 16, 26),
-  ball: svgCur(`<circle cx='16' cy='16' r='10' fill='#3A4352' stroke='#fff' stroke-width='2'/><circle cx='12.5' cy='12.5' r='3' fill='#9AA5B5'/>`, 16, 16),
-  meteor: svgCur(`<path d='M4 4L18 16' stroke='#fff' stroke-width='9' stroke-linecap='round'/><path d='M4 4L18 16' stroke='#F2A33B' stroke-width='5' stroke-linecap='round'/><circle cx='20' cy='20' r='8' fill='#6B3E26' stroke='#fff' stroke-width='2'/>`, 20, 20),
-  hand: svgCur(`<ellipse cx='16' cy='19' rx='8' ry='9' fill='#F2C9A5' stroke='#fff' stroke-width='3'/><ellipse cx='16' cy='19' rx='8' ry='9' fill='#F2C9A5' stroke='#B98A66' stroke-width='1.2'/><path d='M9 14V7M13 12V4M17.5 12V4M22 14V7' stroke='#B98A66' stroke-width='3.4' stroke-linecap='round'/>`, 16, 16),
-  wind: svgCur(wo('M4 11H20a3.5 3.5 0 1 0-3.5-3.5M4 17H26a3.5 3.5 0 1 1-3.5 3.5M4 23H15', '#3B6FB0', 2.6), 16, 16),
-  tornado: svgCur(wo('M5 7H27M8 13H24M11 19H21M14 25H18', '#4B5668', 3), 16, 26)
+const CB = {
+  pluck: [wo('M16 7a9 9 0 1 0 .01 0Z', '#1D5FD1', 2.6) + `<circle cx='16' cy='16' r='2.6' fill='#1D5FD1'/>`, 16, 16],
+  cut: [`<path d='M3 3 L13 17 L17 14 Z' fill='#E8EEF7' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M3 3 L13 17 L17 14 Z' fill='#E8EEF7' stroke='#5B6B82' stroke-width='1.2' stroke-linejoin='round'/><path d='M3 3 L12 15' stroke='#9FB0C8' stroke-width='1'/><path d='M15 15 L28 28' stroke='#fff' stroke-width='7' stroke-linecap='round'/><path d='M15 15 L28 28' stroke='#1D5FD1' stroke-width='4.2' stroke-linecap='round'/>`, 3, 3],
+  cannon: [wo('M16 5V27M5 16H27', '#C62828', 2.4) + `<circle cx='16' cy='16' r='7' fill='none' stroke='#C62828' stroke-width='2'/><circle cx='16' cy='16' r='2' fill='#C62828'/>`, 16, 16],
+  rocket: [wo('M16 4V28M4 16H28', '#8A3B0B', 2.4) + `<circle cx='16' cy='16' r='9' fill='none' stroke='#8A3B0B' stroke-width='2'/><circle cx='16' cy='16' r='3' fill='#F26B1D'/>`, 16, 16],
+  drones: [`<path d='M6 9L26 23M26 9L6 23' stroke='#fff' stroke-width='6' stroke-linecap='round'/><path d='M6 9L26 23M26 9L6 23' stroke='#2B3340' stroke-width='3' stroke-linecap='round'/><circle cx='16' cy='16' r='4' fill='#3A4558' stroke='#fff' stroke-width='1.5'/><circle cx='6' cy='9' r='3.4' fill='#9AA5B5'/><circle cx='26' cy='9' r='3.4' fill='#9AA5B5'/><circle cx='6' cy='23' r='3.4' fill='#9AA5B5'/><circle cx='26' cy='23' r='3.4' fill='#9AA5B5'/>`, 16, 16],
+  dragons: [`<path d='M4 22C8 10 14 8 20 12C22 9 26 8 28 9C26 12 25 13 24 15C20 20 12 24 4 22Z' fill='#2F8F5B' stroke='#fff' stroke-width='2.4' stroke-linejoin='round'/><path d='M10 14L16 4L19 13Z' fill='#1F6E43' stroke='#fff' stroke-width='1.6' stroke-linejoin='round'/><circle cx='24' cy='11' r='1.4' fill='#FFE066'/>`, 16, 16],
+  ufo: [`<ellipse cx='16' cy='14' rx='12' ry='4.5' fill='#9AA6B8' stroke='#fff' stroke-width='2'/><path d='M10 12C10 5 22 5 22 12Z' fill='#9FD6F5' stroke='#fff' stroke-width='1.6'/><path d='M11 18L6 29H26L21 18Z' fill='rgba(190,255,200,.7)'/>`, 16, 16],
+  strut: [`<path d='M12 12 L28 28' stroke='#fff' stroke-width='6.5' stroke-linecap='round'/><path d='M7 16 L16 7' stroke='#fff' stroke-width='12'/><path d='M12 12 L28 28' stroke='#8A5A0B' stroke-width='3.6' stroke-linecap='round'/><path d='M7.6 15.4 L15.4 7.6' stroke='#0E3A75' stroke-width='9'/>`, 5, 17],
+  sword: [wo('M4 28L27 5', '#C9D3E3', 3) + wo('M7 19L13 25', '#0E3A75', 3.4) + wo('M3 29L8 24', '#8A5A0B', 4), 27, 5],
+  fire: [`<path d='M16 3C18 9 24 12 24 19A8 8 0 0 1 8 19C8 15 11 13 12 9C14 11 15 8 16 3Z' fill='#F26B1D' stroke='#fff' stroke-width='2'/><path d='M16 14C17 17 20 18 20 21A4 4 0 0 1 12 21C12 19 15 18 16 14Z' fill='#FFD54A'/>`, 16, 26],
+  ball: [`<circle cx='16' cy='16' r='10' fill='#3A4352' stroke='#fff' stroke-width='2'/><circle cx='12.5' cy='12.5' r='3' fill='#9AA5B5'/>`, 16, 16],
+  meteor: [`<path d='M4 4L18 16' stroke='#fff' stroke-width='9' stroke-linecap='round'/><path d='M4 4L18 16' stroke='#F2A33B' stroke-width='5' stroke-linecap='round'/><circle cx='20' cy='20' r='8' fill='#6B3E26' stroke='#fff' stroke-width='2'/>`, 20, 20],
+  hand: [`<ellipse cx='16' cy='19' rx='8' ry='9' fill='#F2C9A5' stroke='#fff' stroke-width='3'/><ellipse cx='16' cy='19' rx='8' ry='9' fill='#F2C9A5' stroke='#B98A66' stroke-width='1.2'/><path d='M9 14V7M13 12V4M17.5 12V4M22 14V7' stroke='#B98A66' stroke-width='3.4' stroke-linecap='round'/>`, 16, 16],
+  wind: [wo('M4 11H20a3.5 3.5 0 1 0-3.5-3.5M4 17H26a3.5 3.5 0 1 1-3.5 3.5M4 23H15', '#3B6FB0', 2.6), 16, 16],
+  tornado: [wo('M5 7H27M8 13H24M11 19H21M14 25H18', '#4B5668', 3), 16, 26],
+  move: [wo('M10 17V9a1.6 1.6 0 0 1 3.2 0V15M13.2 14V6.8a1.6 1.6 0 0 1 3.2 0V14M16.4 14V8a1.6 1.6 0 0 1 3.2 0v7M19.6 15v-3.6a1.6 1.6 0 0 1 3.2 0V19c0 4.6-3 8-7.4 8h-1.2c-3 0-5-1.8-7-4.8L5 18.6a1.7 1.7 0 0 1 2.7-2L10 19', '#1D5FD1', 2.2), 16, 16],
+  bomb: [`<path d='M17 8C18 5 21 4 23 5' fill='none' stroke='#fff' stroke-width='5' stroke-linecap='round'/><path d='M17 8C18 5 21 4 23 5' fill='none' stroke='#8A6A3A' stroke-width='2.4' stroke-linecap='round'/><circle cx='14' cy='18' r='10' fill='#2B3240' stroke='#fff' stroke-width='2.6'/><circle cx='10.5' cy='14.5' r='2.8' fill='#9AA5B5'/><circle cx='24' cy='5' r='3' fill='#FFB13D' stroke='#fff' stroke-width='1.2'/>`, 14, 18],
+  bolt: [`<path d='M19 2L8 18H15L12 30L25 12H17Z' fill='#FFD43B' stroke='#fff' stroke-width='3.4' stroke-linejoin='round'/><path d='M19 2L8 18H15L12 30L25 12H17Z' fill='#FFD43B' stroke='#B8860B' stroke-width='1.2' stroke-linejoin='round'/>`, 12, 30]
 };
+const CUR = {}; for (const k in CB) if (k !== 'move') CUR[k] = svgCur(CB[k][0], CB[k][1], CB[k][2]);
 (() => {
   const st = document.createElement('style');
   st.textContent = Object.keys(CUR).map(k => `.fun-stage[data-tool="${k}"] canvas{cursor:${CUR[k]}}`).join('') + '.fun-stage[data-grab="1"] canvas{cursor:grabbing}';
@@ -2176,29 +2311,59 @@ const pts = new Map(); let mode = null, last = null, gest = null, vyawS = 0;
 function local(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
 function setGrabAttr(v) { $('fun-stage').dataset.grab = v ? '1' : '0'; }
 cv.addEventListener('contextmenu', e => e.preventDefault());
-cv.addEventListener('pointerdown', e => {
-  cv.setPointerCapture(e.pointerId); cv.focus({ preventScroll: true });
-  const [x, y] = local(e); pts.set(e.pointerId, { x, y });
-  if (pts.size === 2) { const a = [...pts.values()]; gest = { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), z: cam.zoom, cx: (a[0].x + a[1].x) / 2, cy: (a[0].y + a[1].y) / 2 }; grab = null; setGrabAttr(false); mode = 'gesture'; const T = tornadoes.find(t => t.held); if (T) T.held = false; return; }
-  if (pts.size > 2) return;
-  last = { x, y, t: e.timeStamp }; vyawS = 0; cam.vyaw = 0;
-  if (e.button === 1 || e.button === 2) { mode = 'rot'; return; }
+let spaceDown = false, holdTimer = 0, salvoT = 0, salvoSent = false, lastBombG = null, bombsLaid = 0, lastShove = 0;
+function clearHolds() { if (holdTimer) { clearInterval(holdTimer); holdTimer = 0; } if (salvoT) { clearTimeout(salvoT); salvoT = 0; } }
+function tgtAt(x, y) { const t = aimPoint(x, y); if (t) return t; const g = groundHit(x, y); return g ? [g[0], 0, g[2]] : null; }
+function fireMissile(x, y) { const t = aimPoint(x, y); if (t) { aim = { x: t[0], y: t[1], z: t[2], on: true }; launch('rocket', t); say('Missile away.', 2200); } }
+function salvo(x, y) {
+  const t = aimPoint(x, y); if (!t) return; aim = { x: t[0], y: t[1], z: t[2], on: true }; const o = 0.08 * S.size;
+  for (let k = 0; k < 3; k++) setTimeout(() => { launch('rocket', k ? [t[0] + rnd(-o, o), Math.max(0, t[1] + rnd(-o, o) * 0.5), t[2] + rnd(-o, o)] : t, t); }, k * 150);
+  say('Salvo of three away.', 2500);
+}
+function strikeAt(x, y) { const t = tgtAt(x, y); if (t) strikeBolt(t); }
+function bombAt(x, y) { const t = tgtAt(x, y); if (!t) return; if (dropBomb(t)) { bombsLaid++; lastBombG = [t[0], t[2]]; } else if (bombsLaid === 0) say('Five bombs are already ticking.', 2000); }
+function hammerShove(x, y, force) {
+  const now = performance.now(); if (!force && now - lastShove < 110) return; lastShove = now;
+  const R = coarse ? 60 : 40, mag = 0.25 * S.size, fx = cam.fx, fy = cam.fy, fz = cam.fz;
+  for (let i = 0; i < nN; i++) {
+    if (!alive[i] || pinned[i] || sz[i] < NEAR) continue; const d = Math.hypot(sx[i] - x, sy[i] - y); if (d > R) continue;
+    const k = (1 - d / R) * mag; vx[i] += fx * k; vy[i] += fy * k; vz[i] += fz * k;
+  }
+}
+// what each tool does when the pointer goes down (or when Enter is pressed). Sets the drag mode.
+function startTool(x, y) {
   mode = 'rot';
-  if (tool === 'pluck') { const n = pickNode(x, y, coarse ? 52 : 34); if (n >= 0) { mode = 'pluck'; const ray = rayAt(x, y), c = ray.d[0] * cam.fx + ray.d[1] * cam.fy + ray.d[2] * cam.fz, t = sz[n] / c; grab = { i: n, t, x: px[n], y: py[n], z: pz[n], sx: x, sy: y }; setGrabAttr(true); } }
-  else if (tool === 'cut' || tool === 'strut') { mode = 'rot'; paintHit(x, y, true); if (mode === 'paint') return; }
+  if (tool === 'move') { mode = 'pan'; setGrabAttr(true); }
+  else if (tool === 'pluck') { const n = pickNode(x, y, coarse ? 52 : 34); if (n >= 0) { mode = 'pluck'; const ray = rayAt(x, y), c = ray.d[0] * cam.fx + ray.d[1] * cam.fy + ray.d[2] * cam.fz, t = sz[n] / c; grab = { i: n, t, x: px[n], y: py[n], z: pz[n], sx: x, sy: y }; setGrabAttr(true); } }
+  else if (tool === 'cut' || tool === 'strut') { mode = 'rot'; if (tool === 'strut') hammerShove(x, y, true); paintHit(x, y, true); }
   else if (tool === 'fire') { const B = pickRider(x, y, coarse ? 22 : 14); if (B && B.t === 'b') { B.hit = true; mode = 'paint'; } else { const m = pickMember(x, y, coarse ? 46 : 36); if (m >= 0) { burnAt(m); mode = 'paint'; hoverInfo = null; } } }
   else if (tool === 'sword') { mode = 'slash'; slash = [{ x, y, age: 0 }]; }
   else if (tool === 'ball') { mode = 'none'; shoot(x, y, false); }
   else if (tool === 'meteor') { mode = 'none'; const t = aimPoint(x, y); aim = t ? { x: t[0], y: t[1], z: t[2], on: true } : aim; shoot(x, y, true); }
-  else if (tool === 'cannon' || tool === 'rocket') { mode = 'none'; const t = aimPoint(x, y); if (t) { aim = { x: t[0], y: t[1], z: t[2], on: true }; launch(tool, t); say(tool === 'cannon' ? 'Cannon fired.' : 'Rocket away.', 2200); } }
+  else if (tool === 'cannon') { mode = 'none'; const t = aimPoint(x, y); if (t) { aim = { x: t[0], y: t[1], z: t[2], on: true }; launch('cannon', t); say('Cannonball away.', 2200); } }
+  else if (tool === 'rocket') { mode = 'rocket'; salvoSent = false; clearTimeout(salvoT); salvoT = setTimeout(() => { salvoT = 0; if (mode === 'rocket' && ptrScr) { salvoSent = true; salvo(ptrScr.x, ptrScr.y); } }, 400); }
+  else if (tool === 'bomb') { mode = 'bomb'; bombsLaid = 0; lastBombG = null; bombAt(x, y); }
+  else if (tool === 'bolt') { mode = 'bolt'; strikeAt(x, y); clearInterval(holdTimer); holdTimer = setInterval(() => { if (mode === 'bolt' && ptrScr) strikeAt(ptrScr.x, ptrScr.y); }, 250); }
   else if (tool === 'drones') { mode = 'none'; if (drones.length) say('The swarm is still up there.', 2000); else { const t = aimPoint(x, y) || [S.cx, 0, S.cz]; callDrones(t); say('Drone swarm inbound.', 3000); } }
   else if (tool === 'dragons') { mode = 'none'; if (dragons.length) say('The dragons are still circling.', 2000); else { const t = aimPoint(x, y) || [S.cx, 0, S.cz]; callDragons(t); say('Three dragons, three riders. Here they come.', 4000); } }
   else if (tool === 'ufo') { mode = 'ufo'; const g = groundHit(x, y) || [S.cx, 0, S.cz]; if (!ufo) callUfo(g[0], g[2]); ufo.held = true; ufo.leave = false; ufo.tx = g[0]; ufo.tz = g[2]; }
   else if (tool === 'hand') { mode = 'swat'; ptrScr = { x, y, in: true, down: true, ang: 0 }; }
   else if (tool === 'wind') { mode = 'none'; const right = x > cam.w * 0.62 ? -1 : 1; startGust(cam.rx * right, cam.rz * right); say('Gust.', 2000); }
-  else if (tool === 'tornado') {
-    mode = 'tornado'; const g = groundHit(x, y) || [S.cx, 0, S.cz]; const T = startTornado(g[0], g[2], 0, 0, true); T.held = true; T.tx = g[0]; T.tz = g[2];
+  else if (tool === 'tornado') { mode = 'tornado'; const g = groundHit(x, y) || [S.cx, 0, S.cz]; const T = startTornado(g[0], g[2], 0, 0, true); T.held = true; T.tx = g[0]; T.tz = g[2]; }
+}
+cv.addEventListener('pointerdown', e => {
+  cv.setPointerCapture(e.pointerId); cv.focus({ preventScroll: true }); closeMore();
+  const [x, y] = local(e); pts.set(e.pointerId, { x, y });
+  if (pts.size === 2) {
+    const a = [...pts.values()]; clearHolds(); grab = null; setGrabAttr(false); slash.length = 0;
+    gest = { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), ang: Math.atan2(a[1].y - a[0].y, a[1].x - a[0].x), cx: (a[0].x + a[1].x) / 2, cy: (a[0].y + a[1].y) / 2 };
+    mode = 'gesture'; const T = tornadoes.find(t => t.held); if (T) T.held = false; if (ufo) ufo.held = false; return;
   }
+  if (pts.size > 2) return;
+  last = { x, y, t: e.timeStamp }; vyawS = 0; cam.vyaw = 0; ptrScr = { x, y, in: true, down: false, ang: 0 };
+  if (e.button === 2 || (e.button === 0 && e.shiftKey && e.pointerType === 'mouse')) { mode = 'rot'; e.preventDefault(); return; }
+  if (e.button === 1 || (e.button === 0 && spaceDown)) { spaceUsed = true; mode = 'pan'; $('fun-stage').dataset.pan = '1'; e.preventDefault(); return; }
+  startTool(x, y);
   e.preventDefault();
 });
 function pointInQuad(x, y, q) { let c = false; for (let i = 0, j = q.length - 1; i < q.length; j = i++) { if ((q[i][1] > y) !== (q[j][1] > y) && x < (q[j][0] - q[i][0]) * (y - q[i][1]) / (q[j][1] - q[i][1]) + q[i][0]) c = !c; } return c; }
@@ -2225,15 +2390,19 @@ cv.addEventListener('pointermove', e => {
   const [x, y] = local(e); if (pts.has(e.pointerId)) pts.set(e.pointerId, { x, y });
   ptrScr = ptrScr || {}; const pang = ptrScr; ptrScr = { x, y, in: true, down: mode === 'swat', ang: pang.ang || 0 };
   if (mode === 'gesture' && pts.size >= 2) {
-    const a = [...pts.values()], d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y), cx = (a[0].x + a[1].x) / 2, cy = (a[0].y + a[1].y) / 2;
-    cam.zoom = clamp(gest.z * gest.d / Math.max(20, d), 0.12, 3.5); cam.yaw -= (cx - gest.cx) * 0.007; cam.pitch = clamp(cam.pitch + (cy - gest.cy) * 0.006, 0.03, 1.45); gest.cx = cx; gest.cy = cy; return;
+    const a = [...pts.values()], d = Math.max(20, Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y)), ang = Math.atan2(a[1].y - a[0].y, a[1].x - a[0].x), cx = (a[0].x + a[1].x) / 2, cy = (a[0].y + a[1].y) / 2;
+    cam.dragPan(gest.cx, gest.cy, cx, cy);
+    let da = ang - gest.ang; if (da > Math.PI) da -= TAU; else if (da < -Math.PI) da += TAU; cam.yaw += da;
+    cam.zoomAt(cx, cy, gest.d / d); gest.d = d; gest.ang = ang; gest.cx = cx; gest.cy = cy; return;
   }
   if (AIMTOOLS.has(tool)) { const t = aimPoint(x, y); if (t) aim = { x: t[0], y: t[1], z: t[2], on: true }; }
   if (!last || !pts.has(e.pointerId) || pts.size > 1) { if (e.pointerType === 'mouse') hoverPick(x, y); return; }
   const dx = x - last.x, dy = y - last.y, dtm = Math.max(4, e.timeStamp - last.t) / 1000;
-  if (mode === 'rot') { cam.yaw -= dx * 0.007; cam.pitch = clamp(cam.pitch + dy * 0.006, 0.03, 1.45); vyawS = -dx * 0.007 / dtm * 0.5; }
+  if (mode === 'pan') cam.dragPan(last.x, last.y, x, y);
+  else if (mode === 'rot') { cam.yaw -= dx * 0.007; cam.pitch = clamp(cam.pitch + dy * 0.006, 0.03, 1.45); vyawS = -dx * 0.007 / dtm * 0.5; }
   else if (mode === 'pluck' && grab) { grab.sx = x; grab.sy = y; const r = rayAt(x, y); grab.x = r.o[0] + r.d[0] * grab.t; grab.y = Math.max(0.1, r.o[1] + r.d[1] * grab.t); grab.z = r.o[2] + r.d[2] * grab.t; }
-  else if (mode === 'paint') { if (tool === 'fire') { const m = pickMember(x, y, 30); if (m >= 0) burnAt(m); } else paintHit(x, y); }
+  else if (mode === 'paint') { if (tool === 'fire') { const m = pickMember(x, y, 30); if (m >= 0) burnAt(m); } else { if (tool === 'strut') hammerShove(x, y); paintHit(x, y); } }
+  else if (mode === 'bomb') { const g = groundHit(x, y); if (g && bombsLaid < 5 && (!lastBombG || Math.hypot(g[0] - lastBombG[0], g[2] - lastBombG[1]) > 0.12 * S.size)) bombAt(x, y); }
   else if (mode === 'slash') { slash.push({ x, y, age: 0 }); const n = slashSeg(last.x, last.y, x, y); if (n && !reduce) shake = Math.max(shake, 0.2); if (slash.length > 40) slash.shift(); }
   else if (mode === 'swat') {
     ptrScr.ang = Math.atan2(dy, dx) + Math.PI / 2; ptrScr.down = true;
@@ -2252,8 +2421,10 @@ cv.addEventListener('pointermove', e => {
 });
 function endPtr(e) {
   pts.delete(e.pointerId);
-  if (pts.size < 2 && mode === 'gesture') { mode = null; gest = null; }
+  if (pts.size < 2 && mode === 'gesture') { mode = null; gest = null; if (pts.size === 1) { const q = [...pts.values()][0]; last = { x: q.x, y: q.y, t: e.timeStamp }; mode = 'pan'; } }
   if (pts.size === 0) {
+    clearHolds(); if (mode === 'rocket' && !salvoSent && e.type === 'pointerup' && ptrScr) fireMissile(ptrScr.x, ptrScr.y);
+    setGrabAttr(false); $('fun-stage').dataset.pan = '0';
     if (mode === 'rot' && !reduce) cam.vyaw = clamp(vyawS, -3, 3);
     if (mode === 'pluck') { grab = null; setGrabAttr(false); }
     const T = tornadoes.find(t => t.held); if (T) T.held = false; if (ufo) ufo.held = false;
@@ -2264,28 +2435,100 @@ function endPtr(e) {
 }
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('pointerleave', e => { if (ptrScr) ptrScr.in = false; hoverInfo = null; if (aim && e.pointerType === 'mouse') aim.on = false; });
-cv.addEventListener('wheel', e => { if (!e.ctrlKey && document.activeElement !== cv) return; e.preventDefault(); cam.zoom = clamp(cam.zoom * Math.exp(e.deltaY * 0.0012), 0.12, 3.5); }, { passive: false });
-cv.addEventListener('keydown', e => {
+cv.addEventListener('wheel', e => {
+  if (!room && !e.ctrlKey && document.activeElement !== cv) return; e.preventDefault();
+  const [x, y] = local(e), dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 100 : e.deltaY;
+  cam.zoomAt(x, y, Math.exp(clamp(dy, -240, 240) * 0.0012));
+}, { passive: false });
+function panKey(fwd, side) { const s = 0.06 * S.size, fl = Math.hypot(cam.fx, cam.fz) || 1; cam.shift((cam.fx / fl * fwd + cam.rx * side) * s, (cam.fz / fl * fwd + cam.rz * side) * s); }
+function keyAct() {
+  const x = cam.w / 2, y = cam.h * 0.45;
+  if (tool === 'pluck' || tool === 'move') { const free = []; for (let i = 0; i < nN; i++) if (alive[i] && !pinned[i]) free.push(i); if (free.length) { const i = free[Math.floor(Math.random() * free.length)]; vy[i] += S.size * 0.6; vx[i] += rnd(-1, 1) * S.size * 0.3; } return; }
+  ptrScr = { x, y, in: true, down: false, ang: 0 };
+  if (tool === 'sword') { slashSeg(x - cam.w * 0.15, y, x + cam.w * 0.15, y); slash = [{ x: x - cam.w * 0.15, y, age: 0 }, { x: x + cam.w * 0.15, y, age: 0 }]; return; }
+  if (tool === 'rocket') { fireMissile(x, y); return; }
+  startTool(x, y);
+  if (mode === 'paint' || mode === 'rot') { /* a poke is all a key can do */ }
+  clearHolds(); grab = null; setGrabAttr(false); const T = tornadoes.find(t => t.held); if (T) T.held = false; if (ufo) ufo.held = false; mode = null;
+}
+const stageEl = $('fun-stage');
+stageEl.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey || e.key === 'Escape') return;
+  const t = e.target;
+  if (t.tagName === 'SELECT' || t.tagName === 'INPUT' || (t !== cv && t.closest && t.closest('[role=toolbar],#fun-more'))) return;
+  if (!room && t !== cv) return;
   const k = e.key; let used = true;
-  if (k === 'ArrowLeft') cam.yaw -= 0.12; else if (k === 'ArrowRight') cam.yaw += 0.12; else if (k === 'ArrowUp') cam.pitch = clamp(cam.pitch + 0.08, 0.03, 1.45); else if (k === 'ArrowDown') cam.pitch = clamp(cam.pitch - 0.08, 0.03, 1.45);
-  else if (k === '+' || k === '=') cam.zoom = clamp(cam.zoom * 0.88, 0.12, 3.5); else if (k === '-') cam.zoom = clamp(cam.zoom / 0.88, 0.12, 3.5);
-  else if (k === 'Enter' || k === ' ') { const free = []; for (let i = 0; i < nN; i++) if (alive[i] && !pinned[i]) free.push(i); if (free.length) { const i = free[Math.floor(Math.random() * free.length)]; vy[i] += S.size * 0.6; vx[i] += rnd(-1, 1) * S.size * 0.3; } }
+  if (k === 'ArrowLeft') panKey(0, -1); else if (k === 'ArrowRight') panKey(0, 1); else if (k === 'ArrowUp') panKey(1, 0); else if (k === 'ArrowDown') panKey(-1, 0);
+  else if (k === 'q' || k === 'Q') cam.yaw -= 0.12; else if (k === 'e' || k === 'E') cam.yaw += 0.12;
+  else if (k === 'PageUp') cam.pitch = clamp(cam.pitch + 0.08, 0.03, 1.45); else if (k === 'PageDown') cam.pitch = clamp(cam.pitch - 0.08, 0.03, 1.45);
+  else if (k === '+' || k === '=') cam.zoomAt(cam.w / 2, cam.h / 2, 0.88); else if (k === '-' || k === '_') cam.zoomAt(cam.w / 2, cam.h / 2, 1 / 0.88);
+  else if (k >= '1' && k <= '9' && room) { const T = TOOLS[+k - 1]; if (T) setTool(T[0]); }
+  else if (k === '[' || k === ']') { let i = TOOLS.findIndex(q => q[0] === tool) + (k === ']' ? 1 : -1); i = (i + TOOLS.length) % TOOLS.length; setTool(TOOLS[i][0]); }
+  else if (k === 'Enter' && t === cv) { keyAct(); }
+  else if (k === ' ' && t === cv) { /* acts on key release, unless the key was used to drag */ }
+  else if ((k === 'r' || k === 'R') && room) { $('fun-reset').click(); }
+  else if ((k === 'p' || k === 'P') && room) togglePause();
+  else if ((k === 'm' || k === 'M') && room) toggleSound();
   else used = false;
   if (used) e.preventDefault();
 });
+let spaceUsed = false;
+window.addEventListener('keydown', e => { if (e.code === 'Space' && e.target === cv && !e.repeat) { spaceDown = true; spaceUsed = false; } });
+window.addEventListener('keyup', e => { if (e.code === 'Space') { const was = spaceDown; spaceDown = false; if (was && !spaceUsed && e.target === cv) keyAct(); } });
+window.addEventListener('blur', () => { spaceDown = false; });
 
 /* --- interface --- */
-$('fun-zin').addEventListener('click', () => { cam.zoom = clamp(cam.zoom * 0.8, 0.12, 3.5); });
-$('fun-zout').addEventListener('click', () => { cam.zoom = clamp(cam.zoom / 0.8, 0.12, 3.5); });
+$('fun-zin').addEventListener('click', () => { cam.zoomAt(cam.w / 2, cam.h / 2, 0.8); });
+$('fun-zout').addEventListener('click', () => { cam.zoomAt(cam.w / 2, cam.h / 2, 1 / 0.8); });
+$('fun-tup').addEventListener('click', () => { cam.pitch = clamp(cam.pitch + 0.1, 0.03, 1.45); });
+$('fun-tdn').addEventListener('click', () => { cam.pitch = clamp(cam.pitch - 0.1, 0.03, 1.45); });
 function mk(parent, cls, text, attrs) { const b = document.createElement('button'); b.type = 'button'; b.className = 'chipbtn' + (cls ? ' ' + cls : ''); b.textContent = text; for (const k in attrs) b.setAttribute(k, attrs[k]); parent.appendChild(b); return b; }
 const toolBtns = {};
 const sceneSel = $('fun-scene');
 SCENES.forEach((sc, i) => { const o = document.createElement('option'); o.value = i; o.textContent = sc.name; sceneSel.appendChild(o); });
 sceneSel.addEventListener('change', () => chooseScene(+sceneSel.value));
-TOOLS.forEach(([id, label, hint]) => { const b = mk($('fun-tools'), '', label, { title: hint,  'aria-pressed': id === tool ? 'true' : 'false' }); b.addEventListener('click', () => setTool(id)); toolBtns[id] = b; });
-ACTS.forEach(([id, label, ttl]) => { const b = mk($('fun-acts'), id === 'inferno' ? 'hot' : '', label, id === 'arm' ? { title: ttl, 'aria-pressed': 'false' } : { title: ttl }); if (id === 'arm') armBtn = b; b.addEventListener('click', () => act(id)); });
-function setTool(id) { tool = id; hoverInfo = null; for (const k in toolBtns) toolBtns[k].setAttribute('aria-pressed', k === id ? 'true' : 'false'); $('fun-stage').dataset.tool = id; say(TOOLS.find(t => t[0] === id)[2]); }
-function chooseScene(i) { sceneSel.value = i; loadScene(i); if (S.tool) setTool(S.tool); say(SCENES[i].name + '. Pick a tool and have a go.'); }
+TOOLS.forEach(([id, label, hint]) => { const b = mk($('fun-tools'), '', label, { title: hint, 'aria-pressed': id === tool ? 'true' : 'false' }); b.addEventListener('click', () => setTool(id)); toolBtns[id] = b; });
+const armBtns = [], moonBtns = [];
+ACTS.forEach(([id, label, ttl]) => { const b = mk($('fun-acts'), id === 'inferno' ? 'hot' : '', label, id === 'arm' ? { title: ttl, 'aria-pressed': 'false' } : { title: ttl }); if (id === 'arm') armBtns.push(b); b.addEventListener('click', () => act(id)); });
+armBtn = { setAttribute: (k, v) => armBtns.forEach(b => b.setAttribute(k, v)) };
+// the dock: the same tools, as icon buttons at the bottom of the room
+const dockEl = $('fun-dock'), moreEl = $('fun-more'), dockBtns = {};
+const iconOf = id => `<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">${CB[id][0]}</svg>`;
+let lastGroup = null;
+TOOLS.forEach(([id, label, hint, grp, short]) => {
+  if (lastGroup !== null && grp !== lastGroup) { const d = document.createElement('div'); d.className = 'fun-sep'; d.setAttribute('role', 'separator'); dockEl.appendChild(d); } lastGroup = grp;
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'fun-tb'; b.dataset.id = id; b.setAttribute('aria-pressed', id === tool ? 'true' : 'false'); b.setAttribute('aria-label', label); b.title = label + ': ' + hint; b.tabIndex = id === tool ? 0 : -1;
+  b.innerHTML = `<span class="ic">${iconOf(id)}</span><span class="lb">${short}</span>`; b.addEventListener('click', () => setTool(id)); dockEl.appendChild(b); dockBtns[id] = b;
+});
+{
+  const d = document.createElement('div'); d.className = 'fun-sep'; d.setAttribute('role', 'separator'); dockEl.appendChild(d);
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'fun-tb'; b.id = 'fun-morebtn'; b.tabIndex = -1; b.setAttribute('aria-haspopup', 'true'); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', 'fun-more'); b.setAttribute('aria-label', 'More: disasters and surprises'); b.title = 'More: earthquakes, floods, tornado, surprises and low gravity';
+  b.innerHTML = '<span class="ic"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="#1D5FD1"><circle cx="7" cy="16" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="25" cy="16" r="3"/></g></svg></span><span class="lb">More</span>';
+  dockEl.appendChild(b); dockBtns.more = b;
+  const h = document.createElement('span'); h.className = 'fun-h'; h.textContent = 'Disasters'; moreEl.appendChild(h);
+  const mkm = (txt, cls, attrs, fn) => { const x = document.createElement('button'); x.type = 'button'; if (cls) x.className = cls; x.textContent = txt; for (const k in attrs) x.setAttribute(k, attrs[k]); x.addEventListener('click', fn); moreEl.appendChild(x); return x; };
+  ACTS.forEach(([id, label, ttl]) => { const x = mkm(label, id === 'inferno' ? 'hot' : '', id === 'arm' ? { title: ttl, 'aria-pressed': 'false' } : { title: ttl }, () => { act(id); if (id !== 'arm') closeMore(); }); if (id === 'arm') armBtns.push(x); });
+  const h2 = document.createElement('span'); h2.className = 'fun-h'; h2.textContent = 'Time and surprises'; moreEl.appendChild(h2);
+  moonBtns.push(mkm('Low gravity', '', { 'aria-pressed': 'false' }, () => { toggleMoon(); }));
+  mkm('Surprise me', '', {}, () => { closeMore(); surprise(); });
+}
+dockEl.addEventListener('keydown', e => {
+  const bs = [...dockEl.querySelectorAll('.fun-tb')], i = bs.indexOf(document.activeElement); if (i < 0) return;
+  let n = -1; if (e.key === 'ArrowRight') n = (i + 1) % bs.length; else if (e.key === 'ArrowLeft') n = (i - 1 + bs.length) % bs.length; else if (e.key === 'Home') n = 0; else if (e.key === 'End') n = bs.length - 1;
+  if (n < 0) return; e.preventDefault(); bs.forEach(b => { b.tabIndex = -1; }); bs[n].tabIndex = 0; bs[n].focus();
+});
+const moreBtn = dockBtns.more;
+function closeMore(focus) { if (moreEl.hidden) return false; moreEl.hidden = true; moreBtn.setAttribute('aria-expanded', 'false'); if (focus) moreBtn.focus(); return true; }
+moreBtn.addEventListener('click', () => { if (moreEl.hidden) { moreEl.hidden = false; moreBtn.setAttribute('aria-expanded', 'true'); const f = moreEl.querySelector('button'); if (f && e_kb) f.focus(); } else closeMore(); });
+let e_kb = false; moreBtn.addEventListener('keydown', () => { e_kb = true; }); moreBtn.addEventListener('pointerdown', () => { e_kb = false; });
+function setTool(id) {
+  tool = id; hoverInfo = null; for (const k in toolBtns) toolBtns[k].setAttribute('aria-pressed', k === id ? 'true' : 'false');
+  for (const k in dockBtns) { if (k === 'more') continue; const on = k === id; dockBtns[k].setAttribute('aria-pressed', on ? 'true' : 'false'); dockBtns[k].tabIndex = on ? 0 : -1; }
+  if (dockBtns.more) dockBtns.more.tabIndex = -1;
+  $('fun-stage').dataset.tool = id; say(TOOLS.find(t => t[0] === id)[2]);
+  if (dockBtns[id] && room) dockBtns[id].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+}
+function chooseScene(i) { sceneSel.value = i; loadScene(i); if (S.tool && !room) setTool(S.tool); say(SCENES[i].name + '. Pick a tool and have a go.'); }
 function act(id) {
   if (id.startsWith('quake-')) { const k = id.slice(6); if (k === 'rift' && rift.gap > 0) { say('The ground is already split. Reset to close it.'); return; } startQuake(k); say({ side: 'Earthquake: the ground shakes side to side.', up: 'Earthquake: the ground jolts up and down.', rift: 'Earthquake: the ground splits down the middle.', roll: 'Earthquake: a rolling wave crosses the ground.' }[k]); }
   else if (id === 'tornado-across') { tornadoAcross(); say('A tornado is crossing the scene.'); }
@@ -2294,29 +2537,73 @@ function act(id) {
   else if (id === 'arm') { armed = !armed; if (armBtn) armBtn.setAttribute('aria-pressed', armed ? 'true' : 'false'); say(armed ? 'Everyone has picked up a tool and is off to smash the scenery. Nobody hurts anyone.' : 'Everyone put their tools down.', 5000); if (armed) for (const R of riders) if (R.t === 'p') { R.tl = Math.floor(Math.random() * 4); R.tw = 0; } sfx('crowd', 0.6); }
 }
 $('fun-reset').addEventListener('click', () => { loadScene(sceneIx, true); say('Rebuilt and healthy.', 3000); });
-$('fun-pause').addEventListener('click', e => { paused = !paused; e.currentTarget.setAttribute('aria-pressed', paused ? 'true' : 'false'); e.currentTarget.textContent = paused ? 'Paused' : 'Pause'; });
-const SLOW = [1, 0.25, 0.1];
-$('fun-slow').addEventListener('click', e => { const k = (SLOW.indexOf(timeScale) + 1) % SLOW.length; timeScale = SLOW[k]; e.currentTarget.textContent = 'Slow: ' + (timeScale === 1 ? '1x' : timeScale === 0.25 ? '0.25x' : '0.1x'); });
-$('fun-moon').addEventListener('click', e => { const on = grav > 5; grav = on ? 1.62 : 9.81; e.currentTarget.setAttribute('aria-pressed', on ? 'true' : 'false'); say(on ? 'Low gravity: things fall slowly and fly far.' : 'Normal gravity.', 3000); });
-$('fun-surprise').addEventListener('click', () => {
+const SLOW = [1, 0.25, 0.1], SLOWT = ['1x', '0.25x', '0.1x'];
+function togglePause() {
+  paused = !paused; const b = $('fun-pause'); b.setAttribute('aria-pressed', paused ? 'true' : 'false'); b.textContent = paused ? 'Paused' : 'Pause';
+  const r = $('fun-rpause'); r.setAttribute('aria-pressed', paused ? 'true' : 'false'); r.setAttribute('aria-label', paused ? 'Resume' : 'Pause'); r.title = paused ? 'Resume (P)' : 'Pause (P)';
+}
+function cycleSlow() {
+  const k = (SLOW.indexOf(timeScale) + 1) % SLOW.length; timeScale = SLOW[k]; const t = SLOWT[k];
+  $('fun-slow').textContent = 'Slow: ' + t; const r = $('fun-rslow'); r.textContent = t; r.setAttribute('aria-label', 'Slow motion: ' + t); r.title = 'Slow motion: ' + t;
+}
+function toggleMoon() {
+  const on = grav > 5; grav = on ? 1.62 : 9.81; moonBtns.forEach(b => b.setAttribute('aria-pressed', on ? 'true' : 'false')); say(on ? 'Low gravity: things fall slowly and fly far.' : 'Normal gravity.', 3000);
+}
+$('fun-pause').addEventListener('click', togglePause); $('fun-rpause').addEventListener('click', togglePause);
+$('fun-slow').addEventListener('click', cycleSlow); $('fun-rslow').addEventListener('click', cycleSlow);
+moonBtns.push($('fun-moon')); $('fun-moon').addEventListener('click', toggleMoon);
+$('fun-rreset').addEventListener('click', () => { $('fun-reset').click(); });
+function surprise() {
   const opts = [
     () => { tornadoAcross(); say('Surprise: a tornado.'); },
     () => { startQuake(['side', 'up', 'roll', 'rift'][Math.floor(Math.random() * 4)]); say('Surprise: an earthquake.'); },
     () => { for (let k = 0; k < 3; k++) setTimeout(() => { const a = rnd(0, TAU), r = rnd(0, 0.5) * S.size; const x = S.cx + Math.cos(a) * r, z = S.cz + Math.sin(a) * r, dir = [-0.35, 0.9, 0.22], dl = Math.hypot(...dir), far = S.size * 2.4, y = rnd(0, S.size * 0.5); throwBall([x + dir[0] / dl * far, y + dir[1] / dl * far, z + dir[2] / dl * far], [-dir[0] / dl, -dir[1] / dl, -dir[2] / dl], true); }, k * 650); say('Surprise: a meteor shower.'); },
     () => { const a = rnd(0, TAU); startGust(Math.cos(a), Math.sin(a)); for (let k = 0; k < 3; k++) { const m = Math.floor(rnd(0, mem.length)); burnAt(m); } say('Surprise: a gale, and a few sparks.'); },
-    () => { for (let k = 0; k < 4; k++) setTimeout(() => { const a = rnd(0, TAU); const o = [S.cx + Math.cos(a) * S.size * 2.2, rnd(0.1, 0.5) * S.size, S.cz + Math.sin(a) * S.size * 2.2], d = [S.cx - o[0], S.cy * 0.8 - o[1], S.cz - o[2]], l = Math.hypot(...d); throwBall(o, d.map(v => v / l), false); }, k * 500); say('Surprise: wrecking balls from every side.'); }
+    () => { for (let k = 0; k < 4; k++) setTimeout(() => { const a = rnd(0, TAU); const o = [S.cx + Math.cos(a) * S.size * 2.2, rnd(0.1, 0.5) * S.size, S.cz + Math.sin(a) * S.size * 2.2], d = [S.cx - o[0], S.cy * 0.8 - o[1], S.cz - o[2]], l = Math.hypot(...d); throwBall(o, d.map(v => v / l), false); }, k * 500); say('Surprise: wrecking balls from every side.'); },
+    () => { for (let k = 0; k < 3; k++) setTimeout(() => { const a = rnd(0, TAU), r = rnd(0, 0.45) * S.size; strikeBolt([S.cx + Math.cos(a) * r, rnd(0, 0.6) * S.size, S.cz + Math.sin(a) * r]); }, k * 420); say('Surprise: a lightning storm.'); }
   ];
   opts[Math.floor(Math.random() * opts.length)]();
-});
+}
+$('fun-surprise').addEventListener('click', surprise);
 
-const sndBtn = $('fun-sound');
-if (sndBtn) sndBtn.addEventListener('click', () => {
+const sndBtn = $('fun-sound'), rSnd = $('fun-rsound');
+function toggleSound() {
   const sn = window.funSound; if (!sn) { say('Sound is not available here.', 3000); return; }
-  const on = sn.toggle(); sndBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); sndBtn.textContent = on ? 'Sound: on' : 'Sound: off'; say(on ? 'Sound on. Everything you hear is synthesized live.' : 'Sound off.', 2500);
-});
+  const on = sn.toggle(); sndBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); sndBtn.textContent = on ? 'Sound: on' : 'Sound: off';
+  rSnd.setAttribute('aria-pressed', on ? 'true' : 'false'); rSnd.title = on ? 'Sound is on (M)' : 'Sound is off (M)'; rSnd.setAttribute('aria-label', on ? 'Sound: turn off' : 'Sound: turn on');
+  say(on ? 'Sound on. Everything you hear is synthesized live.' : 'Sound off.', 2500);
+}
+if (sndBtn) sndBtn.addEventListener('click', toggleSound); rSnd.addEventListener('click', toggleSound); rSnd.setAttribute('aria-label', 'Sound: turn on');
+
+/* --- room mode: the world fills the window --- */
+const htmlEl = document.documentElement, bodyEl = document.body, selHome = $('fun-sel-home'), selSlot = $('fun-sel-slot'), enterBtn = $('fun-enter'), fsBtn = $('fun-fs');
+const inertEls = () => [...document.querySelectorAll('.site-head, .page-head, .fun-panel, .fun-note, .site-foot')];
+function placeSel() { (room ? selSlot : selHome).appendChild(sceneSel); }
+function enterRoom(fromPop) {
+  if (room) return; room = true;
+  htmlEl.classList.add('fun-full'); bodyEl.classList.add('fun-full'); inertEls().forEach(el => el.setAttribute('inert', ''));
+  placeSel(); window.scrollTo(0, 0);
+  if (!fromPop) { try { history.pushState({ funRoom: 1 }, '', location.pathname + location.search); } catch (err) { /* ignore */ } }
+  resize(); cv.focus({ preventScroll: true }); if (dockBtns[tool]) dockBtns[tool].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+}
+function exitRoom(fromPop) {
+  if (!room) return;
+  if (!fromPop && history.state && history.state.funRoom) { history.back(); return; }
+  closeMore(); room = false; clearHolds();
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+  htmlEl.classList.remove('fun-full'); bodyEl.classList.remove('fun-full'); inertEls().forEach(el => el.removeAttribute('inert'));
+  placeSel(); try { history.replaceState(history.state && history.state.funRoom ? null : history.state, '', location.pathname + location.search + '#page'); } catch (err) { /* ignore */ }
+  window.scrollTo(0, 0); fitStage(); resize(); enterBtn.focus({ preventScroll: true });
+}
+$('fun-exit').addEventListener('click', () => exitRoom(false));
+enterBtn.addEventListener('click', () => enterRoom(false));
+window.addEventListener('popstate', e => { if (e.state && e.state.funRoom) enterRoom(true); else exitRoom(true); });
+document.addEventListener('keydown', e => { if (e.key !== 'Escape' || !room) return; e.preventDefault(); if (!closeMore(true)) exitRoom(false); });
+document.addEventListener('pointerdown', e => { if (room && !moreEl.hidden && !moreEl.contains(e.target) && e.target !== moreBtn && !moreBtn.contains(e.target)) closeMore(); });
+if (fsBtn && $('fun-stage').requestFullscreen) { fsBtn.hidden = false; fsBtn.addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else $('fun-stage').requestFullscreen().catch(() => {}); }); }
 // make the stage and the controls fit one screen below the site header
 function fitStage() {
-  const st = $('fun-stage'), app = $('fun'); if (!st || !app) return; const top = st.getBoundingClientRect().top + window.scrollY, vh = window.innerHeight, narrow = window.innerWidth <= 900;
+  const st = $('fun-stage'), app = $('fun'); if (!st || !app || room) return; const top = st.getBoundingClientRect().top + window.scrollY, vh = window.innerHeight, narrow = window.innerWidth <= 900;
   const h = narrow ? clamp(Math.round(vh * 0.5), 300, 480) : clamp(Math.round(vh - top - 12), 380, 920);
   app.style.setProperty('--fun-h', h + 'px');
 }
@@ -2331,13 +2618,22 @@ function readout() {
   chips.forEach(([s, l], i) => { const t = `${l} `; if (!s.firstChild) { s.innerHTML = `${l} <b></b>`; } s.lastChild.textContent = v[i]; });
 }
 function resize() {
-  const r = cv.getBoundingClientRect(); const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2);
+  const r = cv.getBoundingClientRect();
   const w = Math.max(200, Math.round(r.width)), h = Math.max(200, Math.round(r.height));
+  let dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2) * rscale;
+  dpr = coarse ? Math.min(dpr, 1280 / Math.max(w, h)) : Math.min(dpr, 2560 / w, 1440 / h); dpr = Math.max(0.4, Math.round(dpr * 100) / 100);
   if (cam.w !== w || cam.h !== h || cam.dpr !== dpr || cv.width !== Math.round(w * dpr)) { cam.w = w; cam.h = h; cam.dpr = dpr; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
 }
 if (window.ResizeObserver) new ResizeObserver(resize).observe(cv); window.addEventListener('resize', resize);
 let visible = true; if (window.IntersectionObserver) new IntersectionObserver(es => { visible = es[0].isIntersecting; }, { threshold: 0 }).observe($('fun-stage'));
-let lastTs = 0, acc = 0, drawMs = 0, fpsAvg = 60;
+let lastTs = 0, acc = 0, drawMs = 0, fpsAvg = 60, msSum = 0, msN = 0, lastScaleAt = 0, lowSince = 0;
+// last fallback after lite and fewer substeps: draw at a lower resolution, one step of 0.1 at most once a second
+function rscaleGov(avg, ts) {
+  const floor = coarse ? 0.5 : 0.6;
+  if (avg > 14 && FR.sub <= 5 && lite) { lowSince = 0; if (ts - lastScaleAt > 1000 && rscale > floor) { rscale = Math.max(floor, Math.round((rscale - 0.1) * 10) / 10); lastScaleAt = ts; } }
+  else if (avg < 7) { if (!lowSince) lowSince = ts; if (ts - lowSince > 3000 && ts - lastScaleAt > 1000 && rscale < 1) { rscale = Math.min(1, Math.round((rscale + 0.1) * 10) / 10); lastScaleAt = ts; lowSince = ts; } }
+  else lowSince = 0;
+}
 function loop(ts) {
   requestAnimationFrame(loop);
   if (document.hidden || !visible) { lastTs = ts; return; }
@@ -2348,13 +2644,15 @@ function loop(ts) {
   if (!steps) return;
   const t0 = performance.now(); resize(); render(); drawMs = drawMs * 0.9 + (performance.now() - t0) * 0.1;
   if (cam.vyaw && !reduce) { cam.yaw += cam.vyaw / 60; cam.vyaw *= 0.94; if (Math.abs(cam.vyaw) < 0.01) cam.vyaw = 0; }
-  const total = FR.ms + drawMs; lite = total > 9 ? true : total < 4.5 ? false : lite; if (total > (coarse ? 22 : 13) && FR.sub > 5) FR.sub--; else if (total < (coarse ? 9 : 6) && FR.sub < (coarse ? 8 : 10)) FR.sub++;
+  const total = FR.ms + drawMs;
+  msSum += total; if (++msN >= 30) { rscaleGov(msSum / msN, ts); msSum = 0; msN = 0; }
+  lite = total > 9 ? true : total < 4.5 ? false : lite; if (total > (coarse ? 22 : 13) && FR.sub > 5) FR.sub--; else if (total < (coarse ? 9 : 6) && FR.sub < (coarse ? 8 : 10)) FR.sub++;
   if ((readT += 1) % 15 === 0) readout();
   if (readT % 6 === 0 && window.funSound && window.funSound.on) window.funSound.ambient({ fire: Math.min(1, burning.length / 16), quake: Q.kind ? Q.env : 0, tornado: tornadoes.length ? tornadoes[0].fade : 0, wind: gust ? gust.env : 0, flood: flood ? 1 : 0, drones: drones.length, ufo: ufo ? ufo.beam : 0 });
 }
 function statsNow() {
   let nan = 0, maxv = 0, an = 0; for (let i = 0; i < nN; i++) { if (!alive[i]) continue; an++; if (!isFinite(px[i] + py[i] + pz[i])) nan++; maxv = Math.max(maxv, Math.hypot(vx[i], vy[i], vz[i])); }
-  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, riders: riders.filter(r => !r.dead).length, people: riders.filter(r => r.t === 'p' && !r.dead).length, standingPeople: riders.filter(r => r.t === 'p' && !r.dead && r.st).length, peopleStanding: riders.filter(r => r.t === 'p' && !r.dead && r.st && !r.safe).length, peopleDown: riders.filter(r => r.t === 'p' && !r.dead && !r.st).length, peopleSafeInWater: riders.filter(r => r.t === 'p' && !r.dead && r.safe).length, peopleLost: riders.filter(r => r.t === 'p' && r.dead).length, glassBroken: cnt.glass || 0, barrelsLeft: riders.filter(r => r.t === 'b' && !r.dead).length, drones: drones.length, dragons: dragons.length, ufo: ufo ? 1 : 0, flood: flood ? 1 : 0, armed: armed ? 1 : 0, treesLeft: crowns.filter(c => alive[c.n] || c.ms.some(mi => mem[mi].alive)).length, carBodies: riders.filter(r => (r.t === 'c' || r.t === 'h') && !r.dead).length, fellIn: riders.filter(r => r.fell).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1) };
+  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, rscale, room, lite, bolts: BOLTS.filter(b => b.on).length, bombs: bombsLive(), panX: +cam.panX.toFixed(2), panZ: +cam.panZ.toFixed(2), tool, riders: riders.filter(r => !r.dead).length, people: riders.filter(r => r.t === 'p' && !r.dead).length, standingPeople: riders.filter(r => r.t === 'p' && !r.dead && r.st).length, peopleStanding: riders.filter(r => r.t === 'p' && !r.dead && r.st && !r.safe).length, peopleDown: riders.filter(r => r.t === 'p' && !r.dead && !r.st).length, peopleSafeInWater: riders.filter(r => r.t === 'p' && !r.dead && r.safe).length, peopleLost: riders.filter(r => r.t === 'p' && r.dead).length, glassBroken: cnt.glass || 0, barrelsLeft: riders.filter(r => r.t === 'b' && !r.dead).length, drones: drones.length, dragons: dragons.length, ufo: ufo ? 1 : 0, flood: flood ? 1 : 0, armed: armed ? 1 : 0, treesLeft: crowns.filter(c => alive[c.n] || c.ms.some(mi => mem[mi].alive)).length, carBodies: riders.filter(r => (r.t === 'c' || r.t === 'h') && !r.dead).length, fellIn: riders.filter(r => r.fell).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1) };
 }
 window.funRoom = {
   scenes: SCENES.map(s => s.id), tools: TOOLS.map(t => t[0]),
@@ -2365,11 +2663,12 @@ window.funRoom = {
   fast: v => { const r = []; for (let i = 0; i < nN; i++) if (alive[i] && Math.hypot(vx[i], vy[i], vz[i]) > v) r.push([i, isRider[i], +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), +Math.hypot(vx[i], vy[i], vz[i]).toFixed(1)]); return r; },
   dead: () => { const r = []; for (let i = 0; i < nN; i++) if (!alive[i]) r.push([i, +px[i].toFixed(1), +py[i].toFixed(1), +pz[i].toFixed(1), deg[i]]); return r; },
   riders: () => riders.map(R => ({ n: R.n, id: R.id, t: R.t, dead: !!R.dead, st: R.st, x: px[R.n], y: py[R.n], z: pz[R.n], fell: !!R.fell, air: R.air, why: R.why, tq: R.tq, ok: R.ns.every(i => isFinite(px[i] + py[i] + pz[i])), upy: R.upy })),
-  render, paused: p => { paused = p; }, knockP: i => knock(riders[i]), launch, callDrones, callDragons, startFlood, aimPoint, glassAt, breakGlass, panels: () => panels, barrels: () => riders.filter(r => r.t === 'b'), crowns: () => crowns, water: () => water, setArmed: v => { armed = !!v; if (armBtn) armBtn.setAttribute('aria-pressed', armed ? 'true' : 'false'); if (armed) for (const R of riders) if (R.t === 'p') { R.tl = Math.floor(Math.random() * 4); R.tw = 0; } }, state: () => ({ E, boomT, thr, armed }), callUfo: (x, z) => { callUfo(x, z); ufo.held = false; }
+  enter: () => enterRoom(false), exit: () => exitRoom(false), dropBomb, strikeBolt, pan: (x, z) => cam.shift(x, z), zoomAt: (x, y, f) => cam.zoomAt(x, y, f), dragPan: (a, b, c, d) => cam.dragPan(a, b, c, d), togglePause, render, paused: p => { paused = p; }, knockP: i => knock(riders[i]), launch, callDrones, callDragons, startFlood, aimPoint, glassAt, breakGlass, panels: () => panels, barrels: () => riders.filter(r => r.t === 'b'), crowns: () => crowns, water: () => water, setArmed: v => { armed = !!v; if (armBtn) armBtn.setAttribute('aria-pressed', armed ? 'true' : 'false'); if (armed) for (const R of riders) if (R.t === 'p') { R.tl = Math.floor(Math.random() * 4); R.tw = 0; } }, state: () => ({ E, boomT, thr, armed }), callUfo: (x, z) => { callUfo(x, z); ufo.held = false; }
 };
 resize();
-setTool('pluck'); loadScene(0);
+setTool('move'); loadScene(0);
 say('Pick a scene and a tool, then wreck it. Reset puts everything back.', 7000);
 readout();
+if (location.hash !== '#page') enterRoom(false);
 requestAnimationFrame(loop);
 })();
