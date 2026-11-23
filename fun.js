@@ -16,7 +16,7 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 const TAU = Math.PI * 2;
 
 /* ===================== 1. core data ===================== */
-const NMAX = 3400, MMAX = 3200;
+const NMAX = 12000, MMAX = 12000;
 const px = new Float64Array(NMAX), py = new Float64Array(NMAX), pz = new Float64Array(NMAX);
 const qx = new Float64Array(NMAX), qy = new Float64Array(NMAX), qz = new Float64Array(NMAX);
 const vx = new Float64Array(NMAX), vy = new Float64Array(NMAX), vz = new Float64Array(NMAX);
@@ -31,7 +31,17 @@ let nN = 0, mem = [], adj = [], pins = [], panels = [], riders = [], balls = [],
 // the world around the structures
 let barrels = [], crowns = [], flam = [], water = [], pathsL = [], tufts = [], blooms = [], birds = [], drones = [], dragons = [], shells = [], ufo = null, flood = null, armed = false, props = [], seed = 1, boomT = 0, lamps = [];
 const elevN = new Uint8Array(NMAX), envN = new Uint8Array(NMAX);
-const E = { on: false, y: 0, lv: [], k: 0, wait: 0, dir: 1, x: 0, z: 0, y0: 0 };
+// streaming worlds: slp = node sleeps (frozen, not simulated), ckOf = chunk that owns a node (0 = none), free lists let chunks reuse slots
+const slp = new Uint8Array(NMAX), ckOf = new Uint8Array(NMAX), freeN = [], freeM = [];
+let CK = 0, CKO = null;
+const DEADM = { a: 0, b: 0, kind: LINK_K(), alive: false, burn: -2, dur: 0, lam: 0, T: 0, st: 0, col: null, th: 0, orig: false, stub: true, hid: true, ck: 0, L0: 1, rest: 1, al: 0, brk: 99 };
+function LINK_K() { return 4; }
+const CKG = new Float32Array(256);
+const W = { on: false, kind: '', cs: 40, gen: null, chunks: new Map(), byId: [], ids: [], maxLoad: 12, awakeCap: 2800, dirty: true, loads: 0, awake: 0, nAwake: 0, allAwake: false, frame: [15, 15, 6] };
+function chunkOf(id) { return id ? W.byId[id] || null : null; }
+const nodeRoom = k => NMAX - nN + freeN.length > k, memRoom = k => MMAX - mem.length + freeM.length > k;
+function putMem(m) { if (freeM.length) { const id = freeM.pop(); mem[id] = m; return id; } mem.push(m); return mem.length - 1; }
+const E = { on: false, y: 0, lv: [], k: 0, wait: 0, dir: 1, x: 0, z: 0, y0: 0, ox: 0 };
 let S = null; // current scene info
 const STRUT = 0, BEAM = 1, CABLE = 2, FAB = 3, LINK = 4;
 const KD = [
@@ -43,11 +53,11 @@ const KD = [
 
 function resetWorld() {
   nN = 0; mem = []; adj = []; pins = []; panels = []; riders = []; balls = []; burning = [];
-  alive.fill(0); elevN.fill(0); envN.fill(0); barrels = []; crowns = []; flam = []; water = []; pathsL = []; tufts = []; blooms = []; birds = []; drones = []; dragons = []; shells = []; ufo = null; flood = null; armed = false; props = []; boomT = 0; lamps = []; E.on = false; E.y = 0; E.lv = []; E.k = 0; E.wait = 0; cont.fill(0); pinned.fill(0); isRider.fill(0); riderOf.fill(-1); chx.fill(0); chz.fill(0); nRN = 0; upList.length = 0; lift.fill(0); drg.fill(0); glow.fill(0); deg.fill(0);
+  alive.fill(0); elevN.fill(0); envN.fill(0); barrels = []; crowns = []; flam = []; water = []; pathsL = []; tufts = []; blooms = []; birds = []; drones = []; dragons = []; shells = []; ufo = null; flood = null; armed = false; props = []; boomT = 0; lamps = []; E.on = false; E.ox = 0; E.y = 0; E.lv = []; streamReset(); E.k = 0; E.wait = 0; cont.fill(0); slp.fill(0); ckOf.fill(0); freeN.length = 0; freeM.length = 0; CK = 0; CKO = null; pinned.fill(0); isRider.fill(0); riderOf.fill(-1); chx.fill(0); chz.fill(0); nRN = 0; upList.length = 0; lift.fill(0); drg.fill(0); glow.fill(0); deg.fill(0);
 }
 function node(x, y, z, m, pin, o) {
-  if (nN >= NMAX) return nN - 1;
-  const i = nN++;
+  let i; if (freeN.length) i = freeN.pop(); else { if (nN >= NMAX) return nN - 1; i = nN++; }
+  elevN[i] = 0; envN[i] = 0; riderOf[i] = -1; chx[i] = 0; chz[i] = 0; slp[i] = 0; ckOf[i] = CK; if (CKO) CKO.nodes.push(i);
   px[i] = qx[i] = x; py[i] = qy[i] = y; pz[i] = qz[i] = z; vx[i] = vy[i] = vz[i] = 0;
   wI[i] = pin ? 0 : 1 / (m || S.m); nr[i] = 0.03 * S.u; lift[i] = 0; drg[i] = 0.25; alive[i] = 1; cont[i] = 0; isRider[i] = 0; glow[i] = 0; deg[i] = 0; fric[i] = 0.22; infl[i] = 0;
   pinned[i] = pin ? 1 : 0; ax0[i] = x; ay0[i] = y; az0[i] = z; adj[i] = [];
@@ -58,13 +68,13 @@ function node(x, y, z, m, pin, o) {
 function dist(a, b) { return Math.hypot(px[a] - px[b], py[a] - py[b], pz[a] - pz[b]); }
 function add(a, b, kind, o) {
   o = o || {};
-  if (mem.length >= MMAX || a === b) return -1;
+  if ((!freeM.length && mem.length >= MMAX) || a === b) return -1;
   const L = dist(a, b), K = KD[kind], cab = kind >= CABLE && kind !== LINK;
   const pre = o.pre !== undefined ? o.pre : (cab ? 0.965 : 1);
   const rest = L * pre;
   const ea = K.ea * (o.k || (cab ? S.k : S.ks));
-  const m = { a, b, kind, L0: L, rest, al: rest / ea, brk: o.brk || K.brk, alive: true, burn: -1, dur: 0, lam: 0, T: 0, st: 0, col: o.col || null, th: (o.th || K.th) * S.u * (o.ts || 1), orig: !o.stub, stub: !!o.stub, hid: !!o.hid };
-  mem.push(m); const id = mem.length - 1;
+  const m = { a, b, kind, L0: L, rest, al: rest / ea, brk: o.brk || K.brk, alive: true, burn: -1, dur: 0, lam: 0, T: 0, st: 0, col: o.col || null, th: (o.th || K.th) * S.u * (o.ts || 1), orig: !o.stub, stub: !!o.stub, hid: !!o.hid, ck: CK };
+  const id = putMem(m); if (CKO) CKO.mems.push(id);
   adj[a].push(id); adj[b].push(id); deg[a]++; deg[b]++;
   return id;
 }
@@ -73,7 +83,7 @@ function memBetween(a, b) { const ad = adj[a]; for (let k = 0; k < ad.length; k+
 // a fabric or floor panel over 3 or 4 nodes; hides when any listed member dies. Collides with riders if floor.
 function panel(ns, col, alpha, o) {
   const ms = []; for (let k = 0; k < ns.length; k++) { const id = memBetween(ns[k], ns[(k + 1) % ns.length]); if (id >= 0) ms.push(id); }
-  panels.push({ n: ns, ms, col, al: alpha, floor: !!(o && o.floor), glass: !!(o && o.glass), deco: !!(o && (o.deco || o.glass && o.deco)), uv: (o && o.uv) || null, tag: (o && o.tag) || '', broken: false, z: 0 });
+  panels.push({ n: ns, ms, col, al: alpha, floor: !!(o && o.floor), glass: !!(o && o.glass), deco: !!(o && (o.deco || o.glass && o.deco)), uv: (o && o.uv) || null, tag: (o && o.tag) || '', broken: false, z: 0, ck: CK }); if (CKO) CKO.panels.push(panels[panels.length - 1]);
 }
 const lerp = (a, b, t) => a + (b - a) * t;
 
@@ -84,7 +94,8 @@ function person(x, y, z, s, col) {
   const r = 0.5 * s, hip = node(x, y + r, z, s * s * s + 0.12, false), head = node(x, y + r + 0.86 * s, z, 0.25 * s * s * s + 0.03, false);
   nr[hip] = r; nr[head] = 0.2 * s; isRider[hip] = isRider[head] = 1; drg[hip] = drg[head] = 0.5; fric[hip] = 0.3; fric[head] = 0.05;
   const lk = add(hip, head, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[lk].orig = false;
-  riders.push({ t: 'p', n: hip, h: head, ns: [hip, head], s, col, st: 1, air: 0, run: 0, tq: 0, tp: rnd(0.5, 2.4), lx: x, ly: y + r, lz: z, lks: [lk], fell: false, id: riders.length, hx: x, hz: z, wr: (y > 0.3 ? 0.6 : 5.5) * Math.sqrt(s), gx: x, gz: z, lim: y > 0.3 ? [x - 1.3, x + 1.3, z - 1.3, z + 1.3] : null, gt: rnd(0, 2), ph: rnd(0, 6), wk: 0, dn: 0, cr: 0, gr: 1, pt: 0, safe: false, job: null, tl: 0, sw: 0, ws: 0, spd: 0, hd: 1, lvl: -1 });
+  riders.push({ t: 'p', n: hip, h: head, ns: [hip, head], s, col, st: 1, air: 0, run: 0, tq: 0, tp: rnd(0.5, 2.4), lx: x, ly: y + r, lz: z, lks: [lk], fell: false, id: riders.length, hx: x, hz: z, wr: (y > 0.3 ? 0.6 : 5.5) * Math.sqrt(s), gx: x, gz: z, lim: y > 0.3 ? [x - 1.3, x + 1.3, z - 1.3, z + 1.3] : null, gt: rnd(0, 2), ph: rnd(0, 6), wk: 0, dn: 0, cr: 0, gr: 1, pt: 0, safe: false, job: null, tl: 0, sw: 0, ws: 0, spd: 0, hd: 1, lvl: -1, ck: CK });
+  if (CKO) CKO.riders.push(riders[riders.length - 1]);
   riderOf[hip] = riderOf[head] = riders.length - 1;
   return riders[riders.length - 1];
 }
@@ -93,7 +104,8 @@ function car(x, y, z, s, col, drive, rot) {
   const a = node(x + ax * L / 2, y + r, z + az * L / 2, 3 * s * s, false), b = node(x - ax * L / 2, y + r, z - az * L / 2, 3 * s * s, false), c = node(x, y + r + 0.85 * s, z, 1.2 * s * s, false);
   nr[a] = nr[b] = r; nr[c] = 0.12 * s; for (const n of [a, b, c]) { isRider[n] = 2; drg[n] = 0.5; fric[n] = 0.25; } fric[a] = fric[b] = 0.004;
   const lks = [[a, b], [a, c], [b, c]].map(([p, q]) => { const l = add(p, q, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[l].orig = false; return l; });
-  riders.push({ t: 'c', n: a, n2: b, n3: c, ns: [a, b, c], s, col, drive: drive || null, lks, z0: z, ux: drive ? drive.ux : 1, upy: 1, fell: false, id: riders.length });
+  riders.push({ t: 'c', n: a, n2: b, n3: c, ns: [a, b, c], s, col, drive: drive || null, lks, z0: z, ux: drive ? drive.ux : 1, upy: 1, fell: false, id: riders.length, ck: CK });
+  if (CKO) CKO.riders.push(riders[riders.length - 1]);
   const k = riders.length - 1; riderOf[a] = riderOf[b] = riderOf[c] = k;
 }
 // knock a person over: the balance stops, the body gets thinner so it can lie down, and it tumbles from whatever it was doing
@@ -106,8 +118,8 @@ function knock(R, kx, ky, kz) {
 }
 // break a car into two halves that tumble apart
 function splitCar(R, kx, ky, kz) {
-  if (R.dead || R.t !== 'c' || nN + 3 >= NMAX || mem.length + 3 >= MMAX) return;
-  R.dead = true;
+  if (R.dead || R.t !== 'c' || !nodeRoom(4) || !memRoom(4)) return;
+  R.dead = true; const ck0 = CK, cko0 = CKO; CK = R.ck || 0; CKO = chunkOf(CK);
   for (const id of R.lks) killMem(id, 'x');
   const A = R.n, B = R.n2, C = R.n3, s = R.s;
   let ux = px[A] - px[B], uy = py[A] - py[B], uz = pz[A] - pz[B]; const L = Math.hypot(ux, uy, uz) || 1; ux /= L; uy /= L; uz /= L;
@@ -121,9 +133,11 @@ function splitCar(R, kx, ky, kz) {
   const base = riders.length, hs = [[A, M1, 1], [B, M2, -1]];
   hs.forEach(([n, n2, end], k) => {
     const l = add(n, n2, LINK, { k: 1, hid: true, stub: true, pre: 1 }); mem[l].orig = false;
-    riders.push({ t: 'h', n, n2, ns: [n, n2], s, col: R.col, rgb: R.rgb, up: up.slice(), end, lks: [l], fell: R.fell, id: R.id });
+    riders.push({ t: 'h', n, n2, ns: [n, n2], s, col: R.col, rgb: R.rgb, up: up.slice(), end, lks: [l], fell: R.fell, id: R.id, ck: R.ck || 0, slp: R.slp });
+    if (CKO) CKO.riders.push(riders[riders.length - 1]);
     riderOf[n] = riderOf[n2] = base + k;
   });
+  CK = ck0; CKO = cko0;
   for (let q = 0; q < 14; q++) emit(1, mx, my + 0.3 * s, mz, rnd(-1, 1) * S.size * 0.1, rnd(0, 1) * S.size * 0.12, rnd(-1, 1) * S.size * 0.1, rnd(0.25, 0.6), 0.6);
   if (!reduce) shake = Math.max(shake, 0.4);
 }
@@ -139,12 +153,13 @@ function tree(x, z, h, o) {
   const ids = [];
   for (let k = 0; k < 3; k++) { const a = TAU * k / 3 + 0.4, b = node(x + br * Math.cos(a), 0.02, z + br * Math.sin(a), 1, true); envN[b] = 1; ids.push(beam(b, top, { col: bush ? '#5A4630' : '#6B4A2B', ts: bush ? 0.7 : 1.3, brk: 0.06 })); }
   ids.forEach(mi => { const m = mem[mi]; if (!m) return; m.tree = true; m.orig = false; m.burnT = bush ? 4 : 6.5; flam.push(mi); });
-  crowns.push({ n: top, ms: ids, x, z, h, r: o.r || (bush ? 0.85 : 1.25 + 0.09 * h), bush, tone: rr(), fruit: o.fruit || 0 });
+  crowns.push({ n: top, ms: ids, x, z, h, r: o.r || (bush ? 0.85 : 1.25 + 0.09 * h), bush, tone: rr(), fruit: o.fruit || 0, ck: CK }); if (CKO) CKO.crowns.push(crowns[crowns.length - 1]);
 }
 // a gasoline barrel: a single heavy body that rolls and pushes people. A spark, a hit or a blast sets it off.
 function barrel(x, z, y, o) {
   const sc = (o && o.s) || 1, n = node(x, (y || 0) + 0.45 * sc, z, 1.6 * sc * sc * sc + 0.1); nr[n] = 0.42 * sc; isRider[n] = 3; drg[n] = 0.5; fric[n] = 0.55;
-  riders.push({ t: 'b', n, ns: [n], s: sc, kind: (o && o.kind) || 'gas', fuse: -1, hit: false, st: 1, id: riders.length });
+  riders.push({ t: 'b', n, ns: [n], s: sc, kind: (o && o.kind) || 'gas', fuse: -1, hit: false, st: 1, id: riders.length, ck: CK });
+  if (CKO) CKO.riders.push(riders[riders.length - 1]);
   riderOf[n] = riders.length - 1;
 }
 // a wooden crate stack: a braced frame that burns
@@ -165,9 +180,9 @@ function glaze(G, face, l0, l1, skip, col) {
 }
 // a flat decoration on a cell (door, sign): a rectangle inside the quad. uv = [u0, u1, v0, v1]
 function decal(ns, col, uv, tag) { panel(ns, col, 0.95, { deco: true, uv, tag }); }
-function lake(cx, cz, rx, rz, shape) { water.push({ x: cx, z: cz, rx, rz, sh: shape || 'oval' }); }
+function lake(cx, cz, rx, rz, shape) { water.push({ x: cx, z: cz, rx, rz, sh: shape || 'oval', ck: CK }); }
 const inWater = (x, z, m) => { m = m || 0; for (let k = 0; k < water.length; k++) { const w = water[k]; if (w.res) continue; if (w.sh === 'rect') { if (Math.abs(x - w.x) < w.rx + m && Math.abs(z - w.z) < w.rz + m) return w; } else { const a = (x - w.x) / (w.rx + m), b = (z - w.z) / (w.rz + m); if (a * a + b * b < 1) return w; } } return null; };
-function pathway(pts, w, col, dash) { pathsL.push({ pts, w, col: col || '#D8C79F', dash: !!dash }); }
+function pathway(pts, w, col, dash) { pathsL.push({ pts, w, col: col || '#D8C79F', dash: !!dash, ck: CK }); }
 const onPath = (x, z, m) => { for (const p of pathsL) for (let i = 0; i < p.pts.length - 1; i++) { const a = p.pts[i], b = p.pts[i + 1], ex = b[0] - a[0], ez = b[1] - a[1], t = clamp(((x - a[0]) * ex + (z - a[1]) * ez) / (ex * ex + ez * ez + 1e-9), 0, 1); if (Math.hypot(x - a[0] - ex * t, z - a[1] - ez * t) < p.w / 2 + (m || 0)) return true; } return false; };
 // structure bounds from the nodes placed so far
 function bounds() { let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9, y1 = 0; for (let i = 0; i < nN; i++) { if (isRider[i]) continue; x0 = Math.min(x0, px[i]); x1 = Math.max(x1, px[i]); z0 = Math.min(z0, pz[i]); z1 = Math.max(z1, pz[i]); y1 = Math.max(y1, py[i]); } return { x0, x1, z0, z1, y1 }; }
@@ -295,20 +310,6 @@ function bellTent(cx, cz, sc, col, n) {
   return t;
 }
 
-/* --- tent camp --- */
-function buildTent() {
-  S.m = 2; S.k = 1; S.u = 1; S.ks = 0.5;
-  ridgeTent(-9, -2, 0.2, 1.0, '#E8A33D'); ridgeTent(9, 4, -0.5, 1.15, '#3BA0A5'); ridgeTent(0, -9, 0.05, 1.9, '#D9553E');
-  bellTent(-4, 6, 1.0, '#7FB069', 7); bellTent(5, -1, 1.15, '#B565A7', 8); bellTent(-12, 8, 0.9, '#E5C546', 6);
-  crates(-2.2, 1.2, 1, 1, 1, 1.1, '#7A5C3E');            // the woodpile for the evening fire
-  lake(13, 13, 6.5, 4.2); pathway([[-16, -5], [-6, 1], [4, 5], [11, 10]], 2.2);
-  [[-6, 2], [-2, 4], [3, 7], [14, -2], [-8, -6], [-14, 2], [-1, -3], [10, -3], [-5, 10], [1, 0]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[i % 6]));
-  car(14, 0, -6, 1.1, '#C23B3B', null); car(-15, 0, -8, 1.0, '#2F6DB5', null);
-  barrel(11.6, -9.6); barrel(12.8, -9.2); barrel(-16.6, -10);
-  envFill({ trees: 10, bushes: 10, pad: 3, keep: [[13, 13, 8]] }); S.view = [0.5, 0.4]; S.name = 'Tent camp';
-}
-
-/* --- tensegrity tower --- */
 function buildTower() {
   S.m = 3; S.k = 3; S.u = 1; S.ks = 0.6;
   const rings = prismStack(0, 0, 0, 3, 9, 1.9, 3.1, { pre: 0.97, ts: 1.3, m: 3 });
@@ -564,53 +565,15 @@ function mast(a, b, c, h, col) {
   fab(t, f1, { pre: 1.0 }); fab(f1, f2, { pre: 1.0 }); fab(f2, t, { pre: 1.0 }); panel([t, f1, f2], col || '#D9553E', 0.92); return t;
 }
 function walkLimit(R, x0, x1, z0, z1) { if (R) { R.lim = [x0, x1, z0, z1]; } return R; }
-/* --- city street --- */
-function buildCity() {
-  S.m = 6; S.k = 4; S.u = 1; S.ks = 0.5;
-  pathway([[-27, 0], [27, 0]], 7, '#5C6573', true); pathway([[-27, 4.9], [27, 4.9]], 3.2, '#D9D4C7'); pathway([[-27, -4.9], [27, -4.9]], 3.2, '#D9D4C7');
-  // the tower: a glass front, a door, a roof and a glass elevator
-  const T = frame({ x0: -10, z0: 7, nx: 3, nz: 1, bw: 4, bd: 7, y0: 0, ns: 6, sh: 3.2, m: 6, col: '#7E8BA0', ts: 1.1, pre: 0.98, faces: 'lrb', floorCol: '#CFDDEE', skip: (i, j, l) => i === 0 && j === 0 });
-  glaze(T, 'f', 0, 6, (i, l) => i === 1 && l === 0);
-  decal([T[0][1][0], T[0][2][0], T[1][2][0], T[1][1][0]], '#7A4B2A', [0.28, 0.72, 0, 0.74], 'door');
-  decal([T[1][1][0], T[1][2][0], T[2][2][0], T[2][1][0]], '#B5533C', [0.08, 0.92, 0.02, 0.2], 'awning');
-  wallPanels(T, 'b', 0, 6, '#9AA7BB', 0.85); roofOf(T, 6, '#4F5663'); mast(T[6][1][0], T[6][2][0], T[6][2][1], 4.2, '#C23B3B');
-  // elevator cab: pinned nodes that ride up and down the shaft, a floor panel people stand on, glass walls on three sides, open toward +x
-  const cx0 = -9.5, cx1 = -6.2, cz0 = 9.2, cz1 = 11.6, cab = [];
-  for (const y of [0.04, 2.6]) for (const [x, z] of [[cx0, cz0], [cx1, cz0], [cx1, cz1], [cx0, cz1]]) { const n = node(x, y, z, 5, true); elevN[n] = 1; cab.push(n); }
-  const lo = cab.slice(0, 4), hi = cab.slice(4);
-  for (let i = 0; i < 4; i++) { const j = (i + 1) % 4; const m1 = beam(lo[i], lo[j], { col: '#5E6B80', ts: 0.8 }), m2 = beam(hi[i], hi[j], { col: '#5E6B80', ts: 0.8 }), m3 = strut(lo[i], hi[i], { ts: 0.6 }); [m1, m2, m3].forEach(m => { if (m >= 0) mem[m].orig = false; }); }
-  panel(lo, '#8E9BB0', 0.95, { floor: true }); panel(hi, '#8E9BB0', 0.9);
-  panel([lo[0], lo[1], hi[1], hi[0]], '#BFE3F2', 0.35, { glass: true }); panel([lo[2], lo[3], hi[3], hi[2]], '#BFE3F2', 0.35, { glass: true }); panel([lo[3], lo[0], hi[0], hi[3]], '#BFE3F2', 0.35, { glass: true });
-  E.on = true; E.x = (cx0 + cx1) / 2 + 0.2; E.z = (cz0 + cz1) / 2; E.lv = [0, 3.16, 6.36, 9.56, 12.76, 15.96]; E.k = 0; E.dir = 1; E.wait = 3; E.y = 0;
-  // a lower office with its own door, and a corner shop
-  const B2 = frame({ x0: 4, z0: 7, nx: 2, nz: 1, bw: 4.5, bd: 7, y0: 0, ns: 3, sh: 3.2, m: 5, col: '#A58E6B', ts: 1.0, floorCol: '#E5D3B0', faces: 'lrb', pre: 0.98 });
-  glaze(B2, 'f', 0, 3, (i, l) => i === 0 && l === 0); decal([B2[0][0][0], B2[0][1][0], B2[1][1][0], B2[1][0][0]], '#3F6E5B', [0.28, 0.72, 0, 0.74], 'door'); wallPanels(B2, 'b', 0, 3, '#C7B48E', 0.9); roofOf(B2, 3, '#7A5C3E');
-  const B3 = frame({ x0: -20, z0: 7, nx: 2, nz: 1, bw: 4.5, bd: 6, y0: 0, ns: 2, sh: 3.2, m: 5, col: '#8FA08A', ts: 1.0, floorCol: '#DCE6D6', faces: 'lrb', pre: 0.98 });
-  glaze(B3, 'f', 0, 2, (i, l) => i === 1 && l === 0); decal([B3[0][1][0], B3[0][2][0], B3[1][2][0], B3[1][1][0]], '#B5533C', [0.28, 0.72, 0, 0.74], 'door'); wallPanels(B3, 'b', 0, 2, '#B7C7B0', 0.9); roofOf(B3, 2, '#5A6B58');
-  // shops across the street, glass fronts toward the road
-  const B4 = frame({ x0: 2, z0: -13, nx: 3, nz: 1, bw: 4, bd: 6, y0: 0, ns: 2, sh: 3.2, m: 5, col: '#8B7FA3', ts: 1.0, floorCol: '#DDD6EA', faces: 'flr', pre: 0.98 });
-  glaze(B4, 'b', 0, 2, (i, l) => i === 1 && l === 0); decal([B4[0][1][1], B4[0][2][1], B4[1][2][1], B4[1][1][1]], '#7A4B2A', [0.28, 0.72, 0, 0.74], 'door'); wallPanels(B4, 'f', 0, 2, '#B1A7C6', 0.9); roofOf(B4, 2, '#5E5570');
-  // park with a pool
-  lake(-14, -11, 4.6, 3.1); pathway([[-22, -5], [-18, -8], [-14, -14.5], [-8, -10]], 1.6);
-  [-19, -4, 10, 22].forEach(x => lamppost(x, 3.7, 5.6)); [-14, 4, 18].forEach(x => lamppost(x, -3.7, 5.6));
-  // people on the pavements and in the park
-  [[-16, 5], [-6, 4.6], [6, 5.2], [16, 4.8], [-20, -5], [0, -5.2], [12, -4.6], [20, -5], [-17, -7.5], [-9, -9]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[i % 6]));
-  const el = [[-4.2, 0, 8.2], [-4.2, 3.2, 10.5], [-3.6, 9.6, 10.2], [-4, 12.8, 9.4]].map(([x, y, z], i) => { const R = person(x, y + (y ? 0.04 : 0), z, 1, PCOL[(i + 2) % 6]); R.el = { s: y ? 'idle' : 'wait', here: Math.round(y / 3.2), dest: 0, t: rnd(2, 6) }; R.wr = 1.4; R.lim = null; return R; });
-  [[-3, 3], [3, 1], [-16, 2]].forEach(([x, i0], i) => 0);
-  car(-18, 0, -1.7, 1.1, '#2F6DB5', { ux: 1, lim: 23, zalt: 0.5 }); car(20, 0, 0.5, 1.0, '#C23B3B', { ux: -1, lim: 23, zalt: -1.7 }); car(0, 0, -1.7, 0.95, '#D98A1C', { ux: 1, lim: 23, zalt: 0.5 });
-  car(-13, 0, 3.1, 1.0, '#6B7C93', null); car(9, 0, 3.1, 1.05, '#3C9D6B', null);
-  S.avoid = [[-10.5, 2.5, 6.7, 14.5], [3.5, 13.5, 6.7, 14.5], [-20.5, -10.5, 6.7, 13.5], [1.5, 14.5, -13.5, -6.5]];
-  envFill({ trees: 8, bushes: 8, pad: 2, spread: 7, keep: [[-14, -11, 6]] }); S.view = [2.66, 0.3]; S.name = 'City street'; S.tool = 'pluck';
-}
 // ride the elevator: wait at the door, board when the cab stops at this floor, ride to another, get off, wander, come back
 function elevAI(R, dt) {
   const el = R.el, i = R.n, ex = E.x, ez = E.z, lv = Math.max(0, Math.round((py[i] - 0.5 * R.s - 0.04) / 3.2)), inCab = Math.abs(px[i] - ex) < 1.5 && Math.abs(pz[i] - ez) < 1.2 && Math.abs(py[i] - 0.5 * R.s - 0.04 - E.y) < 0.6;
-  const wx = -4.2, wz = 10.4 + (R.id % 3 - 1) * 0.5;
-  if (el.s === 'idle') { el.t -= dt; R.gt -= dt; if (R.gt <= 0) { R.gt = rnd(1.5, 3.5); R.gx = R.hx + rnd(-1, 1); R.gz = R.hz + rnd(-1, 1); R.gx = clamp(R.gx, -5.6, 1); R.gz = clamp(R.gz, 8, 13); } walk(R, R.gx, R.gz, 0.8, dt); if (el.t <= 0) { el.s = 'wait'; el.here = lv; } }
+  const wx = -4.2 + E.ox, wz = 10.4 + (R.id % 3 - 1) * 0.5;
+  if (el.s === 'idle') { el.t -= dt; R.gt -= dt; if (R.gt <= 0) { R.gt = rnd(1.5, 3.5); R.gx = R.hx + rnd(-1, 1); R.gz = R.hz + rnd(-1, 1); R.gx = clamp(R.gx, -5.6 + E.ox, 1 + E.ox); R.gz = clamp(R.gz, 8, 13); } walk(R, R.gx, R.gz, 0.8, dt); if (el.t <= 0) { el.s = 'wait'; el.here = lv; } }
   else if (el.s === 'wait') { walk(R, wx, wz, 0.9, dt); if (E.at === el.here && E.wait > 1.4 && Math.abs(E.y - (E.lv[el.here] || 0)) < 0.2) { el.s = 'board'; do { el.dest = Math.floor(Math.random() * E.lv.length); } while (el.dest === el.here); } }
   else if (el.s === 'board') { walk(R, ex + 0.2, ez + (R.id % 3 - 1) * 0.5, 1.1, dt); if (inCab) el.s = 'ride'; if (E.at === -1 && !inCab) el.s = 'wait'; }
   else if (el.s === 'ride') { walk(R, ex + 0.1, ez + (R.id % 3 - 1) * 0.5, 0.6, dt); if (E.at === el.dest && E.wait > 0.5) { el.s = 'out'; el.here = el.dest; } }
-  else if (el.s === 'out') { const tx = el.here === 0 ? -3.6 : -3.9, tz = el.here === 0 ? 8.2 : 10.5 + (R.id % 3 - 1) * 1.4; if (walk(R, tx, tz, 1.0, dt) || Math.hypot(px[i] - tx, pz[i] - tz) < 0.5) { el.s = 'idle'; el.t = rnd(6, 12); R.hx = px[i]; R.hz = pz[i]; } }
+  else if (el.s === 'out') { const tx = (el.here === 0 ? -3.6 : -3.9) + E.ox, tz = el.here === 0 ? 8.2 : 10.5 + (R.id % 3 - 1) * 1.4; if (walk(R, tx, tz, 1.0, dt) || Math.hypot(px[i] - tx, pz[i] - tz) < 0.5) { el.s = 'idle'; el.t = rnd(6, 12); R.hx = px[i]; R.hz = pz[i]; } }
 }
 /* --- castle siege --- */
 function buildCastle() {
@@ -707,6 +670,235 @@ function buildDam() {
   };
   envFill({ trees: 9, bushes: 8, pad: 2.5, spread: 6, keep: [[0, -17, 24]] }); S.view = [0.35, 0.3]; S.name = 'Dam and valley'; S.tool = 'cannon';
 }
+/* ===================== 2b. streaming worlds: the tent camp and the city ===================== */
+// A streaming world is cut into square chunks. Each chunk is built from a seed made of its grid cell, so the same place always looks the same.
+// Chunks near the view are loaded and the ones that are in view and nearest are awake (simulated); the rest of the loaded ones sleep (drawn, frozen); far ones are removed.
+function streamReset() { W.on = false; W.chunks.clear(); W.byId = []; W.ids = []; for (let i = 255; i >= 1; i--) W.ids.push(i); CKG.fill(0); W.dirty = true; W.loads = 0; W.awake = 0; W.nAwake = 0; }
+function registerFlam(mi) {
+  const m = mem[mi]; if (!m || m.hid || m.kind === LINK) return;
+  if (m.kind === FAB) flam.push(mi); else if (m.kind === BEAM && WOOD.has(m.col) && !m.tree) { if (!m.burnT) m.burnT = 4.5; flam.push(mi); }
+}
+function chunkLoad(cx, cz) {
+  const key = cx + ',' + cz; if (W.chunks.has(key) || !W.ids.length) return null;
+  if (!nodeRoom(900) || !memRoom(1500)) return null;
+  const id = W.ids.pop(), ch = { id, cx, cz, key, nodes: [], mems: [], panels: [], riders: [], crowns: [], avoid: [], slp: false, nm: 0 };
+  W.chunks.set(key, ch); W.byId[id] = ch; W.dirty = true; W.loads++;
+  const sd = seed; CK = id; CKO = ch; seed = hash(W.kind + ':' + key) || 1;
+  W.gen(ch, cx, cz, cx * W.cs, cz * W.cs);
+  CK = 0; CKO = null; seed = sd;
+  let n = 0; for (const mi of ch.mems) { const m = mem[mi]; registerFlam(mi); if (m.orig) n++; }
+  cnt.total += n; cnt.alive += n; ch.nm = ch.mems.length;
+  for (const P of ch.panels) { P.ok = true; P.thr = 0.05; }
+  CKG[id] = 1.5;
+  return ch;
+}
+function chunkPurge(ch) {
+  const id = ch.id;
+  for (const mi of ch.mems) { const m = mem[mi]; if (m && m.ck === id && m.orig) { cnt.total--; if (m.alive) cnt.alive--; } }
+  pins = pins.filter(i => ckOf[i] !== id); lamps = lamps.filter(i => ckOf[i] !== id);
+  panels = panels.filter(P => P.ck !== id); crowns = crowns.filter(c => c.ck !== id); riders = riders.filter(R => R.ck !== id);
+  flam = flam.filter(mi => mem[mi].ck !== id); burning = burning.filter(mi => mem[mi].ck !== id);
+  tufts = tufts.filter(t => t[4] !== id); blooms = blooms.filter(b => b[3] !== id); water = water.filter(w => w.ck !== id); pathsL = pathsL.filter(p => p.ck !== id);
+  for (const i of ch.nodes) if (ckOf[i] === id) { alive[i] = 0; pinned[i] = 0; isRider[i] = 0; glow[i] = 0; adj[i] = []; ckOf[i] = 0; slp[i] = 0; riderOf[i] = -1; sz[i] = -1; freeN.push(i); }
+  for (const mi of ch.mems) if (mem[mi] && mem[mi].ck === id) { mem[mi] = DEADM; freeM.push(mi); }
+  riderOf.fill(-1); for (let k = 0; k < riders.length; k++) { const R = riders[k]; for (const n of R.ns) if (alive[n]) riderOf[n] = k; }
+  if (grab && !alive[grab.i]) grab = null; hoverInfo = null;
+  W.chunks.delete(ch.key); W.byId[id] = null; W.ids.push(id); CKG[id] = 0; W.dirty = true;
+}
+function wakeCk(id) { const ch = chunkOf(id); if (!ch) return; ch.hold = 5; if (ch.slp) chunkSleep(ch, false); }
+function wakeNear(x, z, r) { const cs = W.cs; for (const ch of W.chunks.values()) if (x + r > ch.cx * cs - cs / 2 && x - r < ch.cx * cs + cs / 2 && z + r > ch.cz * cs - cs / 2 && z - r < ch.cz * cs + cs / 2) wakeCk(ch.id); }
+function chunkSleep(ch, v) {
+  if (ch.slp === v) return; ch.slp = v; const f = v ? 1 : 0;
+  for (const i of ch.nodes) if (ckOf[i] === ch.id) { slp[i] = f; if (v) { vx[i] = vy[i] = vz[i] = 0; qx[i] = px[i]; qy[i] = py[i]; qz[i] = pz[i]; } }
+  for (const R of ch.riders) R.slp = v; for (const P of ch.panels) P.slp = v;
+  if (!v) CKG[ch.id] = Math.max(CKG[ch.id], 1.0);
+}
+function endGrace(ch) {
+  for (const P of ch.panels) if (P.glass && !P.broken) { let mx = 0; for (const mi of P.ms) { const m = mem[mi]; if (m.alive && m.kind <= BEAM) mx = Math.max(mx, Math.abs(m.st)); } P.thr = Math.max(0.009, 3 * mx); }
+}
+// ground rectangle that the screen sees, grown by pad. Rays that miss the ground are clamped to a box around the view target.
+function viewAABB(pad) {
+  const w = cam.w, h = cam.h, cs = W.cs, Rm = cs * 2.3; let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const [mx, my] of [[0, 0], [w, 0], [0, h], [w, h], [w / 2, 0], [w / 2, h], [0, h / 2], [w, h / 2]]) {
+    const r = rayAt(mx, my), t = r.d[1] < -0.04 ? -r.o[1] / r.d[1] : 1e6;
+    const gx = clamp(r.o[0] + r.d[0] * t, cam.tx - Rm, cam.tx + Rm), gz = clamp(r.o[2] + r.d[2] * t, cam.tz - Rm, cam.tz + Rm);
+    x0 = Math.min(x0, gx); x1 = Math.max(x1, gx); z0 = Math.min(z0, gz); z1 = Math.max(z1, gz);
+  }
+  return [x0 - pad, x1 + pad, z0 - pad, z1 + pad];
+}
+const cellHits = (ch, A) => { const cs = W.cs, x = ch.cx * cs, z = ch.cz * cs; return x + cs / 2 > A[0] && x - cs / 2 < A[1] && z + cs / 2 > A[2] && z - cs / 2 < A[3]; };
+function streamUpdate(instant, dt) {
+  if (!W.on) return;
+  const cs = W.cs; S.cx = cam.tx; S.cz = cam.tz;
+  for (const b of birds) { b.cx = cam.tx; b.cz = cam.tz; }
+  const A = viewAABB(cs * 0.42), A2 = viewAABB(cs * 1.25), A0 = viewAABB(cs * 0.08);
+  const want = []; const i0 = Math.floor((A[0] + cs / 2) / cs), i1 = Math.floor((A[1] + cs / 2) / cs), j0 = Math.floor((A[2] + cs / 2) / cs), j1 = Math.floor((A[3] + cs / 2) / cs);
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) want.push([Math.hypot(i * cs - cam.tx, j * cs - cam.tz), i, j]);
+  want.sort((a, b) => a[0] - b[0]); if (want.length > W.maxLoad) want.length = W.maxLoad;
+  let built = 0; const per = instant ? 999 : coarse ? 1 : 2;
+  for (const [, i, j] of want) if (built < per && !W.chunks.has(i + ',' + j) && chunkLoad(i, j)) built++;
+  let gone = 0; for (const ch of [...W.chunks.values()]) { if (!cellHits(ch, A2) && (instant || gone < 3)) { chunkPurge(ch); gone++; } }
+  if (W.chunks.size > W.maxLoad + 5) { const far = [...W.chunks.values()].filter(c => !cellHits(c, A)).sort((a, b) => Math.hypot(b.cx * cs - cam.tx, b.cz * cs - cam.tz) - Math.hypot(a.cx * cs - cam.tx, a.cz * cs - cam.tz)); for (let k = 0; k < far.length && W.chunks.size > W.maxLoad + 5 && k < 3; k++) chunkPurge(far[k]); }
+  const all = [...W.chunks.values()].sort((a, b) => Math.hypot(a.cx * cs - cam.tx, a.cz * cs - cam.tz) - Math.hypot(b.cx * cs - cam.tx, b.cz * cs - cam.tz));
+  for (const B of balls) if (!B.dead) wakeNear(B.x, B.z, 3); for (const T of tornadoes) wakeNear(T.x, T.z, T.r * 3 + 8);
+  let used = 0, awake = 0;
+  for (const ch of all) if (ch.hold > 0) { ch.hold -= dt || 0; used += ch.nm; }
+  for (const ch of all) {
+    const on = W.allAwake || ch.hold > 0 || (cellHits(ch, A0) && (used + ch.nm <= W.awakeCap || used === 0));
+    if (on) { if (!(ch.hold > 0)) used += ch.nm; awake++; }
+    chunkSleep(ch, !on);
+    if (CKG[ch.id] > 0 && dt) { CKG[ch.id] -= dt; if (CKG[ch.id] <= 0) { CKG[ch.id] = 0; endGrace(ch); } }
+  }
+  W.awake = awake; W.nAwake = used;
+  if (W.dirty) { W.dirty = false; S.avoid = []; for (const ch of W.chunks.values()) for (const r of ch.avoid) S.avoid.push(r); }
+}
+function streamStart(kind, o) {
+  W.on = true; W.kind = kind; W.cs = o.cs; W.gen = o.gen; W.maxLoad = coarse ? o.maxLoadM : o.maxLoad; W.awakeCap = coarse ? o.awakeM : o.awake; W.allAwake = true; W.frame = o.frame;
+  S.stream = true; S.cover = o.cover; S.fixSize = o.size; S.bnd = null; S.avoid = [];
+  chunkLoad(0, 0);
+}
+// the points the camera frames at the start: a ground rectangle around the origin and its height
+function streamFrame() {
+  const [hx, hz, hy] = W.frame, pts = []; for (const x of [-hx, hx]) for (const z of [-hz, hz]) { pts.push([x, 0, z]); pts.push([x, hy, z]); }
+  S.pts = pts; S.bb = { x0: -hx, x1: hx, y0: 0, y1: hy, z0: -hz, z1: hz }; S.cx = 0; S.cz = 0;
+}
+
+/* --- a log cabin: log beams and corner struts, braced by cables, with a gable roof --- */
+function cabin(cx, cz, ang, sc) {
+  const ca = Math.cos(ang), sa = Math.sin(ang), L = 3 * sc, Wd = 2.4 * sc, NL = 3, sh = 0.95 * sc;
+  const P = (u, v, y) => node(cx + u * ca - v * sa, y, cz + u * sa + v * ca);
+  const uv = [[-L, -Wd], [0, -Wd], [L, -Wd], [L, Wd], [0, Wd], [-L, Wd]], R = [], LG = ['#8A5A2B', '#6B4A2E'];
+  for (let l = 0; l <= NL; l++) R.push(uv.map(([u, v]) => P(u, v, l === 0 ? 0.02 : l * sh)));
+  for (let l = 0; l <= NL; l++) for (let i = 0; i < 6; i++) beam(R[l][i], R[l][(i + 1) % 6], { col: LG[l % 2], ts: 1.6 });
+  for (let l = 0; l < NL; l++) for (let i = 0; i < 6; i++) strut(R[l][i], R[l + 1][i], { col: '#5B3E24', ts: 1.5 });
+  for (let l = 0; l < NL; l++) for (let i = 0; i < 6; i++) { const j = (i + 1) % 6; cable(R[l][i], R[l + 1][j], { pre: 0.975, ts: 0.9 }); cable(R[l][j], R[l + 1][i], { pre: 0.975, ts: 0.9 }); }
+  const T = R[NL], hT = NL * sh, r0 = P(-L, 0, hT + 1.5 * sc), rm = P(0, 0, hT + 1.75 * sc), r1 = P(L, 0, hT + 1.5 * sc);
+  beam(r0, rm, { col: '#5B3E24', ts: 1.4 }); beam(rm, r1, { col: '#5B3E24', ts: 1.4 });
+  [[T[0], r0], [T[5], r0], [T[1], rm], [T[4], rm], [T[2], r1], [T[3], r1]].forEach(([a, b]) => beam(a, b, { col: '#6B4A2E', ts: 1.2 }));
+  cable(T[1], T[4], { pre: 0.985, ts: 0.8 });
+  panel([T[0], T[1], rm, r0], '#7A4B2A', 0.96); panel([T[1], T[2], r1, rm], '#6E4426', 0.96); panel([T[5], T[4], rm, r0], '#6E4426', 0.96); panel([T[4], T[3], r1, rm], '#7A4B2A', 0.96);
+  panel([T[0], T[5], r0], '#A9784A', 0.95); panel([T[2], T[3], r1], '#A9784A', 0.95);
+  for (let l = 0; l < NL; l++) for (let i = 0; i < 6; i++) {
+    const j = (i + 1) % 6, q = [R[l][i], R[l][j], R[l + 1][j], R[l + 1][i]];
+    if (i === 1 && l === 0) { decal(q, '#4A2E1A', [0.22, 0.78, 0, 0.82], 'door'); continue; }
+    if ((i === 4 || i === 0) && l === 1) { panel(q, '#BFE3F2', 0.36, { glass: true }); continue; }
+    panel(q, (l + i) % 2 ? '#B98450' : '#A9753F', 0.92);
+  }
+  const fu = L / 2, fv = -Wd - 1.5 * sc; return { door: [cx + fu * ca - fv * sa, cz + fu * sa + fv * ca], r: 4.1 * sc };
+}
+
+/* --- tent camp, chunk generator --- */
+const TCOL = ['#E8A33D', '#3BA0A5', '#D9553E', '#7FB069', '#B565A7', '#E5C546', '#5B8DEF', '#E27D60', '#85C7A6'];
+function genCamp(ch, cx, cz, ox, oz) {
+  const cs = W.cs, R = (a, b) => a + rr() * (b - a), pick = a => a[Math.floor(rr() * a.length)], home = cx === 0 && cz === 0, av = (x, z, r) => ch.avoid.push([x - r, x + r, z - r, z + r]);
+  const folk = (x, z, n) => { for (let k = 0; k < n; k++) person(x + R(-1.6, 1.6), 0, z + R(-1.6, 1.6), 1, pick(PCOL)); };
+  const around = (x, z, r, n) => { const a0 = R(0, TAU); for (let k = 0; k < n; k++) { const a = a0 + k * 2.4; person(x + Math.cos(a) * r, 0, z + Math.sin(a) * r, 1, pick(PCOL)); } };
+  const grove = (x, z, n) => { for (let k = 0; k < n; k++) { const a = R(0, TAU), d = R(0.4, 4.2); if (k % 3 === 2) tree(x + Math.cos(a) * d, z + Math.sin(a) * d, R(0.8, 1.2)); else tree(x + Math.cos(a) * d, z + Math.sin(a) * d, R(3.2, 5.6)); } };
+  const cab = (x, z, a, s) => { const c = cabin(x, z, a, s); av(x, z, c.r); person(c.door[0], 0, c.door[1], 1, pick(PCOL)); };
+  if (home) {
+    ridgeTent(-9, -2, 0.2, 1.0, '#E8A33D'); ridgeTent(9, 4, -0.5, 1.15, '#3BA0A5'); ridgeTent(0, -9, 0.05, 1.9, '#D9553E');
+    bellTent(-4, 6, 1.0, '#7FB069', 7); bellTent(5, -1, 1.15, '#B565A7', 8); bellTent(-12, 8, 0.9, '#E5C546', 6);
+    crates(-2.2, 1.2, 1, 1, 1, 1.1, '#7A5C3E'); lake(13, 13, 6.5, 4.2); pathway([[-18, -5], [-6, 1], [4, 5], [11, 10]], 2.2);
+    [[-6, 2], [-2, 4], [3, 7], [14, -2], [-8, -6], [-14, 2], [-1, -3], [10, -3], [-5, 10], [1, 0]].forEach(([x, z], i) => person(x, 0, z, 1, PCOL[i % 6]));
+    car(14, 0, -6, 1.1, '#C23B3B', null); barrel(11.6, -9.6); barrel(12.8, -9.2); barrel(-16.6, -4.6);
+    cab(-14.5, -10.5, 0.1, 1); cab(14.5, -13.5, -0.1, 1); cab(-14.5, 14.5, 0.15, 1);
+    [[-17, 3.5, 4.4], [17, 0, 4.9], [-16, -15, 4.2], [4, 15, 4.6], [-6, -15, 4.8], [17, 6, 1.0], [-3, 13, 1.1], [8, -13, 1.0], [-9, 14, 1.0], [2, -15.5, 1.1]].forEach(([x, z, h]) => tree(x, z, h));
+    av(-9, -2, 5.6); av(9, 4, 5.8); av(0, -9, 8); av(-4, 6, 3.4); av(5, -1, 3.4); av(-12, 8, 3); av(13, 13, 7);
+  } else {
+    // paths along cell boundaries so neighbouring chunks line up
+    const hp = (((cz % 2) + 2) % 2) === 0, vp = (((cx % 3) + 3) % 3) === 0;
+    if (hp) pathway([[ox - cs / 2 - 0.3, oz + 6], [ox + cs / 2 + 0.3, oz + 6]], 2.2);
+    if (vp) pathway([[ox - 6, oz - cs / 2 - 0.3], [ox - 6, oz + cs / 2 + 0.3]], 2.2);
+    let lakeDone = false;
+    for (let gi = -1; gi <= 1; gi++) for (let gj = -1; gj <= 1; gj++) {
+      const x = ox + gi * 12 + R(-2, 2), z = oz + gj * 12 + R(-2, 2), u = rr();
+      if (u < 0.28) { const sc = R(0.8, 1.15); ridgeTent(x, z, R(0, P3), sc, pick(TCOL)); av(x, z, 5.4 * sc); around(x, z, 6.2 * sc, rr() < 0.7 ? 1 : 2); if (rr() < 0.4) tree(x + R(-4, 4), z + (rr() < 0.5 ? 5.6 : -5.6), R(3.2, 5)); }
+      else if (u < 0.44) { const sc = R(0.85, 1.2); bellTent(x, z, sc, pick(TCOL), 6 + Math.floor(rr() * 3)); av(x, z, 3.2 * sc); around(x, z, 4.4 * sc, 1); if (rr() < 0.5) tree(x + R(-5, 5), z + R(4.4, 5.6), R(0.8, 1.2)); }
+      else if (u < 0.64) { cab(x, z, pick([0, 0.12, -0.15, P3 / 2, P3 / 2 + 0.1]), R(0.95, 1.12)); if (rr() < 0.6) tree(x + R(-5, 5), z + R(5, 5.8) * (rr() < 0.5 ? 1 : -1), R(3.4, 5.2)); }
+      else if (u < 0.78) grove(x, z, 4 + Math.floor(rr() * 3));
+      else if (u < 0.88) { car(x, 0, z, R(1, 1.15), pick(['#C23B3B', '#2F6DB5', '#D98A1C', '#3C9D6B']), null); barrel(x + 2.6, z + 1.2); if (rr() < 0.6) barrel(x + 3.4, z + 1.9); crates(x - 3, z - 1.5, 1, 1, 1, 1.1, '#7A5C3E'); folk(x, z + 3, 2); av(x, z, 3.5); }
+      else if (u < 0.93 && !lakeDone) { lakeDone = true; lake(x, z, R(4.5, 6), R(3, 4)); av(x, z, 6.4); }
+      else { grove(x, z, 2); folk(x, z, 2); }
+    }
+  }
+  const nt = coarse ? 14 : 26; for (let i = 0; i < nt; i++) { const x = ox + R(-0.5, 0.5) * cs, z = oz + R(-0.5, 0.5) * cs; if (inWater(x, z, 0.5) || onPath(x, z, 0.4)) continue; tufts.push([x, z, 0.25 + rr() * 0.4, rr() * 6, CK]); }
+  for (let i = 0; i < (coarse ? 4 : 8); i++) { const x = ox + R(-0.5, 0.5) * cs, z = oz + R(-0.5, 0.5) * cs; if (inWater(x, z, 0.5) || onPath(x, z, 0.4)) continue; blooms.push([x, z, Math.floor(rr() * 4), CK]); }
+}
+function buildTent() {
+  S.m = 2; S.k = 1; S.u = 1; S.ks = 0.5;
+  streamStart('camp', { cs: 36, gen: genCamp, maxLoad: 12, maxLoadM: 9, awake: 1900, awakeM: 1200, size: 15, cover: 0.55, frame: [15, 15, 6] });
+  for (let i = 0; i < 6; i++) birds.push({ a: rr() * TAU, r: 24 + rr() * 8, y: 12 + rr() * 8, w: (rr() < 0.5 ? -1 : 1) * (0.12 + rr() * 0.1), ph: rr() * 6, cx: 0, cz: 0, sc: 0, run: 0 });
+  S.env = { sky: 'day', ground: 'grass' }; S.view = [0.5, 0.4]; S.name = 'Tent camp';
+}
+
+/* --- city, chunk generator: a grid of streets with a block of lots in each cell --- */
+const BCOL = ['#7E8BA0', '#A58E6B', '#8FA08A', '#8B7FA3', '#7B93A8', '#A0836B', '#6F8F8A'], FCOL = ['#CFDDEE', '#E5D3B0', '#DCE6D6', '#DDD6EA', '#D6E3EA'], RCOL = ['#4F5663', '#7A5C3E', '#5A6B58', '#5E5570', '#6B5560'];
+function genCity(ch, cx, cz, ox, oz) {
+  const R = (a, b) => a + rr() * (b - a), pick = a => a[Math.floor(rr() * a.length)], home = cx === 0 && cz === 0, dist0 = Math.hypot(cx, cz), cs = W.cs, h = cs / 2 + 0.3;
+  const RD = '#5C6573', SW = '#D9D4C7';
+  pathway([[ox - h, oz], [ox + h, oz]], 6, RD); pathway([[ox, oz - h], [ox, oz + h]], 6, RD);
+  pathway([[ox - h, oz], [ox - 3.6, oz]], 6, RD, true); pathway([[ox + 3.6, oz], [ox + h, oz]], 6, RD, true); pathway([[ox, oz - h], [ox, oz - 3.6]], 6, RD, true); pathway([[ox, oz + 3.6], [ox, oz + h]], 6, RD, true);
+  for (const s of [-1, 1]) for (const t of [-1, 1]) { pathway([[ox + t * 3.2, oz + s * 4.4], [ox + t * h, oz + s * 4.4]], 2.4, SW); pathway([[ox + s * 4.4, oz + t * 3.2], [ox + s * 4.4, oz + t * h]], 2.4, SW); }
+  const av = (x0, x1, z0, z1) => ch.avoid.push([x0 - 1, x1 + 1, z0 - 1, z1 + 1]);
+  const building = (lx, lz, sz_, ns, nx, nz, tower) => {
+    const bw = R(3.7, 4.2), bd = R(4.6, 5.9), w = nx * bw, d = nz * bd, x0 = lx - w / 2, z0 = lz - d / 2, north = sz_ > 0, F = north ? 'lrb' : 'flr', fr = north ? 'f' : 'b', bk = north ? 'b' : 'f', ci = BCOL.length;
+    const col = pick(BCOL), G = frame({ x0, z0, nx, nz, bw, bd, y0: 0, ns, sh: 3.2, m: 5.5, col, ts: 1.05, pre: 0.98, faces: F, floorCol: pick(FCOL) });
+    const di = Math.floor(rr() * nx), jj = north ? 0 : nz;
+    glaze(G, fr, 0, ns, (i, l) => i === di && l === 0);
+    decal([G[0][di][jj], G[0][di + 1][jj], G[1][di + 1][jj], G[1][di][jj]], pick(['#7A4B2A', '#3F6E5B', '#B5533C']), [0.28, 0.72, 0, 0.74], 'door');
+    wallPanels(G, bk, 0, ns, '#9AA7BB', 0.86); roofOf(G, ns, pick(RCOL));
+    if (ns >= 6) mast(G[ns][0][jj], G[ns][1][jj], G[ns][1][north ? 1 : nz - 1], 4.2, pick(['#C23B3B', '#D9553E', '#2F6DB5']));
+    av(x0, x0 + w, z0, z0 + d); return G;
+  };
+  const folk = (x, z, n) => { for (let k = 0; k < n; k++) person(x + R(-1.5, 1.5), 0, z + R(-1.5, 1.5), 1, pick(PCOL)); };
+  for (const sx_ of [-1, 1]) for (const sz_ of [-1, 1]) {
+    const lx = ox + sx_ * 12.8, lz = oz + sz_ * 12.8, u = rr();
+    if (home && sx_ === 1 && sz_ === 1) continue;       // the glass tower with the elevator goes here
+    if (u < 0.66) {
+      const maxNs = dist0 < 1.5 ? 8 : dist0 < 3 ? 6 : 4, wt = rr(); let ns = Math.max(1, Math.min(maxNs, 1 + Math.floor(Math.pow(wt, 1.35) * maxNs + (dist0 < 1.5 ? 1 : 0)))), nx = 1 + Math.floor(rr() * 3), nz = 1 + Math.floor(rr() * 2);
+      if (ns >= 4) { nz = 1; if (ns >= 6) nx = Math.min(nx, 2); } else if (ns === 3) nz = 1 + (rr() < 0.3 ? 1 : 0);
+      building(lx, lz, sz_, ns, nx, nz);
+      folk(lx, oz + sz_ * 7.4, 1);
+    } else if (u < 0.8) {
+      grovePark(lx, lz); folk(lx, lz, 2);
+    } else if (u < 0.9) {
+      building(lx, lz, sz_, 1 + Math.floor(rr() * 2), 3, 2);
+    } else {
+      car(lx - 2.5, 0, lz, 1.05, pick(['#6B7C93', '#3C9D6B', '#C23B3B']), null, true); car(lx + 2.5, 0, lz + 2, 1.0, pick(['#D98A1C', '#2F6DB5']), null); barrel(lx + 4.5, lz - 3); barrel(lx + 5.3, lz - 2.4); crates(lx - 4.5, lz + 3.2, 1, 1, 1, 1.1, '#7A5C3E'); folk(lx, lz - 3, 2); av(lx - 6, lx + 6, lz - 5, lz + 5);
+    }
+  }
+  function grovePark(lx, lz) { for (let k = 0; k < 4; k++) tree(lx + R(-5, 5), lz + R(-5, 5), k % 2 ? R(0.8, 1.2) : R(3.2, 5.4)); if (rr() < 0.55) { lake(lx + R(-1.5, 1.5), lz + R(-1.5, 1.5), R(3, 3.8), R(2.2, 3)); } }
+  // lamps and people on the pavements, cars on the road
+  lamppost(ox + 9.5, oz + 3.6, 5.6); lamppost(ox - 9.5, oz - 3.6, 5.6); lamppost(ox + 3.6, oz - 11, 5.6);
+  for (let k = 0; k < 4; k++) { const s = rr() < 0.5 ? -1 : 1, along = rr() < 0.7; if (along) person(ox + R(-18, 18), 0, oz + s * 4.4 + R(-0.4, 0.4), 1, pick(PCOL)); else person(ox + s * 4.4 + R(-0.4, 0.4), 0, oz + R(-18, 18), 1, pick(PCOL)); }
+  if (rr() < 0.85) car(ox + R(-16, -4), 0, oz - 1.5, R(0.95, 1.1), pick(['#2F6DB5', '#C23B3B', '#D98A1C', '#3C9D6B']), { ux: 1, x0: ox - 17.5, x1: ox + 17.5, zalt: oz + 1.5 });
+  if (rr() < 0.85) car(ox + R(4, 16), 0, oz + 1.5, R(0.95, 1.1), pick(['#C23B3B', '#6B7C93', '#2F6DB5']), { ux: -1, x0: ox - 17.5, x1: ox + 17.5, zalt: oz - 1.5 });
+  if (home) {
+    // the glass tower with a working elevator, as in the first city
+    const OX = 15.6; E.ox = OX;
+    const T = frame({ x0: -10 + OX, z0: 7, nx: 3, nz: 1, bw: 4, bd: 7, y0: 0, ns: 6, sh: 3.2, m: 6, col: '#7E8BA0', ts: 1.1, pre: 0.98, faces: 'lrb', floorCol: '#CFDDEE', skip: (i, j, l) => i === 0 && j === 0 });
+    glaze(T, 'f', 0, 6, (i, l) => i === 1 && l === 0);
+    decal([T[0][1][0], T[0][2][0], T[1][2][0], T[1][1][0]], '#7A4B2A', [0.28, 0.72, 0, 0.74], 'door');
+    decal([T[1][1][0], T[1][2][0], T[2][2][0], T[2][1][0]], '#B5533C', [0.08, 0.92, 0.02, 0.2], 'awning');
+    wallPanels(T, 'b', 0, 6, '#9AA7BB', 0.85); roofOf(T, 6, '#4F5663'); mast(T[6][1][0], T[6][2][0], T[6][2][1], 4.2, '#C23B3B');
+    const cx0 = -9.5 + OX, cx1 = -6.2 + OX, cz0 = 9.2, cz1 = 11.6, cab_ = [];
+    for (const y of [0.04, 2.6]) for (const [x, z] of [[cx0, cz0], [cx1, cz0], [cx1, cz1], [cx0, cz1]]) { const n = node(x, y, z, 5, true); elevN[n] = 1; cab_.push(n); }
+    const lo = cab_.slice(0, 4), hi = cab_.slice(4);
+    for (let i = 0; i < 4; i++) { const j = (i + 1) % 4; const m1 = beam(lo[i], lo[j], { col: '#5E6B80', ts: 0.8 }), m2 = beam(hi[i], hi[j], { col: '#5E6B80', ts: 0.8 }), m3 = strut(lo[i], hi[i], { ts: 0.6 }); [m1, m2, m3].forEach(m => { if (m >= 0) mem[m].orig = false; }); }
+    panel(lo, '#8E9BB0', 0.95, { floor: true }); panel(hi, '#8E9BB0', 0.9);
+    panel([lo[0], lo[1], hi[1], hi[0]], '#BFE3F2', 0.35, { glass: true }); panel([lo[2], lo[3], hi[3], hi[2]], '#BFE3F2', 0.35, { glass: true }); panel([lo[3], lo[0], hi[0], hi[3]], '#BFE3F2', 0.35, { glass: true });
+    E.on = true; E.x = (cx0 + cx1) / 2 + 0.2; E.z = (cz0 + cz1) / 2; E.lv = [0, 3.16, 6.36, 9.56, 12.76, 15.96]; E.k = 0; E.dir = 1; E.wait = 3; E.y = 0;
+    [[-4.2, 0, 8.2], [-4.2, 3.2, 10.5], [-3.6, 9.6, 10.2], [-4, 12.8, 9.4]].forEach(([x, y, z], i) => { const Rd = person(x + OX, y + (y ? 0.04 : 0), z, 1, PCOL[(i + 2) % 6]); Rd.el = { s: y ? 'idle' : 'wait', here: Math.round(y / 3.2), dest: 0, t: rnd(2, 6) }; Rd.wr = 1.4; Rd.lim = null; });
+    av(5.6, 17.6, 7, 14); lake(-12.8, -12.8, 4.6, 3.1);
+  }
+  const nt = coarse ? 8 : 16; for (let i = 0; i < nt; i++) { const x = ox + R(-0.5, 0.5) * cs, z = oz + R(-0.5, 0.5) * cs; if (inWater(x, z, 0.5) || onPath(x, z, 1.4)) continue; tufts.push([x, z, 0.25 + rr() * 0.4, rr() * 6, CK]); }
+}
+function buildCity() {
+  S.m = 6; S.k = 4; S.u = 1; S.ks = 0.5;
+  streamStart('city', { cs: 40, gen: genCity, maxLoad: 12, maxLoadM: 8, awake: 1900, awakeM: 1200, size: 18, cover: 0, frame: [21, 21, 13] });
+  for (let i = 0; i < 5; i++) birds.push({ a: rr() * TAU, r: 26 + rr() * 8, y: 14 + rr() * 8, w: (rr() < 0.5 ? -1 : 1) * (0.12 + rr() * 0.1), ph: rr() * 6, cx: 0, cz: 0, sc: 0, run: 0 });
+  S.env = { sky: 'day', ground: 'grass' }; S.view = [2.4, 0.5]; S.name = 'City street'; S.tool = 'pluck';
+}
 const SCENES = [
   { id: 'tent', name: 'Tent camp', build: buildTent },
   { id: 'tower', name: 'Tensegrity tower', build: buildTower },
@@ -758,6 +950,7 @@ function windVel(i) { return 0; }
 
 function killMem(mi, how) {
   const m = mem[mi]; if (!m.alive) return;
+  if (W.on && slp[m.a]) wakeCk(m.ck);
   m.alive = false; m.burn = -2;
   if (how !== 'burn' && how !== 'x' && !grace) sfx(how === 'cut' || m.kind >= CABLE ? 'snap' : 'crack', 0.6);
   if (m.orig) {
@@ -773,27 +966,36 @@ function sliceMem(mi, t, dirx, diry, dirz) {
   const m = mem[mi]; if (!m.alive || m.kind === LINK) return;
   const a = m.a, b = m.b, ex = px[a] + (px[b] - px[a]) * t, ey = py[a] + (py[b] - py[a]) * t, ez = pz[a] + (pz[b] - pz[a]) * t;
   killMem(mi, 'cut');
-  if (nN + 2 < NMAX && mem.length + 2 < MMAX) {
+  if (nodeRoom(3) && memRoom(3)) {
+    const ck0 = CK, cko0 = CKO; CK = m.ck || 0; CKO = chunkOf(CK);
     const mm = 0.5 / ((wI[a] || 0.4) + (wI[b] || 0.4)) + 0.1, n1 = node(ex, ey, ez, mm), n2 = node(ex, ey, ez, mm), s = S.size * 0.01;
     for (const n of [n1, n2]) { vx[n] = lerp(vx[a], vx[b], t); vy[n] = lerp(vy[a], vy[b], t); vz[n] = lerp(vz[a], vz[b], t); }
     vx[n1] += dirx * s; vy[n1] += diry * s; vz[n1] += dirz * s; vx[n2] -= dirx * s; vy[n2] -= diry * s; vz[n2] -= dirz * s;
     const ea = m.rest / m.al;
     [[a, n1, t], [n2, b, 1 - t]].forEach(([p, q, f]) => {
-      const L = dist(p, q), o = { kind: m.kind, a: p, b: q, L0: L, rest: m.rest * f, al: m.rest * f / ea, brk: m.brk * 1.6, alive: true, burn: -1, dur: 0, lam: 0, T: 0, st: 0, col: m.col, th: m.th, orig: false, stub: true, hid: false };
-      mem.push(o); const id = mem.length - 1; adj[p].push(id); adj[q].push(id); deg[p]++; deg[q]++;
+      const L = dist(p, q), o = { kind: m.kind, a: p, b: q, L0: L, rest: m.rest * f, al: m.rest * f / ea, brk: m.brk * 1.6, alive: true, burn: -1, dur: 0, lam: 0, T: 0, st: 0, col: m.col, th: m.th, orig: false, stub: true, hid: false, ck: CK };
+      const id = putMem(o); if (CKO) CKO.mems.push(id); adj[p].push(id); adj[q].push(id); deg[p]++; deg[q]++;
     });
+    CK = ck0; CKO = cko0;
   }
   for (let q = 0; q < 5; q++) emit(1, ex, ey, ez, rnd(-1, 1) * S.size * 0.1, rnd(0, 1) * S.size * 0.12, rnd(-1, 1) * S.size * 0.1, rnd(0.25, 0.5), 0.5);
 }
 function ignite(mi) {
   const m = mem[mi]; if (!m.alive || m.burn >= 0 || m.kind === LINK) return false;
+  if (W.on && slp[m.a]) wakeCk(m.ck);
   m.burn = 0; m.dur = (m.burnT || KD[m.kind].burn) * rnd(0.7, 1.25); burning.push(mi); sfx('ignite'); return true;
 }
 
 /* ---- the step ---- */
+// lists of what is awake this frame, built once per frame so the substeps never touch sleeping members, nodes or panels
+const actM = new Int32Array(MMAX), actN = new Int32Array(NMAX); let nActM = 0, nActN = 0; const floorP = [], wallP = [];
+function buildActive() {
+  nActM = 0; for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (m.alive && !slp[m.a]) actM[nActM++] = mi; }
+  nActN = 0; for (let i = 0; i < nN; i++) if (alive[i] && !pinned[i] && !slp[i]) actN[nActN++] = i;
+}
 function anchorStep() {
   for (let k = 0; k < pins.length; k++) {
-    const i = pins[k]; if (!alive[i]) continue;
+    const i = pins[k]; if (!alive[i] || slp[i]) continue;
     let x = ax0[i] + Q.ox, y = ay0[i] + (Q.kind === 'up' ? Q.oy : 0) + (elevN[i] ? E.y : 0), z = az0[i] + Q.oz;
     if (Q.kind === 'roll') y += Q.amp * 0.8 * Q.env * Math.sin(Q.k * ax0[i] - Q.w * Q.t);
     if (rift.gap > 0) x += (ax0[i] < 0 ? -1 : 1) * rift.gap / 2;
@@ -805,8 +1007,9 @@ function substep(h) {
   const g = grav, dmp = 1 - (grace ? 5 : 0.28) * h, ih = 1 / h, groundMove = Q.kind === 'side' ? Q.ox - (Q.px || 0) : 0, groundMoveZ = Q.kind === 'side' ? Q.oz - (Q.pz || 0) : 0;
   const riftDrag = rift.gap > 0 && rift.gap < rift.max && Q.kind === 'rift' ? rift.speed * h * Math.min(1, Q.t / 0.8) / 2 : 0;
   const gs = gust ? gust.env * gust.peak : 0;
-  for (let i = 0; i < nN; i++) {
-    if (!alive[i] || pinned[i]) continue;
+  const XL = W.on ? 1e9 : 400 + S.size * 8;
+  for (let kk = 0; kk < nActN; kk++) {
+    const i = actN[kk]; if (!alive[i]) continue;
     qx[i] = px[i]; qy[i] = py[i]; qz[i] = pz[i];
     let ay = -g + lift[i], ax = 0, az = 0;
     if (grab && grab.i === i) {
@@ -828,10 +1031,10 @@ function substep(h) {
     px[i] += vx[i] * h; py[i] += vy[i] * h; pz[i] += vz[i] * h;
   }
   anchorStep();
-  for (let mi = 0; mi < mem.length; mi++) mem[mi].lam = 0;
+  for (let k = 0; k < nActM; k++) mem[actM[k]].lam = 0;
   for (let it = 0; it < 2; it++) {
-    for (let mi = 0; mi < mem.length; mi++) {
-      const m = mem[mi]; if (!m.alive) continue;
+    for (let k = 0; k < nActM; k++) {
+      const m = mem[actM[k]]; if (!m.alive) continue;
       const a = m.a, b = m.b;
       let dx = px[a] - px[b], dy = py[a] - py[b], dz = pz[a] - pz[b];
       const len = Math.sqrt(dx * dx + dy * dy + dz * dz); if (len < 1e-9) continue;
@@ -851,8 +1054,8 @@ function substep(h) {
   if (riders.length) { collidePanels(h); collideRiders(h); }
   if (balls.length) collideBalls(h);
   // ground
-  for (let i = 0; i < nN; i++) {
-    if (!alive[i] || pinned[i]) { continue; }
+  for (let kk = 0; kk < nActN; kk++) {
+    const i = actN[kk]; if (!alive[i]) continue;
     const r = nr[i]; let gy = groundY(px[i], r), c = 0;
     if (rift.gap > 0) {
       const hg = rift.gap / 2 - 0.35 * r, x = px[i];
@@ -864,10 +1067,10 @@ function substep(h) {
   }
   // velocity from positions, friction, clamps and sanity
   const damp = 1;
-  for (let i = 0; i < nN; i++) {
-    if (!alive[i] || pinned[i]) continue;
+  for (let kk = 0; kk < nActN; kk++) {
+    const i = actN[kk]; if (!alive[i]) continue;
     let x = px[i], y = py[i], z = pz[i];
-    if (x !== x || y !== y || z !== z || y < -S.pit - 6 || y > 900 + S.size * 8 || Math.abs(x) > 400 + S.size * 8 || Math.abs(z) > 400 + S.size * 8) { killNode(i); continue; }
+    if (x !== x || y !== y || z !== z || y < -S.pit - 6 || y > 900 + S.size * 8 || Math.abs(x) > XL || Math.abs(z) > XL) { killNode(i); continue; }
     vx[i] = (x - qx[i]) * ih; vy[i] = (y - qy[i]) * ih; vz[i] = (z - qz[i]) * ih;
     if (cont[i]) {
       if (chx[i] !== 0 || chz[i] !== 0) { const hx = chx[i], hz = chz[i], vf = vx[i] * hx + vz[i] * hz, lx = vx[i] - vf * hx, lz = vz[i] - vf * hz; vx[i] = vf * 0.9994 * hx + lx * 0.996; vz[i] = vf * 0.9994 * hz + lz * 0.996; }
@@ -877,8 +1080,8 @@ function substep(h) {
   dampMembers(h);
 }
 function dampMembers(h) {
-  for (let mi = 0; mi < mem.length; mi++) {
-    const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
+  for (let kk = 0; kk < nActM; kk++) {
+    const m = mem[actM[kk]]; if (!m.alive || m.kind === LINK) continue;
     const a = m.a, b = m.b, ws = wI[a] + wI[b]; if (ws === 0) continue;
     let dx = px[a] - px[b], dy = py[a] - py[b], dz = pz[a] - pz[b]; const l = Math.sqrt(dx * dx + dy * dy + dz * dz); if (l < 1e-9) continue; dx /= l; dy /= l; dz /= l;
     const u = (vx[a] - vx[b]) * dx + (vy[a] - vy[b]) * dy + (vz[a] - vz[b]) * dz;
@@ -888,13 +1091,13 @@ function dampMembers(h) {
 }
 function collidePanels(h) {
   for (let ri = 0; ri < riders.length; ri++) {
-    const R = riders[ri]; if (R.dead) continue;
+    const R = riders[ri]; if (R.dead || R.slp) continue;
     const ns = R.ns;
     for (let k = 0; k < ns.length; k++) {
       const i = ns[k]; if (!alive[i]) continue;
       const x = px[i], z = pz[i], r = nr[i];
-      for (let pi = 0; pi < panels.length; pi++) {
-        const P = panels[pi]; if (!P.floor || !P.ok) continue;
+      for (let pi = 0; pi < floorP.length; pi++) {
+        const P = floorP[pi]; if (!P.ok) continue;
         const n = P.n, a = n[0], c = n[2];
         const cx = (px[a] + px[c]) * 0.5, cz = (pz[a] + pz[c]) * 0.5, rad = Math.hypot(px[a] - px[c], pz[a] - pz[c]) * 0.55 + 0.1;
         if (Math.abs(x - cx) > rad || Math.abs(z - cz) > rad) continue;
@@ -930,8 +1133,8 @@ function collideRiders(h) {
       px[i] += dx * k * wI[i]; py[i] += dy * k * wI[i]; pz[i] += dz * k * wI[i]; px[j] -= dx * k * wI[j]; py[j] -= dy * k * wI[j]; pz[j] -= dz * k * wI[j];
     }
   }
-  for (let pi = 0; pi < panels.length; pi++) {
-    const P = panels[pi]; if (P.floor || P.deco || !P.ok) continue;
+  for (let pi = 0; pi < wallP.length; pi++) {
+    const P = wallP[pi]; if (!P.ok) continue;
     const n = P.n, A = n[0], c2 = n[2 % n.length], cx = (px[A] + px[c2]) * 0.5, cy = (py[A] + py[c2]) * 0.5, cz = (pz[A] + pz[c2]) * 0.5, rad = Math.hypot(px[A] - px[c2], py[A] - py[c2], pz[A] - pz[c2]) * 0.6 + 0.2;
     for (let a = 0; a < nRN; a++) {
       const i = RN[a]; if (!alive[i]) continue; const r = nr[i];
@@ -971,7 +1174,7 @@ function collideBalls(h) {
     if (B.rk && pc < PMAX - 6 && Math.random() < 0.8) { emit(3, B.x, B.y, B.z, rnd(-1, 1), rnd(0, 1), rnd(-1, 1), 0.7, 1.1); emit(2, B.x, B.y, B.z, rnd(-1, 1), rnd(-1, 1), rnd(-1, 1), 0.25, 1.0); }
     if (!B.fire && glassNear(B.x, B.y, B.z, r, B.vx * 0.05, B.vy * 0.05, B.vz * 0.05)) { B.vx *= 0.9; B.vy *= 0.9; B.vz *= 0.9; }
     for (let mi = 0; mi < mem.length; mi++) {
-      const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
+      const m = mem[mi]; if (!m.alive || m.kind === LINK || slp[m.a]) continue;
       const a = m.a, b = m.b, ex = px[b] - px[a], ey = py[b] - py[a], ez = pz[b] - pz[a], L2 = ex * ex + ey * ey + ez * ez + 1e-9;
       let t = ((B.x - px[a]) * ex + (B.y - py[a]) * ey + (B.z - pz[a]) * ez) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
       const qx_ = px[a] + ex * t, qy_ = py[a] + ey * t, qz_ = pz[a] + ez * t, dx = qx_ - B.x, dy = qy_ - B.y, dz = qz_ - B.z, d = Math.hypot(dx, dy, dz);
@@ -987,7 +1190,7 @@ function collideBalls(h) {
       px[b] += wI[b] * t * dl * nx; py[b] += wI[b] * t * dl * ny; pz[b] += wI[b] * t * dl * nz;
     }
     for (let i = 0, n0 = nN; i < n0; i++) {
-      if (!alive[i] || pinned[i] || !isRider[i]) continue;
+      if (!alive[i] || pinned[i] || !isRider[i] || slp[i]) continue;
       const dx = px[i] - B.x, dy = py[i] - B.y, dz = pz[i] - B.z, d = Math.hypot(dx, dy, dz), rr = r + nr[i];
       if (d < rr && d > 1e-6) {
         const k = (rr - d) / d; px[i] += dx * k; py[i] += dy * k; pz[i] += dz * k;
@@ -1014,13 +1217,14 @@ function steerRocket(B, h) {
 }
 function boom(B, h) {
   B.dead = true; boomT = 2.5;
+  if (W.on) wakeNear(B.x, B.z, (B.R || 0.3 * S.size) * 1.3);
   const R = B.R || 0.3 * S.size, sp = B.sp || Math.min(VMAX, 1.4 * S.size);
   for (let i = 0; i < nN; i++) {
-    if (!alive[i] || pinned[i]) continue;
+    if (!alive[i] || pinned[i] || slp[i]) continue;
     const dx = px[i] - B.x, dy = py[i] - B.y, dz = pz[i] - B.z, d = Math.hypot(dx, dy, dz);
     if (d < R && d > 1e-6) { const k = (1 - d / R) ** 1.5 * sp / d; vx[i] += dx * k; vy[i] += (dy + 0.4 * d) * k; vz[i] += dz * k; if (isRider[i]) { qx[i] = px[i] - vx[i] * h; qy[i] = py[i] - vy[i] * h; qz[i] = pz[i] - vz[i] * h; } else qx[i] = px[i]; }
   }
-  for (const Rd of riders.slice()) { if (Rd.dead || Rd.t === 'h') continue; const i = Rd.n, d = Math.hypot(px[i] - B.x, py[i] - B.y, pz[i] - B.z); if (Rd.t === 'p' && d < R * 0.8) knock(Rd); else if (Rd.t === 'c' && d < R * 0.3) splitCar(Rd, 0, 0, 0); else if (Rd.t === 'b' && d < R * 1.1 && !Rd.go) Rd.hit = true; }
+  for (const Rd of riders.slice()) { if (Rd.dead || Rd.t === 'h' || Rd.slp) continue; const i = Rd.n, d = Math.hypot(px[i] - B.x, py[i] - B.y, pz[i] - B.z); if (Rd.t === 'p' && d < R * 0.8) knock(Rd); else if (Rd.t === 'c' && d < R * 0.3) splitCar(Rd, 0, 0, 0); else if (Rd.t === 'b' && d < R * 1.1 && !Rd.go) Rd.hit = true; }
   glassNear(B.x, B.y, B.z, R * 0.85, 0, 2, 0);
   for (let mi = 0; mi < mem.length; mi++) {
     const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
@@ -1087,7 +1291,7 @@ function fireSpread(dt) {
 }
 function igniteAll() {
   inferno = 4;
-  for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (ignite(mi)) { m.dur *= rnd(0.45, 1.0); m.burn = -rnd(0, 1.3) * 0; } }
+  for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (W.on && slp[m.a]) continue; if (ignite(mi)) { m.dur *= rnd(0.45, 1.0); m.burn = -rnd(0, 1.3) * 0; } }
 }
 function burnAt(mi) { return ignite(mi); }
 
@@ -1108,7 +1312,7 @@ function throwBall(o, d, fire) {
 
 function refreshRiders() {
   nRN = 0; upList.length = 0;
-  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; for (let k = 0; k < R.ns.length; k++) if (alive[R.ns[k]]) RN[nRN++] = R.ns[k]; if (R.t === 'p' && R.st) upList.push(R); }
+  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead || R.slp) continue; for (let k = 0; k < R.ns.length; k++) if (alive[R.ns[k]]) RN[nRN++] = R.ns[k]; if (R.t === 'p' && R.st) upList.push(R); }
 }
 function syncRiders() { for (const R of riders) if (R.t === 'p') { R.lx = px[R.n]; R.ly = py[R.n]; R.lz = pz[R.n]; R.air = 0; } }
 // fast members (falling struts and beams) hit riders: the rider is carried along and people are knocked over
@@ -1530,7 +1734,7 @@ function aiStep(R, dt, spd) {
 function ridersStep(dt) {
   const quakeOn = Q.kind && Q.kind !== 'rift' && Q.env > 0.3, gs = gust ? gust.env * gust.peak : 0;
   for (let ri = 0; ri < riders.length; ri++) {
-    const R = riders[ri]; if (R.dead) continue;
+    const R = riders[ri]; if (R.dead || R.slp) continue;
     let ok = true; for (let k = 0; k < R.ns.length; k++) if (!alive[R.ns[k]]) ok = false;
     if (!ok) { R.dead = true; continue; }
     if (R.t === 'p') {
@@ -1560,7 +1764,7 @@ function ridersStep(dt) {
         const v0 = 3.2 * Math.sqrt(R.s);
         for (const n of [A, B]) { vx[n] += (R.ux * v0 - vx[n]) * 0.25; vz[n] += (R.z0 - pz[n]) * 6 * dt; }
         const x = (px[A] + px[B]) / 2;
-        if ((R.ux > 0 && x > d.lim) || (R.ux < 0 && x < -d.lim)) {
+        if ((R.ux > 0 && x > (d.x1 !== undefined ? d.x1 : d.lim)) || (R.ux < 0 && x < (d.x0 !== undefined ? d.x0 : -d.lim))) {
           R.ux = -R.ux; const z = d.zalt; d.zalt = R.z0; R.z0 = z;
           for (const n of R.ns) { pz[n] = qz[n] = z; vx[n] *= 0.2; }
         }
@@ -1579,7 +1783,7 @@ function ridersStep(dt) {
 function waterStep(dt) {
   if (!water.length) return;
   for (let i = 0; i < nN; i++) {
-    if (!alive[i] || pinned[i] || py[i] > 1.2) continue; const w = inWater(px[i], pz[i]); if (!w) continue;
+    if (!alive[i] || pinned[i] || slp[i] || py[i] > 1.2) continue; const w = inWater(px[i], pz[i]); if (!w) continue;
     const k = 1 - Math.min(0.5, 3.2 * dt); if (vy[i] < -3.5 && py[i] < nr[i] + 0.4 && !isRider[i]) { sfx('splash', 0.5); for (let q = 0; q < 4; q++) emit(3, px[i], 0.2, pz[i], rnd(-1, 1) * 2, rnd(1, 4), rnd(-1, 1) * 2, 0.6, 0.8); }
     vx[i] *= k; vz[i] *= k; vy[i] *= 1 - Math.min(0.2, 1.5 * dt);
   }
@@ -1595,18 +1799,21 @@ function stepFrame() {
   const dt = (1 / 60) * timeScale, sub = FR.sub, h = dt / sub;
   for (let i = 0; i < nN; i++) cont[i] = 0;
   refreshRiders(); threats(); boomT = Math.max(0, boomT - dt); elevStep(dt);
-  for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; let ok = !P.broken; for (let k = 0; k < P.ms.length; k++) if (!mem[P.ms[k]].alive) { ok = false; break; } if (ok) for (let k = 0; k < P.n.length; k++) if (!alive[P.n[k]]) { ok = false; break; } P.ok = ok; }
+  floorP.length = 0; wallP.length = 0;
+  for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; let ok = !P.broken; for (let k = 0; k < P.ms.length; k++) if (!mem[P.ms[k]].alive) { ok = false; break; } if (ok) for (let k = 0; k < P.n.length; k++) if (!alive[P.n[k]]) { ok = false; break; } P.ok = ok; if (ok && !P.slp) { if (P.floor) floorP.push(P); else if (!P.deco) wallP.push(P); } }
+  buildActive();
   for (let s = 0; s < sub; s++) { substep(h); simT += h; }
   // tension, strain and breaking
   let peak = 0;
-  for (let mi = 0; mi < mem.length; mi++) {
-    const m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
+  for (let kk = 0; kk < nActM; kk++) {
+    const mi = actM[kk], m = mem[mi]; if (!m.alive || m.kind === LINK) continue;
     const len = Math.hypot(px[m.a] - px[m.b], py[m.a] - py[m.b], pz[m.a] - pz[m.b]), st = (len - m.rest) / m.rest;
     m.st = st;
-    if (m.kind >= CABLE) { m.T = Math.max(0, -m.lam / (h * h)); if (m.T > peak) peak = m.T; if (!grace && st > m.brk) killMem(mi, 'snap'); }
-    else if (!grace && Math.abs(st) > m.brk) killMem(mi, 'snap');
+    const gr_ = grace || (m.ck && CKG[m.ck] > 0);
+    if (m.kind >= CABLE) { m.T = Math.max(0, -m.lam / (h * h)); if (m.T > peak) peak = m.T; if (!gr_ && st > m.brk) killMem(mi, 'snap'); }
+    else if (!gr_ && Math.abs(st) > m.brk) killMem(mi, 'snap');
   }
-  if (!grace) for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; if (!P.glass || P.broken || !P.ok) continue; let mx = 0; for (let k = 0; k < P.ms.length; k++) { const m = mem[P.ms[k]]; if (m.alive && m.kind <= BEAM) { const a = Math.abs(m.st); if (a > mx) mx = a; } } if (mx > (P.thr || 0.009)) breakGlass(P, 0, 1, 0); }
+  if (!grace) for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; if (!P.glass || P.broken || !P.ok || P.slp || (P.ck && CKG[P.ck] > 0)) continue; let mx = 0; for (let k = 0; k < P.ms.length; k++) { const m = mem[P.ms[k]]; if (m.alive && m.kind <= BEAM) { const a = Math.abs(m.st); if (a > mx) mx = a; } } if (mx > (P.thr || 0.009)) breakGlass(P, 0, 1, 0); }
   if (!grace && peak > cnt.peak) cnt.peak = peak;
   cnt.now = peak;
   fireStep(dt); fireSpread(dt);
@@ -1645,7 +1852,7 @@ function loadScene(ix, keep) {
   sceneIx = ix; const sc = SCENES[ix];
   resetWorld(); seed = hash(sc.id) || 1;
   S = { m: 2, k: 1, ks: 0.2, u: 1, view: [0.5, 0.3], name: sc.name, id: sc.id, size: 10, pit: 6, env: { sky: 'day', ground: 'grass' }, hint: '' };
-  sc.build(); riftRiders(sc.rs || 1);
+  sc.build(); const nB = nN; if (!W.on) riftRiders(sc.rs || 1);
   for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (m.hid || m.kind === LINK) continue; if (m.kind === FAB) flam.push(mi); else if (m.kind === BEAM && WOOD.has(m.col) && !m.tree) { if (!m.burnT) m.burnT = 4.5; flam.push(mi); } }
   // bounding boxes: the structure (for scale) and everything (for the camera)
   let x0 = 1e9, x1 = -1e9, y1 = 0, z0 = 1e9, z1 = -1e9, X0 = 1e9, X1 = -1e9, Z0 = 1e9, Z1 = -1e9, Y1 = 0;
@@ -1654,13 +1861,14 @@ function loadScene(ix, keep) {
     if (envN[i]) continue; x0 = Math.min(x0, px[i]); x1 = Math.max(x1, px[i]); y1 = Math.max(y1, py[i]); z0 = Math.min(z0, pz[i]); z1 = Math.max(z1, pz[i]);
   }
   for (const w of water) { X0 = Math.min(X0, w.x - w.rx); X1 = Math.max(X1, w.x + w.rx); Z0 = Math.min(Z0, w.z - w.rz); Z1 = Math.max(Z1, w.z + w.rz); }
-  S.size = Math.max(3, 0.5 * Math.max(x1 - x0, z1 - z0, y1 * 1.1)); S.hx = 0.5 * Math.max(x1 - x0, z1 - z0); S.hy = y1; S.top = y1;
+  S.size = S.fixSize || Math.max(3, 0.5 * Math.max(x1 - x0, z1 - z0, y1 * 1.1)); S.hx = 0.5 * Math.max(x1 - x0, z1 - z0); S.hy = y1; S.top = y1;
   S.pit = clamp(0.35 * S.size, 1.5, 14);
   S.cx = (x0 + x1) / 2; S.cz = (z0 + z1) / 2; S.cy = y1 * 0.46;
   S.bb = { x0: X0, x1: X1, y0: 0, y1: Math.max(Y1, 1.5), z0: Z0, z1: Z1 };
-  S.pts = []; for (let i = 0; i < nN; i++) { if (!alive[i]) continue; const r = Math.max(nr[i], 0.3); S.pts.push([px[i], py[i] + (isRider[i] === 1 ? 1.0 : 0.3), pz[i]]); if (py[i] < 0.6) S.pts.push([px[i], 0, pz[i]]); }
-  for (const w of water) for (let k = 0; k < 8; k++) { const a = TAU * k / 8; S.pts.push(w.sh === 'rect' ? [w.x + (k % 4 < 2 ? -1 : 1) * w.rx, 0, w.z + (k % 2 ? -1 : 1) * w.rz] : [w.x + w.rx * Math.cos(a), 0, w.z + w.rz * Math.sin(a)]); }
+  // the points the camera frames: the structures and the people, not the trees, lamps, ponds or the ground around them
+  S.pts = []; for (let k = 0; k < 2 && !S.pts.length; k++) for (let i = 0; i < (k ? nN : nB); i++) { if (!alive[i] || (!k && envN[i])) continue; S.pts.push([px[i], py[i] + (isRider[i] === 1 ? 1.0 : 0.3), pz[i]]); if (py[i] < 0.6) S.pts.push([px[i], 0, pz[i]]); }
   S.bnd = [X0 + 0.5, X1 - 0.5, Z0 + 0.5, Z1 - 0.5];
+  if (W.on) { streamFrame(); S.bnd = null; }
   cnt.cut = cnt.broke = cnt.burnt = 0; cnt.peak = 0; cnt.glass = 0; cnt.total = cnt.alive = mem.filter(m => m.orig).length;
   Q.kind = null; Q.ox = Q.oy = Q.oz = 0; rift.gap = 0; tornadoes = []; gust = null; grab = null; pc = 0; rings = []; inferno = 0; simT = 0; shake = 0; streaks.length = 0; tracers.length = 0; marks.length = 0; for (let i = 0; i < 3; i++) BOLTS[i].on = false; flash = 0;
   for (let i = 0; i < nN; i++) { vx[i] = vy[i] = vz[i] = 0; }
@@ -1674,6 +1882,13 @@ function loadScene(ix, keep) {
   cnt.peak = 0; simT = 0; simClock = 0; boomT = 0;
   if (S.afterLoad) S.afterLoad();
   if (!keep) cam.reset(true); else { cam.panX = 0; cam.panZ = 0; }
+  if (W.on) {   // load the chunks around the first view, let them settle together, then let only the near ones stay awake
+    resize(); cam.update(0); W.allAwake = true; streamUpdate(true, 0);
+    grace = true; const ts2 = timeScale; timeScale = 1; for (let f = 0; f < 45; f++) stepFrame();
+    for (let i = 0; i < nN; i++) { vx[i] *= 0.2; vy[i] *= 0.2; vz[i] *= 0.2; }
+    syncRiders(); timeScale = ts2; grace = false; simT = 0; cnt.peak = 0; pc = 0; rings = []; for (let k = 0; k < 6; k++) stepFrame();
+    for (const ch of W.chunks.values()) { CKG[ch.id] = 0; endGrace(ch); } W.allAwake = false; cnt.peak = 0; simT = 0; streamUpdate(true, 0);
+  }
   if (armBtn) armBtn.setAttribute('aria-pressed', 'false');
   if (window.funSound) window.funSound.stopAll();
 }
@@ -1681,33 +1896,38 @@ function loadScene(ix, keep) {
 /* ===================== 5. camera and drawing ===================== */
 const cam = { yaw: 0.5, pitch: 0.3, dist: 30, vyaw: 0, w: 800, h: 600, dpr: 1, zoom: 1, cx: 400, cy: 300, f: 700, x: 0, y: 0, z: 0, fx: 0, fy: 0, fz: 0, rx: 1, rz: 0, ux: 0, uy: 1, uz: 0, tx: 0, ty: 0, tz: 0 };
 cam.panX = 0; cam.panZ = 0;
-cam.reset = function (full) { this.yaw = S.view[0]; this.pitch = S.view[1]; this.vyaw = 0; this.zoom = 1; this.panX = 0; this.panZ = 0; };
-// frame the whole scene: fit its bounding box to the stage at the current angle and center it, so it also works from above
+cam.reset = function (full) { this.yaw = S.view[0]; this.pitch = S.view[1]; this.pitchAuto = undefined; this.vyaw = 0; this.zoom = 1; this.panX = 0; this.panZ = 0; };
+// frame the scene: fit the structures to the stage and center them. The distance comes from the structures' bounding points and the stage shape:
+// fitting the width and fitting the height give two distances, and the view sits between the loose one (all in view) and the tight one (no empty edge).
 cam.update = function (shk) {
-  const w = this.w, h = this.h, bb = S.bb;
+  const w = this.w, h = this.h, bb = S.bb, narrow = room && w < 560;
+  const aspect = w / h, boost = room ? clamp((1 / aspect - 1.1) * 0.5, 0, 0.35) : 0, ptgt = clamp(S.view[1] + boost, 0.03, 1.2);
+  if (this.pitchAuto === undefined || Math.abs(this.pitch - this.pitchAuto) < 1e-6) this.pitch = this.pitchAuto = ptgt;   // follows the stage shape until the player tilts the view
   const sy = Math.sin(this.yaw), cy = Math.cos(this.yaw), sp = Math.sin(this.pitch), cp = Math.cos(this.pitch);
   const ox = sy * cp, oy = sp, oz = cy * cp;
   this.fx = -ox; this.fy = -oy; this.fz = -oz; this.rx = cy; this.rz = -sy; this.ux = -sp * sy; this.uy = cp; this.uz = -sp * cy;
   const s0 = Math.min(w, h * 1.2); this.f = s0 * 1.25;
   const tx = (bb.x0 + bb.x1) / 2, ty = (bb.y0 + bb.y1) / 2, tz = (bb.z0 + bb.z1) / 2; this.tx0 = tx; this.tz0 = tz; this.tx = tx + this.panX; this.ty = ty; this.tz = tz + this.panZ;
-  const mL = 14, mT = room ? (coarse ? 64 : 60) : coarse ? 40 : 42, mB = room ? (coarse ? 92 : 104) : coarse ? 44 : 48, aw = w - 2 * mL, ah = h - mT - mB, P = [];
+  const mL = narrow ? 10 : 14, mR = narrow ? 52 : 14, mT = room ? (coarse ? 56 : 56) : coarse ? 40 : 42, mB = room ? (coarse ? 84 : 96) : coarse ? 44 : 48, aw = w - mL - mR, ah = h - mT - mB, P = [];
   for (const q of S.pts) { const dx = q[0] - tx, dy = q[1] - ty, dz = q[2] - tz; P.push([dx * this.rx + dz * this.rz, dx * this.ux + dy * this.uy + dz * this.uz, dx * this.fx + dy * this.fy + dz * this.fz]); }
   let zmin = 1e9; for (const p of P) zmin = Math.min(zmin, p[2]);
   const ext = D => { let a = 1e9, b = -1e9, c = 1e9, e = -1e9; for (const p of P) { const k = this.f / Math.max(0.5, D + p[2]), u = p[0] * k, v = p[1] * k; if (u < a) a = u; if (u > b) b = u; if (v < c) c = v; if (v > e) e = v; } return [a, b, c, e]; };
-  let d = 60; for (let it = 0; it < 6; it++) { const q = ext(d); d = Math.max(-zmin + 1, d * Math.max((q[1] - q[0]) / aw, (q[3] - q[2]) / ah)); }
+  let dw = 60, dh = 60; for (let it = 0; it < 7; it++) { let q = ext(dw); dw = Math.max(-zmin + 1, dw * (q[1] - q[0]) / aw); q = ext(dh); dh = Math.max(-zmin + 1, dh * (q[3] - q[2]) / ah); }
+  const loose = Math.max(dw, dh), tight = Math.min(dw, dh), cv = S.cover !== undefined ? S.cover : 0.32;
+  const d = loose * Math.pow(tight / loose, cv) * (S.tighten || 0.94);
   const D = d * this.zoom, q = ext(D); this.base = d; this.dist = D;
   this.x = this.tx + D * ox; this.y = ty + D * oy; this.z = this.tz + D * oz;
   this.cx = mL + aw / 2 - (q[0] + q[1]) / 2 + (shk ? rnd(-1, 1) * shk : 0); this.cy = mT + ah / 2 + (q[2] + q[3]) / 2 + (shk ? rnd(-1, 1) * shk : 0);
 };
-// move the view across the ground by (dx, dz), kept inside the scene box grown by 1.5 sizes
+// move the view across the ground by (dx, dz). Fixed scenes keep it inside the scene box grown by 1.5 sizes; streaming worlds have no edge.
 cam.shift = function (dx, dz) {
   const bb = S.bb, g = 1.5 * S.size, tx0 = this.tx0 === undefined ? (bb.x0 + bb.x1) / 2 : this.tx0, tz0 = this.tz0 === undefined ? (bb.z0 + bb.z1) / 2 : this.tz0;
-  const nx = clamp(this.panX + dx, bb.x0 - g - tx0, bb.x1 + g - tx0), nz = clamp(this.panZ + dz, bb.z0 - g - tz0, bb.z1 + g - tz0), ax = nx - this.panX, az = nz - this.panZ;
+  const nx = W.on ? this.panX + dx : clamp(this.panX + dx, bb.x0 - g - tx0, bb.x1 + g - tx0), nz = W.on ? this.panZ + dz : clamp(this.panZ + dz, bb.z0 - g - tz0, bb.z1 + g - tz0), ax = nx - this.panX, az = nz - this.panZ;
   this.panX = nx; this.panZ = nz; this.x += ax; this.z += az; this.tx += ax; this.tz += az;
 };
 // zoom by a factor (below 1 is closer) while the ground point under (x, y) stays under it
 cam.zoomAt = function (x, y, f) {
-  const g0 = groundHit(x, y); this.zoom = clamp(this.zoom * f, 0.12, 3.5); if (!g0) return;
+  const g0 = groundHit(x, y); this.zoom = clamp(this.zoom * f, 0.12, W.on ? 1.7 : 3.5); if (!g0) return;
   this.update(0); const g1 = groundHit(x, y); if (g1) this.shift(g0[0] - g1[0], g0[2] - g1[2]);
 };
 // drag the world: the ground point that was under (x0, y0) follows the pointer to (x1, y1)
@@ -1793,7 +2013,7 @@ function drawGround() {
     ctx.fillStyle = '#3A4558'; if (polyPath([[hg, 0, -G], [hg, -S.pit, -G], [hg, -S.pit, G], [hg, 0, G]])) ctx.fill();
     ctx.fillStyle = gr; if (polyPath([[-G, 0, -G], [-hg, 0, -G], [-hg, 0, G], [-G, 0, G]])) ctx.fill(); if (polyPath([[hg, 0, -G], [G, 0, -G], [G, 0, G], [hg, 0, G]])) ctx.fill();
     ctx.strokeStyle = '#7C8AA0'; ctx.lineWidth = 2; ctx.beginPath(); lineW([-hg, 0, -G], [-hg, 0, G]); lineW([hg, 0, -G], [hg, 0, G]); ctx.stroke();
-  } else { ctx.fillStyle = gr; if (polyPath([[-G, 0, -G], [G, 0, -G], [G, 0, G], [-G, 0, G]])) ctx.fill(); }
+  } else { const gx0 = W.on ? cam.tx : 0, gz0 = W.on ? cam.tz : 0; ctx.fillStyle = gr; if (polyPath([[gx0 - G, 0, gz0 - G], [gx0 + G, 0, gz0 - G], [gx0 + G, 0, gz0 + G], [gx0 - G, 0, gz0 + G]])) ctx.fill(); }
   const inRift = x => hg > 0 && Math.abs(x) < hg + 0.2;
   // paths and roads
   for (const p of pathsL) {
@@ -1934,12 +2154,13 @@ function drawShadows() {
     for (let mi = 0; mi < mem.length; mi++) {
       const m = mem[mi]; if (!m.alive || m.hid || m.kind === FAB || (pass === 0) !== (m.kind <= BEAM)) continue;
       const a = m.a, b = m.b; if (py[a] < -1 || py[b] < -1) continue;
+      if ((sx[a] < -150 && sx[b] < -150) || (sx[a] > cam.w + 150 && sx[b] > cam.w + 150) || (sy[a] < -250 && sy[b] < -250) || (sy[a] > cam.h + 150 && sy[b] > cam.h + 150)) continue;
       lineW([px[a] + py[a] * 0.32, 0, pz[a] + py[a] * 0.18], [px[b] + py[b] * 0.32, 0, pz[b] + py[b] * 0.18]);
     }
     ctx.lineWidth = pass === 0 ? Math.max(1.5, 0.1 * S.u * cam.f / cam.dist) : 1; ctx.stroke();
   }
   ctx.fillStyle = 'rgba(20,40,80,.14)';
-  for (const R of riders) { if (R.dead) continue; const i = R.n; const k = pr(px[i] + py[i] * 0.32, 0, pz[i] + py[i] * 0.18); if (PZ < NEAR) continue; ctx.beginPath(); ctx.ellipse(PX, PY, R.s * (R.t === 'c' ? 1.5 : R.t === 'h' ? 0.9 : 0.35) * k, R.s * (R.t === 'c' ? 0.6 : R.t === 'h' ? 0.45 : 0.14) * k, 0, 0, TAU); ctx.fill(); }
+  for (const R of riders) { if (R.dead || sx[R.n] < -90 || sx[R.n] > cam.w + 90 || sy[R.n] < -90 || sy[R.n] > cam.h + 120) continue; const i = R.n; const k = pr(px[i] + py[i] * 0.32, 0, pz[i] + py[i] * 0.18); if (PZ < NEAR) continue; ctx.beginPath(); ctx.ellipse(PX, PY, R.s * (R.t === 'c' ? 1.5 : R.t === 'h' ? 0.9 : 0.35) * k, R.s * (R.t === 'c' ? 0.6 : R.t === 'h' ? 0.45 : 0.14) * k, 0, 0, TAU); ctx.fill(); }
 }
 function drawMember(m) {
   const a = m.a, b = m.b, az = sz[a], bz = sz[b]; if (az < NEAR || bz < NEAR) return;
@@ -2118,13 +2339,14 @@ function render() {
   if (aim && aim.on && AIMTOOLS.has(tool)) drawBull(aim.x, aim.y, aim.z, bullR(tool), 0.75);
   // depth-sorted items
   const items = [];
-  for (let ci = 0; ci < crowns.length; ci++) { const c = crowns[ci]; if (alive[c.n]) items.push([sz[c.n] + 0.05, 6, ci]); else { pr(c.x, 0, c.z); items.push([PZ, 6, ci]); } }
+  for (let ci = 0; ci < crowns.length; ci++) { const c = crowns[ci]; if (alive[c.n]) { if (sx[c.n] < -140 || sx[c.n] > w + 140 || sy[c.n] < -160 || sy[c.n] > h + 100) continue; items.push([sz[c.n] + 0.05, 6, ci]); } else { pr(c.x, 0, c.z); if (PX < -140 || PX > w + 140 || PY < -100 || PY > h + 100) continue; items.push([PZ, 6, ci]); } }
   for (let di = 0; di < drones.length; di++) { const D = drones[di]; pr(D.x, D.y, D.z); items.push([PZ, 7, di]); }
   for (let di = 0; di < dragons.length; di++) { const D = dragons[di]; pr(D.x, D.y, D.z); items.push([PZ, 8, di]); }
   if (ufo) { pr(ufo.x, ufo.y, ufo.z); items.push([PZ, 9, 0]); }
-  for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (!m.alive || m.hid || m.kind === LINK) continue; const d = (sz[m.a] + sz[m.b]) * 0.5; items.push([d, 0, mi]); }
-  for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; if (!P.ok) continue; let d = 0; for (let k = 0; k < P.n.length; k++) d += sz[P.n[k]]; items.push([d / P.n.length + 0.3 * S.u, 1, pi]); }
-  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; items.push([R.ns.length > 1 ? (sz[R.n] + sz[R.ns[1]]) * 0.5 : sz[R.n], 2, ri]); }
+  const cw = w + 30, chh = h + 30;
+  for (let mi = 0; mi < mem.length; mi++) { const m = mem[mi]; if (!m.alive || m.hid || m.kind === LINK) continue; const xa = sx[m.a], xb = sx[m.b], ya = sy[m.a], yb = sy[m.b]; if ((xa < -30 && xb < -30) || (xa > cw && xb > cw) || (ya < -30 && yb < -30) || (ya > chh && yb > chh)) continue; items.push([(sz[m.a] + sz[m.b]) * 0.5, 0, mi]); }
+  for (let pi = 0; pi < panels.length; pi++) { const P = panels[pi]; if (!P.ok) continue; let d = 0, xl = 1e9, xr = -1e9, yt = 1e9, yb = -1e9; for (let k = 0; k < P.n.length; k++) { const q = P.n[k]; d += sz[q]; if (sx[q] < xl) xl = sx[q]; if (sx[q] > xr) xr = sx[q]; if (sy[q] < yt) yt = sy[q]; if (sy[q] > yb) yb = sy[q]; } if (xr < -30 || xl > cw || yb < -30 || yt > chh) continue; items.push([d / P.n.length + 0.3 * S.u, 1, pi]); }
+  for (let ri = 0; ri < riders.length; ri++) { const R = riders[ri]; if (R.dead) continue; if (sx[R.n] < -70 || sx[R.n] > w + 70 || sy[R.n] < -90 || sy[R.n] > h + 70) continue; items.push([R.ns.length > 1 ? (sz[R.n] + sz[R.ns[1]]) * 0.5 : sz[R.n], 2, ri]); }
   for (let bi = 0; bi < balls.length; bi++) { const B = balls[bi]; pr(B.x, B.y, B.z); items.push([PZ, 3, bi]); }
   for (let ti = 0; ti < tornadoes.length; ti++) { const T = tornadoes[ti]; pr(T.x, T.h * 0.3, T.z); items.push([PZ, 4, ti]); }
   for (let i = 0; i < nN; i++) if (glow[i] && alive[i]) items.push([sz[i], 5, i]);
@@ -2334,7 +2556,7 @@ function hammerShove(x, y, force) {
 function startTool(x, y) {
   mode = 'rot';
   if (tool === 'move') { mode = 'pan'; setGrabAttr(true); }
-  else if (tool === 'pluck') { const n = pickNode(x, y, coarse ? 52 : 34); if (n >= 0) { mode = 'pluck'; const ray = rayAt(x, y), c = ray.d[0] * cam.fx + ray.d[1] * cam.fy + ray.d[2] * cam.fz, t = sz[n] / c; grab = { i: n, t, x: px[n], y: py[n], z: pz[n], sx: x, sy: y }; setGrabAttr(true); } }
+  else if (tool === 'pluck') { const n = pickNode(x, y, coarse ? 52 : 34); if (n >= 0) { mode = 'pluck'; if (W.on && slp[n]) wakeCk(ckOf[n]); const ray = rayAt(x, y), c = ray.d[0] * cam.fx + ray.d[1] * cam.fy + ray.d[2] * cam.fz, t = sz[n] / c; grab = { i: n, t, x: px[n], y: py[n], z: pz[n], sx: x, sy: y }; setGrabAttr(true); } }
   else if (tool === 'cut' || tool === 'strut') { mode = 'rot'; if (tool === 'strut') hammerShove(x, y, true); paintHit(x, y, true); }
   else if (tool === 'fire') { const B = pickRider(x, y, coarse ? 22 : 14); if (B && B.t === 'b') { B.hit = true; mode = 'paint'; } else { const m = pickMember(x, y, coarse ? 46 : 36); if (m >= 0) { burnAt(m); mode = 'paint'; hoverInfo = null; } } }
   else if (tool === 'sword') { mode = 'slash'; slash = [{ x, y, age: 0 }]; }
@@ -2642,6 +2864,7 @@ function loop(ts) {
   while (acc >= 1 / 60 && steps < 2) { if (!paused) stepFrame(); acc -= 1 / 60; steps++; }
   if (acc > 0.1) acc = 0;
   if (!steps) return;
+  if (W.on) streamUpdate(false, steps / 60);
   const t0 = performance.now(); resize(); render(); drawMs = drawMs * 0.9 + (performance.now() - t0) * 0.1;
   if (cam.vyaw && !reduce) { cam.yaw += cam.vyaw / 60; cam.vyaw *= 0.94; if (Math.abs(cam.vyaw) < 0.01) cam.vyaw = 0; }
   const total = FR.ms + drawMs;
@@ -2652,9 +2875,10 @@ function loop(ts) {
 }
 function statsNow() {
   let nan = 0, maxv = 0, an = 0; for (let i = 0; i < nN; i++) { if (!alive[i]) continue; an++; if (!isFinite(px[i] + py[i] + pz[i])) nan++; maxv = Math.max(maxv, Math.hypot(vx[i], vy[i], vz[i])); }
-  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, rscale, room, lite, bolts: BOLTS.filter(b => b.on).length, bombs: bombsLive(), panX: +cam.panX.toFixed(2), panZ: +cam.panZ.toFixed(2), tool, riders: riders.filter(r => !r.dead).length, people: riders.filter(r => r.t === 'p' && !r.dead).length, standingPeople: riders.filter(r => r.t === 'p' && !r.dead && r.st).length, peopleStanding: riders.filter(r => r.t === 'p' && !r.dead && r.st && !r.safe).length, peopleDown: riders.filter(r => r.t === 'p' && !r.dead && !r.st).length, peopleSafeInWater: riders.filter(r => r.t === 'p' && !r.dead && r.safe).length, peopleLost: riders.filter(r => r.t === 'p' && r.dead).length, glassBroken: cnt.glass || 0, barrelsLeft: riders.filter(r => r.t === 'b' && !r.dead).length, drones: drones.length, dragons: dragons.length, ufo: ufo ? 1 : 0, flood: flood ? 1 : 0, armed: armed ? 1 : 0, treesLeft: crowns.filter(c => alive[c.n] || c.ms.some(mi => mem[mi].alive)).length, carBodies: riders.filter(r => (r.t === 'c' || r.t === 'h') && !r.dead).length, fellIn: riders.filter(r => r.fell).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1) };
+  return { scene: S.id, nodes: an, nodesBuilt: nN, members: mem.filter(m => m.alive && !m.hid).length, total: cnt.total, standing: cnt.alive, cut: cnt.cut, broke: cnt.broke, burnt: cnt.burnt, peak: Math.round(cnt.peak), nan, maxSpeed: +maxv.toFixed(2), simMs: +FR.ms.toFixed(2), drawMs: +drawMs.toFixed(2), fps: Math.round(fpsAvg), sub: FR.sub, rscale, room, lite, bolts: BOLTS.filter(b => b.on).length, bombs: bombsLive(), panX: +cam.panX.toFixed(2), panZ: +cam.panZ.toFixed(2), tool, riders: riders.filter(r => !r.dead).length, people: riders.filter(r => r.t === 'p' && !r.dead).length, standingPeople: riders.filter(r => r.t === 'p' && !r.dead && r.st).length, peopleStanding: riders.filter(r => r.t === 'p' && !r.dead && r.st && !r.safe).length, peopleDown: riders.filter(r => r.t === 'p' && !r.dead && !r.st).length, peopleSafeInWater: riders.filter(r => r.t === 'p' && !r.dead && r.safe).length, peopleLost: riders.filter(r => r.t === 'p' && r.dead).length, glassBroken: cnt.glass || 0, barrelsLeft: riders.filter(r => r.t === 'b' && !r.dead).length, drones: drones.length, dragons: dragons.length, ufo: ufo ? 1 : 0, flood: flood ? 1 : 0, armed: armed ? 1 : 0, treesLeft: crowns.filter(c => alive[c.n] || c.ms.some(mi => mem[mi].alive)).length, carBodies: riders.filter(r => (r.t === 'c' || r.t === 'h') && !r.dead).length, fellIn: riders.filter(r => r.fell).length, particles: pc, tornadoes: tornadoes.length, rift: +rift.gap.toFixed(2), quake: Q.kind, balls: balls.length, burning: burning.length, grav, size: +S.size.toFixed(1), chunks: W.chunks.size, awakeChunks: W.awake, awakeMembers: W.nAwake, loads: W.loads, freeNodes: freeN.length, freeMems: freeM.length, memLen: mem.length };
 }
 window.funRoom = {
+  chunkInfo: () => [...W.chunks.values()].map(c => [c.key, c.mems.length, c.nodes.length, c.slp ? 1 : 0]).sort(), world: W,
   scenes: SCENES.map(s => s.id), tools: TOOLS.map(t => t[0]),
   load: id => { const i = typeof id === 'number' ? id : SCENES.findIndex(s => s.id === id); chooseScene(i); }, stats: statsNow,
   step: n => { for (let k = 0; k < n; k++) stepFrame(); render(); }, act, setTool, cam, shoot, startQuake,
