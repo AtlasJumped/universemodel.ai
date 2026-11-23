@@ -53,6 +53,48 @@
 </div></div>
 
 <style>
+.hp-core{background:linear-gradient(135deg,#0B2545 0%,#123A6B 100%);border-radius:var(--radius);padding:clamp(22px,4vw,40px);color:#DCE8F7;box-shadow:var(--shadow)}
+.hp-lab{display:inline-block;font:650 .74rem/1 var(--font);letter-spacing:.1em;text-transform:uppercase;color:#0B2545;background:#9CC3F5;border-radius:6px;padding:6px 8px;margin-bottom:14px}
+.hp-q{font-size:clamp(1.2rem,2.4vw,1.7rem);line-height:1.45;color:#fff;font-weight:600;margin:0 0 14px;max-width:none}
+.hp-core p.hp-n{color:#C9DAF0;font-size:.95rem;margin:0;max-width:none}
+.hp-god{margin-top:16px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow)}
+.hp-god h3{margin:0 0 8px}.hp-god p{margin:0 0 8px;max-width:none}.hp-god p:last-child{margin-bottom:0}
+.hp-venn{margin:20px auto 6px;max-width:640px}.hp-venn svg{display:block;width:100%;height:auto}
+.hp-parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px}
+@media (max-width:860px){.hp-parts{grid-template-columns:1fr}}
+.hp-parts .card{border-top:4px solid var(--blue)}
+.hp-parts .card.b{border-top-color:var(--deep)}.hp-parts .card.m{border-top-color:var(--sky)}
+.hp-parts h3{margin:0 0 8px}.hp-parts p{margin:0 0 8px;max-width:none}
+.hp-st{font-size:.84rem;color:var(--soft);border-top:1px dashed var(--line);padding-top:8px;margin-top:8px!important}
+.hp-cmp .compare li{font-size:.96rem}
+.hp-cmp .compare h3{margin-bottom:2px}
+.hp-cmp .k{display:block;font:650 .72rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin:14px 0 4px}
+.hp-cmp .compare ul{margin-top:4px}
+.hp-anchor{margin-top:22px;border:1px solid #C5D8F2;background:var(--ice);border-radius:var(--radius);padding:22px 26px}
+.hp-anchor h3{margin:0 0 8px}.hp-anchor p{margin:0 0 8px;max-width:none}.hp-anchor p:last-child{margin-bottom:0}
+.hp-three{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.hp-three span{background:#fff;border:1px solid #C5D8F2;border-radius:999px;padding:4px 14px;font-weight:650;color:var(--navy);font-size:.95rem}
+</style>
+<section id="core">
+  <div class="wrap">
+    <span class="eyebrow">The starting point</span>
+    <h2>The core of HMR in three sentences</h2>
+    <div class="hp-core">
+      <span class="hp-lab">HMR's starting premise</span>
+      <p class="hp-q">A Universal Intelligence exists. Before the Big Bang it was unlimited. The Big Bang is the manifestation of a system in which that Universal Intelligence imposes limits on itself.</p>
+      <p class="hp-n">This is HMR's premise, not an established result. We state it plainly, reason forward from it step by step, and tie each claim that follows to something that can be tested.</p>
+    </div>
+    <div class="hp-god" id="god-question">
+      <span class="tag" style="display:block;font:600 .74rem/1 var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:10px">HMR's central open problem</span>
+      <h3>The God question</h3>
+      <p><b>Explain and define the mechanics by which an unlimited Universal Intelligence created a reality in which it is limited.</b></p>
+      <p>When people ask HMR about God, what God is, or how to think about God, this is the specific question HMR answers. If one accepts the premise above, the problem of God becomes the problem of how a reality went from unlimited to limited: what the self-imposed limits were, and why.</p>
+      <p class="muted" style="font-size:.94rem">Open: HMR has not solved it. The mathematics on this page is our attempt to build an answer, starting from thoughts and the act of thinking, and the version note below says where it falls short. See also <a href="ui.html">Defining UI</a>.</p>
+    </div>
+  </div>
+</section>
+
+<style>
 .lvl.v2{background:#FCEFD9;color:#8A5A0B}
 .v2-f{display:block;margin-top:6px;font-size:.84rem;line-height:1.45;color:var(--soft)}
 @media (min-width:861px){
