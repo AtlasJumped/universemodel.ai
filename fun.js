@@ -1167,7 +1167,21 @@ function collideBalls(h) {
     if (!B.rk) B.vy -= grav * 0.7 * h; B.x += B.vx * h; B.y += B.vy * h; B.z += B.vz * h;
     const gy = groundY(B.x);
     if (B.bomb) { B.fuse -= h; B.tk -= h; if (B.tk <= 0) { B.lit = !B.lit; B.tk = 0.06 + 0.2 * clamp(B.fuse / 1.6, 0, 1); if (B.lit) sfx('tick', 0.5); } if (B.fuse <= 0) { B.R = 0.26 * S.size + 2; boom(B, h); return; } if ((B.age = (B.age || 0) + h) > 0.3 && burning.length && bombNearFire(B)) { B.R = 0.26 * S.size + 2; boom(B, h); return; } }
-    if (B.rk && B.tg) steerRocket(B, h);
+    if (B.tg) steerRocket(B, h);
+    // aimed shots fly through everything until they reach the bullseye, so the hit lands where the player aimed
+    if (B.ghost) {
+      const ax = B.aimp[0] - B.x, ay = B.aimp[1] - B.y, az = B.aimp[2] - B.z, ad = Math.hypot(ax, ay, az), near = Math.max(r * 2.5, 0.05 * S.size);
+      if (ad < near || (ad > B.pd && ad < 0.35 * S.size)) {
+        B.ghost = false;
+        if (B.fire) { B.x = B.aimp[0]; B.y = Math.max(B.aimp[1], groundY(B.aimp[0]) + r); B.z = B.aimp[2]; boom(B, h); return; }
+        B.x = B.aimp[0]; B.y = Math.max(B.aimp[1], groundY(B.aimp[0]) + r); B.z = B.aimp[2];
+      } else {
+        B.pd = ad; const gy0 = groundY(B.x); if (B.y < gy0 + r) B.y = gy0 + r;
+        B.life -= h; if (B.life <= 0) { B.dead = true; continue; }
+        if (B.rk && pc < PMAX - 6 && Math.random() < 0.8) { emit(3, B.x, B.y, B.z, rnd(-1, 1), rnd(0, 1), rnd(-1, 1), 0.7, 1.1); emit(2, B.x, B.y, B.z, rnd(-1, 1), rnd(-1, 1), rnd(-1, 1), 0.25, 1.0); }
+        continue;
+      }
+    }
     if (B.y < gy + r) { B.y = gy + r; if (B.fire) { boom(B, h); return; } if (B.vy < -3 && !B.th) { B.th = 1; sfx('thud', 1); } if (B.vy < 0) B.vy *= B.bomb ? -0.2 : -0.32; B.vx *= B.bomb ? 0.96 : 0.995; B.vz *= B.bomb ? 0.96 : 0.995; }
     B.life -= h; if (B.life <= 0 || B.y < -S.pit - 3) { B.dead = true; continue; }
     const hitV = B.bomb ? 0.5 : Math.max(sp, 1);
@@ -1393,7 +1407,7 @@ function launch(kind, tgt, home) {
   const o = [tgt[0] + rx * left * D, kind === 'cannon' ? 0.9 : 1.0, tgt[2] + rz * left * D];
   if (kind === 'cannon') {
     const T = clamp(D / (sz * 2.8), 0.5, 1.5), g = 0.7 * grav, dx = tgt[0] - o[0], dz = tgt[2] - o[2];
-    const B = { x: o[0], y: o[1], z: o[2], vx: dx / T, vy: (tgt[1] - o[1] + 0.5 * g * T * T) / T, vz: dz / T, r: Math.max(0.32 * S.u, 0.03 * sz), fire: false, cn: true, dead: false, life: 12, spin: 0 };
+    const B = { x: o[0], y: o[1], z: o[2], vx: dx / T, vy: (tgt[1] - o[1] + 0.5 * g * T * T) / T, vz: dz / T, r: Math.max(0.32 * S.u, 0.03 * sz), fire: false, cn: true, dead: false, life: 12, spin: 0, ghost: true, aimp: tgt.slice(), pd: 1e9 };
     balls.push(B); if (balls.length > 8) balls.shift();
     props.push({ k: 'cannon', x: o[0], y: 0, z: o[2], dx: dx / Math.hypot(dx, dz), dz: dz / Math.hypot(dx, dz), t: 0, life: 2.2 });
     marks.push({ x: tgt[0], y: tgt[1], z: tgt[2], t: 0, life: T + 0.5, k: 'cannon' });
@@ -1401,7 +1415,7 @@ function launch(kind, tgt, home) {
     emit(2, o[0], 1, o[2], 0, 0, 0, 0.3, 3); sfx('cannon', 1);
   } else {
     const dx = tgt[0] - o[0], dy = tgt[1] - o[1], dz = tgt[2] - o[2], L = Math.hypot(dx, dy, dz), sp = 1.9 * sz + 10;
-    balls.push({ x: o[0], y: o[1], z: o[2], vx: dx / L * sp, vy: dy / L * sp + 0.05 * sz, vz: dz / L * sp, r: Math.max(0.3 * S.u, 0.03 * sz), fire: true, rk: true, tg: home || tgt, R: 0.2 * sz + 1.6, dead: false, life: 10, spin: 0 }); if (balls.length > 8) balls.shift();
+    balls.push({ x: o[0], y: o[1], z: o[2], vx: dx / L * sp, vy: dy / L * sp + 0.05 * sz, vz: dz / L * sp, r: Math.max(0.3 * S.u, 0.03 * sz), fire: true, rk: true, tg: tgt.slice(), R: 0.2 * sz + 1.6, dead: false, life: 10, spin: 0, ghost: true, aimp: tgt.slice(), pd: 1e9 }); if (balls.length > 8) balls.shift();
     props.push({ k: 'rocket', x: o[0], y: 0, z: o[2], dx: dx / Math.hypot(dx, dz), dz: dz / Math.hypot(dx, dz), t: 0, life: 2 });
     marks.push({ x: tgt[0], y: tgt[1], z: tgt[2], t: 0, life: L / sp + 0.5, k: 'rocket' }); sfx('rocket', 1);
   }
@@ -2525,7 +2539,7 @@ function shoot(x, y, fire) {
   const nid = pickNode(x, y, 40); if (nid >= 0) tgt = [px[nid], py[nid], pz[nid]];
   const dir = [-0.35, 0.9, 0.22], dl = Math.hypot(...dir), far = S.size * 2.4;
   const start = [tgt[0] + dir[0] / dl * far, tgt[1] + dir[1] / dl * far, tgt[2] + dir[2] / dl * far];
-  throwBall(start, [-dir[0] / dl, -dir[1] / dl, -dir[2] / dl], true); say('Meteor incoming.', 2500);
+  throwBall(start, [-dir[0] / dl, -dir[1] / dl, -dir[2] / dl], true); { const M = balls[balls.length - 1]; M.tg = tgt.slice(); M.ghost = true; M.aimp = tgt.slice(); M.pd = 1e9; } say('Meteor incoming.', 2500);
 }
 
 /* --- pointers --- */
