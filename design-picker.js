@@ -14,7 +14,7 @@
       ':root{--white:#FFFFFF;--mist:#FFFFFF;--ice:#F0F0F0;--line:#111111;--navy:#000000;--ink:#000000;--soft:#222222;--blue:#0036B3;--blue-d:#002580;--sky:#0036B3;--deep:#000000;--shadow:none}' +
       'body{font-size:1.125rem}.card,.compare,.tbl,.pgroup,.fig,.lg-tab{border-width:2px!important;box-shadow:none!important}a{text-decoration:underline}.muted,.small{color:#222!important}' }
   ];
-  var LEVELS = [['strong dislike', 'Strong dislike'], ['dislike', 'Dislike'], ['like', 'Like'], ['strong like', 'Strong like']];
+  var LEVELS = [['strong like', 'Strong like'], ['like', 'Like'], ['dislike', 'Dislike'], ['strong dislike', 'Strong dislike']];
   var KEY = 'um-design-ratings-v1', KEYD = 'um-design-current';
   var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
                 set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
