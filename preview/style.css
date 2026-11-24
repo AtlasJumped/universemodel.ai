@@ -420,3 +420,11 @@ h3.subhead{font-size:clamp(1.3rem,2vw,1.5rem);font-weight:700;line-height:1.2;ma
 .site-foot .wrap{position:relative;z-index:1}
 /* an unordered to-do list drawn as cards: no counter circles */
 .road.mm-two li{padding-left:22px}.road.mm-two li::before{content:none;display:none}
+/* red "Human trials" button and menu item (owner, recording 2026-11-23l) */
+.btn-red{display:inline-flex;align-items:center;gap:8px;font:650 .98rem/1 var(--font);padding:14px 20px;border-radius:10px;background:#C8102E;color:#fff;border:1px solid #C8102E}
+.btn-red:hover{background:#A50D26;border-color:#A50D26;color:#fff;text-decoration:none}
+.navyband .btn-red{border-color:rgba(255,255,255,.35)}
+.site-head .nav .drop a.nav-red{background-image:none !important;background-color:#C8102E !important;-webkit-background-clip:border-box !important;background-clip:border-box !important;-webkit-text-fill-color:#fff;color:#fff;animation:none;font-weight:600;border-radius:8px;margin:2px 0}
+.site-head .nav .drop a.nav-red:hover{background-color:#A50D26 !important}
+.site-head .nav .drop a.nav-red[aria-current="page"]{box-shadow:0 0 0 2px #fff,0 0 0 4px #C8102E}
+.site-head .nav a.cta[aria-current="page"]{color:#fff;background:var(--blue-d)}
