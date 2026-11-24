@@ -985,7 +985,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
       if (cuts) parts.push(`${cuts} cable${cuts > 1 ? 's' : ''} cut`);
       if (removed) parts.push(`${removed} strut${removed > 1 ? 's' : ''} broken`);
       if (S.fire) parts.length = 0;
-      let m = S.fire ? fireLine() : parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : mode === 'fire' ? 'Tap a point on the structure to light a fire there. It spreads along the cables and struts.' : 'Tap a node to send a pulse of tension; drag to turn.';
+      let m = S.fire ? fireLine() : parts.length ? parts.join(', ') + '. The physics decides what follows.' : mode === 'cut' ? 'Tap a cable to cut it.' : mode === 'strut' ? 'Tap a strut to break it. It cracks in the middle and folds.' : mode === 'fire' ? 'Tap a point on the structure to light a fire there. It spreads along the cables and struts.' : (stage.dataset.nohint ? '' : 'Tap a node to send a pulse of tension; drag to turn.');
       if (!running) m = 'Paused. ' + m + ' Press Play to run the physics.';
       status.textContent = m;
     };
