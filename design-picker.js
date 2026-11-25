@@ -97,11 +97,7 @@
   btn.onclick = function () { panel ? close() : open(); };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel) close(); });
 
-  function init() {
-    document.body.appendChild(btn);
-    var q = null; try { q = new URLSearchParams(location.search).get('design'); } catch (e) {}
-    var n = q !== null && /^[1-9]\d*$/.test(q) ? parseInt(q, 10) - 1 : parseInt(store.get(KEYD) || '0', 10);
-    apply(isNaN(n) ? 0 : n);
-  }
+  // Retired: the dock's Design button (hmr-dock.js v6.1) is now the only design feature. This picker no longer adds a button or applies a saved look.
+  function init() { try { styleEl.textContent = ''; store.set(KEYD, '0'); document.documentElement.removeAttribute('data-design'); } catch (e) {} }
   if (document.body) init(); else document.addEventListener('DOMContentLoaded', init);
 })();
