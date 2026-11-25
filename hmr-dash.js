@@ -1,4 +1,4 @@
-/* HMR dash v1.1: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
+/* HMR dash v1.2: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
    One file, copied next to hmr-dock.js on every HMR site, lazy-loaded the first time the HMR button is pressed (or at boot when a visitor has a saved look).
    Layers:
      Home      intro card (with "Don't show this again", explained), row "Right now" (Share, Top with a way back, Bigger text, Night),
@@ -16,7 +16,7 @@
 (function () {
   'use strict';
   if (window.HMRDash && window.HMRDash.version >= 1) return;
-  var doc = document, root = doc.documentElement, VERSION = 1.1;
+  var doc = document, root = doc.documentElement, VERSION = 1.2;
   var SKIN_URL = 'https://hmrfamily.life/hmr-kit/skin.json';
   var KEY = 'hmr-studio-v1', INTRO_KEY = 'hmr-dash-intro-off', SKIN_CACHE = 'hmr-skin-v1';
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -135,16 +135,24 @@
       var r = R[i], pi = (r.par && painted.get(r.par)) || { role: 'bg', orig: X.pb, color: p.text, photo: false };
       var role = pi.role, orig = pi.orig, photo = pi.photo, c = parse(r.bg), set = [];
       if (/url\(/.test(r.bgi)) photo = true;
-      else if (opaqueGrad(r.bgi)) { set.push(['background-image', 'linear-gradient(135deg,' + p.grad.join(',') + ')']); role = 'grad'; orig = c && c.a > 0.1 ? c : orig; photo = false; }
-      if (!/url\(/.test(r.bgi) && c && c.a >= 0.1 && role !== 'grad') {
+      else if (opaqueGrad(r.bgi)) {
+        var gs = (r.bgi.match(/rgba?\([^)]*\)/g) || []).map(parse), g0 = gs[0], g1 = gs[gs.length - 1];
+        if (gs.every(function (q) { return oklab(q).C < 0.04 && Math.abs(oklab(q).L - X.L0) < 0.12; })) {   // a pale tint (page wash): keep its shape in the palette's own surfaces
+          var r0 = bgRole(X, g0), r1 = bgRole(X, g1);
+          set.push(['background-image', 'linear-gradient(180deg,' + X.newBg[r0] + ',' + X.newBg[r1] + ')']); role = r0 === 'bg' ? r1 : r0; orig = g0; photo = false;
+        } else { set.push(['background-image', 'linear-gradient(135deg,' + p.grad.join(',') + ')']); role = 'grad'; orig = c && c.a > 0.1 ? c : orig; photo = false; }
+      }
+      var tinted = set.length > 0;
+      if (!/url\(/.test(r.bgi) && c && c.a >= 0.1 && role !== 'grad' && !tinted) {
         var br = bgRole(X, c), nb = hexRgb(X.newBg[br]);
         set.push(['background-color', c.a >= 0.98 ? X.newBg[br] : 'rgba(' + nb.r + ',' + nb.g + ',' + nb.b + ',' + c.a + ')']);
         if (c.a >= 0.5) { role = br; orig = c; photo = false; }
       }
       var col = pi.color;
       if (!photo) {
-        var own = !r.inh || role !== pi.role || pi.photo;
-        if (own) { col = textFor(X, parse(r.color), r.link, role, orig); if (col !== pi.color || role !== pi.role || pi.photo) set.push(['color', col]); }
+        // every element gets its color set outright: an element whose own CSS color merely equals its parent's (h1 navy on ink body) would otherwise keep that CSS color
+        col = (r.inh && role === pi.role && !pi.photo) ? pi.color : textFor(X, parse(r.color), r.link, role, orig);
+        set.push(['color', col]);
       }
       if (r.bw > 0) { var bc = parse(r.bc) || parse(r.bc2); if (bc && bc.a > 0.05) set.push(['border-color', oklab(bc).C >= 0.06 ? p.accent : (X.hi ? p.muted : p.line)]); }
       var oc = parse(r.oc); if (r.os !== 'none' && oc && oc.a > 0.05 && r.ow > 0) set.push(['outline-color', p.accent]);
