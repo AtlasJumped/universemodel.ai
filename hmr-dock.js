@@ -1,4 +1,5 @@
-/* HMR dock v6.6.0: one shared bottom bar for all HMR sites.
+/* HMR dock v6.6.1: one shared bottom bar for all HMR sites.
+   v6.6.1: the demo cards now show (v6.6.0 skipped every spot because the page's html tag carries hmr- classes).
    v6.6.0 edit mode: small "Add a demo?" cards with Yes and No at spots that have no demo yet (see the block at the end of this file).
    (was v6.5.9: one shared bottom bar for all HMR sites.
    v6.5.9 (Leo's Speak feedback, Nov 24 and 25): the mic starts OFF when the card opens (status "Not recording yet", line "Press the record button and begin speaking");
@@ -1524,7 +1525,7 @@
   // v6.5: the HMR button opens the HMR family experience dashboard (hmr-dash.js, same folder as this file, loaded on first press)
   var hmrBtn = mkPill('hmr-hmrbtn', 'hmr-hmr', 'Open your HMR family experience dashboard', '<span class="hmr-hmrt">HMR</span>');
   hmrBtn.title = 'Your HMR dashboard'; hmrBtn.setAttribute('aria-haspopup', 'dialog'); hmrBtn.setAttribute('aria-expanded', 'false'); hmrBtn.setAttribute('aria-controls', 'hmr-dash');
-  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.6.0'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
+  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.6.1'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
   var dashState = 0, dashWait = [];   // 0 not loaded, 1 loading, 2 ready, 3 failed
   function loadDash(cb) {
     if (window.HMRDash) { dashState = 2; if (cb) cb(); return; }
@@ -3083,12 +3084,13 @@
     if (!n) n = sp.tagName.toLowerCase() + ' ' + (i + 1);
     return n.length > 60 ? n.slice(0, 57) + '...' : n;
   }
+  function skipped(e) { for (var n = e; n && n !== doc.body && n !== doc.documentElement; n = n.parentElement) if (n.matches(SKIPIN)) return true; return false; }   // v6.6.1: html and body carry hmr- classes (pointer prefs), so they are not tested
   function visible(e) { var r = e.getBoundingClientRect(); return r.width >= 220 && r.height >= 90; }
   function find() {
     var cand = [].slice.call(doc.querySelectorAll('[data-demo-spot],form,section,article')), out = [];
     cand.forEach(function (sp) {
       if (out.length >= MAX) return;
-      if (sp.closest(SKIPIN)) return;
+      if (skipped(sp)) return;
       if (!sp.hasAttribute('data-demo-spot') && !sp.querySelector('input:not([type=hidden]),textarea,select,canvas,button')) return;
       if (sp.matches(HASDEMO) || sp.querySelector(HASDEMO)) return;
       if (!visible(sp)) return;
