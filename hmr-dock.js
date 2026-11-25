@@ -1754,7 +1754,7 @@
     sp = { want: false, committed: '', sess: '', raw: '', ign: '', rec: null, fails: 0, quick: 0, el0: 0, last: Date.now(), startedAt: 0 };
     var s = el('div', 'hmr-spk'); s.id = 'hmr-spk'; s.hidden = true; s.setAttribute('role', 'dialog'); s.setAttribute('aria-label', 'Speak here'); sp.el = s;
     var hd = el('div', 'hd');
-    hd.appendChild(el('span', 'hs-heart', '\u2764\uFE0F')); hd.appendChild(el('span', 'hs-ttl', 'Do us a big favor, tell us what you think')); hd.appendChild(el('span', 'hs-sp'));
+    hd.appendChild(el('span', 'hs-heart', '\uD83D\uDC9B')); hd.appendChild(el('span', 'hs-ttl', 'Do us a big favor, tell us what you think')); hd.appendChild(el('span', 'hs-sp'));
     var x = el('button', 'x', '\u00d7'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.addEventListener('click', function () { closeSpeak(true, true); });
     hd.appendChild(x); s.appendChild(hd);
     // small status row: red dot, timer, state
