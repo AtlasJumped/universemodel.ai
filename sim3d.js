@@ -238,8 +238,8 @@
   // ---------- editor ----------
   const ed = $('sim-editor');
   const FIELDS = [
-    ['density', 'Density', 1, 4, 0.05, v => '×' + v.toFixed(2), 'How densified the tissue is. Shortens the fascia in the zone by 11% per unit and stiffens it in proportion.'],
-    ['friction', 'Friction', 1, 10, 0.1, v => '×' + v.toFixed(1), 'How much the zone resists fascia sliding through it. Higher friction keeps tension from spreading along the lines and damps motion there.'],
+    ['density', 'Density', 1, 4, 0.05, v => '×' + v.toFixed(2), 'How densified the tissue is. Shortens the connective tissue in the zone by 11% per unit and stiffens it in proportion.'],
+    ['friction', 'Friction', 1, 10, 0.1, v => '×' + v.toFixed(1), 'How much the zone resists connective tissue sliding through it. Higher friction keeps tension from spreading along the lines and damps motion there.'],
     ['mass', 'Mass', 0.5, 4, 0.05, v => '×' + v.toFixed(2), 'Relative mass of the zone. Added mass is extra weight under gravity that the web must hold up.'],
     ['volume', 'Volume', 0.5, 2.5, 0.05, v => '×' + v.toFixed(2), 'Relative volume. Above 1 the zone acts as a spacer that pushes outward (swelling, a mass); below 1 it pulls inward.'],
     ['radius', 'Boundary radius', 2, 25, 0.5, v => v.toFixed(1) + ' cm', 'The local zone. Cables inside it take the full change, fading to none at the boundary. With time passing, the change also creeps along the fascial lines that leave it.'],
@@ -285,7 +285,7 @@
       const r = c.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, hd = ['top', 'brow', 'chin', 'occ', 'earL', 'earR'].map(n => proj(sim.P[sim.IDX[n]]));
       const cx = hd.reduce((s, q) => s + q[0], 0) / hd.length, cy = hd.reduce((s, q) => s + q[1], 0) / hd.length, rad = Math.max(...hd.map(q => Math.hypot(q[0] - cx, q[1] - cy)));
       if (Math.hypot(mx - cx, my - cy) < rad) { const T = sim.IDX.top, Cn = sim.IDX.chin, ks = sim.E.findIndex(f => f.strut && !f.cut && f.bone === 'skull' && ((f.a === T && f.b === Cn) || (f.a === Cn && f.b === T)));
-        if (ks >= 0 && sim.breakBone(ks, 0.5)) { hoverE = -1; changed(); status('Skull crushed. Every fascial line that runs to the head, front, back and sides, has lost its top anchor and let go along its whole length (dotted). Nothing is left to hold the column up. Press Reset to healthy to heal.'); }
+        if (ks >= 0 && sim.breakBone(ks, 0.5)) { hoverE = -1; changed(); status('Skull crushed. Every connective tissue line that runs to the head, front, back and sides, has lost its top anchor and let go along its whole length (dotted). Nothing is left to hold the column up. Press Reset to healthy to heal.'); }
         return; } }
     const k = nearestEdge(c, e.clientX, e.clientY, mode === 'break'); if (k < 0) return;
     const ed = sim.E[k];
@@ -296,14 +296,14 @@
       const B = sim.boneOf(k), n = sim.breakBone(k, t); hoverE = -1;
       if (!n) { status(`The ${B ? B.def.name : 'bone'} is one fixed piece in this model and cannot be broken. Try a long bone, a vertebra, a rib-bearing segment or the collarbone.`); return; }
       changed();
-      status(`${cap(B.name)} broken where you tapped. Its two ends are no longer one piece, and the muscle around it can no longer brace against it. ` + (B.def.seg ? 'The column of the spine is interrupted here: what is above now hangs on the fascia.' : /femur|tibia/.test(B.def.id) ? 'This bone carried the body to the ground. Watch whether the fascia and the other leg can hold the weight.' : 'Watch what it was holding.'));
+      status(`${cap(B.name)} broken where you tapped. Its two ends are no longer one piece, and the muscle around it can no longer brace against it. ` + (B.def.seg ? 'The column of the spine is interrupted here: what is above now hangs on the connective tissue.' : /femur|tibia/.test(B.def.id) ? 'This bone carried the body to the ground. Watch whether the connective tissue and the other leg can hold the weight.' : 'Watch what it was holding.'));
       return; }
     sim.cut(k); hoverE = -1; changed();
     const L = sim.lastCut || {}, sd = s => s === 'L' ? 'left' : s === 'R' ? 'right' : '', n = (L.released || 0) + 1;
     const REG = { leg1: 'left leg', 'leg-1': 'right leg', coreUpL: 'left side of the chest, the shoulder and the arm', coreUpR: 'right side of the chest, the shoulder and the arm', coreLowL: 'left side of the belly and lower back', coreLowR: 'right side of the belly and lower back', coreC: 'midline of the trunk' };
-    status(`Cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (L.kind === 'line' ? `That cord is part of the ${(L.names || [L.name]).map(s => s.toLowerCase()).join(' and the ')}${L.side === 'both' ? ', where both sides share it' : ' on the ' + sd(L.side) + ' side'}${(L.names || []).length > 1 ? ', which share fibers here, so both let go' : ''}. A fascial system is one continuous band, so a cut anywhere lets all of it go: ${n} stretches, from one end of the body to the other (dotted). Watch what it was holding, also far from the cut.`
+    status(`Cut between the ${pretty(ed.a)} and the ${pretty(ed.b)}. ` + (L.kind === 'line' ? `That cord is part of the ${(L.names || [L.name]).map(s => s.toLowerCase()).join(' and the ')}${L.side === 'both' ? ', where both sides share it' : ' on the ' + sd(L.side) + ' side'}${(L.names || []).length > 1 ? ', which share fibers here, so both let go' : ''}. A connective tissue system is one continuous band, so a cut anywhere lets all of it go: ${n} stretches, from one end of the body to the other (dotted). Watch what it was holding, also far from the cut.`
       : L.kind === 'deep' ? `That was one of the deep guys of the spine${L.side === 'C' ? ', on the midline' : ', ' + sd(L.side) + ' side'}. They work as one system from the skull to the pelvis, so all ${n} have let go (dotted), and the guys on the other side now pull the column their way.`
-      : `That was a strand of the general fascial web of the ${REG[L.region] || 'body'}. The web of a region is one sheet: all ${n} strands of it have let go (dotted). What it wrapped now hangs on the lines alone.`));
+      : `That was a strand of the general connective tissue web of the ${REG[L.region] || 'body'}. The web of a region is one sheet: all ${n} strands of it have let go (dotted). What it wrapped now hangs on the lines alone.`));
   }
   const setCursor = () => { for (const c of [cv, cv2].filter(Boolean)) { c.classList.remove('cur-point', 'cur-cut', 'cur-strut', 'cur-pluck'); c.classList.add(mode === 'cut' ? 'cur-cut' : mode === 'break' ? 'cur-strut' : mode === 'pluck' ? 'cur-pluck' : 'cur-point'); } };
   setCursor();
@@ -330,12 +330,12 @@
   // ---------- controls ----------
   const on = (q, ev, fn) => document.querySelectorAll(q).forEach(b => b.addEventListener(ev, () => fn(b)));
   on('[data-imode]', 'click', b => { mode = b.dataset.imode; linePick = null; hoverE = -1; dirty = true; setCursor(); document.querySelectorAll('[data-imode]').forEach(x => x.classList.toggle('on', x === b));
-    status({ pluck: 'Pluck: tap any point to push it out and watch the web answer.', cut: 'Cut a cable: hover over the fascial web and tap a cable to cut it.', break: 'Break a bone: tap a bone to snap it where you tap.', point: 'Point: tap any point on either figure.', line: 'Line: tap two points; the imperfection follows the fascia between them.', plane: 'Plane: tap the center of a sheet of tissue. The sheet faces you, so turn the body to choose its angle.',
+    status({ pluck: 'Pluck: tap any point to push it out and watch the web answer.', cut: 'Cut a cable: hover over the connective tissue web and tap a cable to cut it.', break: 'Break a bone: tap a bone to snap it where you tap.', point: 'Point: tap any point on either figure.', line: 'Line: tap two points; the imperfection follows the connective tissue between them.', plane: 'Plane: tap the center of a sheet of tissue. The sheet faces you, so turn the body to choose its angle.',
       torque: 'Twist: tap a hip, a knee, the lower back (trunk) or the base of the neck (head). Joints you can twist are shown in orange.' }[mode]); });
   const setSpin = v => { spin = v; const c = $('sim-spin'); if (c) c.checked = v; };
   on('[data-view]', 'click', b => { setSpin(false); pitch = -0.04; yaw = { front: 0, side: -Math.PI / 2, back: Math.PI }[b.dataset.view]; dirty = true; });
   on('[data-sex]', 'click', b => { document.querySelectorAll('[data-sex]').forEach(x => x.classList.toggle('on', x === b)); sim.build(b.dataset.sex); sel = null; origin = null; linePick = null; metrics = null; renderEditor(); changed();
-    status(`${sim.sex === 'male' ? 'Male' : 'Female'} reference body, ${sim.HEIGHT} cm: a perfect tensegrity at time zero.`); });
+    status(`${sim.sex === 'male' ? 'Male' : 'Female'} reference body, ${sim.HEIGHT} cm: an ideal biotensegrity at time zero.`); });
   const chk = (id, fn) => { const el = $(id); if (el) { el.addEventListener('change', () => { fn(el.checked); dirty = true; }); fn(el.checked); } };
   chk('sim-spin', v => spin = v); chk('sim-skin', v => showSkin = v); chk('sim-bones', v => showBones = v); chk('sim-web', v => showWeb = v); chk('sim-heat', v => heat = v);
   chk('sim-tint', v => strainTint = v);
@@ -344,7 +344,7 @@
   const legend = $('sim-lines');
   if (legend) { legend.innerHTML = UMSim.LINES.map(L => `<label class="lineopt"><input type="checkbox" data-line="${L.id}" checked><i style="background:${L.color}"></i>${L.name}</label>`).join('');
     legend.querySelectorAll('[data-line]').forEach(c => { lineOn[c.dataset.line] = c.checked; c.addEventListener('change', () => { lineOn[c.dataset.line] = c.checked; dirty = true; }); }); }
-  $('sim3d-reset') && $('sim3d-reset').addEventListener('click', () => { sim.reset(); sel = null; origin = null; linePick = null; renderEditor(); changed(); status('Healthy: a perfect tensegrity at time zero.'); });
+  $('sim3d-reset') && $('sim3d-reset').addEventListener('click', () => { sim.reset(); sel = null; origin = null; linePick = null; renderEditor(); changed(); status('Healthy: an ideal biotensegrity at time zero.'); });
   $('sim-zoomin') && $('sim-zoomin').addEventListener('click', () => { zoom = Math.min(2.6, zoom * 1.15); dirty = true; });
   $('sim-zoomout') && $('sim-zoomout').addEventListener('click', () => { zoom = Math.max(0.6, zoom / 1.15); dirty = true; });
   const BACK_TEXT = 'Tight lower back: the thoracolumbar fascia and the lower back muscles densified (density 3.2) and made sticky (friction 4). The lower back shortens, the pelvis tips back and the head is drawn back with it. The measured amounts are under What changed.';

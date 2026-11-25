@@ -403,7 +403,7 @@ const TG = (() => {
       info: 'Hot air pushes up on the envelope; the fabric and the cables are in tension, carrying the basket. Two small people ride in the basket. Two tethers hold it down. Cut a tether and it drifts; break one strut of the basket and only that corner gives way.' };
   }
 
-  // A simplified human: bones as rigid struts, fascia as cables in tension crossing every joint. Feet are pinned.
+  // A simplified human: bones as rigid struts, connective tissue as cables in tension crossing every joint. Feet are pinned.
   function human() {
     const b = builder(), N = {};
     const nd = (k, x, y, z, m, pin) => (N[k] = b.node(x, y, z, m || 0.03, pin));
@@ -450,7 +450,7 @@ const TG = (() => {
     cab('nape', 't6'); cab('nape', 'scL'); cab('nape', 'scR'); // the nuchal line: holds the head up against its own forward weight
     cab('pub', 'xi'); cab('asisL', 'ribR'); cab('asisR', 'ribL'); cab('st', 'chin'); cab('l3', 'scL'); cab('l3', 'scR'); cab('crestL', 'scL'); cab('crestR', 'scR'); cab('scL', 'earL'); cab('scR', 'earR'); cab('asisL', 'xi'); cab('asisR', 'xi');
     return { b, ea: 3000, strain: 0.0005, kb: 8000, iters: 6, kick: 0.9, view: [0.3, 0.1], thin: 0.55, head: ['occ', 'top', 'brow', 'chin', 'earL', 'earR', 'nape'].map(n),
-      info: 'A simplified human tensegrity: the bones are struts, and the fascia is a web of cables in tension crossing every joint, front, back and sides. Nothing holds it upright but tension.' };
+      info: 'A simplified human biotensegrity: the bones are struts, and the connective tissue is a web of cables in tension crossing every joint, front, back and sides. Nothing holds it upright but tension.' };
   }
 
 
@@ -1316,7 +1316,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = TG;
 // with the reader instead. New blocks should be given a tile here (or be built balanced by hand, as the kids page is).
 if (typeof document !== 'undefined') (() => {
   const IMG = { // picture tiles: file, alt text, credit
-    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of colored fascial lines.', 'Universe Model simulation'],
+    sim: ['sim-skeleton.jpg', 'The simulated skeleton: separate bones held up by a web of colored connective tissue lines.', 'Universe Model simulation'],
     cells: ['hx-cytoskeleton-cells.jpg', 'Cells under fluorescence: blue nuclei inside a green web of cytoskeleton filaments.', 'Erin Rod, CC BY 4.0, Wikimedia Commons'],
     hudf: ['rv-hudf.jpg', 'The Hubble Ultra Deep Field: thousands of galaxies in one small patch of sky.', 'NASA, ESA and others, public domain'],
     webb: ['ew-deep-field.jpg', 'Webb\'s first deep field: a cluster of galaxies bending the light of those behind it.', 'NASA, ESA, CSA, STScI, public domain'],
@@ -1331,10 +1331,10 @@ if (typeof document !== 'undefined') (() => {
   };
   // page -> start of the section heading -> tile. p = picture [key, title, text, link]; a = answer [question, answer, link]
   const FILL = {
-    index: { 'Medicine has never': { p: ['sim', 'Meet the reference body', 'A skeleton of 45 separate bones held up by fascia alone. Cut a line or break a bone and the physics decides what happens.', 'simulation.html'] },
+    index: { 'Medicine has never': { p: ['sim', 'Meet the reference body', 'A skeleton of 45 separate bones held up by connective tissue alone. Cut a line or break a bone and the physics decides what happens.', 'simulation.html'] },
       'The body as a tensegrity': { p: ['cells', 'The same design at the scale of a cell', 'Inside every cell, stiff filaments are held in a web of tensed ones.', 'health.html#ideal'] } },
     hmr: { 'One theory, from': { a: ['What came before the Big Bang?', 'Universal Intelligence: awareness with unlimited potential and no order yet. Its first act was a distinction, me and not me, and that distinction was the first distance.', 'answers.html#before'] } },
-    health: { 'The problem: the wrong': { p: ['sim', 'The right reference, being built', 'A body with perfect tissue, measured exactly: the simulation starts there and works outward to every way a body can fall short.', 'simulation.html'] },
+    health: { 'The problem: the wrong': { p: ['sim', 'The right reference, being built', 'A body with ideal tissue, measured exactly: the simulation starts there and works outward to every way a body can fall short.', 'simulation.html'] },
       'How disease is assessed': { p: ['vhp', 'What medicine can already see', 'A whole body, slice by slice. The pictures exist. What is missing is the ideal to compare them with.', 'library.html'] },
       'The body as a physical': { p: ['gallop', 'Motion is physics', 'The first photographs to freeze a moving body, 1878. Everything a body does is forces through tissue.', 'physics-health.html'] },
       'The ideal comes from': { p: ['straws', 'Build one', 'Six straws and some elastic: the same principle the ideal body is worked out from.', 'simulation.html#why-tensegrity'] } },
@@ -1347,15 +1347,15 @@ if (typeof document !== 'undefined') (() => {
       'Why the human path': { a: ['What is consciousness?', 'The ground of reality, not a product of matter. Each living being is an instance of UI experiencing physical reality.', 'answers.html#conscious'] } },
     protocol: { 'Water, then moisture': { p: ['fascia', 'What the water is for', 'Loose connective tissue under the microscope. Its layers slide on a film of fluid, and the protocol works from the skin inward.', 'physics-health.html'] },
       'Two directions, one web': { p: ['beach', 'Go slow and stay long', 'Minutes, not seconds, and every day. People have practiced long holds together for centuries.', 'east-west.html#body'] } },
-    'health-model': { 'Body, mind and meaning': { a: ['What is health?', 'Closeness to the perfect human body: an optimized tensegrity, bones floating in an evenly tensioned web of fascia.', 'answers.html#health'] } },
+    'health-model': { 'Body, mind and meaning': { a: ['What is health?', 'Closeness to the ideal human body: an optimized biotensegrity, bones floating in an evenly tensioned web of connective tissue.', 'answers.html#health'] } },
     'mental-health': { 'Protocols for the body': { a: ['What is mental illness?', 'What follows when one of three supports is missing: a body at ease, beliefs that are true, and a community that understands you.', 'answers.html#mental'] } },
-    'physics-health': { 'Watch the body move': { p: ['gallop', 'It began with a horse', 'Muybridge froze motion in 1878 and motion science began. The same idea, with today\'s imaging, applied to the whole fascia web.', 'simulation.html'] } },
+    'physics-health': { 'Watch the body move': { p: ['gallop', 'It began with a horse', 'Muybridge froze motion in 1878 and motion science began. The same idea, with today\'s imaging, applied to the whole connective tissue web.', 'simulation.html'] } },
     'east-west': { 'Practices that work': { p: ['beach', 'Long holds, done together', 'A yoga class holding one pose on a beach in France. The protocol uses the same long, slow loading.', 'protocol.html'] },
       'The golden age': { p: ['siddhas', 'The traditions pictured it', 'Adepts who spent their lives on the body and mind, painted in eighteenth century Tibet.', 'ui.html'] } },
     simulation: { 'A mechanic needs': { p: ['tower', 'The same principle at 18 meters', 'Tubes that never touch, held up only by cables in tension. Scroll up and try it on a body.', '#model'] } },
     methods: { 'Compute': { p: ['sim', 'What the compute is for', 'Millions of simulated bodies, each with a different set of imperfections, solved as physics.', 'roadmap.html#campaign'] },
       'Data sources': { p: ['vhp', 'The raw material', 'One of 9,808 cross-sections of a complete male body, from the Visible Human Project.', 'library.html'] },
-      'The full model': { p: ['cells', 'Down to the cell', 'The model is meant to reach from whole-body lines of fascia to the filaments inside each cell.', 'health.html#ideal'] } }
+      'The full model': { p: ['cells', 'Down to the cell', 'The model is meant to reach from whole-body lines of connective tissue to the filaments inside each cell.', 'health.html#ideal'] } }
   };
   const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const tile = d => { const a = document.createElement('a'); if (d.p) { const [k, title, text, href] = d.p, im = IMG[k], pre = /\/preview\//.test(location.pathname) ? '../' : '';
