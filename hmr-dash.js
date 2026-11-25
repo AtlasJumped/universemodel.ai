@@ -1,4 +1,4 @@
-/* HMR dash v1.0: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
+/* HMR dash v1.1: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
    One file, copied next to hmr-dock.js on every HMR site, lazy-loaded the first time the HMR button is pressed (or at boot when a visitor has a saved look).
    Layers:
      Home      intro card (with "Don't show this again", explained), row "Right now" (Share, Top with a way back, Bigger text, Night),
@@ -16,7 +16,7 @@
 (function () {
   'use strict';
   if (window.HMRDash && window.HMRDash.version >= 1) return;
-  var doc = document, root = doc.documentElement, VERSION = 1.0;
+  var doc = document, root = doc.documentElement, VERSION = 1.1;
   var SKIN_URL = 'https://hmrfamily.life/hmr-kit/skin.json';
   var KEY = 'hmr-studio-v1', INTRO_KEY = 'hmr-dash-intro-off', SKIN_CACHE = 'hmr-skin-v1';
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
