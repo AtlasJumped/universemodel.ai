@@ -70,11 +70,18 @@
     var c = typeof n.className === 'string' ? n.className : '', id = n.id || '';
     return /(^|\s)hmr-/.test(c) || /^hmr-/.test(id) || n.hasAttribute('data-hmr-dock');
   }
-  var undo = [], painted = null, paintedKey = '', mo = null, moT = 0, pending = [];
-  function setP(n, prop, v) { undo.push([n, prop, n.style.getPropertyValue(prop), n.style.getPropertyPriority(prop)]); n.style.setProperty(prop, v, 'important'); }
+  var painted = null, paintedKey = '', mo = null, moT = 0, pending = [];
+  // colors go in through classes and one stylesheet, never the style attribute: some pages' own scripts reset an element's style attribute after their animations, which would wipe inline colors
+  var cls = {}, clsN = 0, clsCss = [], clsEls = [], clsDirty = false;
+  function setP(n, prop, v) {
+    var k = prop + ':' + v, c = cls[k];
+    if (!c) { c = cls[k] = 'hmrp' + (++clsN); clsCss.push('html.hmr-pal .' + c + '.' + c + '.' + c + ',html.hmr-pal.' + c + '.' + c + '.' + c + '{' + prop + ':' + v + '!important}'); clsDirty = true; }
+    if (!n.classList.contains(c)) { n.classList.add(c); clsEls.push([n, c]); }
+  }
+  function flushCls() { if (clsDirty) { cssVar('palc', clsCss.join('\n')); clsDirty = false; } }
   function restoreColors() {
-    for (var i = undo.length - 1; i >= 0; i--) { var u = undo[i]; try { if (u[2]) u[0].style.setProperty(u[1], u[2], u[3]); else u[0].style.removeProperty(u[1]); } catch (e) { } }
-    undo = []; painted = null; paintedKey = ''; pending = []; clearTimeout(moT); moT = 0; if (mo) { try { mo.disconnect(); } catch (e) { } mo = null; }
+    for (var i = 0; i < clsEls.length; i++) { try { clsEls[i][0].classList.remove(clsEls[i][1]); } catch (e) { } }
+    clsEls = []; cls = {}; clsCss = []; clsDirty = false; cssVar('palc', ''); painted = null; paintedKey = ''; pending = []; clearTimeout(moT); moT = 0; if (mo) { try { mo.disconnect(); } catch (e) { } mo = null; }
     root.classList.remove('hmr-pal'); root.removeAttribute('data-hmr-pal'); cssVar('pal', '');
   }
   var EXCL = '[data-hmr-ui],#hmr-dock,.hmr-dock,svg,[class^="hmr-"],[class*=" hmr-"]';
@@ -147,6 +154,7 @@
       if (set.length) W.push([r.e, set]);
     }
     for (i = 0; i < W.length; i++) for (var j = 0; j < W[i][1].length; j++) setP(W[i][0], W[i][1][j][0], W[i][1][j][1]);
+    flushCls();
   }
   function paint(p, hi) {
     var k = p ? p.id + '|' + (hi ? 1 : 0) : '';
