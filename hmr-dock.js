@@ -1,4 +1,4 @@
-/* HMR dock v6.2: one shared bottom bar for all HMR sites.
+/* HMR dock v6.3: one shared bottom bar for all HMR sites.
    One row along the bottom, left to right:
      far left: Back (round, browser back) then the dock's own Design button (round). v6.1: the dock's Design is the ONLY design feature on every site; a page's own
        Design button and panel (data-design / data-design-panel) are hidden, so there is never a second design control.
@@ -1669,6 +1669,9 @@
   var sp = null, SPKEY = 'hmr-draft-v1:speak';
   var SPNOSR = 'Your browser cannot turn speech into text here. Type instead, or use your keyboard\'s mic button.';
   function saveSpeak() { if (sp) jset(SPKEY, { t: sp.ta.value }); }
+  var MICSVG = function (on_) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + (on_ ? '<rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/>' : '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>') + '</svg>'; };
+  var TOUCH = (function () { try { return (navigator.maxTouchPoints || 0) > 0 || (window.matchMedia && matchMedia('(pointer:coarse)').matches); } catch (e) { return false; } })();
+  var SPWHY = 'hmr-spk-why-off', SPRESUME = 'hmr-spk-resume';
   function spRec() { return !!(sp && sp.want); }
   function spSay(t) { if (sp) sp.mst.textContent = t || ''; }
   function fmtT(ms) { var s = Math.floor(ms / 1000), m = Math.floor(s / 60); s = s % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
@@ -1676,7 +1679,7 @@
   function spPaint() { sp.ta.value = spText(); try { sp.ta.scrollTop = sp.ta.scrollHeight; } catch (e) { } saveSpeak(); }
   function spShow() {
     var on = !!sp.want;
-    sp.dot.classList.toggle('on', on); sp.ctl.textContent = on ? 'Stop' : 'Resume'; sp.ctl.setAttribute('aria-label', on ? 'Stop recording' : 'Resume recording');
+    sp.dot.classList.toggle('on', on); sp.ctl.classList.toggle('rec', on); sp.ctl.setAttribute('aria-pressed', on ? 'true' : 'false'); sp.ctl.innerHTML = MICSVG(on); sp.ctl.setAttribute('aria-label', on ? 'Stop recording' : 'Start recording'); sp.ctl.title = on ? 'Stop recording' : 'Start recording';
     sp.state.textContent = on ? 'Recording' : (sp.el0 > 0 ? 'Paused' : 'Ready');
     sp.tm.textContent = fmtT(sp.el0);
     spBtn.classList.toggle('rec', on);
@@ -1713,7 +1716,7 @@
   }
   function spStart() {
     if (!sp || !SR) return;
-    sp.want = true; sp.fails = 0; sp.quick = 0; sp.last = Date.now(); sp.help.hidden = true; sp.el.classList.remove('help'); spSay('Listening. Talk as long as you like.');
+    sp.want = true; sp.fails = 0; sp.quick = 0; sp.last = Date.now(); sp.help.hidden = true; sp.el.classList.remove('help'); spSay('Listening. Keep scrolling and using the site while you talk.');
     spBegin(); spShow();
   }
   function spBegin() {
@@ -1730,13 +1733,13 @@
         if (sp.rec !== r) return; var er = ev && ev.error;
         if (er === 'not-allowed' || er === 'service-not-allowed') { sp.want = false; spShow(); spSay(''); spHelp(); }
         else if (er === 'audio-capture') { sp.want = false; spShow(); spSay('No microphone found. You can type instead. Your words are saved.'); }
-        else if (er === 'network') { sp.fails++; if (sp.fails >= 3) { sp.want = false; spShow(); spSay('Voice typing lost its connection. Your words are saved. Tap Resume to try again.'); } }
+        else if (er === 'network') { sp.fails++; if (sp.fails >= 3) { sp.want = false; spShow(); spSay('Voice typing lost its connection. Your words are saved. Tap the mic in the box to try again.'); } }
       };
       r.onend = function () {
         if (sp.rec !== r) return; sp.rec = null; sp.committed = spText(); sp.sess = ''; sp.raw = ''; sp.ign = ''; spPaint();
         if (sp.want) {
           sp.quick = (Date.now() - sp.startedAt < 1200) ? sp.quick + 1 : 0;
-          if (sp.quick >= 6) { sp.want = false; spShow(); spSay('Voice typing keeps stopping on this device. Your words are saved. Tap Resume, or use your keyboard\'s mic button.'); return; }
+          if (sp.quick >= 6) { sp.want = false; spShow(); spSay('Voice typing keeps stopping on this device. Your words are saved. Tap the mic in the box, or use your keyboard\'s mic button.'); return; }
           setTimeout(function () { if (sp && sp.want && !sp.rec) spBegin(); }, 250 + sp.quick * 300);
         } else { spShow(); if (!/blocked|found|connection|stopping/.test(sp.mst.textContent)) spSay(sp.ta.value ? 'Paused. Your words are saved.' : ''); }
       };
@@ -1751,17 +1754,31 @@
     sp = { want: false, committed: '', sess: '', raw: '', ign: '', rec: null, fails: 0, quick: 0, el0: 0, last: Date.now(), startedAt: 0 };
     var s = el('div', 'hmr-spk'); s.id = 'hmr-spk'; s.hidden = true; s.setAttribute('role', 'dialog'); s.setAttribute('aria-label', 'Speak here'); sp.el = s;
     var hd = el('div', 'hd');
+    hd.appendChild(el('span', 'hs-heart', '\u2764\uFE0F')); hd.appendChild(el('span', 'hs-ttl', 'Do us a big favor, tell us what you think')); hd.appendChild(el('span', 'hs-sp'));
+    var x = el('button', 'x', '\u00d7'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.addEventListener('click', function () { closeSpeak(true, true); });
+    hd.appendChild(x); s.appendChild(hd);
+    // small status row: red dot, timer, state
+    var rw = el('div', 'hs-row');
     sp.dot = el('span', 'hs-dot'); sp.dot.setAttribute('aria-hidden', 'true'); sp.tm = el('span', 'hs-tm', '0:00'); sp.state = el('span', 'hs-state', 'Ready');
-    sp.ctl = el('button', 'hs-ctl', 'Stop'); sp.ctl.type = 'button';
-    var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.addEventListener('click', function () { closeSpeak(true, true); });
-    hd.appendChild(sp.dot); hd.appendChild(sp.tm); hd.appendChild(sp.state); hd.appendChild(el('span', 'hs-sp')); hd.appendChild(sp.ctl); hd.appendChild(x); s.appendChild(hd);
+    rw.appendChild(sp.dot); rw.appendChild(sp.tm); rw.appendChild(sp.state); s.appendChild(rw);
+    // the explainer, with its own small x ("Don't show again")
+    if (lsGet(SPWHY) !== '1') {
+      var why = el('div', 'hs-why2'); why.appendChild(el('p', '', 'We give real value for free, and we hope you will spend a couple of minutes sharing your thoughts. That is how a community of cooperation grows. Two minutes of your talk is worth a lot to us. After you press the mic, wait half a second, then begin. Your words appear in the text box, and you can keep scrolling and using the site while you talk.'));
+      var wx = el('button', 'hs-wx', '\u00d7 Don\'t show again'); wx.type = 'button'; wx.setAttribute('aria-label', 'Hide this explanation and do not show it again');
+      wx.addEventListener('click', function () { lsSet(SPWHY, '1'); if (why.parentNode) why.parentNode.removeChild(why); });
+      why.appendChild(wx); s.appendChild(why);
+    }
     sp.help = el('div', 'hs-help'); sp.help.hidden = true; s.appendChild(sp.help);
-    sp.live = el('div', 'hs-live'); sp.ta = el('textarea'); sp.ta.id = 'hmr-sp-text'; sp.ta.rows = 2; sp.ta.setAttribute('autocomplete', 'off'); sp.ta.setAttribute('aria-label', 'What we heard. You can edit it.'); sp.ta.placeholder = SR ? 'Your words show up here as you talk' : 'Type here'; sp.live.appendChild(sp.ta); s.appendChild(sp.live);
+    sp.live = el('div', 'hs-live'); sp.ta = el('textarea'); sp.ta.id = 'hmr-sp-text'; sp.ta.rows = 2; sp.ta.setAttribute('autocomplete', 'off'); sp.ta.setAttribute('aria-label', 'What we heard. You can edit it.'); sp.ta.placeholder = SR ? 'Your words show up here as you talk' : 'Type here';
+    var tw = el('div', 'hmr-tw'); tw.appendChild(sp.ta);
+    sp.ctl = el('button', 'hmr-tmic'); sp.ctl.type = 'button'; sp.ctl.innerHTML = MICSVG(false); sp.ctl.setAttribute('aria-label', 'Start recording'); sp.ctl.title = 'Start recording'; tw.appendChild(sp.ctl);
+    sp.live.appendChild(tw); s.appendChild(sp.live);
+    s.appendChild(el('p', 'hs-tip', 'Tip: our mic keeps listening while you scroll. Your keyboard\'s mic works too, but it stops when you leave the box.'));
     sp.mst = el('p', 'st'); sp.mst.setAttribute('role', 'status'); sp.mst.setAttribute('aria-live', 'polite'); s.appendChild(sp.mst);
     sp.ctl.addEventListener('click', function () { if (sp.want) spPause(); else spStart(); });
     sp.ta.addEventListener('input', function () { sp.committed = sp.ta.value; sp.ign = sp.raw; sp.sess = ''; saveSpeak(); });
     sp.sub = submitPair({
-      text: function () { spPause(); saveSpeak(); var t = sp.ta.value.trim(); if (!t) { try { sp.ta.focus(); } catch (e) { } } return t; },
+      text: function () { spPause(); saveSpeak(); var t = sp.ta.value.trim(); if (!t && !TOUCH) { try { sp.ta.focus({ preventScroll: true }); } catch (e) { } } return t; },
       kind: 'speak',
       onSent: function () { sp.committed = ''; sp.sess = ''; sp.raw = ''; sp.ign = ''; sp.ta.value = ''; sp.el0 = 0; ldel(SPKEY); spShow(); setTimeout(function () { if (sp && !sp.el.hidden) closeSpeak(true, true); }, 1500); }
     });
@@ -1780,8 +1797,8 @@
     if (sp.el.hidden) { sp.committed = d.t || ''; sp.sess = ''; sp.raw = ''; sp.ign = ''; sp.ta.value = sp.committed; sp.el0 = 0; sp.help.hidden = true; sp.el.classList.remove('help'); sp.last = Date.now(); }
     sp.sub.say(d.t && sp.el.hidden ? 'Your unsent words from last time are here.' : '');
     sp.el.hidden = false; spBtn.setAttribute('aria-expanded', 'true'); spShow();
-    if (!SR) { spSay(SPNOSR); try { sp.ta.focus({ preventScroll: true }); } catch (e) { } return; }
-    if (fromTap === true && !sp.want) spStart(); else if (!sp.want) spSay('Press Resume to start recording.');
+    if (!SR) { spSay(SPNOSR); if (!TOUCH) { try { sp.ta.focus({ preventScroll: true }); } catch (e) { } } return; }
+    if (fromTap === true && !sp.want) spStart(); else if (!sp.want) spSay('Press the mic in the box to start recording.');
   }
   // an outside tap never closes this: the page stays usable (scroll, tap) while it records. The X, Escape, or the Speak button itself (force) close it. Other dock buttons leave a recording alone.
   function closeSpeak(back, force) {
@@ -1791,7 +1808,15 @@
   }
   spBtn.addEventListener('click', function () { if (sp && !sp.el.hidden) closeSpeak(true, true); else openSpeak(true); });
   doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && sp && !sp.el.hidden) closeSpeak(true, true); });
-  window.addEventListener('pagehide', function () { if (sp) { spPause(); saveSpeak(); } });
+  window.addEventListener('pagehide', function () {
+    if (sp) { var live = !sp.el.hidden, txt = sp.ta.value; spPause(); saveSpeak(); try { if (live && txt.trim()) sessionStorage.setItem(SPRESUME, JSON.stringify({ t: txt, at: Date.now() })); } catch (e) { } }
+  });
+  // coming back on another page of the site: offer to pick the note up where it was left (recording needs a tap, so it starts paused)
+  (function () {
+    var r = null; try { r = JSON.parse(sessionStorage.getItem(SPRESUME) || 'null'); sessionStorage.removeItem(SPRESUME); } catch (e) { }
+    if (!r || !r.t || Date.now() - (r.at || 0) > 30 * 60 * 1000) return;
+    setTimeout(function () { try { jset(SPKEY, { t: r.t }); openSpeak(false); spSay('Welcome back. Your note from the last page is here. Press the mic in the box to keep talking.'); } catch (e) { } }, 900);
+  })();
   doc.addEventListener('visibilitychange', function () { if (!doc.hidden && sp && sp.want && !sp.rec) spBegin(); });
 
   // ---- highlight tool (v6): select text and it is marked right away (several at once); hover a mark to get the menu; the menu stays while anything is highlighted.
@@ -2508,7 +2533,7 @@
     if (back) { try { own.btn.focus({ preventScroll: true }); } catch (e) { own.btn.focus(); } }
   }
   function openOwn() {
-    if (!own) return; closeOthers('ds'); closeSpeak(false, true); own.panel.hidden = false; own.btn.setAttribute('aria-expanded', 'true');
+    if (!own) return; closeOthers('ds'); closeSpeak(false, false); own.panel.hidden = false; own.btn.setAttribute('aria-expanded', 'true');
     dsInset(); doc.addEventListener('pointerdown', dsOutside, true); window.addEventListener('resize', dsInset);
     try { if (window.ResizeObserver) { own.ro = new ResizeObserver(dsInset); own.ro.observe(own.panel); } } catch (e) { }
   }
@@ -2545,6 +2570,12 @@
     // Speak here card: small, floating, above the dock, never a sheet
     'html .hmr-spk{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:calc(' + BASE + ' + var(--hmr-c) + 10px)!important;width:min(460px,calc(100vw - 16px))!important;max-width:calc(100vw - 16px)!important;max-height:max(30vh,200px)!important;padding:8px 10px!important;border-radius:14px;overflow:auto;z-index:99996}' +
     'html .hmr-spk.help{max-height:min(60vh,420px)!important}' +
+    'html .hmr-spk{max-height:min(66vh,480px)!important}' +
+    '.hmr-spk .hd .hs-heart{flex:none;font-size:16px}.hmr-spk .hd .hs-ttl{flex:0 1 auto;white-space:normal;line-height:1.2;font-size:14px;font-weight:800}' +
+    '.hmr-spk .hs-row{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:12px}' +
+    '.hmr-spk .hs-why2{position:relative;margin:2px 0 6px;padding:6px 8px;border-radius:8px;background:#f1f5ff;font-size:12.5px;line-height:1.35;color:#222}.hmr-spk .hs-why2 p{margin:0 0 4px}.hmr-spk .hs-wx{min-height:32px;padding:0 8px;border:1px solid #9aa4b5;border-radius:999px;background:#fff;color:#222;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}' +
+    '.hmr-spk .hs-live .hmr-tw textarea{padding:6px 46px 6px 8px!important}.hmr-spk .hs-live .hmr-tmic{right:8px;bottom:8px;width:36px;height:36px}' +
+    '.hmr-spk .hs-tip{margin:4px 0 0;font-size:11.5px;line-height:1.3;color:#444}' +
     '.hmr-spk .hd{display:flex;align-items:center;gap:8px;margin:0 0 4px;white-space:nowrap;font-size:13px;font-weight:700}.hmr-spk .hs-sp{flex:1}' +
     '.hmr-spk .hs-dot{flex:none;width:12px;height:12px;border-radius:50%;background:#9ca3af}.hmr-spk .hs-dot.on{background:#dc2626;animation:hmr-spkpulse 1.1s ease-in-out infinite}' +
     '@keyframes hmr-spkpulse{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.hmr-spk .hs-dot.on{animation:none}}' +
