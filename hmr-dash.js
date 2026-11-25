@@ -1,4 +1,4 @@
-/* HMR dash v1.3: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
+/* HMR dash v1.4: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
    One file, copied next to hmr-dock.js on every HMR site, lazy-loaded the first time the HMR button is pressed (or at boot when a visitor has a saved look).
    Layers:
      Home      intro card (with "Don't show this again", explained), row "Right now" (Share, Top with a way back, Bigger text, Night),
@@ -8,7 +8,8 @@
      Improve   Speak, Write feedback, React to a spot, Highlight tip, I'm lost, Rate a design.
      Funsies   the toy box plus each toy by name.
      Places    sections of this page, and the other HMR family sites.
-     Settings  intro on/off, reset studio, privacy line, version.
+     Settings  intro on/off, reset studio, reset everything saved on this site (with a confirm), privacy line, version.
+    Log in    button at the top of the dashboard; accounts are coming soon, so it opens a short note for now.
    Shared design assets: the skin manifest https://hmrfamily.life/hmr-kit/skin.json (palettes, fonts, media) is read by every site, so a new palette or a
    finished render added there shows up across the whole HMR ecosystem without touching each site. Built-in palettes work offline.
    Everything a visitor chooses is stored in this browser only (localStorage, per site), always inside try/catch.
@@ -16,7 +17,7 @@
 (function () {
   'use strict';
   if (window.HMRDash && window.HMRDash.version >= 1) return;
-  var doc = document, root = doc.documentElement, VERSION = 1.3;
+  var doc = document, root = doc.documentElement, VERSION = 1.4;
   var SKIN_URL = 'https://hmrfamily.life/hmr-kit/skin.json';
   var KEY = 'hmr-studio-v1', INTRO_KEY = 'hmr-dash-intro-off', SKIN_CACHE = 'hmr-skin-v1';
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -325,6 +326,10 @@
     '.hmrd-hd{display:flex;align-items:center;gap:8px;min-height:44px}',
     '.hmrd-hd h2{flex:1;min-width:0;margin:0;font-size:16px;font-weight:800;line-height:1.2;color:var(--d-fg);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
     '.hmrd-hd .crumb{font-weight:600;color:var(--d-mut)}',
+    '.hmrd-login{flex:none;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--d-line);background:var(--d-tile);font-weight:800;font-size:13.5px;color:var(--d-fg)}.hmrd-login:hover{background:var(--d-tile2)}',
+    '.hmrd-soon{display:inline-block;margin:4px 2px 10px;padding:4px 10px;border-radius:99px;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.55);color:#ffd28a;font-size:12px;font-weight:800;letter-spacing:.04em}',
+    '.hmrd-confirm{padding:12px;border-radius:16px;border:1px solid rgba(239,68,68,.55);background:rgba(239,68,68,.12)}.hmrd-confirm p{margin:0 0 10px;font-size:14px;line-height:1.45;color:var(--d-fg)}.hmrd-confirm .row{display:flex;gap:8px;flex-wrap:wrap}',
+    '.hmrd-pill.danger{background:#ef4444;border-color:#ef4444;color:#fff}',
     '.hmrd-ib{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--d-line);background:var(--d-tile);display:flex;align-items:center;justify-content:center;padding:0}.hmrd-ib:hover{background:var(--d-tile2)}',
     '.hmrd-logo{flex:none;width:34px;height:34px;border-radius:50%;background:var(--d-grad);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10.5px;color:#fff;letter-spacing:.04em;box-shadow:0 0 0 2px rgba(255,255,255,.18)}',
     '.hmrd-body{overflow:auto;overscroll-behavior:contain;padding:2px 2px 4px;margin:0 -2px}',
@@ -418,10 +423,11 @@
     var logo = el('span', 'hmrd-logo', 'HMR'); logo.setAttribute('aria-hidden', 'true');
     var h = el('h2'); h.id = 'hmrd-title';
     var x = btn('hmrd-ib', '', 'Close the dashboard'); x.innerHTML = svg('x'); x.addEventListener('click', function () { close(true); });
+    var li = btn('hmrd-login', 'Log in', 'Log in (coming soon)'); li.addEventListener('click', function () { show('login'); });
     bk.addEventListener('click', function () { show('home'); });
-    hd.appendChild(bk); hd.appendChild(logo); hd.appendChild(h); hd.appendChild(x); dash.appendChild(hd);
+    hd.appendChild(bk); hd.appendChild(logo); hd.appendChild(h); hd.appendChild(li); hd.appendChild(x); dash.appendChild(hd);
     var body = el('div', 'hmrd-body'); dash.appendChild(body);
-    dash._h = h; dash._bk = bk; dash._logo = logo; dash._body = body;
+    dash._h = h; dash._li = li; dash._bk = bk; dash._logo = logo; dash._body = body;
     dash.addEventListener('keydown', trap);
     // swipe the grab bar down to close on phones
     var y0 = null; dash.addEventListener('touchstart', function (e) { if (body.scrollTop <= 0 && e.touches.length === 1) y0 = e.touches[0].clientY; else y0 = null; }, { passive: true });
@@ -435,12 +441,12 @@
     var i = f.indexOf(doc.activeElement);
     if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); } else if (!e.shiftKey && i === f.length - 1) { f[0].focus(); e.preventDefault(); }
   }
-  var TITLES = { home: 'Your HMR family experience dashboard', improve: 'Improve this site', funsies: 'Funsies', places: 'Places', settings: 'Your settings', showcase: 'New from our studio' };
+  var TITLES = { home: 'Your HMR family experience dashboard', improve: 'Improve this site', funsies: 'Funsies', places: 'Places', settings: 'Your settings', showcase: 'New from our studio', login: 'Log in' };
   function show(v) {
-    var VIEWS = { home: home, improve: improve, funsies: funsies, places: places, settings: settings, showcase: showcase };
+    var VIEWS = { home: home, improve: improve, funsies: funsies, places: places, settings: settings, showcase: showcase, login: login };
     if (!VIEWS[v] || (v === 'showcase' && !SKIN.media.length)) v = 'home';
     view = v; var b = dash._body; b.textContent = ''; b.scrollTop = 0;
-    dash._bk.hidden = v === 'home'; dash._logo.hidden = v !== 'home';
+    dash._bk.hidden = v === 'home'; dash._logo.hidden = v !== 'home'; dash._li.hidden = v === 'login';
     dash._h.textContent = ''; if (v === 'home') dash._h.textContent = TITLES.home; else { dash._h.appendChild(el('span', 'crumb', 'Dash › ')); dash._h.appendChild(doc.createTextNode(TITLES[v] || '')); }
     VIEWS[v](b);
     if (v !== 'home') { try { dash._bk.focus({ preventScroll: true }); } catch (e) { } }
@@ -493,7 +499,8 @@
     if (SKIN.media.length) r2.appendChild(tile('show', 'hmrd-g5', 'New from our studio', SKIN.media.length + (SKIN.media.length === 1 ? ' new piece' : ' new pieces') + ' to watch', function () { show('showcase'); }));
     b.appendChild(r2);
     var ft = el('div', 'hmrd-foot'); var sb = btn('hmrd-link', T('settings', 'label') || 'Your settings'); sb.addEventListener('click', function () { show('settings'); });
-    ft.appendChild(el('span', '', isDefault() ? 'Showing the site as built' : 'Your look is on')); ft.appendChild(sb); b.appendChild(ft);
+    var rb = btn('hmrd-link', 'Reset'); rb.setAttribute('aria-label', 'Reset everything saved on this site'); rb.addEventListener('click', function () { show('settings'); askReset(); });
+    ft.appendChild(el('span', '', isDefault() ? 'Showing the site as built' : 'Your look is on')); var fr = el('span'); fr.appendChild(rb); fr.appendChild(sb); ft.appendChild(fr); b.appendChild(ft);
   }
   var introHidden = false;
   function nightPal() { var a = allPalettes(), n = palById('candle-hour'); if (n) return n; a.forEach(function (p) { if (!n && p.dark && /night|ember|hearth|candle|low/.test(p.id + ' ' + (p.mood || '').toLowerCase())) n = p; }); if (!n) a.forEach(function (p) { if (!n && p.dark) n = p; }); return n; }
@@ -558,6 +565,8 @@
     l.appendChild(sw);
     l.appendChild(item('studio', 'Open the studio', 'Colors, type, comfort, layouts', function () { openStudio('colors'); }));
     l.appendChild(item('x', 'Reset my look', isDefault() ? 'You are seeing the site as built' : 'Go back to the site as built', function () { resetLook(); show('settings'); try { dash._bk.focus({ preventScroll: true }); } catch (e) { } }));
+    var ra = item('x', 'Reset everything on this site', 'Clear every choice saved here and start fresh', function () { askReset(); }); ra.setAttribute('data-k', 'reset-all'); l.appendChild(ra);
+    var cf = el('div', 'hmrd-confirm'); cf.hidden = true; cf.id = 'hmrd-reset-confirm'; l.appendChild(cf);
     b.appendChild(l);
     b.appendChild(el('p', 'hmrd-p', 'Everything you choose here stays in this browser, on this site. We only hear from you when you choose to send us something. Fonts you pick load from Google Fonts.'));
     b.appendChild(el('p', 'hmrd-p', 'Dashboard v' + VERSION.toFixed(1) + (SKIN.version ? ', studio kit ' + SKIN.version : '')));
@@ -572,6 +581,31 @@
       w.appendChild(f);
     });
     b.appendChild(w);
+  }
+  function askReset() {
+    var cf = dash && dash.querySelector('#hmrd-reset-confirm'); if (!cf) return;
+    cf.textContent = ''; cf.hidden = false;
+    cf.appendChild(el('p', '', 'This clears everything saved on this site in this browser: your look, the intro choice, toys, highlights and drafts. Reset now?'));
+    var r = el('div', 'row'), yes = btn('hmrd-pill danger', 'Reset'), no = btn('hmrd-pill', 'Cancel');
+    yes.addEventListener('click', resetAll); no.addEventListener('click', function () { cf.hidden = true; var a = dash.querySelector('[data-k="reset-all"]'); try { if (a) a.focus({ preventScroll: true }); } catch (e) { } });
+    r.appendChild(yes); r.appendChild(no); cf.appendChild(r);
+    try { cf.scrollIntoView({ block: 'nearest' }); no.focus({ preventScroll: true }); } catch (e) { }
+  }
+  function resetAll() {
+    [function () { return localStorage; }, function () { return sessionStorage; }].forEach(function (g) {
+      try { var S = g(), ks = []; for (var i = 0; i < S.length; i++) { var k = S.key(i); if (k && /^hmr[-_]/.test(k)) ks.push(k); } ks.forEach(function (k) { S.removeItem(k); }); } catch (e) { }
+    });
+    var u = location.href; try { var U = new URL(u); U.searchParams.delete('hmrlook'); U.searchParams.delete('design'); u = U.toString(); } catch (e) { }
+    try { if (u === location.href) location.reload(); else location.replace(u); } catch (e) { location.reload(); }
+  }
+  function login(b) {
+    b.appendChild(el('span', 'hmrd-soon', 'Coming soon'));
+    b.appendChild(el('p', 'hmrd-p', 'Soon you can log in so your look and settings follow you to every HMR family site, on any device. Logging in will be quick and simple.'));
+    b.appendChild(el('p', 'hmrd-p', 'Until then, everything you choose is saved in this browser, on this site, and nothing is needed from you.'));
+    var l = el('div', 'hmrd-list'), D = dock();
+    if (D.openFeedback) l.appendChild(item('write', 'Tell us what you want from an account', 'Your ideas shape how logging in works', then(function () { D.openFeedback(); })));
+    l.appendChild(item('settings', 'Your settings', 'See or reset what is saved here', function () { show('settings'); }));
+    b.appendChild(l);
   }
   function resetLook() { st = { pal: '', font: '', size: 100, comfort: false, calm: false, links: false, focus: false, contrast: false, prevPal: '' }; shared = false; lsDel(KEY); renderAll(); toast('Back to the site as built.'); }
 
