@@ -1,4 +1,6 @@
-/* HMR dock v6.5.9: one shared bottom bar for all HMR sites.
+/* HMR dock v6.6.0: one shared bottom bar for all HMR sites.
+   v6.6.0 edit mode: small "Add a demo?" cards with Yes and No at spots that have no demo yet (see the block at the end of this file).
+   (was v6.5.9: one shared bottom bar for all HMR sites.
    v6.5.9 (Leo's Speak feedback, Nov 24 and 25): the mic starts OFF when the card opens (status "Not recording yet", line "Press the record button and begin speaking");
      "Talk as long as you like."; the Speak button's label is "Do us a big favor, tell us what you think"; the Speak card can be dragged anywhere by its top line,
      with a one-time hint ("You can grab this and move it anywhere").
@@ -1522,7 +1524,7 @@
   // v6.5: the HMR button opens the HMR family experience dashboard (hmr-dash.js, same folder as this file, loaded on first press)
   var hmrBtn = mkPill('hmr-hmrbtn', 'hmr-hmr', 'Open your HMR family experience dashboard', '<span class="hmr-hmrt">HMR</span>');
   hmrBtn.title = 'Your HMR dashboard'; hmrBtn.setAttribute('aria-haspopup', 'dialog'); hmrBtn.setAttribute('aria-expanded', 'false'); hmrBtn.setAttribute('aria-controls', 'hmr-dash');
-  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.5.9'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
+  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.6.0'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
   var dashState = 0, dashWait = [];   // 0 not loaded, 1 loading, 2 ready, 3 failed
   function loadDash(cb) {
     if (window.HMRDash) { dashState = 2; if (cb) cb(); return; }
@@ -3045,4 +3047,97 @@
     send: send, mailto: mailSelf, openFeedback: function (o) { openSheet('feedback', o); }, openLost: function () { openSheet('lost'); }, closeFeedback: function () { closeSheet(true); }, openSpeak: openSpeak, closeSpeak: function () { closeSpeak(true, true); },
     highlights: hlList, clearHighlights: clearAllHighlights, version: 6.5, openDash: function (v) { loadDash(function () { window.HMRDash.open(v); }); }, openStudio: function (t) { loadDash(function () { window.HMRDash.studio(t); }); }, closeOthers: closeOthers, designPanel: function () { return buildDx(null); }, design: { theme: function (s) { return genTheme(s); }, palettes: function () { return PALS; }, famOf: famOfSeed, seedIn: seedIn, show: function (s) { goTheme('g:' + s); }, hide: function () { goTheme(defaultId()); }, stats: function () { return gen ? { ms: gen.ms || 0, frames: gen.frames || 0, id: gen.t && gen.t.id, layouts: LAYS.length, palettes: PALS.length, fonts: FONTS.length, cards: CARDS.length } : null; }, count: function (fam) { return LAYS.length * PALS.length * FONTS.length * CARDS.length * 5 * DENKEYS.length * RADII.length * ACCS.length; } }, themes: function () { return allThemes().map(function (t) { return { id: t.id, name: t.name, genre: GENRES[t.gi].n, b: t.b, bi: t.bi, f: t.f, h: t.h, l: t.l, c: t.c }; }); }
   };
+})();
+
+/* HMR dock v6.6.0 edit mode: "Add a demo?" cards (Leo, Nov 25: the HMR sites are in edit mode by him).
+   On each page the dock finds spots where a demo could help (forms, tools, sections with controls) that have no demo yet, and puts a small square
+   card at the spot's top right: "Add a demo?" with Yes and No. An answer is sent with the dock's send() (kind 'demo', page, spot name) and the card
+   goes away on this device (localStorage 'hmr-demo-ans'). Turn off: EDIT_MODE = false below, ?edit=0 in the address, or localStorage 'hmr-edit-off' = '1'.
+   A page can mark a spot with data-demo-spot="Name", or opt out with data-demo="none". */
+(function () {
+  'use strict';
+  var EDIT_MODE = true, MAX = 8, KEY = 'hmr-demo-ans', doc = document;
+  if (!EDIT_MODE || window.__hmrDemoSpots) return; window.__hmrDemoSpots = 1;
+  function lg(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function ls(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+  if (/[?&]edit=0\b/.test(location.search) || lg('hmr-edit-off') === '1') return;
+  var answered = {}; try { answered = JSON.parse(lg(KEY) || '{}') || {}; } catch (e) { answered = {}; }
+  var SKIPIN = '#hmr-dock,[class^="hmr-"],[class*=" hmr-"],[id^="hmr-"],nav,header,footer,[role="dialog"],dialog,[aria-hidden="true"]';
+  var HASDEMO = '[data-demo="none"],.demo,[id*="demo" i],[class*="demo" i],video,iframe[src*="youtube"],iframe[src*="vimeo"]';
+  var layer = null, cards = [];
+  function css() {
+    var s = doc.createElement('style'); s.id = 'hmr-demo-css';
+    s.textContent = '.hmr-demo-layer{position:absolute;top:0;left:0;width:0;height:0;z-index:9990}' +
+      '.hmr-demo{position:absolute;width:104px;min-height:96px;box-sizing:border-box;padding:8px;border:2px dashed #b8860b;border-radius:10px;background:#fff8d6;color:#2a2508;font:600 13px/1.25 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.18);display:flex;flex-direction:column;justify-content:space-between;gap:6px}' +
+      '.hmr-demo .q{display:block}.hmr-demo .r{display:flex;gap:6px;justify-content:center}' +
+      '.hmr-demo button{flex:1;min-height:30px;padding:4px 0;border:1px solid #6b5a10;border-radius:6px;background:#fff;color:#2a2508;font:600 13px system-ui,sans-serif;cursor:pointer}' +
+      '.hmr-demo button:hover,.hmr-demo button:focus-visible{background:#f5c518;outline:2px solid #2a2508;outline-offset:1px}' +
+      '.hmr-demo .ok{font-weight:500}@media print{.hmr-demo-layer{display:none}}';
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+  function txt(e) { return String((e && (e.textContent || '')) || '').replace(/\s+/g, ' ').trim(); }
+  function nameOf(sp, i) {
+    var n = sp.getAttribute('data-demo-spot') || sp.getAttribute('aria-label');
+    if (!n) { var h = sp.querySelector('h1,h2,h3,h4,legend,label'); n = txt(h); }
+    if (!n && sp.id) n = '#' + sp.id;
+    if (!n) n = sp.tagName.toLowerCase() + ' ' + (i + 1);
+    return n.length > 60 ? n.slice(0, 57) + '...' : n;
+  }
+  function visible(e) { var r = e.getBoundingClientRect(); return r.width >= 220 && r.height >= 90; }
+  function find() {
+    var cand = [].slice.call(doc.querySelectorAll('[data-demo-spot],form,section,article')), out = [];
+    cand.forEach(function (sp) {
+      if (out.length >= MAX) return;
+      if (sp.closest(SKIPIN)) return;
+      if (!sp.hasAttribute('data-demo-spot') && !sp.querySelector('input:not([type=hidden]),textarea,select,canvas,button')) return;
+      if (sp.matches(HASDEMO) || sp.querySelector(HASDEMO)) return;
+      if (!visible(sp)) return;
+      for (var i = 0; i < out.length; i++) if (out[i].contains(sp) || sp.contains(out[i])) return;   // one card per area
+      out.push(sp);
+    });
+    return out;
+  }
+  function place(c) {
+    var r = c.sp.getBoundingClientRect(), x = r.right + scrollX - 112, y = r.top + scrollY + 8;
+    c.el.style.left = Math.max(8, x) + 'px'; c.el.style.top = Math.max(8, y) + 'px';
+    c.el.style.display = (r.width || r.height) ? '' : 'none';
+  }
+  function answer(c, yes) {
+    var site = (window.HMRDock && window.HMRDock.site) || location.hostname, ans = yes ? 'YES' : 'NO';
+    c.el.innerHTML = '<span class="ok">Sending...</span>';
+    var done = function (ok) {
+      if (ok) { answered[c.key] = ans; ls(KEY, JSON.stringify(answered)); c.el.innerHTML = '<span class="ok">' + (yes ? 'Yes, noted. Thank you.' : 'No, noted. Thank you.') + '</span>'; setTimeout(function () { c.el.remove(); }, 1600); }
+      else { build(c); var e = doc.createElement('span'); e.className = 'ok'; e.textContent = 'Not sent. Try again.'; c.el.insertBefore(e, c.el.firstChild); }
+    };
+    if (!window.HMRDock || !window.HMRDock.send) return done(false);
+    window.HMRDock.send({ kind: 'demo', subject: 'HMR site, demo spot: ' + site, noMailto: true,
+      message: 'Add a demo here? ' + ans + '\nSpot: ' + c.name + '\nPage: ' + location.pathname,
+      details: { answer: ans, spot: c.name, path: location.pathname } }).then(function (r) { done(r && r.ok); }, function () { done(false); });
+  }
+  function build(c) {
+    c.el.innerHTML = '';
+    var q = doc.createElement('span'); q.className = 'q'; q.textContent = 'Add a demo?'; c.el.appendChild(q);
+    var row = doc.createElement('span'); row.className = 'r';
+    [['Yes', true], ['No', false]].forEach(function (b) {
+      var bt = doc.createElement('button'); bt.type = 'button'; bt.textContent = b[0];
+      bt.setAttribute('aria-label', b[0] + ', add a demo to ' + c.name);
+      if (!b[1]) bt.setAttribute('aria-label', 'No demo needed for ' + c.name);
+      bt.addEventListener('click', function () { answer(c, b[1]); }); row.appendChild(bt);
+    });
+    c.el.appendChild(row);
+  }
+  function run() {
+    var spots = find(); if (!spots.length) return;
+    css(); layer = doc.createElement('div'); layer.className = 'hmr-demo-layer'; doc.body.appendChild(layer);
+    spots.forEach(function (sp, i) {
+      var name = nameOf(sp, i), key = location.pathname + '|' + name;
+      if (answered[key]) return;
+      var e = doc.createElement('div'); e.className = 'hmr-demo'; e.setAttribute('role', 'group'); e.setAttribute('aria-label', 'Add a demo to ' + name + '?');
+      var c = { sp: sp, el: e, name: name, key: key }; build(c); layer.appendChild(e); cards.push(c); place(c);
+    });
+    var re = function () { cards.forEach(function (c) { if (c.el.isConnected) place(c); }); };
+    addEventListener('resize', re); setInterval(re, 2000);
+    window.HMRDemoSpots = { list: function () { return cards.map(function (c) { return c.name; }); }, reset: function () { ls(KEY, '{}'); } };
+  }
+  if (doc.readyState === 'complete') setTimeout(run, 600); else addEventListener('load', function () { setTimeout(run, 600); });
 })();
