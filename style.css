@@ -428,3 +428,8 @@ h3.subhead{font-size:clamp(1.3rem,2vw,1.5rem);font-weight:700;line-height:1.2;ma
 .site-head .nav .drop a.nav-red:hover{background-color:#A50D26 !important}
 .site-head .nav .drop a.nav-red[aria-current="page"]{box-shadow:0 0 0 2px #fff,0 0 0 4px #C8102E}
 .site-head .nav a.cta[aria-current="page"]{color:#fff;background:var(--blue-d)}
+
+/* Log in (coming soon), opens the HMR dash */
+.site-head .hlogin{order:5;flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--navy);font:600 .9rem var(--font);cursor:pointer;white-space:nowrap}.site-head .hlogin:hover{border-color:var(--navy)}
+.site-head .nav{margin-left:auto}
+@media (max-width:1180px){.site-head .menu{margin-left:auto}.site-head .wrap{gap:10px}}

@@ -1519,7 +1519,7 @@
   // v6.5: the HMR button opens the HMR family experience dashboard (hmr-dash.js, same folder as this file, loaded on first press)
   var hmrBtn = mkPill('hmr-hmrbtn', 'hmr-hmr', 'Open your HMR family experience dashboard', '<span class="hmr-hmrt">HMR</span>');
   hmrBtn.title = 'Your HMR dashboard'; hmrBtn.setAttribute('aria-haspopup', 'dialog'); hmrBtn.setAttribute('aria-expanded', 'false'); hmrBtn.setAttribute('aria-controls', 'hmr-dash');
-  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.5.6'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
+  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.5.7'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
   var dashState = 0, dashWait = [];   // 0 not loaded, 1 loading, 2 ready, 3 failed
   function loadDash(cb) {
     if (window.HMRDash) { dashState = 2; if (cb) cb(); return; }
@@ -1533,6 +1533,8 @@
   }
   hmrBtn.addEventListener('click', function () { loadDash(function () { window.HMRDash.toggle(); }); });
   hmrBtn.addEventListener('pointerenter', function () { loadDash(); }, { once: true });
+  // a Log in button in a site's own top bar (data-hmr-login) opens the dashboard's Log in view
+  doc.addEventListener('click', function (e) { var t = e.target && e.target.closest ? e.target.closest('[data-hmr-login]') : null; if (!t) return; e.preventDefault(); loadDash(function () { window.HMRDash.open('login'); }); });
   try { if (localStorage.getItem('hmr-studio-v1') || /[?&]hmrlook=/.test(location.search)) { if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', function () { loadDash(); }); else loadDash(); } } catch (e) { }
   dock.textContent = '';
   [backBtn, fzBtn, hmrBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { dock.appendChild(b); });
