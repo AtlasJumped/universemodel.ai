@@ -1,4 +1,5 @@
-/* HMR dash v1.4: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
+/* HMR dash v1.5 (Nov 25, Leo's feedback): the dashboard can be dragged anywhere on the screen by its top bar, with a one-time hint.
+   HMR dash v1.4: the HMR family experience dashboard, opened by the round HMR button in the center of the shared bottom bar (hmr-dock.js v6.5+).
    One file, copied next to hmr-dock.js on every HMR site, lazy-loaded the first time the HMR button is pressed (or at boot when a visitor has a saved look).
    Layers:
      Home      intro card (with "Don't show this again", explained), row "Right now" (Share, Top with a way back, Bigger text, Night),
@@ -17,9 +18,9 @@
 (function () {
   'use strict';
   if (window.HMRDash && window.HMRDash.version >= 1) return;
-  var doc = document, root = doc.documentElement, VERSION = 1.4;
+  var doc = document, root = doc.documentElement, VERSION = 1.5;
   var SKIN_URL = 'https://hmrfamily.life/hmr-kit/skin.json';
-  var KEY = 'hmr-studio-v1', INTRO_KEY = 'hmr-dash-intro-off', SKIN_CACHE = 'hmr-skin-v1';
+  var DRAG_KEY = 'hmr-dash-drag-hint', KEY = 'hmr-studio-v1', INTRO_KEY = 'hmr-dash-intro-off', SKIN_CACHE = 'hmr-skin-v1';
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) { } }
@@ -321,6 +322,8 @@
     '.hmrd-veil{position:fixed;inset:0;z-index:99993;background:rgba(5,6,14,.35);opacity:0;transition:opacity .2s}.hmrd-veil.on{opacity:1}',
     '.hmrd{position:fixed;z-index:99994;left:0;right:0;bottom:0;max-height:min(86vh,720px);max-height:min(86dvh,calc(100dvh - 96px),720px);display:flex;flex-direction:column;background:var(--d-bg);color:var(--d-fg);border:1px solid var(--d-line);border-bottom:0;border-radius:24px 24px 0 0;box-shadow:0 -18px 60px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);padding:6px 14px calc(14px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);font-size:15px;text-align:left}',
     '.hmrd.on{transform:none}',
+    '.hmrd-drag{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.hmrd.hmrd-moved{border-radius:24px;border-bottom:1px solid var(--d-line);transform:none!important;opacity:1!important}.hmrd.hmrd-moved .hmrd-grab{display:block}',
+    '.hmrd-dhint{margin:0 0 6px;padding:6px 10px;border-radius:10px;background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.55);color:var(--d-fg);font-size:13px}',
     '@media (min-width:720px){.hmrd{left:50%;right:auto;width:460px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 70px);border-radius:24px;border-bottom:1px solid var(--d-line);transform:translate(-50%,24px);opacity:0;transition:transform .24s cubic-bezier(.2,.8,.2,1),opacity .2s}.hmrd.on{transform:translate(-50%,0);opacity:1}}',
     '.hmrd-grab{width:42px;height:5px;border-radius:9px;background:rgba(255,255,255,.28);margin:4px auto 6px}@media (min-width:720px){.hmrd-grab{display:none}}',
     '.hmrd-hd{display:flex;align-items:center;gap:8px;min-height:44px}',
@@ -432,6 +435,28 @@
     // swipe the grab bar down to close on phones
     var y0 = null; dash.addEventListener('touchstart', function (e) { if (body.scrollTop <= 0 && e.touches.length === 1) y0 = e.touches[0].clientY; else y0 = null; }, { passive: true });
     dash.addEventListener('touchend', function (e) { if (y0 != null && e.changedTouches[0].clientY - y0 > 90) close(true); y0 = null; }, { passive: true });
+    // v1.5: drag the dashboard anywhere by its top bar (mouse or finger); the spot is kept for this page view
+    (function () {
+      var g = null, grab = dash.querySelector('.hmrd-grab');
+      [hd, grab].forEach(function (hnd) {
+        if (!hnd) return; hnd.classList.add('hmrd-drag'); hnd.title = 'Drag to move';
+        hnd.addEventListener('pointerdown', function (e) {
+          if (e.button > 0 || (e.target.closest && e.target.closest('button,a'))) return;
+          var r = dash.getBoundingClientRect(); g = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, w: r.width, on: false, id: e.pointerId, h: hnd };
+        });
+        hnd.addEventListener('pointermove', function (e) {
+          if (!g || e.pointerId !== g.id) return;
+          var dx = e.clientX - g.x, dy = e.clientY - g.y;
+          if (!g.on) { if (Math.abs(dx) + Math.abs(dy) < 6) return; g.on = true; y0 = null; try { hnd.setPointerCapture(e.pointerId); } catch (er) { } dash.classList.add('hmrd-moved'); lsSet(DRAG_KEY, '1'); var t0 = dash.querySelector('.hmrd-dhint'); if (t0) t0.parentNode.removeChild(t0); }
+          var W = window.innerWidth, H = window.innerHeight, w = Math.min(g.w, W - 8);
+          var l = Math.max(4, Math.min(W - w - 4, g.l + dx)), t = Math.max(4, Math.min(H - 60, g.t + dy));
+          var cs = dash.style; cs.left = l + 'px'; cs.top = t + 'px'; cs.width = w + 'px'; cs.right = 'auto'; cs.bottom = 'auto';
+          cs.maxHeight = Math.max(160, H - t - 8) + 'px'; e.preventDefault();
+        });
+        function end(e) { if (g && g.on) { try { hnd.releasePointerCapture(e.pointerId); } catch (er) { } } g = null; }
+        hnd.addEventListener('pointerup', end); hnd.addEventListener('pointercancel', end);
+      });
+    })();
     doc.body.appendChild(veil); doc.body.appendChild(dash);
     doc.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (dash && !dash.hidden) { close(true); e.stopPropagation(); } else if (studio && !studio.hidden) { closeStudio(true); e.stopPropagation(); } }, true);
   }
@@ -697,8 +722,13 @@
     if (back) focusBack();
   }
   function focusBack() { var b = doc.getElementById('hmr-hmr') || lastFocus; try { if (b) b.focus({ preventScroll: true }); } catch (e) { } }
+  function dragHint() {
+    if (lsGet(DRAG_KEY) === '1' || dash.querySelector('.hmrd-dhint')) return;
+    var h = el('p', 'hmrd-dhint', 'You can grab this and move it anywhere: drag the top bar.');
+    dash.insertBefore(h, dash._body);
+  }
   function open(v) {
-    build(); closeStudio(false); var D = dock(); if (D.closeOthers) D.closeOthers('dash');
+    build(); dragHint(); closeStudio(false); var D = dock(); if (D.closeOthers) D.closeOthers('dash');
     if (doc.activeElement && !(dash.contains(doc.activeElement))) lastFocus = doc.activeElement;
     show(v || 'home'); dash.hidden = false; veil.hidden = false;
     var b = doc.getElementById('hmr-hmr'); if (b) b.setAttribute('aria-expanded', 'true');

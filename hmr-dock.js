@@ -1,4 +1,7 @@
-/* HMR dock v6.5: one shared bottom bar for all HMR sites.
+/* HMR dock v6.5.9: one shared bottom bar for all HMR sites.
+   v6.5.9 (Leo's Speak feedback, Nov 24 and 25): the mic starts OFF when the card opens (status "Not recording yet", line "Press the record button and begin speaking");
+     "Talk as long as you like."; the Speak button's label is "Do us a big favor, tell us what you think"; the Speak card can be dragged anywhere by its top line,
+     with a one-time hint ("You can grab this and move it anywhere").
    v6.5 HMR dash: a round HMR button sits in the center of the bar. It opens the HMR family experience dashboard (hmr-dash.js, loaded from the same folder
      the first time it is pressed): quick actions, the UI/UX studio (colors, type, comfort, layouts), Improve this site, Funsies and Places.
      The Design button left the bar; its panel lives on inside the studio's Layouts tab (HMRDock.designPanel). The bar is one grid row:
@@ -1508,8 +1511,8 @@
   var ARR = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; };
   var backBtn = mkPill('hmr-nv back', 'hmr-back', 'Go back', ARR('M15 5l-7 7 7 7'));
   var fwdBtn = mkPill('hmr-nv fwd', 'hmr-fwd', 'Go forward', ARR('M9 5l7 7-7 7'));
-  var spBtn = mkPill('hmr-spbtn', 'hmr-speak', 'Speak here: say anything and someone will listen', '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>');
-  spBtn.title = 'Speak here'; spBtn.setAttribute('aria-haspopup', 'dialog'); spBtn.setAttribute('aria-expanded', 'false'); spBtn.setAttribute('aria-controls', 'hmr-spk');
+  var spBtn = mkPill('hmr-spbtn', 'hmr-speak', 'Do us a big favor, tell us what you think', '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>');
+  spBtn.title = 'Do us a big favor, tell us what you think'; spBtn.setAttribute('aria-haspopup', 'dialog'); spBtn.setAttribute('aria-expanded', 'false'); spBtn.setAttribute('aria-controls', 'hmr-spk');
   // The Feedback and "I'm lost" pill buttons are no longer in the dock. fbBtn / lostBtn stay as detached stand-ins so the sheet code (and HMRDock.openFeedback / openLost) keeps working.
   var FWDTIP = 'Forward. Our bar has a forward button even on your first visit, because on many sites the next best step is forward.';
   fwdBtn.title = FWDTIP; fwdBtn.setAttribute('aria-description', FWDTIP);
@@ -1519,7 +1522,7 @@
   // v6.5: the HMR button opens the HMR family experience dashboard (hmr-dash.js, same folder as this file, loaded on first press)
   var hmrBtn = mkPill('hmr-hmrbtn', 'hmr-hmr', 'Open your HMR family experience dashboard', '<span class="hmr-hmrt">HMR</span>');
   hmrBtn.title = 'Your HMR dashboard'; hmrBtn.setAttribute('aria-haspopup', 'dialog'); hmrBtn.setAttribute('aria-expanded', 'false'); hmrBtn.setAttribute('aria-controls', 'hmr-dash');
-  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.5.8'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
+  var DASHSRC = (function () { try { var u = new URL((script && script.src) || '', location.href); u.pathname = u.pathname.replace(/[^\/]*$/, 'hmr-dash.js'); u.search = '?v=6.5.9'; u.hash = ''; return u.toString(); } catch (e) { return ''; } })();
   var dashState = 0, dashWait = [];   // 0 not loaded, 1 loading, 2 ready, 3 failed
   function loadDash(cb) {
     if (window.HMRDash) { dashState = 2; if (cb) cb(); return; }
@@ -1720,7 +1723,8 @@
   function spShow() {
     var on = !!sp.want;
     sp.dot.classList.toggle('on', on); sp.ctl.classList.toggle('rec', on); sp.ctl.setAttribute('aria-pressed', on ? 'true' : 'false'); sp.ctl.innerHTML = MICSVG(on); sp.ctl.setAttribute('aria-label', on ? 'Stop recording' : 'Start recording'); sp.ctl.title = on ? 'Stop recording' : 'Start recording';
-    sp.state.textContent = on ? 'Recording' : (sp.el0 > 0 ? 'Paused' : 'Ready');
+    sp.state.textContent = on ? 'Recording' : (sp.el0 > 0 ? 'Paused' : 'Not recording yet');
+    if (sp.go) sp.go.hidden = on || sp.el0 > 0 || !SR;
     sp.tm.textContent = fmtT(sp.el0);
     spBtn.classList.toggle('rec', on);
   }
@@ -1790,6 +1794,32 @@
     }
   }
   function spPause() { if (!sp) return; sp.want = false; var r = sp.rec; try { if (r) r.stop(); } catch (e) { } spShow(); }
+  // v6.5.9: drag the Speak card anywhere by its top line (mouse or finger). The spot is kept for this page view.
+  var SPDRAG = 'hmr-spk-drag-hint';
+  function spDraggable(card, handle) {
+    handle.classList.add('hs-grab'); handle.title = 'Drag to move';
+    var st = null;
+    handle.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || (e.target.closest && e.target.closest('button'))) return;
+      var r = card.getBoundingClientRect(); st = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, w: r.width, on: false, id: e.pointerId };
+    });
+    handle.addEventListener('pointermove', function (e) {
+      if (!st || e.pointerId !== st.id) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!st.on) { if (Math.abs(dx) + Math.abs(dy) < 5) return; st.on = true; try { handle.setPointerCapture(e.pointerId); } catch (er) { } card.classList.add('hs-moved'); lsSet(SPDRAG, '1'); var h = card.querySelector('.hs-dhint'); if (h) h.parentNode.removeChild(h); }
+      var W = window.innerWidth, H = window.innerHeight, ch = card.offsetHeight;
+      var l = Math.max(4, Math.min(W - st.w - 4, st.l + dx)), t = Math.max(4, Math.min(H - Math.min(ch, H - 8) - 4, st.t + dy));
+      var cs = card.style; cs.setProperty('left', l + 'px', 'important'); cs.setProperty('top', t + 'px', 'important'); cs.setProperty('bottom', 'auto', 'important'); cs.setProperty('right', 'auto', 'important'); cs.setProperty('transform', 'none', 'important'); cs.setProperty('width', st.w + 'px', 'important');
+      e.preventDefault();
+    });
+    function end(e) { if (st && st.on) { try { handle.releasePointerCapture(e.pointerId); } catch (er) { } } st = null; }
+    handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+  }
+  function spDragHint() {
+    if (!sp || lsGet(SPDRAG) === '1' || sp.el.querySelector('.hs-dhint')) return;
+    var h = el('p', 'hs-dhint', 'You can grab this and move it anywhere: drag the top line.'), hd = sp.el.querySelector('.hd');
+    if (hd && hd.nextSibling) sp.el.insertBefore(h, hd.nextSibling); else sp.el.appendChild(h);
+  }
   function buildSpeak() {
     sp = { want: false, committed: '', sess: '', raw: '', ign: '', rec: null, fails: 0, quick: 0, el0: 0, last: Date.now(), startedAt: 0 };
     var s = el('div', 'hmr-spk'); s.id = 'hmr-spk'; s.hidden = true; s.setAttribute('role', 'dialog'); s.setAttribute('aria-label', 'Speak here'); sp.el = s;
@@ -1799,7 +1829,7 @@
     hd.appendChild(x); s.appendChild(hd);
     // small status row: red dot, timer, state
     var rw = el('div', 'hs-row');
-    sp.dot = el('span', 'hs-dot'); sp.dot.setAttribute('aria-hidden', 'true'); sp.tm = el('span', 'hs-tm', '0:00'); sp.state = el('span', 'hs-state', 'Ready');
+    sp.dot = el('span', 'hs-dot'); sp.dot.setAttribute('aria-hidden', 'true'); sp.tm = el('span', 'hs-tm', '0:00'); sp.state = el('span', 'hs-state', 'Not recording yet');
     rw.appendChild(sp.dot); rw.appendChild(sp.tm); rw.appendChild(sp.state); s.appendChild(rw);
     // the explainer, with its own small x ("Don't show again")
     if (lsGet(SPWHY) !== '1') {
@@ -1808,7 +1838,9 @@
       wx.addEventListener('click', function () { lsSet(SPWHY, '1'); if (why.parentNode) why.parentNode.removeChild(why); });
       why.appendChild(wx); s.appendChild(why);
     }
+    s.appendChild(el('p', 'hs-long', 'Talk as long as you like.'));
     sp.help = el('div', 'hs-help'); sp.help.hidden = true; s.appendChild(sp.help);
+    sp.go = el('p', 'hs-go', 'Press the record button and begin speaking'); s.appendChild(sp.go);
     sp.live = el('div', 'hs-live'); sp.ta = el('textarea'); sp.ta.id = 'hmr-sp-text'; sp.ta.rows = 2; sp.ta.setAttribute('autocomplete', 'off'); sp.ta.setAttribute('aria-label', 'What we heard. You can edit it.'); sp.ta.placeholder = SR ? 'Your words show up here as you talk' : 'Type here';
     var tw = el('div', 'hmr-tw'); tw.appendChild(sp.ta);
     sp.ctl = el('button', 'hmr-tmic'); sp.ctl.type = 'button'; sp.ctl.innerHTML = MICSVG(false); sp.ctl.setAttribute('aria-label', 'Start recording'); sp.ctl.title = 'Start recording'; tw.appendChild(sp.ctl);
@@ -1828,6 +1860,7 @@
     if (!SR) { sp.dot.hidden = sp.tm.hidden = sp.ctl.hidden = true; sp.state.textContent = 'Speak here'; sp.state.hidden = false; }
     sp.timer = setInterval(spTick, 250);
     doc.body.appendChild(s);
+    spDraggable(s, hd);
   }
   // fromTap is true only when the Speak button was pressed: recording starts inside that tap, because phones only allow the microphone after a user gesture
   function openSpeak(fromTap) {
@@ -1838,7 +1871,9 @@
     sp.sub.say(d.t && sp.el.hidden ? 'Your unsent words from last time are here.' : '');
     sp.el.hidden = false; spBtn.setAttribute('aria-expanded', 'true'); spShow();
     if (!SR) { spSay(SPNOSR); if (!TOUCH) { try { sp.ta.focus({ preventScroll: true }); } catch (e) { } } return; }
-    if (fromTap === true && !sp.want) spStart(); else if (!sp.want) spSay('Press the mic in the box to start recording.');
+    // v6.5.9: never starts on its own; the visitor presses the record button in the box (also a user gesture, so phones allow it)
+    if (!sp.want) spSay('');
+    spDragHint();
   }
   // an outside tap never closes this: the page stays usable (scroll, tap) while it records. The X, Escape, or the Speak button itself (force) close it. Other dock buttons leave a recording alone.
   function closeSpeak(back, force) {
@@ -2903,6 +2938,9 @@
     '.hmr-spk .hs-why2{position:relative;margin:2px 0 6px;padding:6px 8px;border-radius:8px;background:#f1f5ff;font-size:12.5px;line-height:1.35;color:#222}.hmr-spk .hs-why2 p{margin:0 0 4px}.hmr-spk .hs-wx{min-height:32px;padding:0 8px;border:1px solid #9aa4b5;border-radius:999px;background:#fff;color:#222;font-size:12px;font-weight:700;cursor:pointer;touch-action:manipulation}' +
     '.hmr-spk .hs-live .hmr-tw textarea{padding:6px 46px 6px 8px!important}.hmr-spk .hs-live .hmr-tmic{right:8px;bottom:8px;width:36px;height:36px}' +
     '.hmr-spk .hs-tip{margin:4px 0 0;font-size:11.5px;line-height:1.3;color:#444}' +
+    '.hmr-spk .hs-long{margin:2px 0 4px;font-size:13px;font-weight:700}.hmr-spk .hs-go{margin:2px 0 4px;font-size:13px;font-weight:700;color:#b91c1c}.hmr-spk .hs-go[hidden]{display:none}' +
+    '.hmr-spk .hd.hs-grab{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.hmr-spk.hs-moved .hd.hs-grab:active{cursor:grabbing}' +
+    '.hmr-spk .hs-dhint{margin:0 0 4px;padding:4px 8px;border-radius:8px;background:#fff7d6;border:1px solid #f0c94a;font-size:12px;color:#222}' +
     '.hmr-spk .hd{display:flex;align-items:center;gap:8px;margin:0 0 4px;white-space:nowrap;font-size:13px;font-weight:700}.hmr-spk .hs-sp{flex:1}' +
     '.hmr-spk .hs-dot{flex:none;width:12px;height:12px;border-radius:50%;background:#9ca3af}.hmr-spk .hs-dot.on{background:#dc2626;animation:hmr-spkpulse 1.1s ease-in-out infinite}' +
     '@keyframes hmr-spkpulse{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.hmr-spk .hs-dot.on{animation:none}}' +
