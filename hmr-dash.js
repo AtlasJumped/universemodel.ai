@@ -175,6 +175,13 @@
     for (var i = 0; i < all.length && i < 20000; i++) list.push(all[i]);
     paintBatch(list);
     root.classList.add('hmr-pal'); root.setAttribute('data-hmr-pal', p.id);
+    if (/[?&]hmrdebug=1/.test(location.search)) setTimeout(function () {   // TEMP diagnostic, removed after use
+      var o = ['.site-head', '.page-head', '.page-head .eyebrow', '.page-head h1', '.page-head .lede', 'main h2'].map(function (q) {
+        var el = doc.querySelector(q); if (!el) return q + ': none'; var cs = getComputedStyle(el), pi = painted && painted.get(el);
+        return q + ' | cls=' + el.className + ' | col=' + cs.color + ' | bg=' + cs.backgroundColor + ' | bgi=' + cs.backgroundImage.slice(0, 90) + ' | painted=' + (pi ? pi.role + '/' + pi.color : 'NO') + ' | skip=' + !!skip(el);
+      });
+      var d = doc.createElement('pre'); d.setAttribute('role', 'note'); d.setAttribute('aria-label', 'hmrdebug'); d.textContent = 'HMRDEBUG\n' + o.join('\n'); d.style.cssText = 'white-space:pre-wrap;font:10px monospace'; doc.body.insertBefore(d, doc.body.firstChild);
+    }, 2500);
     cssVar('pal', '::selection{background:' + p.select + ';color:' + p.text + '}html.hmr-pal{accent-color:' + p.accent + ';scrollbar-color:' + p.line + ' ' + p.bg + '}');
     // content a page adds later (menus, cards built by script) is painted as it arrives: one shared queue, flushed at most every 200 ms
     try {
