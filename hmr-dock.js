@@ -1,4 +1,4 @@
-/* HMR dock v6.1: one shared bottom bar for all HMR sites.
+/* HMR dock v6.2: one shared bottom bar for all HMR sites.
    One row along the bottom, left to right:
      far left: Back (round, browser back) then the dock's own Design button (round). v6.1: the dock's Design is the ONLY design feature on every site; a page's own
        Design button and panel (data-design / data-design-panel) are hidden, so there is never a second design control.
@@ -1187,8 +1187,8 @@
     fzm.textContent = '';
     var hd = el('div', 'hd'); hd.appendChild(el('span', '', 'Funsies')); var x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close Funsies'); x.addEventListener('click', function () { closeFz(true); }); hd.appendChild(x); fzm.appendChild(hd);
     var rec = loadRecents().map(effByName).filter(Boolean); if (rec.length) section('Recent', rec.map(fxBtn));
-    section('Play', PLAY.map(function (p) { var b = el('button', 'hmr-fcard'); b.type = 'button'; b.setAttribute('data-play', p.id); b.appendChild(icon(p.ic)); b.appendChild(el('span', '', p.title)); b.appendChild(el('small', '', p.sub)); b.addEventListener('click', function () { openPlay(p); }); return b; }), 'hmr-fplay');
     section('Wreck the page', EFFECTS.filter(function (e) { return e.group === 'wreck'; }).map(fxBtn));
+    section('Play', PLAY.map(function (p) { var b = el('button', 'hmr-fcard'); b.type = 'button'; b.setAttribute('data-play', p.id); b.appendChild(icon(p.ic)); b.appendChild(el('span', '', p.title)); b.appendChild(el('small', '', p.sub)); b.addEventListener('click', function () { openPlay(p); }); return b; }), 'hmr-fplay');
     section('More fun', EFFECTS.filter(function (e) { return e.group === 'more'; }).map(fxBtn));
   }
   function focusables() { return fzm ? [].filter.call(fzm.querySelectorAll('button,a[href]'), function (b) { return !b.disabled && b.offsetParent !== null; }) : []; }
@@ -1309,13 +1309,14 @@
     if (p.email) { fields.email = p.email; fields.replyto = p.email; }
     if (m.details) fields.details = m.details;
     var key = formKey();
+    if (p.noMailto && (!key || !window.fetch)) return Promise.resolve({ ok: false, via: 'none' });
     if (!key || !window.fetch) { var r0 = mailSelf(p); r0.reason = key ? 'no-fetch' : 'no-key'; return Promise.resolve(r0); }
     fields.access_key = key; fields.botcheck = '';
     var ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function () { try { if (ctl) ctl.abort(); } catch (e) { } }, 15000);
     return fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(fields), signal: ctl ? ctl.signal : undefined })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && !(j && j.success === false) }; }, function () { return { ok: r.ok }; }); })
-      .then(function (res) { clearTimeout(t); if (res.ok) return { ok: true, via: 'web3forms' }; var r1 = mailSelf(p); r1.reason = 'http'; return r1; },
-        function () { clearTimeout(t); var r2 = mailSelf(p); r2.reason = 'network'; return r2; });
+      .then(function (res) { clearTimeout(t); if (res.ok) return { ok: true, via: 'web3forms' }; if (p.noMailto) return { ok: false, via: 'none' }; var r1 = mailSelf(p); r1.reason = 'http'; return r1; },
+        function () { clearTimeout(t); if (p.noMailto) return { ok: false, via: 'none' }; var r2 = mailSelf(p); r2.reason = 'network'; return r2; });
   }
   var SENT_LINE = 'Sent. Thank you so much for your contribution.';
   var MAIL_LINE = 'Your email app should have opened with your message. Your text is still saved here.';
@@ -1379,6 +1380,7 @@
     '.hmr-nv.off{opacity:.45;filter:grayscale(.7);cursor:default}',
     '.hmr-nv .ntip{position:absolute;right:0;bottom:calc(100% + 12px);width:236px;max-width:calc(100vw - 24px);background:#111;color:#fff;border:2px solid #fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:600;line-height:1.35;text-align:left;white-space:normal;letter-spacing:0;text-transform:none;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s;box-shadow:0 6px 18px rgba(0,0,0,.4)}',
     '.hmr-nv:hover .ntip,.hmr-nv:focus-visible .ntip{opacity:1;visibility:visible}',
+    '.hmr-nv.hmr-nt0 .ntip{opacity:0!important;visibility:hidden!important}',
     '.hmr-spbtn{left:50%;width:var(--hmr-sw);height:var(--hmr-sw);padding:0;margin:0 0 calc((var(--hmr-c) - var(--hmr-sw)) / 2);margin-left:calc(var(--hmr-fw) / 2 + var(--hmr-g) + var(--hmr-sh));background:linear-gradient(135deg,#ec4899,#f59e0b 55%,#22c55e)}.hmr-spbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}',
     '.hmr-spbtn:hover{transform:rotate(-3deg) scale(1.08)}.hmr-spbtn:active{transform:scale(.94)}.hmr-spbtn[aria-expanded="true"]{background:linear-gradient(135deg,#dc2626,#7f1d1d)}',
     '.hmr-nv:not(.off):hover{transform:rotate(-3deg) scale(1.06)}.hmr-nv:not(.off):active{transform:scale(.95)}',
@@ -1498,10 +1500,25 @@
   dock.textContent = '';
   [backBtn, fzBtn, spBtn, rxBtn, fwdBtn, again].forEach(function (b) { dock.appendChild(b); });
   function navState() { var off = (history.length < 2); backBtn.classList.toggle('off', off); backBtn.setAttribute('aria-disabled', off ? 'true' : 'false'); fwdBtn.classList.remove('off'); fwdBtn.setAttribute('aria-disabled', 'false'); }   // forward is never greyed out: the browser will not say whether a page is ahead
-  backBtn.addEventListener('click', function () { if (history.length < 2) return; try { history.back(); } catch (e) { } });
+  // v6.2: a page opened in a new tab keeps its entry referrer for the tab's life, so Back can return there when browser history cannot go back
+  var ENTRY_REF = '';
+  try { ENTRY_REF = sessionStorage.getItem('hmr-entry-ref') || ''; if (!ENTRY_REF && !sessionStorage.getItem('hmr-entry-seen')) { sessionStorage.setItem('hmr-entry-seen', '1'); var rf = doc.referrer || ''; if (rf && rf.split('/')[2] !== location.host) { ENTRY_REF = rf; sessionStorage.setItem('hmr-entry-ref', rf); } } } catch (e) { }
+  function refTarget() { var r = ENTRY_REF || ''; if (!r) { try { r = doc.referrer || ''; } catch (e) { } } return /^https?:\/\//i.test(r) && r !== location.href ? r : ''; }
+  function navState() { var off = (history.length < 2 && !refTarget()); backBtn.classList.toggle('off', off); backBtn.setAttribute('aria-disabled', off ? 'true' : 'false'); fwdBtn.classList.remove('off'); fwdBtn.setAttribute('aria-disabled', 'false'); }   // forward is never greyed out: the browser will not say whether a page is ahead
+  backBtn.addEventListener('click', function () {
+    if (history.length >= 2) { try { history.back(); } catch (e) { } return; }
+    var r = refTarget(); if (r) { try { location.href = r; } catch (e) { } }
+  });
+  // forward: one message only. The hover tooltip and title are hidden once the button is pressed, so only the toast shows; a guard also drops a second toast within 1.5s
+  var fwdBusy = 0;
+  function fwdQuiet(on) { fwdBtn.classList.toggle('hmr-nt0', on); if (on) { fwdBtn.removeAttribute('title'); } else { fwdBtn.title = FWDTIP; } }
+  fwdBtn.addEventListener('mouseleave', function () { fwdQuiet(false); }); fwdBtn.addEventListener('blur', function () { fwdQuiet(false); });
   fwdBtn.addEventListener('click', function () {
+    fwdQuiet(true);
     var h0 = location.href; try { history.forward(); } catch (e) { }
-    setTimeout(function () { if (location.href === h0 && !doc.hidden) toast('Nothing is ahead yet. Our bar always has a forward button, even on a first visit, because on many sites the next best step is forward.', null, 6000); }, 500);
+    setTimeout(function () {
+      if (location.href === h0 && !doc.hidden && Date.now() - fwdBusy > 1500) { fwdBusy = Date.now(); toast('Nothing is ahead yet. Our bar always has a forward button, even on a first visit, because on many sites the next best step is forward.', null, 6000); }
+    }, 500);
   });
   navState(); window.addEventListener('popstate', navState);
   // self-repair: coming back to a page (back / forward, bfcache) or a page script that rebuilds the body must never leave a half dock

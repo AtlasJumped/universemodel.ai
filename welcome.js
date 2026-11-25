@@ -1,5 +1,5 @@
 /* Welcome question, shown once per browser before the first page (Leo, recording 2026-11-22f).
-   Answers stay in this browser (localStorage key "hmrWelcome"); nothing is sent anywhere. */
+   Answers are kept in this browser (localStorage key "hmrWelcome") and, when the visitor presses Enter the site and filled in at least one, sent to us once through the dock's HMRDock.send (fire and forget). */
 (function () {
   var KEY = "hmrWelcome";
   try {
@@ -7,6 +7,7 @@
   } catch (e) { return; }
   if (/fun\.html$/.test(location.pathname)) return;
 
+  try { history.scrollRestoration = "manual"; } catch (e) {}
   var css = "#hmr-welcome{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:18px;background:rgba(11,27,51,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .35s ease}" +
     "#hmr-welcome.on{opacity:1}" +
     "#hmr-welcome .box{background:#fff;color:#0B1B33;max-width:560px;width:100%;border-radius:18px;box-shadow:0 30px 80px rgba(11,27,51,.35);padding:28px 28px 22px;max-height:calc(100vh - 36px);overflow:auto}" +
@@ -51,7 +52,7 @@
       '<div class="row" style="justify-content:flex-end">' +
         '<button type="button" class="go">Enter the site</button>' +
       '</div>' +
-      '<p class="note">Your answers stay in your own browser. We do not send them anywhere.</p>' +
+      '<p class="note">If you answer, we receive your answers without your name or email. Skipping sends nothing.</p>' +
     '</div>';
 
   function show() {
@@ -73,7 +74,11 @@
     if (e.target.closest(".go")) {
       var r = w.querySelector("#hmr-welcome-rel").value.trim();
       if (r) ans.religion = r;
-      return close(ans);
+      var has = !!(ans.power || ans.open || ans.religion);
+      var snap = { power: ans.power, religion: ans.religion, open: ans.open };
+      close(ans);
+      if (has) sendAnswers(snap);
+      return;
     }
   });
   w.addEventListener("keydown", function (e) {
@@ -85,11 +90,31 @@
       else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
     }
   });
+  var LABELS = { power: "Higher power", religion: "Religion", open: "Receptive to new ideas" };
+  function sendAnswers(a) {
+    try {
+      var lines = [];
+      ["power", "religion", "open"].forEach(function (k) { if (a[k]) lines.push(LABELS[k] + ": " + a[k]); });
+      var payload = { kind: "welcome answers", subject: "universemodel.ai welcome answers", message: "Welcome answers\n" + lines.join("\n") + "\nHost: " + location.host, details: { host: location.host, answers: a }, noMailto: true };
+      var tries = 0;
+      (function go() {
+        if (window.HMRDock && typeof window.HMRDock.send === "function") { try { var r = window.HMRDock.send(payload); if (r && r.catch) r.catch(function () {}); } catch (e) {} return; }
+        if (++tries < 40) setTimeout(go, 250);
+      })();
+    } catch (e) {}
+  }
+  function toTop() {
+    try { if (location.hash) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    try { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch (e) {}
+  }
   function close(data) {
     data.t = new Date().toISOString();
     try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
     w.classList.remove("on");
-    setTimeout(function () { if (w.parentNode) w.parentNode.removeChild(w); }, 350);
+    setTimeout(function () {
+      if (w.parentNode) w.parentNode.removeChild(w);
+      toTop(); requestAnimationFrame(function () { toTop(); setTimeout(toTop, 120); });
+    }, 350);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", show); else show();
 })();
