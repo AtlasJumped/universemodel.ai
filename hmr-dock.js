@@ -1,4 +1,4 @@
-/* HMR dock v6.7.1: drag any bar button anywhere (saved per visitor), Funsies lives in the HMR dashboard only, a mic at the top right of every text box.
+/* HMR dock v6.7.2: drag any bar button anywhere (saved per visitor), Funsies lives in the HMR dashboard only, a mic at the top right of every text box.
    (was HMR dock v6.6.1: one shared bottom bar for all HMR sites.
    v6.6.1: the demo cards now show (v6.6.0 skipped every spot because the page's html tag carries hmr- classes).
    v6.6.0 edit mode: small "Add a demo?" cards with Yes and No at spots that have no demo yet (see the block at the end of this file).
@@ -3172,11 +3172,14 @@
       var pflex = /flex|grid/.test(pcs.display);
       w.style.display = block ? 'block' : 'inline-block';
       ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'flexGrow', 'flexShrink', 'flexBasis', 'alignSelf', 'gridColumn', 'gridRow', 'gridArea', 'order'].forEach(function (k) { if (pflex || /^margin/.test(k)) w.style[k] = cs[k]; });
-      if (block || pflex) {
-        var pw = par.clientWidth - parseFloat(pcs.paddingLeft || 0) - parseFloat(pcs.paddingRight || 0);
-        if (f.offsetWidth >= pw - 2 || pflex) { w.style.width = pflex ? 'auto' : '100%'; f.style.setProperty('width', '100%'); } else w.style.width = f.offsetWidth + 'px';
-        if (pflex && cs.flexGrow === '0' && cs.flexBasis === 'auto') w.style.width = f.offsetWidth + 'px';
+      var pw = par.clientWidth - parseFloat(pcs.paddingLeft || 0) - parseFloat(pcs.paddingRight || 0), fills = f.offsetWidth >= pw - 2;
+      if (pflex) {
+        w.style.width = (cs.flexGrow === '0' && cs.flexBasis === 'auto') ? f.offsetWidth + 'px' : 'auto';
+      } else {
+        if (fills) w.style.display = 'block';
+        w.style.width = fills ? '100%' : f.offsetWidth + 'px';   // keep the field's own width, whatever its display type
       }
+      f.style.setProperty('width', '100%');
       f.style.setProperty('margin', '0'); f.style.setProperty('box-sizing', 'border-box');
       par.insertBefore(w, f); w.appendChild(f);
       return w;
