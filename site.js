@@ -1409,3 +1409,39 @@ if (typeof document !== 'undefined') (() => {
   let t = 0; const later = () => { clearTimeout(t); t = setTimeout(fit, 150); };
   addEventListener('load', fit); addEventListener('resize', later); if (document.readyState !== 'loading') fit(); else addEventListener('DOMContentLoaded', fit);
 })();
+
+/* Thirty-minute collaborator question (recording of_fcaa, 2026-11-22). Counts time with the page visible, across pages,
+   in this browser only (localStorage "umTime"); asks once (localStorage "umCollabAsked"). Nothing is sent anywhere. */
+(() => {
+  const LIMIT = 30 * 60, TK = 'umTime', AK = 'umCollabAsked';
+  let store;
+  try { store = window.localStorage; if (store.getItem(AK)) return; } catch (e) { return; }
+  if (/collaborators\.html$/.test(location.pathname) || /fun\.html$/.test(location.pathname)) return;
+  const read = () => { try { return parseInt(store.getItem(TK) || '0', 10) || 0; } catch (e) { return 0; } };
+  const ask = () => {
+    try { store.setItem(AK, '1'); } catch (e) {}
+    if (document.getElementById('hmr-welcome')) return;
+    const css = '#um-collab{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;padding:16px;background:rgba(11,27,51,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}' +
+      '#um-collab .box{background:#fff;color:#0B1B33;max-width:460px;width:100%;border-radius:18px;box-shadow:0 30px 80px rgba(11,27,51,.35);padding:26px 24px 20px;text-align:center}' +
+      '#um-collab h2{margin:0 0 8px;font-size:1.3rem;line-height:1.3}#um-collab p{margin:0 0 18px;line-height:1.5;color:#3A4A63}' +
+      '#um-collab .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}#um-collab button,#um-collab a{font:inherit;font-weight:650;border-radius:999px;padding:10px 22px;cursor:pointer;text-decoration:none}' +
+      '#um-collab a{background:#1F5FD6;color:#fff;border:0}#um-collab button{background:#F5F8FD;color:#0B1B33;border:1.5px solid #CBD6EA}';
+    const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    const d = document.createElement('div'); d.id = 'um-collab'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'um-collab-h');
+    d.innerHTML = '<div class="box"><h2 id="um-collab-h">You have spent 30 minutes on this site.</h2><p>Have we gotten your attention enough for you to consider being a collaborator?</p><div class="row"><a href="collaborators.html">Yes</a><button type="button">No</button></div></div>';
+    const close = () => { d.remove(); document.removeEventListener('keydown', esc); };
+    const esc = (e) => { if (e.key === 'Escape') close(); };
+    d.querySelector('button').addEventListener('click', close);
+    d.addEventListener('click', (e) => { if (e.target === d) close(); });
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(d);
+    d.querySelector('a').focus();
+  };
+  if (read() >= LIMIT) { setTimeout(ask, 1500); return; }
+  const iv = setInterval(() => {
+    if (document.visibilityState !== 'visible') return;
+    const t = read() + 5;
+    try { store.setItem(TK, String(t)); } catch (e) { clearInterval(iv); return; }
+    if (t >= LIMIT) { clearInterval(iv); ask(); }
+  }, 5000);
+})();
