@@ -185,6 +185,7 @@
       <div class="card"><h3>The measures</h3><p>Knee function and chronic pain on published, validated scales, at baseline and every three months. Daily records of how much of the protocol each person did, so dose can be compared with outcome. The community itself is a second hypothesis.</p></div>
       <div class="card"><h3>The safeguards</h3><p>Hypotheses registered before the first participant arrives, a comparison group, assessors who do not know each participant's dose, and failures reported. The trial needs a principal investigator and the approval of an Institutional Review Board before it can begin.</p></div>
     </div>
+    <p style="margin-top:18px;max-width:76ch"><b>Two avenues, run in parallel.</b> HMR is being tested along two avenues at once: the mathematics and physics of how reality emerges, on <a href="physics.html">the physics page</a>, and connective tissue health in people, here and in the simulation. They come from one model and are separate tests. A breakthrough in either would earn a hearing for the other, and neither proves the other.</p>
     <p style="margin-top:18px;max-width:76ch">It is a design, not a running study. Nothing has been funded or approved. The full plan covers the hypotheses, the facility, a day in the life, the budget, and the ethics.</p>
     <p style="margin-top:14px"><a class="btn-red" href="human-trials.html">Human trials: the full design</a></p>
   </div>
@@ -196,14 +197,11 @@
       <h2>Compute</h2>
       <p>The simulations and the library indexing run on our own workstation:</p>
       <table class="me-hw">
-        <tr><th>Graphics (GPUs)</th><td>2 × NVIDIA GeForce RTX 5090 (ASUS TUF Gaming), Blackwell architecture, 32 GB of GDDR7 memory each, 64 GB in total. Used for simulation and for the local AI models that index the library.</td></tr>
-        <tr><th>Processor</th><td>AMD Ryzen Threadripper 9970X: 32 cores, 64 threads, Zen 5, up to 5.49 GHz.</td></tr>
-        <tr><th>Memory</th><td>128 GB of DDR5 ECC RAM (4 × 32 GB, Kingston, 4800 MT/s). ECC corrects memory errors, which matters for long runs.</td></tr>
-        <tr><th>Fast storage</th><td>10 TB of NVMe solid-state drives: Samsung 9100 PRO 2 TB (system), Samsung 9100 PRO 4 TB (working data: indexes, embeddings, current runs) and a T-FORCE 4 TB (disposable scratch).</td></tr>
-        <tr><th>Archive storage</th><td>2 × 16 TB hard drives as a mirror: every file is written to both, so one drive can fail without losing anything.</td></tr>
-        <tr><th>File system</th><td>ZFS on every drive, which checksums each block so silent corruption is detected, and compresses the archive.</td></tr>
-        <tr><th>Total</th><td>About 42 TB of raw capacity; about 26 TB usable, because the archive stores everything twice.</td></tr>
-        <tr><th>Board and power</th><td>ASUS Pro WS TRX50-SAGE WIFI workstation board; SuperFlower 1600 W 80+ Titanium power supply.</td></tr>
+        <tr><th>Graphics (GPUs)</th><td>Two current high-end graphics cards, 64 GB of GPU memory in total. Used for simulation and for the local AI models that index the library.</td></tr>
+        <tr><th>Memory</th><td>Error-correcting (ECC) memory, which matters for long runs.</td></tr>
+        <tr><th>Fast storage</th><td>Solid-state drives for the system, the working data (indexes, embeddings, current runs), and disposable scratch.</td></tr>
+        <tr><th>Archive storage</th><td>Hard drives as a mirror: every file is written twice, so one drive can fail without losing anything. The file system checksums each block, so silent corruption is detected.</td></tr>
+        <tr><th>Total</th><td>About 26 TB usable.</td></tr>
       </table>
       <p>The storage is organized for this process: the working set (the search indexes, embeddings, the models in use, and the current simulation runs) sits on the fastest drives, and the raw archive (papers, datasets, imaging, and media) is stored by source, with manifests and catalogs, so a run can trace each number back to where it came from. <a href="library.html">What is in the library →</a></p>
       <p>Each simulated body is independent of the others, so the campaign divides cleanly across both GPUs, and the method scales to larger clusters without changing. Compute is a constraint, but not a large one.</p>
