@@ -505,7 +505,7 @@ const FX_PATCHES = [
   function addMini(mainName) {
     try {
       if (!keptCons || W < 1200 || !/(^|\/)(index\.html)?$/.test(location.pathname.replace(/^.*\/preview\//, '/'))) return;
-      const hb = hdrBottom(), bx = { l: W * 0.62, r: W - 80, t: hb + 24, b: hb + 170 };
+      const hb = hdrBottom(), hh = document.querySelector('.hero-home'), ht = hh ? Math.max(hb + 24, hh.getBoundingClientRect().top + 24) : hb + 24, bx = { l: W * 0.62, r: W - 80, t: ht, b: ht + 146 };   // below the note above the hero, if there is one
       const name = CONS_ORDER.find(n => n !== mainName && /Cassiopeia|Ursa|Cygnus/.test(n)) || CONS_ORDER.find(n => n !== mainName), sh = consShape(name); if (!sh) return;
       let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; sh.pos.forEach(p => { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
       const k = Math.min((bx.r - bx.l) / Math.max(1, x1 - x0), (bx.b - bx.t) / Math.max(1, y1 - y0)), ox = (bx.l + bx.r) / 2 - (x0 + x1) / 2 * k, oy = (bx.t + bx.b) / 2 - (y0 + y1) / 2 * k, P = new Map(); sh.pos.forEach((p, q) => P.set(q, { x: ox + p.x * k, y: oy + p.y * k }));
