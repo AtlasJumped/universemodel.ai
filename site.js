@@ -8,12 +8,29 @@
   if (typeof document === 'undefined') return;
   const btn = document.querySelector('.menu'), nav = document.querySelector('.nav');
   // the small-screen menu: one scrolling panel with every page in it; the page behind does not scroll while it is open
+  // the header uses the Menu panel on small screens, and on wider ones whenever the full menu does not fit on one line
+  const de = document.documentElement, head = document.querySelector('.site-head .wrap');
+  const folded = () => innerWidth <= 1180 || de.classList.contains('navfold');
+  const fitHead = () => {
+    if (!head || !nav) return;
+    if (innerWidth <= 1180) { de.classList.remove('navfold'); return; }
+    const was = de.classList.contains('navfold');
+    de.classList.remove('navfold');
+    const brand = head.querySelector('.brand'), nr = nav.getBoundingClientRect();
+    const over = head.scrollWidth > head.clientWidth + 1 || nr.height > 56 || (brand && nr.left - brand.getBoundingClientRect().right < 12);
+    de.classList.toggle('navfold', over);
+    if (was && !over && nav.classList.contains('open')) setMenu(false);
+  };
+  window.umFitHead = fitHead;
+  let fitT = 0; addEventListener('resize', () => { cancelAnimationFrame(fitT); fitT = requestAnimationFrame(fitHead); });
+  addEventListener('load', fitHead);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHead);
   const setMenu = o => { nav.classList.toggle('open', o); btn.setAttribute('aria-expanded', o); document.documentElement.classList.toggle('menu-open', o); if (o) nav.scrollTop = 0; };
   if (btn && nav) {
     btn.addEventListener('click', e => { e.stopPropagation(); setMenu(!nav.classList.contains('open')); });
     nav.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
     document.addEventListener('click', e => { if (nav.classList.contains('open') && !e.target.closest('.nav')) setMenu(false); });
-    addEventListener('resize', () => { if (innerWidth > 1180 && nav.classList.contains('open')) setMenu(false); });
+    addEventListener('resize', () => { if (!folded() && nav.classList.contains('open')) setMenu(false); });
     addEventListener('pageshow', () => setMenu(false));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) { setMenu(false); btn.focus(); } });
   }
@@ -22,7 +39,7 @@
   grps.forEach(g => {
     const b = g.querySelector('.grpbtn'); if (!b) return;
     b.setAttribute('aria-expanded', 'false');
-    b.addEventListener('click', () => { if (innerWidth <= 1180) return; const o = !g.classList.contains('open'); closeAll(g); g.classList.toggle('open', o); b.setAttribute('aria-expanded', o); });
+    b.addEventListener('click', () => { if (folded()) return; const o = !g.classList.contains('open'); closeAll(g); g.classList.toggle('open', o); b.setAttribute('aria-expanded', o); });
   });
   document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('.nav .grp')) closeAll(null); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(null); });
@@ -1458,6 +1475,7 @@ if (typeof document !== 'undefined') (() => {
   wrap.appendChild(head);
   const inMenu = document.createElement('button'); inMenu.type = 'button'; inMenu.className = 'nsearch'; inMenu.innerHTML = ICON + '<span>Search the site</span>';
   nav.insertBefore(inMenu, nav.firstChild);
+  if (window.umFitHead) window.umFitHead();
 
   let pages = null, loading = null, opener = null;
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

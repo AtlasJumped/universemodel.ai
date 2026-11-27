@@ -460,3 +460,29 @@ html.search-open{overflow:hidden}
 #um-search .sres .sh{display:block;color:var(--blue);font-size:.88rem;margin-top:2px}
 #um-search .sres .ss{display:block;color:var(--soft);font-size:.88rem;line-height:1.45;margin-top:4px;overflow-wrap:anywhere}
 #um-search mark{background:#FFF1B8;color:inherit;border-radius:2px}
+
+/* 2026-11-27 header on laptops: one line, never crowded.
+   1181-1439px: tighter header (smaller side padding, item padding and type).
+   If it still does not fit (bigger fonts, zoom), site.js adds html.navfold and the header uses the Menu panel, as on phones. */
+.site-head .brand{flex:none}
+.nav .grpbtn{white-space:nowrap}
+@media (min-width:1181px) and (max-width:1439px){
+  .site-head .wrap{gap:12px;padding-left:clamp(16px,2vw,56px);padding-right:clamp(16px,2vw,56px)}
+  .nav a,.nav .grpbtn{padding:8px 7px;font-size:.86rem}
+  .nav .cta{margin-left:4px}
+  .site-head .hlogin{padding:0 11px}
+}
+html.navfold .site-head .menu{display:block;margin-left:auto}
+html.navfold .site-head .wrap{gap:10px}
+html.navfold .site-head .nav{display:none;position:absolute;left:0;right:0;top:66px;margin-left:0;flex-direction:column;align-items:stretch;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px 14px;max-height:calc(100vh - 66px);max-height:calc(100dvh - 66px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 18px 30px rgba(11,37,69,.12)}
+html.navfold .site-head .nav.open{display:flex}
+html.navfold .nav a{padding:12px;font-size:.98rem}
+html.navfold .nav .cta{margin:6px 0 0;text-align:center}
+html.navfold .nav .grpbtn{width:100%;padding:14px 12px 2px;font-size:.8rem;font-weight:600;letter-spacing:.02em;cursor:default;pointer-events:none}
+html.navfold .nav .grpbtn span{display:none}
+html.navfold .site-head .nav .grp.on>.grpbtn{--hb:transparent}
+html.navfold .nav .drop,html.navfold .nav .grp:hover .drop,html.navfold .nav .grp:focus-within .drop,html.navfold .nav .grp.open .drop{display:flex;position:static;border:0;box-shadow:none;padding:0 0 4px 10px;min-width:0}
+html.navfold .site-head .hsearch{display:none}
+html.navfold .nav .nsearch{display:flex;align-items:center;gap:10px;width:100%;padding:12px;margin:0 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--mist);color:var(--soft);font:500 .94rem/1 var(--font);cursor:pointer;text-align:left}
+/* nothing in the top bar may widen the page (sparkle canvases are sized by script) */
+.site-head{overflow-x:clip}

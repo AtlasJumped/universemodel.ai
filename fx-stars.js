@@ -125,7 +125,9 @@
   let timer = 0;
   function arm() { clearTimeout(timer); const now = clock() - t0, wait = ((0.5 * CYC - (now % CYC)) + CYC) % CYC;
     timer = setTimeout(() => { burst(); setTimeout(arm, 400); }, Math.max(30, wait)); }
-  const again = () => { place(); sync(); arm(); };
+  // when the button is not in the bar (the Menu panel is in use), park the burst canvas so it never widens the page (2026-11-27)
+  const park = () => { if (!inBar()) { cv.style.left = '0px'; cv.style.width = '0px'; cv.width = 0; } };
+  const again = () => { place(); sync(); park(); arm(); };
   addEventListener('resize', again); addEventListener('load', again); document.addEventListener('visibilitychange', () => { if (!document.hidden) again(); });
   const menu = head.querySelector('.menu'); if (menu) menu.addEventListener('click', () => setTimeout(again, 60));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
