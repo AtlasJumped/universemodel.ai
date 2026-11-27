@@ -1428,7 +1428,7 @@ if (typeof document !== 'undefined') (() => {
       '#um-collab a{background:#1F5FD6;color:#fff;border:0}#um-collab button{background:#F5F8FD;color:#0B1B33;border:1.5px solid #CBD6EA}';
     const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
     const d = document.createElement('div'); d.id = 'um-collab'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'um-collab-h');
-    d.innerHTML = '<div class="box"><h2 id="um-collab-h">You have spent 30 minutes on this site.</h2><p>Have we gotten your attention enough for you to consider being a collaborator?</p><div class="row"><a href="collaborators.html">Yes</a><button type="button">No</button></div></div>';
+    d.innerHTML = '<div class="box"><h2 id="um-collab-h">You have spent 30 minutes on this site</h2><p>Have we gotten your attention enough for you to consider being a collaborator?</p><div class="row"><a href="collaborators.html">Yes</a><button type="button">No</button></div></div>';
     const close = () => { d.remove(); document.removeEventListener('keydown', esc); };
     const esc = (e) => { if (e.key === 'Escape') close(); };
     d.querySelector('button').addEventListener('click', close);

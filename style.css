@@ -54,7 +54,7 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid 
 .site-head .brand .lg i{animation:umspin var(--cyc) linear infinite,umgold var(--cyc) linear infinite;will-change:transform}
 @keyframes umspin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
 @keyframes umgold{0%,100%{background-color:#F6C453}5%,95%{background-color:#fff}}
-/* "Get in touch": when the band arrives it lights up, a sheen crosses it, and the words give way to a wink */
+/* "Collaborators" (the .cta button, last in the menu): when the band arrives it lights up, a sheen crosses it, and the words give way to a wink */
 .nav .cta{position:relative}
 .cta-t{display:inline-block}
 .cta-w{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none}

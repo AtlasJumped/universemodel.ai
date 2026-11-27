@@ -10,8 +10,8 @@
   const PAGES = [
     ['index.html', 'Home'], ['about.html', 'About'], ['reality.html', 'Science Today'], ['fixing-exercise.html', 'Exercise Today'],
     ['mental-health.html', 'Mental Health Today'], ['hmr.html', 'The HMR'], ['ui.html', 'Universal Intelligence'],
-    ['health-model.html', 'HMR Holistic Health Model'], ['physics-health.html', 'HMR Physical Health Model'], ['health.html', 'The Perfect Body'],
-    ['protocol.html', 'HMR Fascia Health Protocol'], ['mental-model.html', 'HMR Mental Health Model'], ['math.html', 'HMR Math Paradigm'], ['physics.html', 'HMR Physics Paradigm'],
+    ['health-model.html', 'HMR Holistic Health Model'], ['physics-health.html', 'HMR Physical Health Model'], ['health.html', 'The Ideal Body'],
+    ['protocol.html', 'HMR Connective Tissue Health Protocol'], ['mental-model.html', 'HMR Mental Health Model'], ['math.html', 'HMR Math Paradigm'], ['physics.html', 'HMR Physics Paradigm'],
     ['values.html', 'HMR Values'], ['answers.html', 'The Answers'], ['east-west.html', 'East and West'], ['kids.html', 'Do you have kids?'],
     ['simulation.html', 'Simulation'], ['fun.html', 'For fun'], ['roadmap.html', 'Road Ahead'], ['collaborators.html', 'Collaborators'],
     ['influencers.html', 'Influencers'], ['methods.html', 'Methods'], ['library.html', 'Library']
