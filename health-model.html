@@ -30,6 +30,13 @@
 .hm-pos svg{display:block;width:100%;height:auto;max-height:96px;margin-bottom:6px}
 .hm-pos b{display:block;color:var(--navy);font-size:.92rem}
 @media (max-width:620px){.hm-pos{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.hm-cmp{margin-top:22px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.hm-cmp>div{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.hm-cmp>div:first-child{border-top:0;background:var(--ice);font:700 .78rem/1.2 var(--font);letter-spacing:.05em;text-transform:uppercase;color:var(--navy)}
+.hm-cmp>div>*{padding:11px 14px;margin:0;line-height:1.5}
+.hm-cmp>div>b{color:var(--navy)}
+.hm-cmp>div>p:last-child{background:#F4F8FF}
+@media (max-width:700px){.hm-cmp>div{grid-template-columns:1fr}.hm-cmp>div:first-child{display:none}.hm-cmp>div>*{padding:4px 14px}.hm-cmp>div>b{padding-top:12px}.hm-cmp>div>p:last-child{padding-bottom:12px}.hm-cmp p::before{font:650 .72rem/1 var(--font);letter-spacing:.05em;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:3px}.hm-cmp p:nth-child(2)::before{content:"Today"}.hm-cmp p:nth-child(3)::before{content:"In HMR"}}
 .hm-class{display:grid;gap:14px;margin-top:22px}
 .hm-class .card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.hm-class .card{grid-template-columns:1fr}}
@@ -58,7 +65,7 @@
     <span class="eyebrow">Who does what</span>
     <h2>Most care moves home. The rest goes connective-tissue-first</h2>
     <div class="hm-tier">
-      <div class="card" data-react="happy"><span class="tag">Everyone, every day</span><b class="big">Self-sufficient</b><p>Every person knows how to care for their own connective tissue, as ordinarily as brushing their teeth, and does it daily from childhood. <a href="protocol.html">HMR Connective Tissue Health Protocol →</a></p></div>
+      <div class="card" data-react="happy"><span class="tag">Everyone, every day</span><b class="big">Self-sufficient</b><p>Every person knows how to care for their own connective tissue, as ordinarily as brushing their teeth, and does it daily from childhood, and teaches it to their children. <a href="protocol.html">HMR Connective Tissue Health Protocol →</a></p></div>
       <div class="card" data-react="happy"><span class="tag">The prediction</span><b class="big">About 90%</b><p>HMR predicts that if everyone practiced self-sufficient connective tissue care, about 90% of today's doctor visits would no longer be needed. It is a prediction, stated so that it can be tested, not a finding.</p></div>
       <div class="card" data-react="happy"><span class="tag">When more is needed</span><b class="big">Connective-tissue-first</b><p>The specialists who remain look at the web first: how its tension, density, and gliding have changed, and what that change is pressing on, before reaching for a drug or a scalpel.</p></div>
     </div>
@@ -87,6 +94,27 @@
       <span class="tag">Why it starts with a reference</span>
       <p>Medicine today learns what health is mostly from people who are unwell. HMR starts from the optimized human biotensegrity, defined by physics, and measures every body against it. <a href="health.html">The Ideal Body →</a></p>
     </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Point by point</span><h2>Today's model of care, and HMR's</h2></div><div><p class="lede">Modern medicine sees the body as connected systems and works from symptoms. HMR sees one physical structure and works from the ideal.</p></div></div>
+    <div class="hm-cmp">
+      <div><span>Area</span><span>Today</span><span>In HMR</span></div>
+      <div><b>Where it starts</b><p>A symptom, reported by someone who has never known full health. Tests look for the matching pattern.</p><p>The ideal body, defined by physics. Every body is measured against it, before and after symptoms appear.</p></div>
+      <div><b>How the body is seen</b><p>Connected systems of organs, each with its own specialty: heart, spine, gut, and mind are treated apart.</p><p>One physical structure, a biotensegrity, with connective tissue at the center. A change anywhere is felt everywhere.</p></div>
+      <div><b>Who gives the care</b><p>Mostly professionals, in short visits.</p><p>Mostly the person, every day at home, from the outside in and the inside out. Specialists take the rest, connective tissue first, with referrals and imaging.</p></div>
+      <div><b>How a problem is found</b><p>A described symptom, then tests and scans, most of them taken lying still.</p><p>Watching the body move, and imaging it standing, bending, stretched, on a full inhale, and on a full exhale.</p></div>
+      <div><b>When people are checked</b><p>When something goes wrong.</p><p>At critical points in life, such as puberty, and every one to two years, building a 3D profile of each person's biotensegrity that symptoms can be mapped against over a lifetime.</p></div>
+      <div><b>How disease is named</b><p>By its signs and the organ it shows up in.</p><p>By the physics that produces it: what the person was born with, outside agents, local adhesions from overuse and gravity, compression of what runs through the web, slow creep downstream, and errors in the body's signaling. <a href="physics-health.html">HMR physical health model →</a></p></div>
+      <div><b>The mind</b><p>A separate field, with its own specialists.</p><p>Part of the same person: meditation, recognizing Universal Intelligence and one's role in it, and values and purpose. <a href="mental-model.html">HMR mental health model →</a></p></div>
+      <div><b>The goal</b><p>Fix problems as they appear.</p><p>Prevent them, by keeping the web close to the ideal.</p></div>
+    </div>
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card"><span class="tag">HMR's view</span><h3>Why it would cost less</h3><p>Positional imaging every year or two sounds expensive. HMR expects the opposite: when healthcare is refocused on connective tissue, much of what it pays for today shrinks, from repeat physical therapy to the facilities and tools that treat problems one at a time. The money moves from fixing problems to preventing them, and that makes these protocols inexpensive.</p></div>
+      <div class="card"><span class="tag">A prediction</span><h3>Every person, a profile</h3><p>Over a lifetime, each person builds a record of how their biotensegrity has changed. When a symptom appears, the question is not only what it is, but what changed in the web before it, and when. That is a dataset medicine has never had.</p></div>
     </div>
   </div>
 </section>
