@@ -78,10 +78,13 @@
     var ta = el('textarea', { id: 'dp-note' }); ta.value = r.note || '';
     ta.oninput = function () { var o = ratings[cur] || {}; o.note = ta.value; ratings[cur] = o; save(); };
     panel.appendChild(ta);
-    var cp = el('button', { 'class': 'dp-b', type: 'button', style: 'margin-top:10px' }, 'Copy all ratings'); 
+    var cp = el('button', { 'class': 'dp-b', type: 'button', style: 'margin-top:10px' }, 'Submit'); 
+    function ratingsText() { return 'Design ratings (' + location.pathname + ')\n' + DESIGNS.map(function (d) { var o = ratings[d.id] || {}; return (d.id + 1) + '. ' + d.name + ': ' + (o.rating || 'not rated') + (o.note ? ' | ' + o.note : ''); }).join('\n'); }
+    function hmrSubmit(b, txt) { var D = window.HMRDock; if (!D || !D.submitBox || !b.parentNode) return false; var bx = D.submitBox({ text: txt, kind: 'design ratings' }); b.parentNode.insertBefore(bx, b.nextSibling); b.hidden = true; return true; }   // Submit with my email / Submit anonymously (the shared dock)
     cp.onclick = function () {
-      var t = 'Design ratings (' + location.pathname + ')\n' + DESIGNS.map(function (d) { var o = ratings[d.id] || {}; return (d.id + 1) + '. ' + d.name + ': ' + (o.rating || 'not rated') + (o.note ? ' | ' + o.note : ''); }).join('\n');
-      function done(ok) { cp.textContent = ok ? 'Copied' : 'Copy failed: select the text below'; if (!ok) { var pre = el('textarea', { 'aria-label': 'Ratings text' }); pre.value = t; panel.appendChild(pre); pre.select(); } setTimeout(function () { if (ok) cp.textContent = 'Copy all ratings'; }, 1500); }
+      if (hmrSubmit(cp, ratingsText)) return;
+      var t = ratingsText();
+      function done(ok) { cp.textContent = ok ? 'Copied' : 'Copy failed: select the text below'; if (!ok) { var pre = el('textarea', { 'aria-label': 'Ratings text' }); pre.value = t; panel.appendChild(pre); pre.select(); } setTimeout(function () { if (ok) cp.textContent = 'Submit'; }, 1500); }
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); }); else done(false);
     };
     panel.appendChild(cp);
