@@ -44,6 +44,8 @@
       '</div>' +
       '<div class="lbl"><label for="hmr-welcome-rel">Religion (optional)</label></div>' +
       '<input type="text" id="hmr-welcome-rel" maxlength="80" placeholder="Any, or none" autocomplete="off">' +
+      '<div class="lbl"><label for="hmr-welcome-age">Age (optional)</label></div>' +
+      '<input type="text" inputmode="numeric" id="hmr-welcome-age" maxlength="3" placeholder="Leave empty if you like" autocomplete="off" style="max-width:9em">' +
       '<div class="lbl">New ideas</div>' +
       '<p style="margin:0 0 8px">I am generally receptive to new ideas about reality.</p>' +
       '<div class="opts" data-q="open">' +
@@ -53,7 +55,7 @@
       '<div class="row" style="justify-content:flex-end">' +
         '<button type="button" class="go">Enter the site</button>' +
       '</div>' +
-      '<p class="note">If you answer, we receive your answers without your name or email. Skipping sends nothing.</p>' +
+      '<p class="note">If you answer, we receive your answers without your name or email. Your age, if you give it, stays in this browser and is not sent. Skipping sends nothing.</p>' +
     '</div>';
 
   function show() {
@@ -75,6 +77,8 @@
     if (e.target.closest(".go")) {
       var r = w.querySelector("#hmr-welcome-rel").value.trim();
       if (r) ans.religion = r;
+      var ag = parseInt(w.querySelector("#hmr-welcome-age").value, 10);
+      if (ag > 0 && ag < 130) ans.age = ag; /* optional; kept in this browser only, never sent (snap below leaves it out) */
       var has = !!(ans.power || ans.open || ans.religion);
       var snap = { power: ans.power, religion: ans.religion, open: ans.open };
       close(ans);
