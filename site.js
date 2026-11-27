@@ -19,6 +19,7 @@
     const brand = head.querySelector('.brand'), nr = nav.getBoundingClientRect();
     const over = head.scrollWidth > head.clientWidth + 1 || nr.height > 56 || (brand && nr.left - brand.getBoundingClientRect().right < 12);
     de.classList.toggle('navfold', over);
+    if (/navdebug/.test(location.hash)) document.title = 'NAV sw' + head.scrollWidth + ' cw' + head.clientWidth + ' h' + Math.round(nr.height) + ' gap' + Math.round(brand ? nr.left - brand.getBoundingClientRect().right : -1) + ' iw' + innerWidth + ' over' + over;
     if (was && !over && nav.classList.contains('open')) setMenu(false);
   };
   window.umFitHead = fitHead;
