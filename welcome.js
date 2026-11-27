@@ -35,7 +35,7 @@
     '<div class="box">' +
       '<h2 id="hmr-welcome-t">Tell us a little about yourself</h2>' +
       '<p>Before you start, where do you stand? There are no wrong answers.</p>' +
-      '<button type="button" class="skip" style="padding-top:0">No thanks, just continue to the site</button>' +
+      '<button type="button" class="skip" style="padding-top:0">No, just continue to the site</button>' +
       '<div class="lbl">A higher power</div>' +
       '<div class="opts" data-q="power">' +
         '<button type="button" class="opt" aria-pressed="false" data-v="believe">I believe in a higher power</button>' +
@@ -45,9 +45,10 @@
       '<div class="lbl"><label for="hmr-welcome-rel">Religion (optional)</label></div>' +
       '<input type="text" id="hmr-welcome-rel" maxlength="80" placeholder="Any, or none" autocomplete="off">' +
       '<div class="lbl">New ideas</div>' +
+      '<p style="margin:0 0 8px">I am generally receptive to new ideas about reality.</p>' +
       '<div class="opts" data-q="open">' +
-        '<button type="button" class="opt" aria-pressed="false" data-v="yes">I am generally receptive to new ideas about reality</button>' +
-        '<button type="button" class="opt" aria-pressed="false" data-v="no">Not really</button>' +
+        '<button type="button" class="opt" aria-pressed="false" data-v="yes">Yes</button>' +
+        '<button type="button" class="opt" aria-pressed="false" data-v="no">No</button>' +
       '</div>' +
       '<div class="row" style="justify-content:flex-end">' +
         '<button type="button" class="go">Enter the site</button>' +
