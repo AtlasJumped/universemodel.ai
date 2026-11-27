@@ -468,8 +468,9 @@ html.search-open{overflow:hidden}
 .nav .grpbtn{white-space:nowrap}
 @media (min-width:1181px) and (max-width:1439px){
   .site-head .wrap{gap:12px;padding-left:clamp(16px,2vw,56px);padding-right:clamp(16px,2vw,56px)}
-  .nav a,.nav .grpbtn{padding:8px 7px;font-size:.86rem}
+  .nav a,.nav .grpbtn{padding:8px 6px;font-size:.84rem}
   .nav .cta{margin-left:4px}
+  .site-head .brand{margin-right:14px}
   .site-head .hlogin{padding:0 11px}
 }
 html.navfold .site-head .menu{display:block;margin-left:auto}
@@ -482,7 +483,6 @@ html.navfold .nav .grpbtn{width:100%;padding:14px 12px 2px;font-size:.8rem;font-
 html.navfold .nav .grpbtn span{display:none}
 html.navfold .site-head .nav .grp.on>.grpbtn{--hb:transparent}
 html.navfold .nav .drop,html.navfold .nav .grp:hover .drop,html.navfold .nav .grp:focus-within .drop,html.navfold .nav .grp.open .drop{display:flex;position:static;border:0;box-shadow:none;padding:0 0 4px 10px;min-width:0}
-html.navfold .site-head .hsearch{display:none}
 html.navfold .nav .nsearch{display:flex;align-items:center;gap:10px;width:100%;padding:12px;margin:0 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--mist);color:var(--soft);font:500 .94rem/1 var(--font);cursor:pointer;text-align:left}
 /* nothing in the top bar may widen the page (sparkle canvases are sized by script) */
 .site-head{overflow-x:clip}
