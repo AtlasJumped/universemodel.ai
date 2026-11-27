@@ -1445,3 +1445,104 @@ if (typeof document !== 'undefined') (() => {
     if (t >= LIMIT) { clearInterval(iv); ask(); }
   }, 5000);
 })();
+
+/* ---------- site search (M-0303) ----------
+   A Search button in the header (wide screens) and at the top of the menu panel (small screens).
+   On first open it fetches every page linked from the menu and footer, and searches their text in the browser:
+   no index file to keep up to date, no service, nothing sent anywhere. */
+(() => {
+  const wrap = document.querySelector('.site-head .wrap'), nav = document.getElementById('nav');
+  if (!wrap || !nav) return;
+  const ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+  const head = document.createElement('button'); head.type = 'button'; head.className = 'hsearch'; head.setAttribute('aria-label', 'Search the site'); head.innerHTML = ICON;
+  wrap.appendChild(head);
+  const inMenu = document.createElement('button'); inMenu.type = 'button'; inMenu.className = 'nsearch'; inMenu.innerHTML = ICON + '<span>Search the site</span>';
+  nav.insertBefore(inMenu, nav.firstChild);
+
+  let pages = null, loading = null, opener = null;
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const urls = () => {
+    const seen = new Set(['index.html']), out = ['index.html'];
+    document.querySelectorAll('#nav a[href], .site-foot a[href]').forEach(a => {
+      const h = (a.getAttribute('href') || '').split('#')[0];
+      if (/^[\w-]+\.html$/.test(h) && !seen.has(h)) { seen.add(h); out.push(h); }
+    });
+    return out;
+  };
+  const load = () => loading || (loading = Promise.all(urls().map(u => fetch(u).then(r => r.ok ? r.text() : '').catch(() => '').then(html => {
+    if (!html) return null;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,style,noscript,svg,canvas,header,footer,nav,.nextup').forEach(n => n.remove());
+    const main = doc.querySelector('main') || doc.body;
+    const heads = [...main.querySelectorAll('h1,h2,h3')].map(h => {
+      const sec = h.closest('[id]'); return { t: h.textContent.replace(/\s+/g, ' ').trim(), id: h.id || (sec && sec !== main ? sec.id : '') };
+    }).filter(h => h.t);
+    const title = (doc.title || u).replace(/\s*[|—–-]\s*Universe Model.*$/i, '').trim();
+    return { u, title, heads, text: (main.textContent || '').replace(/\s+/g, ' ').trim() };
+  })))).then(list => (pages = list.filter(Boolean)));
+
+  const box = document.createElement('div'); box.id = 'um-search'; box.hidden = true;
+  box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Search the site');
+  box.innerHTML = '<div class="sbox"><div class="srow"><label for="um-q" class="vh">Search the site</label>' +
+    '<input id="um-q" type="search" autocomplete="off" spellcheck="false" placeholder="e.g. tensegrity, puberty, pulleys">' +
+    '<button type="button" class="sclose">Close</button></div><p class="snote" aria-live="polite"></p><ol class="sres"></ol></div>';
+  document.body.appendChild(box);
+  const q = box.querySelector('#um-q'), note = box.querySelector('.snote'), res = box.querySelector('.sres');
+
+  const run = () => {
+    const raw = q.value.trim().toLowerCase(), terms = raw.split(/\s+/).filter(Boolean);
+    res.innerHTML = '';
+    if (!terms.length) { note.textContent = ''; return; }
+    if (!pages) { note.textContent = 'Loading pages…'; load().then(run); return; }
+    const hits = [];
+    pages.forEach(p => {
+      const tl = p.title.toLowerCase(), xl = p.text.toLowerCase();
+      if (!terms.every(t => tl.includes(t) || xl.includes(t))) return;
+      let score = 0;
+      terms.forEach(t => { if (tl.includes(t)) score += 20; score += Math.min(10, xl.split(t).length - 1); });
+      if (tl.includes(raw)) score += 30;
+      if (xl.includes(raw)) score += 10;
+      const h = p.heads.find(h => terms.some(t => h.t.toLowerCase().includes(t)));
+      if (h) score += 8;
+      const i = xl.indexOf(xl.includes(raw) ? raw : terms[0]), a = Math.max(0, i - 70);
+      let snip = p.text.slice(a, i + 130); if (a > 0) snip = '…' + snip.replace(/^\S*\s/, ''); if (i + 130 < p.text.length) snip += '…';
+      hits.push({ p, h, snip, score });
+    });
+    hits.sort((x, y) => y.score - x.score);
+    note.textContent = hits.length ? hits.length + (hits.length === 1 ? ' page matches' : ' pages match') : 'No page matches “' + q.value.trim() + '”. Try fewer or shorter words.';
+    const re = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+    const mark = s => esc(s).replace(re, '<mark>$1</mark>');
+    res.innerHTML = hits.slice(0, 20).map(({ p, h, snip }) =>
+      '<li><a href="' + esc(p.u + (h && h.id ? '#' + h.id : '')) + '"><b>' + mark(p.title) + '</b>' +
+      (h ? '<span class="sh">' + mark(h.t) + '</span>' : '') + '<span class="ss">' + mark(snip) + '</span></a></li>').join('');
+  };
+  let tm = 0; q.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(run, 120); });
+
+  const open = from => {
+    opener = from || document.activeElement;
+    if (nav.classList.contains('open')) { const mb = document.querySelector('.menu'); if (mb) mb.click(); }
+    box.hidden = false; document.documentElement.classList.add('search-open');
+    q.focus(); q.select(); load();
+  };
+  const close = () => {
+    box.hidden = true; document.documentElement.classList.remove('search-open');
+    if (opener && document.contains(opener) && opener.offsetParent) opener.focus(); else head.focus();
+  };
+  head.addEventListener('click', () => open(head));
+  inMenu.addEventListener('click', () => open(head));
+  box.querySelector('.sclose').addEventListener('click', close);
+  box.addEventListener('click', e => { if (e.target === box) close(); if (e.target.closest('.sres a')) box.hidden = true, document.documentElement.classList.remove('search-open'); });
+  document.addEventListener('keydown', e => {
+    if (!box.hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key === 'Tab') {
+        const f = [...box.querySelectorAll('input,button,a[href]')], first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      return;
+    }
+    const t = e.target, typing = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+    if ((e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey))) { e.preventDefault(); open(head); }
+  });
+})();
